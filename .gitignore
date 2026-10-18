@@ -1,0 +1,26 @@
+# deps & builds
+node_modules/
+dist/
+.astro/
+.turbo/
+.wrangler/
+coverage/
+*.tsbuildinfo
+
+# env & secrets (repo is public)
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# local tooling
+.claude/settings.local.json
+scripts/.cache/
