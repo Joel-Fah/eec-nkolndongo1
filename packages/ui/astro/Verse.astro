@@ -1,9 +1,9 @@
 ---
 /**
  * Verse — our way to show a quotation, a verse, a testimony.
- * A soft rounded panel framed all the way round by a dotted ornament border (the ornament's dots), with a
- * wave on the bottom edge; the gold opening mark sits inside, top-left; the words in Fraunces italic; the
- * reference in a small rounded tag. A complete frame — never a side rule.
+ * A page from the hymn book: a soft gold sheet with a turned corner (the page-turn of our transitions) and
+ * the gold bookmark ribbon from our illustrations hanging from its top edge, carrying the opening mark.
+ * Words in Fraunces italic; the reference in a small rounded tag. No frame, no side rule.
  */
 interface Props {
   /** Opening mark: « for French, “ for English. */
@@ -16,64 +16,54 @@ const { mark = '«', cite, class: className } = Astro.props
 ---
 
 <figure class:list={['eec-verse', className]}>
-  <svg class="eec-verse-frame" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" rx="26" /></svg>
-  <svg class="eec-verse-wave" viewBox="0 0 132 16" width="132" height="16" fill="none" aria-hidden="true" focusable="false">
-    <circle cx="6" cy="8" r="2.5" fill="currentColor" />
-    <path d="M18 8c9-9 16 9 25 0s16 9 25 0 16 9 25 0 12 4 21 0" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-    <circle cx="126" cy="8" r="2.5" fill="currentColor" />
-  </svg>
-  <span class="eec-verse-mark" aria-hidden="true">{mark}</span>
+  <span class="eec-verse-ribbon" aria-hidden="true">{mark}</span>
   <blockquote class="eec-verse-text"><slot /></blockquote>
   {cite && <figcaption class="eec-verse-ref">{cite}</figcaption>}
 </figure>
 
 <style is:global>
   .eec-verse {
+    --fold: 2.25rem;
     position: relative;
     display: grid;
-    gap: 0.75rem;
+    gap: 1rem;
     justify-items: start;
-    padding: 1.5rem 2rem 1.75rem;
+    padding: 1.75rem 2rem 1.75rem 6rem;
     border-radius: var(--radius-xl);
+    border-start-end-radius: 0;
     background: var(--gold-soft);
     color: var(--ink);
+    clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
   }
-  .eec-verse-frame {
+  /* The turned corner: the back of the page, in a deeper gold. */
+  .eec-verse::after {
+    content: "";
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    pointer-events: none;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    width: var(--fold);
+    height: var(--fold);
+    background: color-mix(in oklab, var(--gold) 55%, var(--gold-soft));
+    border-end-start-radius: var(--radius-sm);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
   }
-  .eec-verse-frame rect {
-    width: calc(100% - 3px);
-    height: calc(100% - 3px);
-    fill: none;
-    stroke: var(--gold);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-dasharray: 0.1 10;
-  }
-  .eec-verse-wave {
+  /* The bookmark ribbon, with a swallow-tail notch, hanging from the top edge. */
+  .eec-verse-ribbon {
     position: absolute;
-    inset-block-end: -8px;
-    inset-inline-start: 50%;
-    translate: -50% 0;
-    padding-inline: 0.5rem;
-    background: var(--bg);
-    color: var(--gold);
-    box-sizing: content-box;
-    pointer-events: none;
-  }
-  .eec-verse-mark {
+    inset-block-start: 0;
+    inset-inline-start: 1.5rem;
+    display: grid;
+    place-items: start center;
+    width: 3rem;
+    height: 5rem;
+    padding-block-start: 0.5rem;
+    background: var(--gold);
+    color: var(--on-gold);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 0.9rem), 0 100%);
     font-family: var(--font-display);
-    font-size: 4.5rem;
+    font-size: 2.75rem;
     font-weight: 600;
-    line-height: 0.7;
-    height: 2.25rem;
-    color: var(--gold);
-    pointer-events: none;
+    line-height: 1;
     user-select: none;
   }
   .eec-verse-text {
@@ -96,5 +86,14 @@ const { mark = '«', cite, class: className } = Astro.props
     font-size: var(--text-sm);
     font-weight: 600;
     letter-spacing: 0.01em;
+  }
+  @media (max-width: 30rem) {
+    .eec-verse {
+      padding-inline-start: 5rem;
+    }
+    .eec-verse-ribbon {
+      inset-inline-start: 1rem;
+      width: 2.75rem;
+    }
   }
 </style>

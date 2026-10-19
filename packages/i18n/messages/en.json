@@ -444,8 +444,8 @@
       },
       "verse": {
         "name": "Verse",
-        "desc": "Our way to quote. A soft rounded panel; the big gold opening mark straddles its top edge (half in, half out); wavy ornaments run along two of its sides; the reference is a tag.",
-        "use": "<Verse mark=\"“\" cite=\"Matthew 11:28\">…</Verse>. No side rule, ever. One verse per screen at most.",
+        "desc": "Our way to quote: a page from the hymn book, corner turned (the gesture of our page transitions), with the gold bookmark from our illustrations hanging from the edge and carrying the opening mark. No frame, no rule.",
+        "use": "<Verse mark=\"“\" cite=\"Matthew 11:28\">…</Verse>. One verse per screen at most. The bookmark always carries the opening mark; the reference goes in the tag.",
         "a11y": "blockquote + figcaption; the decorative mark is hidden. Text and reference contrast verified.",
         "demo": "“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”",
         "demo_cite": "Matthew 11:28"

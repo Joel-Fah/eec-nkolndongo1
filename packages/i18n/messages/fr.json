@@ -444,8 +444,8 @@
       },
       "verse": {
         "name": "Verset",
-        "desc": "Notre façon de citer. Un panneau doux et arrondi ; le grand guillemet doré chevauche son bord supérieur (à moitié dedans, à moitié dehors) ; des ornements ondulés longent deux de ses côtés ; la référence est une étiquette.",
-        "use": "<Verse mark=\"«\" cite=\"Matthieu 11 : 28\">…</Verse>. Pas de filet latéral, jamais. Un verset par écran au plus.",
+        "desc": "Notre façon de citer : une page du recueil de cantiques, au coin corné (le geste de nos transitions de page), avec le signet doré de nos illustrations qui pend du bord et porte le guillemet. Pas de cadre, pas de filet.",
+        "use": "<Verse mark=\"«\" cite=\"Matthieu 11 : 28\">…</Verse>. Un verset par écran au plus. Le signet porte toujours le guillemet ; la référence va en étiquette.",
         "a11y": "blockquote + figcaption ; le guillemet décoratif est masqué. Contraste du texte et de la référence vérifié.",
         "demo": "« Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos. »",
         "demo_cite": "Matthieu 11 : 28"

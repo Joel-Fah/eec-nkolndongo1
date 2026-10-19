@@ -29,11 +29,11 @@ def line(text, size, x, baseline, tracking=0):
     return out
 
 TEXT_X = 930
-eec = line('EEC', 250, TEXT_X, 440, 14)
-name = line('Paroisse de Nkolndongo 1', 100, TEXT_X, 620, 1)
+eec = line('EEC', 118, TEXT_X, 390, 10)
+name = line('Paroisse de Nkolndongo 1', 168, TEXT_X, 590, 1)
 paths = [sail] + letters + [cross]
 glyphs = eec + name
-svg = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 120 2320 700" role="img" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><title>EEC Nkolndongo 1</title>']
+svg = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 120 3000 700" role="img" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><title>EEC Nkolndongo 1</title>']
 svg.append('<g stroke-width="9">' + ''.join(f'<path class="ln" pathLength="1" style="--d:{i*0.12:.2f}" d="{d}"/>' for i, d in enumerate(paths)) + '</g>')
 base = len(paths) * 0.12
 svg.append(''.join(f'<path class="ln" pathLength="1" style="--d:{base + i*0.045:.3f}" d="{d}"/>' for i, d in enumerate(glyphs)))
