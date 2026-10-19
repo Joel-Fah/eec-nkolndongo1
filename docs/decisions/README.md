@@ -19,4 +19,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0012 | Frugal CI/CD | Accepted |
 | 0013 | Biome for lint and format | Accepted |
 | 0014 | Paraglide JS for i18n messages | Accepted |
-| 0015 | Brand and type (logo, lockups, Switzer + General Sans, colours) | Accepted |
+| 0015 | Brand and type (logo, lockups, Fraunces + Switzer, colours) | Accepted |

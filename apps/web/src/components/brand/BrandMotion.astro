@@ -1,0 +1,83 @@
+---
+import { motion, radius } from '@eec/ui/tokens'
+import { useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const t = useT(Astro.currentLocale)
+const lanes = [
+  { key: 'brand.shape.micro', duration: 'var(--duration-micro)', ms: motion.duration.micro.normal },
+  { key: 'brand.shape.ui', duration: 'var(--duration-ui)', ms: motion.duration.ui.normal },
+  { key: 'brand.shape.story', duration: 'var(--duration-story)', ms: motion.duration.story.normal },
+] as const
+---
+
+<Section id="motion" title={t('brand.motion.title')} lead={t('brand.motion.lead')}>
+  <div class="motion-demo grid gap-5">
+    <h3 class="text-xl">{t('brand.shape.motion')}</h3>
+    <div class="flex flex-wrap gap-3">
+      <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md bg-primary px-5 font-medium text-on-primary">
+        <input type="checkbox" class="play sr-only" />
+        {t('brand.shape.replay')}
+      </label>
+      <label class="inline-flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-3 font-medium">
+        <input type="checkbox" class="reduce size-5 accent-[var(--primary)]" />
+        {t('brand.shape.reduce')}
+      </label>
+    </div>
+    <div class="grid gap-3">
+      {
+        lanes.map((lane) => (
+          <div class="lane grid gap-1">
+            <span class="text-sm text-ink-muted tabular-nums">{t(lane.key, { ms: String(lane.ms) })}</span>
+            <div class="track rounded-md bg-surface-2 p-1.5">
+              <span class="dot block size-8 rounded-sm bg-season" style={`--d:${lane.duration}`} />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <p class="max-w-[62ch] text-sm text-ink-muted">{t('brand.shape.reduced_note')}</p>
+  </div>
+  <div class="grid gap-3">
+    <h3 class="text-xl">{t('brand.motion.rules_title')}</h3>
+    <ul class="grid max-w-[72ch] list-disc gap-2 ps-6">
+      {(['brand.motion.rule1', 'brand.motion.rule2', 'brand.motion.rule3', 'brand.motion.rule4'] as const).map((key) => <li>{t(key)}</li>)}
+    </ul>
+  </div>
+</Section>
+
+<style>
+  .motion-demo {
+    --travel: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .motion-demo {
+      --travel: 0;
+    }
+  }
+  .motion-demo:has(.reduce:checked) {
+    --travel: 0;
+    --duration-micro: 100ms;
+    --duration-ui: 120ms;
+    --duration-story: 150ms;
+  }
+  .track {
+    container-type: inline-size;
+  }
+  .dot {
+    transition:
+      transform var(--d) var(--ease-out),
+      opacity var(--d) var(--ease-out);
+  }
+  .motion-demo:has(.play:checked) .dot {
+    transform: translateX(calc(var(--travel) * (100cqw - 2rem)));
+    opacity: calc(1 - (1 - var(--travel)) * 0.65);
+  }
+  .motion-demo label:has(.play:focus-visible),
+  .motion-demo label:has(.reduce:focus-visible) {
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--gold),
+      0 0 0 6px var(--focus-outer);
+  }
+</style>

@@ -1,7 +1,7 @@
 /*
  * Self-hosted fonts — no third-party requests.
- * Switzer and General Sans: Fontshare (ITF Free Font License) — fetched by `pnpm fonts:fetch`,
- * served unmodified, never committed (decision 0015). Preload: Switzer (layout).
+ * Switzer: Fontshare (ITF Free Font License) — fetched by `pnpm fonts:fetch`, served unmodified, never
+ * committed (decision 0015). Fraunces: SIL OFL 1.1, subset and committed. Preload: Switzer (layout).
  */
 
 @font-face {
@@ -20,16 +20,16 @@
 }
 
 @font-face {
-  font-family: "General Sans";
-  src: url("../fonts/fontshare/general-sans/GeneralSans-Variable.woff2") format("woff2");
-  font-weight: 200 700;
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces/Fraunces-Display.woff2") format("woff2");
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "General Sans";
-  src: url("../fonts/fontshare/general-sans/GeneralSans-VariableItalic.woff2") format("woff2");
-  font-weight: 200 700;
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces/Fraunces-DisplayItalic.woff2") format("woff2");
+  font-weight: 300 700;
   font-style: italic;
   font-display: swap;
 }
@@ -52,18 +52,18 @@
   line-gap-override: 0%;
 }
 @font-face {
-  font-family: "General Sans Fallback";
-  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
-  size-adjust: 114.5%;
-  ascent-override: 88.2%;
-  descent-override: 21%;
+  font-family: "Fraunces Fallback";
+  src: local("Georgia");
+  size-adjust: 106.1%;
+  ascent-override: 92.2%;
+  descent-override: 24%;
   line-gap-override: 0%;
 }
 @font-face {
-  font-family: "General Sans Fallback Android";
-  src: local("Roboto"), local("Roboto-Regular");
-  size-adjust: 112.6%;
-  ascent-override: 89.7%;
-  descent-override: 21.3%;
+  font-family: "Fraunces Fallback Android";
+  src: local("Noto Serif"), local("NotoSerif-Regular");
+  size-adjust: 96.5%;
+  ascent-override: 101.3%;
+  descent-override: 26.4%;
   line-gap-override: 0%;
 }

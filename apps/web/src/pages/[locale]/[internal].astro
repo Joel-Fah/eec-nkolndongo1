@@ -1,21 +1,27 @@
 ---
-/**
- * Internal pages (noindex, excluded from the sitemap): the brand board (and later the UI gallery).
- * Astro ignores files starting with "_", so these paths come from getStaticPaths.
- */
 import { locales } from '@eec/i18n'
+/**
+ * Internal pages (noindex, excluded from the sitemap, not linked): the living brand guidelines and
+ * design-system documentation. Astro ignores files starting with "_", so these paths come from
+ * getStaticPaths. Everything new in the design system is documented here.
+ */
 import Mark from '@eec/ui/astro/Mark.astro'
 import BrandColour from '../../components/brand/BrandColour.astro'
+import BrandComponents from '../../components/brand/BrandComponents.astro'
 import BrandIcons from '../../components/brand/BrandIcons.astro'
+import BrandIdentity from '../../components/brand/BrandIdentity.astro'
 import BrandLogo from '../../components/brand/BrandLogo.astro'
+import BrandMotion from '../../components/brand/BrandMotion.astro'
+import BrandRules from '../../components/brand/BrandRules.astro'
 import BrandShape from '../../components/brand/BrandShape.astro'
 import BrandType from '../../components/brand/BrandType.astro'
+import BrandVoice from '../../components/brand/BrandVoice.astro'
 import ThemeToggle from '../../components/ThemeToggle.astro'
 import Base from '../../layouts/Base.astro'
 import { localeOf, useT } from '../../lib/i18n'
 
 export function getStaticPaths() {
-  return locales.flatMap((locale) => [{ params: { locale, internal: '_brand' } }])
+  return locales.map((locale) => ({ params: { locale, internal: '_brand' } }))
 }
 
 const locale = localeOf(Astro.currentLocale)
@@ -23,21 +29,26 @@ const t = useT(locale)
 const other = locale === 'fr' ? 'en' : 'fr'
 const alternates = Object.fromEntries(locales.map((l) => [l, `/${l}/_brand/`]))
 const toc = [
-  ['logo', 'brand.logo.title'],
-  ['colour', 'brand.colour.title'],
-  ['type', 'brand.type.title'],
-  ['shape', 'brand.shape.title'],
-  ['icons', 'brand.icons.title'],
+  ['identity', 'brand.nav.identity'],
+  ['voice', 'brand.nav.voice'],
+  ['logo', 'brand.nav.logo'],
+  ['colour', 'brand.nav.colour'],
+  ['type', 'brand.nav.type'],
+  ['shape', 'brand.nav.shape'],
+  ['motion', 'brand.nav.motion'],
+  ['icons', 'brand.nav.icons'],
+  ['components', 'brand.nav.components'],
+  ['rules', 'brand.nav.rules'],
 ] as const
 ---
 
 <Base title={t('brand.title')} noindex alternates={alternates}>
-  <header class="sticky top-0 z-10 border-b border-line bg-bg/90 backdrop-blur">
-    <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 md:px-8">
+  <header class="sticky top-0 z-20 bg-bg/90 shadow-1 backdrop-blur">
+    <div class="mx-auto flex max-w-[88rem] items-center gap-3 px-4 py-2 md:px-8">
       <Mark variant="mark" class="h-9 w-auto" />
       <p class="me-auto font-display text-lg leading-tight">
         {t('brand.title')}
-        <span class="block font-sans text-xs text-ink-muted">{t('brand.status')}</span>
+        <span class="block font-sans text-xs text-ink-muted">{t('brand.page.status')}</span>
       </p>
       <a
         href={`/${other}/_brand/`}
@@ -52,34 +63,54 @@ const toc = [
     </div>
   </header>
 
-  <main id="main" class="mx-auto max-w-7xl px-4 pb-24 md:px-8">
-    <div class="grid gap-4 py-12 md:py-16">
-      <p class="inline-flex w-fit items-center gap-2 rounded-xs bg-gold-soft px-2 py-0.5 text-xs font-semibold text-gold-ink">
-        {t('common.noindex_note')}
-      </p>
-      <h1 class="text-4xl">{t('brand.title')}</h1>
-      <p class="max-w-[62ch] text-lg text-ink-muted">{t('brand.intro')}</p>
-      <nav aria-label={t('brand.toc')} class="mt-2">
-        <ul class="flex flex-wrap gap-2" role="list">
-          {
-            toc.map(([id, key]) => (
-              <li>
-                <a href={`#${id}`} class="inline-flex min-h-11 items-center rounded-sm border border-line px-4 text-sm font-medium hover:bg-surface-2">
-                  {t(key)}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </div>
+  <div class="mx-auto grid max-w-[88rem] gap-10 px-4 md:px-8 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <nav aria-label={t('brand.toc')} class="hidden lg:block">
+      <ul class="sticky top-24 grid gap-1 rounded-xl bg-surface p-3 shadow-1" role="list">
+        {
+          toc.map(([id, key]) => (
+            <li>
+              <a href={`#${id}`} class="flex min-h-11 items-center rounded-md px-3 text-sm font-medium hover:bg-surface-2">
+                {t(key)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
 
-    <BrandLogo />
-    <BrandColour />
-    <BrandType />
-    <BrandShape />
-    <BrandIcons />
-  </main>
+    <main id="main" class="min-w-0 pb-24">
+      <div class="grid gap-4 py-12 md:py-16">
+        <p class="w-fit rounded-xs bg-gold-soft px-2 py-0.5 text-xs font-semibold text-gold-ink">{t('common.noindex_note')}</p>
+        <h1 class="text-4xl">{t('brand.title')}</h1>
+        <p class="max-w-[62ch] text-lg text-ink-muted">{t('brand.page.intro')}</p>
+        <p class="max-w-[62ch] text-sm text-ink-muted">{t('brand.page.private_note')}</p>
+        <nav aria-label={t('brand.toc')} class="lg:hidden">
+          <ul class="flex flex-wrap gap-2" role="list">
+            {
+              toc.map(([id, key]) => (
+                <li>
+                  <a href={`#${id}`} class="inline-flex min-h-11 items-center rounded-sm bg-surface px-4 text-sm font-medium shadow-1">
+                    {t(key)}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+
+      <BrandIdentity />
+      <BrandVoice />
+      <BrandLogo />
+      <BrandColour />
+      <BrandType />
+      <BrandShape />
+      <BrandMotion />
+      <BrandIcons />
+      <BrandComponents />
+      <BrandRules />
+    </main>
+  </div>
 </Base>
 
 <style is:global>

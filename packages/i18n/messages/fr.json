@@ -84,7 +84,14 @@
       "lockup_long": "Long",
       "icons": "Favicons et icônes d’application",
       "lockup_auto": "Adaptatif",
-      "lockup_auto_lead": "Une seule composition choisit court ou long selon la largeur disponible (à partir de 22 rem)."
+      "lockup_auto_lead": "Une seule composition choisit court ou long selon la largeur disponible (à partir de 22 rem).",
+      "usage_title": "Bon et mauvais usage",
+      "do1": "Utiliser les fichiers de packages/ui/brand, sans les modifier.",
+      "do2": "Laisser la zone de protection autour du logo.",
+      "do3": "Sur fond sombre : halo crème (B) ou traits crème (C).",
+      "dont1": "Déformer, pivoter, recolorer ou redessiner le logo.",
+      "dont2": "Poser le logo sur une photo chargée ou un fond vert.",
+      "dont3": "Réécrire le nom de la paroisse dans une autre police que celle des logotypes."
     },
     "colour": {
       "title": "Couleurs",
@@ -116,8 +123,8 @@
     },
     "type": {
       "title": "Typographie",
-      "lead": "Switzer pour le texte et l’interface, General Sans pour les titres : deux sans-serif, l’une sobre et l’autre plus chaleureuse.",
-      "pairing": "Switzer + General Sans",
+      "lead": "Fraunces pour les titres, Switzer pour le texte et l’interface : la chaleur d’un titre doux, le calme d’une lecture facile.",
+      "pairing": "Fraunces + Switzer",
       "weight": "Poids des fichiers : {size}",
       "sample_label": "Exemple typographique, pas une information sur la paroisse.",
       "h1": "Bienvenue à la maison",
@@ -134,7 +141,12 @@
       "numbers": "Dates et montants",
       "scale": "Échelle typographique",
       "scale_base": "Texte courant, 17 à 18 px",
-      "scale_xs": "Étiquettes"
+      "scale_xs": "Étiquettes",
+      "rules_title": "Règles typographiques",
+      "rule1": "Titres en Fraunces (graisse 400 à 600), texte et interface en Switzer.",
+      "rule2": "Corps de texte 17 à 18 px, interligne 1,6 ; pas de texte courant en dessous de 14,5 px.",
+      "rule3": "Chiffres alignés (tabular-nums) pour les heures, dates et montants.",
+      "rule4": "Les titres s’équilibrent (text-wrap: balance), les paragraphes évitent les veuves (pretty)."
     },
     "shape": {
       "title": "Formes, ombres et mouvement",
@@ -156,7 +168,12 @@
       "story": "Récit · {ms} ms",
       "replay": "Rejouer",
       "reduce": "Simuler le mouvement réduit",
-      "reduced_note": "Mouvement réduit : plus de déplacement ni de défilement animé, seulement des fondus courts (≤ 150 ms)."
+      "reduced_note": "Mouvement réduit : plus de déplacement ni de défilement animé, seulement des fondus courts (≤ 150 ms).",
+      "rules_title": "Règles de forme",
+      "rule1": "Arrondis standard (6, 10, 14, 20, 28 px) ; jamais en pilule, jamais en squircle.",
+      "rule2": "Jamais de bordure d’un seul côté. On sépare avec de l’espace, une teinte, un cadre complet ou l’ornement.",
+      "rule3": "Rayons concentriques : rayon intérieur = rayon extérieur − marge.",
+      "rule4": "Cibles tactiles d’au moins 44 × 44 px ; anneau de focus visible partout."
     },
     "icons": {
       "title": "Icônes et illustration",
@@ -166,6 +183,198 @@
       "light": "Clair",
       "dark": "Sombre",
       "size": "{size} gzippé"
+    },
+    "page": {
+      "status": "Guide vivant — interne",
+      "intro": "Ici vivent notre identité et notre système de design : qui nous sommes, comment nous parlons, comment nous apparaissons, et chaque composant, animation et transition du site. Tout ce qui s’ajoute au site s’ajoute ici.",
+      "private_note": "Page interne, non indexée et sans lien depuis le site. L’accès sera réservé aux équipes en phase 02."
+    },
+    "nav": {
+      "identity": "Identité",
+      "voice": "Voix et ton",
+      "logo": "Logo",
+      "colour": "Couleurs",
+      "type": "Typographie",
+      "shape": "Formes et ombres",
+      "motion": "Mouvement",
+      "icons": "Icônes",
+      "illustration": "Illustration",
+      "components": "Composants",
+      "rules": "Règles et entretien"
+    },
+    "identity": {
+      "title": "Notre identité",
+      "lead": "Ce guide dit qui nous sommes et comment nous voulons être reconnus. Il est écrit à la première personne du pluriel : cette maison appartient à tous ceux qui la fréquentent, et la voix d’une paroisse n’est jamais celle d’une agence.",
+      "draft": "Texte proposé, à relire par le Conseil paroissial avant publication. Il décrit une intention de marque, pas des faits sur la paroisse.",
+      "essence_title": "Notre essence",
+      "essence": "Une paroisse, ce sont d’abord des personnes qui se retrouvent. Notre image doit donner envie d’entrer, de s’asseoir, de rester. Elle ne montre pas un bâtiment : elle invite un peuple en marche.",
+      "signature_title": "Pistes de signature",
+      "signature": "Venez, il y a de la place. · Une maison ouverte. · [À VALIDER : phrase retenue par le Conseil]",
+      "pillars_title": "Trois piliers",
+      "p1_name": "Communauté",
+      "p1": "Nous avançons ensemble. Chaque visage compte, chaque âge a sa place. Nos images montrent des mains, des gestes, des rassemblements — jamais un individu mis en scène.",
+      "p2_name": "Mouvement",
+      "p2": "Nous ne sommes pas figés : nous marchons vers Dieu, vers les autres, vers demain. Le site respire, change avec les saisons de l’année liturgique, et ne se fige jamais en vitrine.",
+      "p3_name": "Invitation",
+      "p3": "Tout part d’un geste : tendre la main. Chaque page dit à sa façon : venez, il y a de la place pour vous. Nous invitons, nous n’exigeons jamais.",
+      "look_title": "Ce que cela donne à voir",
+      "look1": "Du vert forêt et de l’or, chauds et lumineux, comme le logo.",
+      "look2": "Des formes arrondies, accueillantes, jamais en pilule.",
+      "look3": "Des mains, des livres de cantiques, des paniers, des tam-tams : notre monde, dessiné par nous.",
+      "look4": "Du mouvement doux, toujours facultatif, jamais bloquant.",
+      "look5": "Un petit sourire dans les détails, jamais dans les moments graves."
+    },
+    "voice": {
+      "title": "Notre voix",
+      "lead": "Nous parlons comme on accueille quelqu’un à la porte : simplement, avec chaleur, sans bruit. Notre voix est celle d’un « nous » qui s’adresse à un « vous » respecté.",
+      "traits_title": "Quatre traits",
+      "t1_name": "Chaleureuse",
+      "t1": "Nous disons bonjour, merci, bienvenue. Nous ne sommes pas une administration.",
+      "t2_name": "Simple",
+      "t2": "Phrases courtes, mots de tous les jours. Un jeune et une grand-mère comprennent la même page.",
+      "t3_name": "Respectueuse",
+      "t3": "Nous disons « vous ». Nous ne jugeons pas, nous ne culpabilisons pas, nous ne pressons pas.",
+      "t4_name": "Pleine d’espoir",
+      "t4": "Même devant l’épreuve, nous regardons vers la lumière — sans minimiser la peine.",
+      "examples_title": "Dire ou ne pas dire",
+      "yes": "Nous disons",
+      "no": "Nous évitons",
+      "e1_yes": "Venez comme vous êtes.",
+      "e1_no": "Inscrivez-vous maintenant !",
+      "e2_yes": "Rien de prévu ce jour-là. Revenez bientôt, nous aurons du nouveau.",
+      "e2_no": "Aucun résultat.",
+      "e3_yes": "Votre message nous est bien parvenu. Merci !",
+      "e3_no": "Opération réussie.",
+      "e4_yes": "Cette page s’est égarée, comme une brebis. Revenons à l’accueil.",
+      "e4_no": "Erreur 404 : ressource introuvable.",
+      "tone_title": "Notre ton selon les moments",
+      "m1_name": "Accueil",
+      "m1": "Chaleureux et direct. On tend la main en premier.",
+      "m2_name": "Pratique",
+      "m2": "Clair et factuel : où, quand, comment. Rien de plus, rien de moins.",
+      "m3_name": "Fêtes et joie",
+      "m3": "Plus vif, plus lumineux. Les points d’exclamation y sont permis, un par phrase au plus.",
+      "m4_name": "Deuil et épreuves",
+      "m4": "Sobre, lent, sans humour ni point d’exclamation. Nous accompagnons, nous n’expliquons pas.",
+      "m5_name": "Jeunesse",
+      "m5": "Plus léger et plus direct, toujours respectueux. Jamais de fausse jeunesse forcée.",
+      "m6_name": "Erreurs et attentes",
+      "m6": "Rassurant, jamais coupable. On dit ce qui s’est passé et ce qu’on peut faire. Un petit sourire est bienvenu.",
+      "rules_title": "Règles d’écriture",
+      "r1": "Nous disons « vous » aux visiteurs et aux membres.",
+      "r2": "Une idée par phrase, des phrases courtes, des verbes d’action.",
+      "r3": "Nous invitons : « Venir ce dimanche », « Nous rejoindre ». Jamais « Cliquez ici ».",
+      "r4": "Les mots de la maison : culte, Sainte-Cène, Conseil paroissial, offrande, Fête des Moissons — sans jargon ni acronyme non expliqué.",
+      "r5": "Nous n’inventons rien sur la paroisse : un horaire, un nom, une date viennent d’une source validée.",
+      "r6": "Typographie française : espace insécable avant « : ; ! ? » et dans les guillemets « », apostrophe courbe ’. Les heures s’écrivent 09h00, les montants 5 000 FCFA.",
+      "r7": "Nous écrivons d’abord en français, puis nous adaptons en anglais — nous ne traduisons pas mot à mot. Les noms propres (JAPE, Fête des Moissons) restent en français, avec un court sens la première fois.",
+      "sample_title": "La voix en situation",
+      "sample_body": "Que vous veniez pour la première fois ou depuis toujours, il y a une place pour vous. Entrez, installez-vous : le chant va commencer.",
+      "sample_cite": "Exemple de ton d’accueil"
+    },
+    "motion": {
+      "title": "Mouvement",
+      "lead": "Le mouvement sert le récit, il ne bloque jamais le contenu. Doux, court, réversible, et toujours facultatif.",
+      "rules_title": "Principes",
+      "rule1": "Entrée : fondu et petite montée (8 à 16 px). Sortie : plus rapide que l’entrée. Pas de rebond sur l’interface.",
+      "rule2": "Seuls transform et opacity s’animent. Le CSS suffit pour les survols et fondus ; GSAP n’est chargé que sur les pages qui en ont besoin.",
+      "rule3": "Mouvement réduit ou économie de données : plus de déplacement ni de boucle, seulement des fondus de 150 ms au plus, et GSAP n’est même pas téléchargé.",
+      "rule4": "Tout contenu se lit avant l’exécution de JavaScript.",
+      "catalog_title": "Catalogue"
+    },
+    "illustration": {
+      "title": "Illustration",
+      "lead": "Nous dessinons nos propres images : formes plates et franches, objets surdimensionnés, traits d’accent par-dessus les aplats. Les références ne servent que d’inspiration, jamais de calque.",
+      "rules_title": "Ce que nous faisons",
+      "rule1": "Notre palette (vert, or, argile, crème, encre) et la teinte de la saison.",
+      "rule2": "Quatre teintes de peau chaudes, mélangées d’une image à l’autre ; tous les âges, tous les genres.",
+      "rule3": "Notre monde : mains, Bible, recueil de cantiques, tam-tam, panier d’offrandes, tenues de chorale, la colline de Nkolndongo.",
+      "rule4": "Jamais le visage de Dieu ni du Christ, jamais de caricature.",
+      "rule5": "Où ? États vides, chargements, bannières, héros saisonniers, 404, moments clés. Ailleurs : des icônes.",
+      "photo_title": "Photographies",
+      "photo": "Vraies photos de la paroisse d’abord ; sinon des photos sélectionnées sans personnes ; sinon l’illustration. Étalonnage chaud, jamais froid ni clinquant. Chaque photo a un texte alternatif et un crédit."
+    },
+    "components": {
+      "title": "Composants",
+      "lead": "Chaque élément d’interface, motif et animation du site est documenté ici, avec une démonstration vivante, son usage et ses exigences d’accessibilité. Un composant sans fiche n’est pas terminé.",
+      "status_stable": "Stable",
+      "status_draft": "Brouillon",
+      "usage": "Usage",
+      "a11y": "Accessibilité",
+      "demo": "Démonstration",
+      "upcoming_title": "À documenter au fil de la construction",
+      "upcoming": "Bouton · Champ · Zone de texte · Liste déroulante · Case à cocher · Bouton radio · Interrupteur · Menu · Infobulle · Fenêtre · Volet · Onglets · Accordéon · Notification · Carte · Pastille · Avatar · Squelette · État vide · En-tête et navigation · Pied de page · Transitions de page",
+      "icon": {
+        "name": "Icône",
+        "desc": "Hugeicons à trait arrondi, rendues au moment de la construction : aucun JavaScript.",
+        "use": "<Icon name=\"calendar\" size=\"20\" />. 16, 20 ou 24 px, couleur du texte. Ajouter d’abord l’icône à packages/ui/src/icons.ts.",
+        "a11y": "Décorative (aria-hidden) sauf si un label est fourni ; ne jamais porter seule une information."
+      },
+      "mark": {
+        "name": "Marque",
+        "desc": "Le logo de l’EEC en SVG en ligne, en six variantes (complet, sans texte, mono, halo).",
+        "use": "<Mark variant=\"halo\" />. Halo sur fond sombre, mono pour une couleur. Hauteur minimale 24 px.",
+        "a11y": "Un label si la marque est seule ; décorative quand le nom de la paroisse est écrit à côté."
+      },
+      "lockup": {
+        "name": "Logotype",
+        "desc": "La marque et le nom de la paroisse en texte vivant ; court ou long selon la place disponible.",
+        "use": "<SiteLockup /> dans l’en-tête (variant auto). Le conteneur fixe la largeur, la taille de police l’échelle.",
+        "a11y": "Texte réel, lisible par les lecteurs d’écran et traduisible."
+      },
+      "illustration": {
+        "name": "Illustration",
+        "desc": "Une illustration originale en SVG en ligne, colorée par les jetons (thème, saison, teintes de peau).",
+        "use": "<Illustration name=\"hymn-book-handover\" animate />. Les couches ont des data-part ciblables par GSAP. 15 Ko gzippé au plus.",
+        "a11y": "Décorative par défaut ; avec un title, elle devient role=img. L’animation s’arrête en mouvement réduit."
+      },
+      "theme": {
+        "name": "Bouton de thème",
+        "desc": "Alterne appareil → clair → sombre, mémorisé par navigateur, sans flash au chargement.",
+        "use": "<ThemeToggle /> dans l’en-tête. Un petit script dans <head> applique le choix avant le premier affichage.",
+        "a11y": "Cible de 44 px ; l’étiquette annonce le thème courant ; l’accès au stockage est protégé par try/catch."
+      },
+      "verse": {
+        "name": "Verset",
+        "desc": "Notre façon de citer : un verset, un témoignage, un mot. Panneau doux et arrondi, grand guillemet doré, référence en étiquette.",
+        "use": "<Verse mark=\"«\" cite=\"Matthieu 11 : 28\">…</Verse>. Pas de filet latéral, jamais. Un verset par écran au plus.",
+        "a11y": "blockquote + figcaption ; le guillemet décoratif est masqué. Contraste du texte et de la référence vérifié.",
+        "demo": "« Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos. »",
+        "demo_cite": "Matthieu 11 : 28"
+      },
+      "ornament": {
+        "name": "Ornement",
+        "desc": "Une petite vague dessinée à la main entre deux points, pour séparer deux sections à la place d’un filet.",
+        "use": "<Ornament /> entre les sections. Couleur or ; --ornament pour la changer. De l’espace autour, jamais de trait.",
+        "a11y": "Purement décoratif : aria-hidden."
+      },
+      "docblock": {
+        "name": "Fiche de composant",
+        "desc": "Le cadre de cette page : nom, statut, description, démonstration, usage, accessibilité.",
+        "use": "Ajouter une <DocBlock> par composant dans BrandComponents.astro, avec ses textes dans packages/i18n.",
+        "a11y": "Un titre h3 par fiche ; la démonstration est dans une région nommée."
+      },
+      "motion_idle": {
+        "name": "Animation d’illustration",
+        "desc": "Notes qui flottent et étincelles qui respirent, en boucle douce ; en pause hors écran.",
+        "use": "<Illustration animate /> + scripts/illustration-idle.ts. GSAP est importé dynamiquement, jamais globalement.",
+        "a11y": "Absente en mouvement réduit et en économie de données (GSAP n’est pas téléchargé)."
+      }
+    },
+    "rules": {
+      "title": "Règles et entretien",
+      "lead": "Ces règles tiennent le système cohérent. Certaines sont vérifiées automatiquement à chaque contrôle du code.",
+      "auto_title": "Vérifiées automatiquement",
+      "auto1": "Aucune bordure d’un seul côté, aucun squircle (pnpm lint).",
+      "auto2": "Chaque couple texte/fond respecte WCAG AA dans les deux thèmes (pnpm contrast, test unitaire).",
+      "auto3": "Le français et l’anglais ont exactement les mêmes clés de texte.",
+      "auto4": "Les jetons CSS sont générés depuis un seul fichier et vérifiés à jour.",
+      "manual_title": "À vérifier à la main",
+      "manual1": "Clair et sombre, français et anglais, à 320 px de large.",
+      "manual2": "Clavier seul : focus visible, Échap ferme les fenêtres.",
+      "manual3": "Mouvement réduit respecté.",
+      "upkeep_title": "Entretenir ce guide",
+      "upkeep": "Toute nouvelle couleur, composant, animation, transition ou règle s’ajoute à cette page dans la même modification que le code. Les textes sont écrits en français d’abord. Une décision importante reçoit aussi une fiche dans docs/decisions."
     }
   }
 }

@@ -118,9 +118,8 @@ export const radius = { xs: 6, sm: 10, md: 14, lg: 20, xl: 28 } as const
 
 export const fonts = {
   sans: '"Switzer", "Switzer Fallback", "Switzer Fallback Android", ui-sans-serif, system-ui, sans-serif',
-  /** Headings, lockups, big numbers. General Sans (Fontshare) — chosen on the brand board. */
-  display:
-    '"General Sans", "General Sans Fallback", "General Sans Fallback Android", ui-sans-serif, system-ui, sans-serif',
+  /** Headings, lockups, big numbers. Fraunces (SIL OFL, soft + wonk) — chosen by Joël on the brand board. */
+  display: '"Fraunces", "Fraunces Fallback", "Fraunces Fallback Android", ui-serif, Georgia, serif',
 } as const
 
 export const motion = {

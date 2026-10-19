@@ -1,6 +1,6 @@
 ---
 /**
- * Horizontal lockup: the EEC mark + the parish name, in live text (General Sans), so it stays
+ * Horizontal lockup: the EEC mark + the parish name, in live text (Fraunces), so it stays
  * crisp, translatable and responsive.
  *   short  → mark + « EEC NKOLNDONGO 1 »
  *   long   → mark + « Église Évangélique du Cameroun » / « Paroisse de Nkolndongo 1 » (two lines)
@@ -53,7 +53,8 @@ const { variant = 'auto', mark = 'mark', short, church, parish, class: className
   .eec-lockup-short,
   .eec-lockup-parish {
     font-weight: 600;
-    white-space: nowrap;
+    min-width: 0;
+    text-wrap: balance;
   }
   .eec-lockup-short {
     font-size: 1.1em;
@@ -71,7 +72,6 @@ const { variant = 'auto', mark = 'mark', short, church, parish, class: className
     font-weight: 500;
     letter-spacing: 0.02em;
     color: var(--ink-muted);
-    white-space: nowrap;
   }
   .eec-lockup-parish {
     font-size: 1.05em;

@@ -1,0 +1,30 @@
+---
+import { useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const t = useT(Astro.currentLocale)
+const auto = [
+  'brand.rules.auto1',
+  'brand.rules.auto2',
+  'brand.rules.auto3',
+  'brand.rules.auto4',
+] as const
+const manual = ['brand.rules.manual1', 'brand.rules.manual2', 'brand.rules.manual3'] as const
+---
+
+<Section id="rules" title={t('brand.rules.title')} lead={t('brand.rules.lead')}>
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid content-start gap-3 rounded-xl bg-success-soft p-6">
+      <h3 class="text-xl text-success">{t('brand.rules.auto_title')}</h3>
+      <ul class="grid list-disc gap-2 ps-5">{auto.map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+    <div class="grid content-start gap-3 rounded-xl bg-info-soft p-6">
+      <h3 class="text-xl text-info">{t('brand.rules.manual_title')}</h3>
+      <ul class="grid list-disc gap-2 ps-5">{manual.map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+  </div>
+  <div class="grid gap-2 rounded-xl bg-gold-soft p-6">
+    <h3 class="text-xl">{t('brand.rules.upkeep_title')}</h3>
+    <p class="max-w-[72ch]">{t('brand.rules.upkeep')}</p>
+  </div>
+</Section>

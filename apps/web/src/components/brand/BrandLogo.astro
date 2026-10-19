@@ -137,6 +137,17 @@ const darkOptions = [
     </div>
   </div>
 
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid content-start gap-2 rounded-lg bg-success-soft p-5">
+      <h3 class="text-lg text-success">{t('brand.logo.usage_title')} · ✓</h3>
+      <ul class="grid list-disc gap-1 ps-5 text-ink">{(['brand.logo.do1', 'brand.logo.do2', 'brand.logo.do3'] as const).map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+    <div class="grid content-start gap-2 rounded-lg bg-danger-soft p-5">
+      <h3 class="text-lg text-danger">{t('brand.logo.usage_title')} · ✗</h3>
+      <ul class="grid list-disc gap-1 ps-5 text-ink">{(['brand.logo.dont1', 'brand.logo.dont2', 'brand.logo.dont3'] as const).map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+  </div>
+
   <div class="grid gap-5">
     <h3 class="text-xl">{t('brand.logo.icons')}</h3>
     <div class="flex flex-wrap items-end gap-6">

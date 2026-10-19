@@ -15,7 +15,6 @@ import { inflateRawSync } from 'node:zlib'
 
 const families: Record<string, string[]> = {
   switzer: ['Variable', 'VariableItalic', 'Regular', 'Italic', 'Medium', 'Semibold'],
-  'general-sans': ['Variable', 'VariableItalic'],
 }
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')

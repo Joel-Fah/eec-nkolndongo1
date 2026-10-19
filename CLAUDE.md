@@ -17,6 +17,8 @@ super admin and (for now) the only developer. Read this file, then `STATUS.md`, 
 1. **French first.** Write FR strings first, then EN. No hard-coded user-facing text — everything goes
    through `packages/i18n`. Both the public site and the admin are bilingual.
 2. **Light + dark themes** through design tokens only. No raw hex/px values in components.
+   **Never a one-sided border** (no `border-t/b/s/e/l/r`, no side rule on quotes): separate with space, a
+   tint, a full frame or `<Ornament>`. Enforced by `pnpm lint`.
 3. **Performance budget** (public site, per page, 4G mobile): ≤ 100 KB JS (compressed), ≤ 250 KB total on
    first load excluding lazy media, LCP < 2.5 s. GSAP is loaded only on pages that use it.
 4. **Accessibility:** WCAG 2.2 AA. Keyboard reachable, visible focus, `prefers-reduced-motion` respected,
@@ -43,6 +45,8 @@ pnpm workspaces + Turborepo.
   Emails → `email-templates`. Copy → `i18n-content`. Stock photos → `pexels-curation`.
   Before a release → `release-checklist`.
 - Icons: Hugeicons **stroke-rounded only** (`@hugeicons/core-free-icons`). No other icon set.
+- **Document as you build:** every new component, pattern, animation, transition or token is documented
+  in the living guide (`apps/web` → `/fr/_brand`, `/en/_brand`) in the same change. No entry = not done.
 - Keep `STATUS.md` updated at the end of each working session (what changed, what's next).
 - Commits: Conventional Commits (`feat(events): …`, `fix(web): …`, `docs: …`). Small and focused.
 - Prefer editing existing docs over creating new ones. All documentation lives in `docs/`, except the

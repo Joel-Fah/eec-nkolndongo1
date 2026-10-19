@@ -1,0 +1,53 @@
+---
+import Verse from '@eec/ui/astro/Verse.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const pillars = [
+  ['brand.identity.p1_name', 'brand.identity.p1', 'bg-primary-soft text-primary'],
+  ['brand.identity.p2_name', 'brand.identity.p2', 'bg-gold-soft text-gold-ink'],
+  ['brand.identity.p3_name', 'brand.identity.p3', 'bg-info-soft text-info'],
+] as const
+const looks = [
+  'brand.identity.look1',
+  'brand.identity.look2',
+  'brand.identity.look3',
+  'brand.identity.look4',
+  'brand.identity.look5',
+] as const
+---
+
+<Section id="identity" first title={t('brand.identity.title')} lead={t('brand.identity.lead')}>
+  <p class="w-fit rounded-md bg-warning-soft px-3 py-2 text-sm text-warning">{t('brand.identity.draft')}</p>
+
+  <div class="grid items-start gap-8 lg:grid-cols-2">
+    <div class="grid gap-3">
+      <h3 class="text-2xl">{t('brand.identity.essence_title')}</h3>
+      <p class="max-w-[60ch] text-lg">{t('brand.identity.essence')}</p>
+    </div>
+    <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('brand.identity.signature_title')}>{t('brand.identity.signature')}</Verse>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-2xl">{t('brand.identity.pillars_title')}</h3>
+    <div class="grid gap-4 md:grid-cols-3">
+      {
+        pillars.map(([name, body, tint]) => (
+          <article class="grid content-start gap-3 rounded-xl bg-surface p-6 shadow-1">
+            <h4 class:list={['w-fit rounded-sm px-3 py-1 text-lg', tint]}>{t(name)}</h4>
+            <p class="text-ink-muted">{t(body)}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-3">
+    <h3 class="text-xl">{t('brand.identity.look_title')}</h3>
+    <ul class="flex flex-wrap gap-2" role="list">
+      {looks.map((key) => <li class="rounded-md bg-surface-2 px-4 py-2">{t(key)}</li>)}
+    </ul>
+  </div>
+</Section>

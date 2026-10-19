@@ -1,0 +1,75 @@
+---
+import Verse from '@eec/ui/astro/Verse.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const traits = [1, 2, 3, 4] as const
+const examples = [1, 2, 3, 4] as const
+const moments = [1, 2, 3, 4, 5, 6] as const
+const rules = [1, 2, 3, 4, 5, 6, 7] as const
+---
+
+<Section id="voice" title={t('brand.voice.title')} lead={t('brand.voice.lead')}>
+  <div class="grid gap-5">
+    <h3 class="text-2xl">{t('brand.voice.traits_title')}</h3>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        traits.map((n) => (
+          <article class="grid content-start gap-2 rounded-xl bg-surface p-5 shadow-1">
+            <h4 class="text-lg">{t(`brand.voice.t${n}_name` as 'brand.voice.t1_name')}</h4>
+            <p class="text-sm text-ink-muted">{t(`brand.voice.t${n}` as 'brand.voice.t1')}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-2xl">{t('brand.voice.examples_title')}</h3>
+    <div class="grid gap-3">
+      {
+        examples.map((n) => (
+          <div class="grid gap-3 md:grid-cols-2">
+            <p class="rounded-lg bg-success-soft p-4 text-ink">
+              <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-success">✓ {t('brand.voice.yes')}</span>
+              {t(`brand.voice.e${n}_yes` as 'brand.voice.e1_yes')}
+            </p>
+            <p class="rounded-lg bg-danger-soft p-4 text-ink">
+              <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-danger">✗ {t('brand.voice.no')}</span>
+              {t(`brand.voice.e${n}_no` as 'brand.voice.e1_no')}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-2xl">{t('brand.voice.tone_title')}</h3>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        moments.map((n) => (
+          <article class="grid content-start gap-1 rounded-lg bg-surface-2 p-4">
+            <h4 class="text-base font-semibold">{t(`brand.voice.m${n}_name` as 'brand.voice.m1_name')}</h4>
+            <p class="text-sm text-ink-muted">{t(`brand.voice.m${n}` as 'brand.voice.m1')}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid items-start gap-8 lg:grid-cols-2">
+    <div class="grid gap-3">
+      <h3 class="text-2xl">{t('brand.voice.rules_title')}</h3>
+      <ol class="grid list-decimal gap-2 ps-6">
+        {rules.map((n) => <li>{t(`brand.voice.r${n}` as 'brand.voice.r1')}</li>)}
+      </ol>
+    </div>
+    <div class="grid gap-3">
+      <h3 class="text-2xl">{t('brand.voice.sample_title')}</h3>
+      <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('brand.voice.sample_cite')}>{t('brand.voice.sample_body')}</Verse>
+    </div>
+  </div>
+</Section>

@@ -84,7 +84,14 @@
       "lockup_long": "Long",
       "icons": "Favicons and app icons",
       "lockup_auto": "Adaptive",
-      "lockup_auto_lead": "One composition picks short or long from the width it has (from 22 rem)."
+      "lockup_auto_lead": "One composition picks short or long from the width it has (from 22 rem).",
+      "usage_title": "Do and don’t",
+      "do1": "Use the files in packages/ui/brand, unmodified.",
+      "do2": "Keep the clear space around the logo.",
+      "do3": "On dark backgrounds: cream halo (B) or cream line art (C).",
+      "dont1": "Stretch, rotate, recolour or redraw the logo.",
+      "dont2": "Place the logo on a busy photo or a green background.",
+      "dont3": "Set the parish name in a font other than the lockups’."
     },
     "colour": {
       "title": "Colour",
@@ -116,8 +123,8 @@
     },
     "type": {
       "title": "Typography",
-      "lead": "Switzer for text and interface, General Sans for headings: two sans-serifs, one calm and one warmer.",
-      "pairing": "Switzer + General Sans",
+      "lead": "Fraunces for headings, Switzer for text and interface: the warmth of a soft headline, the calm of easy reading.",
+      "pairing": "Fraunces + Switzer",
       "weight": "File weight: {size}",
       "sample_label": "Typographic sample, not information about the parish.",
       "h1": "Welcome home",
@@ -134,7 +141,12 @@
       "numbers": "Dates and amounts",
       "scale": "Type scale",
       "scale_base": "Body text, 17 to 18 px",
-      "scale_xs": "Labels"
+      "scale_xs": "Labels",
+      "rules_title": "Type rules",
+      "rule1": "Headings in Fraunces (weights 400 to 600), text and interface in Switzer.",
+      "rule2": "Body 17 to 18 px, line height 1.6; no running text below 14.5 px.",
+      "rule3": "Tabular figures for times, dates and amounts.",
+      "rule4": "Headings balance (text-wrap: balance); paragraphs avoid orphans (pretty)."
     },
     "shape": {
       "title": "Shape, elevation and motion",
@@ -156,7 +168,12 @@
       "story": "Narrative · {ms} ms",
       "replay": "Replay",
       "reduce": "Simulate reduced motion",
-      "reduced_note": "Reduced motion: no movement or animated scrolling, only short fades (≤ 150 ms)."
+      "reduced_note": "Reduced motion: no movement or animated scrolling, only short fades (≤ 150 ms).",
+      "rules_title": "Shape rules",
+      "rule1": "Standard radii (6, 10, 14, 20, 28 px); never pills, never squircles.",
+      "rule2": "Never a one-sided border. We separate with space, a tint, a full frame or the ornament.",
+      "rule3": "Concentric radii: inner radius = outer radius − padding.",
+      "rule4": "Touch targets at least 44 × 44 px; a visible focus ring everywhere."
     },
     "icons": {
       "title": "Icons and illustration",
@@ -166,6 +183,198 @@
       "light": "Light",
       "dark": "Dark",
       "size": "{size} gzipped"
+    },
+    "page": {
+      "status": "Living guide — internal",
+      "intro": "This is where our identity and our design system live: who we are, how we speak, how we look, and every component, animation and transition of the site. Whatever is added to the site is added here.",
+      "private_note": "Internal page, not indexed and not linked from the site. Access will be restricted to the team in phase 02."
+    },
+    "nav": {
+      "identity": "Identity",
+      "voice": "Voice and tone",
+      "logo": "Logo",
+      "colour": "Colour",
+      "type": "Typography",
+      "shape": "Shape and elevation",
+      "motion": "Motion",
+      "icons": "Icons",
+      "illustration": "Illustration",
+      "components": "Components",
+      "rules": "Rules and upkeep"
+    },
+    "identity": {
+      "title": "Our identity",
+      "lead": "This guide says who we are and how we want to be recognised. It is written in the first person plural: this house belongs to everyone who comes through its doors, and a parish never speaks in an agency’s voice.",
+      "draft": "Proposed text, for the Parish Council to review before it is published. It describes a brand intention, not facts about the parish.",
+      "essence_title": "Our essence",
+      "essence": "A parish is first of all people finding one another. Our image should make you want to come in, sit down, stay. It does not show a building: it invites a people on the move.",
+      "signature_title": "Signature ideas",
+      "signature": "Come in, there is room. · An open house. · [TO CONFIRM: line chosen by the Council]",
+      "pillars_title": "Three pillars",
+      "p1_name": "Community",
+      "p1": "We walk together. Every face counts, every age has a place. Our images show hands, gestures, gatherings — never a staged individual.",
+      "p2_name": "Movement",
+      "p2": "We are not standing still: we walk towards God, towards one another, towards tomorrow. The site breathes, changes with the seasons of the liturgical year, and never freezes into a shop window.",
+      "p3_name": "Invitation",
+      "p3": "Everything starts with a gesture: reaching out a hand. Every page says, in its own way: come, there is room for you. We invite; we never demand.",
+      "look_title": "What it looks like",
+      "look1": "Forest green and gold, warm and bright, like the logo.",
+      "look2": "Rounded, welcoming shapes, never pills.",
+      "look3": "Hands, hymn books, baskets, drums: our world, drawn by us.",
+      "look4": "Gentle movement, always optional, never blocking.",
+      "look5": "A small smile in the details, never in solemn moments."
+    },
+    "voice": {
+      "title": "Our voice",
+      "lead": "We speak the way you greet someone at the door: simply, warmly, without fuss. Ours is the voice of a “we” speaking to a respected “you”.",
+      "traits_title": "Four traits",
+      "t1_name": "Warm",
+      "t1": "We say hello, thank you, welcome. We are not an administration.",
+      "t2_name": "Simple",
+      "t2": "Short sentences, everyday words. A teenager and a grandmother read the same page.",
+      "t3_name": "Respectful",
+      "t3": "We say “vous”. We do not judge, guilt or rush anyone.",
+      "t4_name": "Hopeful",
+      "t4": "Even in hardship we look towards the light — without playing down the pain.",
+      "examples_title": "Say it, don’t say it",
+      "yes": "We say",
+      "no": "We avoid",
+      "e1_yes": "Come as you are.",
+      "e1_no": "Sign up now!",
+      "e2_yes": "Nothing planned that day. Come back soon, there will be news.",
+      "e2_no": "No results.",
+      "e3_yes": "Your message reached us. Thank you!",
+      "e3_no": "Operation successful.",
+      "e4_yes": "This page wandered off, like a lost sheep. Let’s head back home.",
+      "e4_no": "Error 404: resource not found.",
+      "tone_title": "Our tone, moment by moment",
+      "m1_name": "Welcome",
+      "m1": "Warm and direct. We reach out first.",
+      "m2_name": "Practical",
+      "m2": "Clear and factual: where, when, how. Nothing more, nothing less.",
+      "m3_name": "Feasts and joy",
+      "m3": "Livelier, brighter. Exclamation marks are allowed, one per sentence at most.",
+      "m4_name": "Grief and hardship",
+      "m4": "Quiet, slow, no humour, no exclamation marks. We accompany; we do not explain.",
+      "m5_name": "Youth",
+      "m5": "Lighter and more direct, always respectful. Never forced “youth speak”.",
+      "m6_name": "Errors and waiting",
+      "m6": "Reassuring, never blaming. We say what happened and what can be done. A small smile is welcome.",
+      "rules_title": "Writing rules",
+      "r1": "We address visitors and members as “vous” (formal you).",
+      "r2": "One idea per sentence, short sentences, action verbs.",
+      "r3": "We invite: “Plan a visit”, “Join us”. Never “Click here”.",
+      "r4": "The words of the house: service, Holy Communion, Parish Council, offering, Fête des Moissons — no jargon, no unexplained acronyms.",
+      "r5": "We invent nothing about the parish: a time, a name or a date comes from a validated source.",
+      "r6": "French typography: no-break space before “: ; ! ?” and inside « », curly apostrophe ’. Times read 09h00, amounts 5,000 FCFA.",
+      "r7": "We write in French first, then adapt to English — never word for word. Proper names (JAPE, Fête des Moissons) stay in French, with a short gloss the first time.",
+      "sample_title": "The voice in action",
+      "sample_body": "Whether you are coming for the first time or have always been here, there is a place for you. Come in, sit down: the singing is about to begin.",
+      "sample_cite": "Example of the welcome tone"
+    },
+    "motion": {
+      "title": "Motion",
+      "lead": "Motion serves the story and never blocks content. Gentle, short, reversible, and always optional.",
+      "rules_title": "Principles",
+      "rule1": "Enter: fade and a small rise (8 to 16 px). Exit: faster than enter. No bounce on the interface.",
+      "rule2": "Only transform and opacity animate. CSS is enough for hovers and fades; GSAP loads only on pages that need it.",
+      "rule3": "Reduced motion or data saver: no travel, no loops, only fades of 150 ms at most, and GSAP isn’t even downloaded.",
+      "rule4": "All content reads before JavaScript runs.",
+      "catalog_title": "Catalogue"
+    },
+    "illustration": {
+      "title": "Illustration",
+      "lead": "We draw our own images: flat, bold shapes, oversized objects, accent lines over the fills. References are inspiration only, never traced.",
+      "rules_title": "What we do",
+      "rule1": "Our palette (green, gold, clay, cream, ink) and the season’s tint.",
+      "rule2": "Four warm skin tones, mixed from one image to the next; every age, every gender.",
+      "rule3": "Our world: hands, Bible, hymn book, drum, offering basket, choir robes, the hill of Nkolndongo.",
+      "rule4": "Never the face of God or Christ, never caricature.",
+      "rule5": "Where? Empty states, loaders, banners, seasonal heroes, 404, key moments. Elsewhere: icons.",
+      "photo_title": "Photography",
+      "photo": "Real parish photos first; otherwise curated photos without people; otherwise illustration. Warm grade, never cold or glossy. Every photo has alt text and a credit."
+    },
+    "components": {
+      "title": "Components",
+      "lead": "Every interface element, pattern and animation of the site is documented here, with a live demo, its usage and its accessibility requirements. A component without an entry is not finished.",
+      "status_stable": "Stable",
+      "status_draft": "Draft",
+      "usage": "Usage",
+      "a11y": "Accessibility",
+      "demo": "Demo",
+      "upcoming_title": "To document as we build",
+      "upcoming": "Button · Input · Textarea · Select · Checkbox · Radio · Switch · Menu · Tooltip · Dialog · Sheet · Tabs · Accordion · Toast · Card · Badge · Avatar · Skeleton · Empty state · Header and navigation · Footer · Page transitions",
+      "icon": {
+        "name": "Icon",
+        "desc": "Stroke-rounded Hugeicons, rendered at build time: no JavaScript.",
+        "use": "<Icon name=\"calendar\" size=\"20\" />. 16, 20 or 24 px, text colour. Add the icon to packages/ui/src/icons.ts first.",
+        "a11y": "Decorative (aria-hidden) unless a label is given; never carries information alone."
+      },
+      "mark": {
+        "name": "Mark",
+        "desc": "The EEC logo as inline SVG, in six variants (full, without text, mono, halo).",
+        "use": "<Mark variant=\"halo\" />. Halo on dark backgrounds, mono for one colour. Minimum height 24 px.",
+        "a11y": "Give it a label when alone; decorative when the parish name sits next to it."
+      },
+      "lockup": {
+        "name": "Lockup",
+        "desc": "The mark and the parish name in live text; short or long depending on the room.",
+        "use": "<SiteLockup /> in the header (variant auto). The container sets the width, the font size the scale.",
+        "a11y": "Real text, readable by screen readers and translatable."
+      },
+      "illustration": {
+        "name": "Illustration",
+        "desc": "An original illustration as inline SVG, coloured by tokens (theme, season, skin tones).",
+        "use": "<Illustration name=\"hymn-book-handover\" animate />. Layers carry data-part attributes GSAP can target. 15 KB gzipped at most.",
+        "a11y": "Decorative by default; with a title it becomes role=img. Animation stops under reduced motion."
+      },
+      "theme": {
+        "name": "Theme toggle",
+        "desc": "Cycles device → light → dark, remembered per browser, no flash on load.",
+        "use": "<ThemeToggle /> in the header. A tiny <head> script applies the choice before first paint.",
+        "a11y": "44 px target; the label announces the current theme; storage access is wrapped in try/catch."
+      },
+      "verse": {
+        "name": "Verse",
+        "desc": "Our way to quote: a verse, a testimony, a word. A soft rounded panel, an oversized gold mark, the reference as a tag.",
+        "use": "<Verse mark=\"“\" cite=\"Matthew 11:28\">…</Verse>. No side rule, ever. One verse per screen at most.",
+        "a11y": "blockquote + figcaption; the decorative mark is hidden. Text and reference contrast verified.",
+        "demo": "“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”",
+        "demo_cite": "Matthew 11:28"
+      },
+      "ornament": {
+        "name": "Ornament",
+        "desc": "A small hand-drawn wave between two dots, separating sections in place of a rule.",
+        "use": "<Ornament /> between sections. Gold; --ornament changes it. Space around it, never a line.",
+        "a11y": "Purely decorative: aria-hidden."
+      },
+      "docblock": {
+        "name": "Component entry",
+        "desc": "This page’s frame: name, status, description, demo, usage, accessibility.",
+        "use": "Add one <DocBlock> per component in BrandComponents.astro, with its texts in packages/i18n.",
+        "a11y": "One h3 per entry; the demo sits in a labelled region."
+      },
+      "motion_idle": {
+        "name": "Illustration idle animation",
+        "desc": "Floating notes and breathing sparkles in a gentle loop; paused off-screen.",
+        "use": "<Illustration animate /> + scripts/illustration-idle.ts. GSAP is imported dynamically, never globally.",
+        "a11y": "Absent under reduced motion and data saver (GSAP isn’t downloaded)."
+      }
+    },
+    "rules": {
+      "title": "Rules and upkeep",
+      "lead": "These rules keep the system coherent. Some are checked automatically on every code check.",
+      "auto_title": "Checked automatically",
+      "auto1": "No one-sided border, no squircle (pnpm lint).",
+      "auto2": "Every text/background pair meets WCAG AA in both themes (pnpm contrast, unit test).",
+      "auto3": "French and English have exactly the same text keys.",
+      "auto4": "CSS tokens are generated from a single file and checked for freshness.",
+      "manual_title": "To check by hand",
+      "manual1": "Light and dark, French and English, at 320 px wide.",
+      "manual2": "Keyboard only: visible focus, Esc closes overlays.",
+      "manual3": "Reduced motion respected.",
+      "upkeep_title": "Keeping this guide alive",
+      "upkeep": "Every new colour, component, animation, transition or rule is added to this page in the same change as the code. Texts are written in French first. An important decision also gets a record in docs/decisions."
     }
   }
 }

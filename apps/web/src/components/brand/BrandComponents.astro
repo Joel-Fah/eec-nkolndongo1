@@ -1,0 +1,86 @@
+---
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Mark from '@eec/ui/astro/Mark.astro'
+import Ornament from '@eec/ui/astro/Ornament.astro'
+import Verse from '@eec/ui/astro/Verse.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import SiteLockup from '../SiteLockup.astro'
+import ThemeToggle from '../ThemeToggle.astro'
+import DocBlock from './DocBlock.astro'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+type Id =
+  | 'icon'
+  | 'mark'
+  | 'lockup'
+  | 'illustration'
+  | 'theme'
+  | 'verse'
+  | 'ornament'
+  | 'docblock'
+  | 'motion_idle'
+const doc = (id: Id) => ({
+  id: id.replace('_', '-'),
+  name: t(`brand.components.${id}.name` as 'brand.components.icon.name'),
+  description: t(`brand.components.${id}.desc` as 'brand.components.icon.desc'),
+  usage: t(`brand.components.${id}.use` as 'brand.components.icon.use'),
+  a11y: t(`brand.components.${id}.a11y` as 'brand.components.icon.a11y'),
+})
+---
+
+<Section id="components" title={t('brand.components.title')} lead={t('brand.components.lead')}>
+  <div class="grid gap-6">
+    <DocBlock {...doc('icon')}>
+      <div class="flex flex-wrap items-center gap-5">
+        <Icon name="calendar" size={16} /><Icon name="church" size={20} /><Icon name="heart" size={24} />
+        <Icon name="whatsapp" size={24} label="WhatsApp" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('mark')}>
+      <div class="flex flex-wrap items-end gap-8">
+        <Mark variant="mark" class="h-20 w-auto" />
+        <Mark variant="mono" class="h-20 w-auto" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('lockup')}>
+      <div class="grid gap-4">
+        <div class="w-[min(100%,14rem)] text-[1.125rem]"><SiteLockup /></div>
+        <div class="w-[min(100%,30rem)] text-[1.25rem]"><SiteLockup /></div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('illustration')}>
+      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" />
+    </DocBlock>
+
+    <DocBlock {...doc('motion_idle')}>
+      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" animate />
+    </DocBlock>
+
+    <DocBlock {...doc('theme')}>
+      <div class="w-fit"><ThemeToggle /></div>
+    </DocBlock>
+
+    <DocBlock {...doc('verse')}>
+      <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('brand.components.verse.demo_cite')}>{t('brand.components.verse.demo')}</Verse>
+    </DocBlock>
+
+    <DocBlock {...doc('ornament')}>
+      <Ornament />
+    </DocBlock>
+
+    <DocBlock {...doc('docblock')} status="stable">
+      <p class="text-sm text-ink-muted">{t('brand.components.docblock.desc')}</p>
+    </DocBlock>
+  </div>
+
+  <div class="grid gap-3 rounded-xl bg-surface-2 p-6">
+    <h3 class="text-xl">{t('brand.components.upcoming_title')}</h3>
+    <p class="text-ink-muted">{t('brand.components.upcoming')}</p>
+  </div>
+</Section>

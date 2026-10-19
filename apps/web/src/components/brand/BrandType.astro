@@ -1,5 +1,6 @@
 ---
 import { formatBytes, formatDate, formatTime, formatXAF } from '@eec/i18n'
+import Verse from '@eec/ui/astro/Verse.astro'
 import { localeOf, useT } from '../../lib/i18n'
 import Section from './Section.astro'
 
@@ -10,7 +11,7 @@ const t = useT(locale)
 const files = import.meta.glob<string>(
   [
     '../../../../../packages/ui/fonts/fontshare/switzer/Switzer-Variable.woff2',
-    '../../../../../packages/ui/fonts/fontshare/general-sans/GeneralSans-Variable.woff2',
+    '../../../../../packages/ui/fonts/fraunces/Fraunces-Display.woff2',
   ],
   { query: '?inline', import: 'default', eager: true },
 )
@@ -21,7 +22,7 @@ const kb = (file: string) => {
   return formatBytes(Math.floor((base64.length * 3) / 4), locale)
 }
 
-const sizes = `Switzer ${kb('Switzer-Variable.woff2')} + General Sans ${kb('GeneralSans-Variable.woff2')}`
+const sizes = `Switzer ${kb('Switzer-Variable.woff2')} + Fraunces ${kb('Fraunces-Display.woff2')}`
 
 // A typographic sample only: Sunday 25 October 2026, 09:00 in Yaoundé.
 const sample = new Date('2026-10-25T08:00:00Z')
@@ -42,9 +43,9 @@ const nav = ['nav.discover', 'nav.live', 'nav.calendar', 'nav.news', 'nav.give']
 
 <Section id="type" title={t('brand.type.title')} lead={t('brand.type.lead')}>
   <p class="text-sm text-ink-muted">{t('brand.type.sample_label')}</p>
-  <div class="grid gap-6 lg:grid-cols-2">
+  <div class="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
     <article class="specimen grid min-w-0 content-start gap-5 rounded-xl bg-surface p-6 shadow-1 md:p-8">
-      <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-4">
+      <header class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-surface-2 px-4 py-3">
         <h3 class="font-sans text-base font-semibold">{t('brand.type.pairing')}</h3>
         <p class="w-full text-xs text-ink-muted">{t('brand.type.weight', { size: sizes })}</p>
       </header>
@@ -54,10 +55,7 @@ const nav = ['nav.discover', 'nav.live', 'nav.calendar', 'nav.news', 'nav.give']
       <p class="font-display text-xl font-medium">{t('brand.type.h4')}</p>
       <p class="text-lg text-ink-muted">{t('brand.type.lead_text')}</p>
       <p>{t('brand.type.body')}</p>
-      <blockquote class="border-s-2 border-gold ps-4">
-        <p class="font-display text-xl italic">{t('brand.type.quote')}</p>
-        <footer class="mt-1 text-sm text-ink-muted">{t('brand.type.quote_ref')}</footer>
-      </blockquote>
+      <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('brand.type.quote_ref')}>{t('brand.type.quote')}</Verse>
       <p>{t('brand.type.punctuation')}</p>
       <p class="text-sm text-ink-muted">{t('brand.type.small')}</p>
       <div class="grid gap-1">
@@ -74,19 +72,25 @@ const nav = ['nav.discover', 'nav.live', 'nav.calendar', 'nav.news', 'nav.give']
         </span>
       </div>
     </article>
-    <div class="grid content-start gap-4 rounded-xl bg-surface-2 p-6 md:p-8">
+    <div class="grid min-w-0 content-start gap-4 rounded-xl bg-surface-2 p-6 md:p-8">
       <h3 class="text-xl">{t('brand.type.scale')}</h3>
       <dl class="grid gap-3">
         {
           scale.map(([token, key]) => (
-            <div class="grid grid-cols-[4.5rem_1fr] items-baseline gap-3 border-b border-line pb-2">
+            <div class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-3 rounded-md bg-surface px-3 py-2">
               <dt class="text-xs text-ink-muted tabular-nums">{token}</dt>
-              <dd class="font-display font-medium" style={`font-size:var(--text-${token});line-height:1.15`}>{t(key)}</dd>
+              <dd class="min-w-0 font-display font-medium" style={`font-size:var(--text-${token});line-height:1.15`}>{t(key)}</dd>
             </div>
           ))
         }
       </dl>
     </div>
+  </div>
+  <div class="grid gap-3">
+    <h3 class="text-xl">{t('brand.type.rules_title')}</h3>
+    <ul class="grid max-w-[72ch] list-disc gap-2 ps-6">
+      {(['brand.type.rule1', 'brand.type.rule2', 'brand.type.rule3', 'brand.type.rule4'] as const).map((key) => <li>{t(key)}</li>)}
+    </ul>
   </div>
 </Section>
 

@@ -45,6 +45,9 @@ Generous but not pill-shaped radii, standard `border-radius` (no `corner-shape: 
 | `--radius-xl` | 28px | Sheets, dialogs, hero media |
 
 - **Concentric rule:** inner radius = outer radius − padding (never inner > outer).
+- **No one-sided borders, ever** (no side rule on quotes, no `border-bottom` dividers). Frames are
+  complete or absent; separate with space, a tint, shadow or the hand-drawn `<Ornament>`. Quotations use
+  `<Verse>` (soft gold panel + oversized mark). Checked by `scripts/check-design-rules.ts`.
 - Buttons are *not* fully rounded; only avatars and the theme toggle knob are circles.
 
 ## 4. Elevation
@@ -53,10 +56,9 @@ black. 3 levels: `--shadow-1` (cards), `--shadow-2` (dropdowns/popovers), `--sha
 In dark mode, elevation = lighter surface + faint top highlight border rather than shadow.
 
 ## 5. Typography
-- **Text & UI:** **Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
+- **Headings: Fraunces** (SIL OFL; opsz 72, soft, wonk — decision 0015). **Text & UI: Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
   No Inter, no Geist.
-- **Display:** **General Sans** (Fontshare) — chosen on the brand board over Fraunces / Zodiak /
-  Gambetta (decision 0015). Two sans-serifs: Switzer calm for reading, General Sans warmer for headings.
+- **Display:** **Fraunces** for headings — chosen by Joël (decision 0015) over Zodiak / Gambetta / General Sans.
 - Fluid type scale (clamp), ratio ~1.25 mobile / 1.333 desktop. Body 17–18px, line-height 1.6.
 - French typography: non-breaking space before `: ; ! ?` and inside « guillemets » (handled by an i18n
   helper), proper apostrophe `’`.
