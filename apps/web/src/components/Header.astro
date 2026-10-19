@@ -20,7 +20,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   <div class="site-header-bar">
     <a href={home} class="site-brand" aria-label={`${t('site.name')} — ${t('nav.home')}`}>
       <SiteLockup variant="three" class="site-lockup-narrow text-[0.95rem]" />
-      <SiteLockup variant="two" class="site-lockup-wide text-[1.05rem]" />
+      <SiteLockup variant="two" class="site-lockup-wide text-[0.95rem]" />
     </a>
 
     <nav class="site-nav" aria-label={t('nav.main')}>
@@ -351,7 +351,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       gap: 1.25rem;
     }
     .site-brand {
-      width: 17rem;
+      width: 19.5rem;
     }
     .site-brand .site-lockup-narrow {
       display: none;

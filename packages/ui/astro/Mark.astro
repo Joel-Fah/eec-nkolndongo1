@@ -1,4 +1,5 @@
 ---
+import lockupLine from '../brand/lockup-line.svg?raw'
 import mark from '../brand/mark.svg?raw'
 /**
  * The EEC mark, inlined so mono variants follow `currentColor`. Ids get a per-instance prefix so
@@ -20,6 +21,7 @@ const sources = {
   halo,
   mono,
   line,
+  'lockup-line': lockupLine,
 } as const
 
 interface Props {

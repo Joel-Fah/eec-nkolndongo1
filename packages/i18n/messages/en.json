@@ -176,12 +176,12 @@
       "minsize": "Minimum size: 24 px tall without text; 200 px with the arched text, which is unreadable below that.",
       "minsize_demo": "The mark without text at 24, 32, 48 and 64 px",
       "lockups": "Horizontal lockups",
-      "lockups_lead": "The mark and the parish name, in live text. “EEC” always stays abbreviated. One line for the tiniest spaces, two lines as the default, three lines when room is short.",
+      "lockups_lead": "The mark and the parish name, in live text: one line for the tiniest spaces, two lines by default, three lines when room is short.",
       "lockup_short": "Short",
       "lockup_long": "Long",
       "icons": "Favicons and app icons",
       "lockup_auto": "Adaptive",
-      "lockup_auto_lead": "One composition picks two or three lines from the width available (from 15 rem).",
+      "lockup_auto_lead": "One composition picks two or three lines from the width available (from 22 rem).",
       "usage_title": "Do and don’t",
       "do1": "Use the files in packages/ui/brand, unmodified.",
       "do2": "Keep the clear space around the logo.",
@@ -190,10 +190,10 @@
       "dont2": "Place the logo on a busy photo or a green background.",
       "dont3": "Set the parish name in a font other than the lockups’.",
       "lockup_rules_title": "Lockup rules",
-      "lr1": "Two lines: “EEC” then “Paroisse de Nkolndongo 1”.",
-      "lr2": "Three lines, for smaller spaces: “EEC”, “Paroisse de”, “Nkolndongo 1”.",
+      "lr1": "Two lines: “Église Évangélique du Cameroun” in full, dimmed, then “Paroisse de Nkolndongo 1” strong.",
+      "lr2": "Three lines, for smaller spaces: “EEC” abbreviated and dimmed, then “Paroisse de” and “Nkolndongo 1” strong.",
       "lr3": "One line (“EEC NKOLNDONGO 1”) only when height is tight.",
-      "lr4": "The lockup picks between two and three lines by itself from the width available (from 15 rem).",
+      "lr4": "The lockup picks between two and three lines by itself from the width available (from 22 rem).",
       "admin_icon": "The administration has its own icon: dark only, terminal-flavoured (the sail as a green line and a blinking gold prompt)."
     },
     "colour": {
@@ -426,8 +426,8 @@
       },
       "lockup": {
         "name": "Lockup",
-        "desc": "The mark and the parish name in live text: one, two or three lines, “EEC” always abbreviated.",
-        "use": "<SiteLockup /> (variant auto: three lines when small, two lines from 15 rem) or variant one / two / three.",
+        "desc": "The mark and the parish name in live text: one, two or three lines; the church line is dimmed.",
+        "use": "<SiteLockup /> (variant auto: three lines when small, two lines from 22 rem) or variant one / two / three.",
         "a11y": "Real text, readable by screen readers and translatable."
       },
       "illustration": {
@@ -546,7 +546,7 @@
       },
       "preloader": {
         "name": "Preloader",
-        "desc": "On the first visit, the logo draws itself in fine lines, then fades into the page once it is ready. Once per session; without JavaScript it fades by itself.",
+        "desc": "On the first visit, the logo and the parish name draw themselves in fine lines, letter after letter, then fade into the page once it is ready. Once per session.",
         "use": "<Preloader /> in the base layout, with the line variant of <Mark>. The drawing lasts about 1.2 s; it never replays during navigation.",
         "a11y": "Decorative (aria-hidden), holds the content no longer than needed. Reduced motion: the line is already drawn, a plain fade."
       }

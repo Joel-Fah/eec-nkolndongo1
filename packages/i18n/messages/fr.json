@@ -176,12 +176,12 @@
       "minsize": "Taille minimale : 24 px de haut sans texte ; 200 px avec le texte en arc, illisible en dessous.",
       "minsize_demo": "Le logo sans texte à 24, 32, 48 et 64 px",
       "lockups": "Logotypes horizontaux",
-      "lockups_lead": "Le logo et le nom de la paroisse, en texte vivant. « EEC » reste toujours abrégé. Sur une ligne pour les très petits espaces, sur deux lignes en général, sur trois lignes quand la place manque.",
+      "lockups_lead": "Le logo et le nom de la paroisse, en texte vivant : une ligne pour les très petits espaces, deux lignes par défaut, trois lignes quand la place manque.",
       "lockup_short": "Court",
       "lockup_long": "Long",
       "icons": "Favicons et icônes d’application",
       "lockup_auto": "Adaptatif",
-      "lockup_auto_lead": "Une seule composition choisit deux ou trois lignes selon la largeur disponible (à partir de 15 rem).",
+      "lockup_auto_lead": "Une seule composition choisit deux ou trois lignes selon la largeur disponible (à partir de 22 rem).",
       "usage_title": "Bon et mauvais usage",
       "do1": "Utiliser les fichiers de packages/ui/brand, sans les modifier.",
       "do2": "Laisser la zone de protection autour du logo.",
@@ -190,10 +190,10 @@
       "dont2": "Poser le logo sur une photo chargée ou un fond vert.",
       "dont3": "Réécrire le nom de la paroisse dans une autre police que celle des logotypes.",
       "lockup_rules_title": "Règles des logotypes",
-      "lr1": "Deux lignes : « EEC » puis « Paroisse de Nkolndongo 1 ».",
-      "lr2": "Trois lignes, pour les petits espaces : « EEC », « Paroisse de », « Nkolndongo 1 ».",
+      "lr1": "Deux lignes : « Église Évangélique du Cameroun » en entier, atténué, puis « Paroisse de Nkolndongo 1 » bien visible.",
+      "lr2": "Trois lignes, pour les petits espaces : « EEC » abrégé et atténué, puis « Paroisse de » et « Nkolndongo 1 » bien visibles.",
       "lr3": "Une ligne (« EEC NKOLNDONGO 1 ») seulement si la hauteur est comptée.",
-      "lr4": "Le logotype choisit seul entre deux et trois lignes selon la largeur disponible (à partir de 15 rem).",
+      "lr4": "Le logotype choisit seul entre deux et trois lignes selon la largeur disponible (à partir de 22 rem).",
       "admin_icon": "L’administration a sa propre icône : sombre uniquement, d’esprit terminal (la voile en trait vert et une invite dorée clignotante)."
     },
     "colour": {
@@ -426,8 +426,8 @@
       },
       "lockup": {
         "name": "Logotype",
-        "desc": "La marque et le nom de la paroisse en texte vivant : une, deux ou trois lignes, « EEC » toujours abrégé.",
-        "use": "<SiteLockup /> (variant auto : trois lignes en petit, deux lignes dès 15 rem) ou variant one / two / three.",
+        "desc": "La marque et le nom de la paroisse en texte vivant : une, deux ou trois lignes ; la ligne d’Église est atténuée.",
+        "use": "<SiteLockup /> (variant auto : trois lignes en petit, deux lignes dès 22 rem) ou variant one / two / three.",
         "a11y": "Texte réel, lisible par les lecteurs d’écran et traduisible."
       },
       "illustration": {
@@ -546,7 +546,7 @@
       },
       "preloader": {
         "name": "Préchargeur",
-        "desc": "À la première visite, le logo se dessine en traits fins puis se fond dans la page quand elle est prête. Une seule fois par session ; sans JavaScript, il s’efface seul.",
+        "desc": "À la première visite, le logo et le nom de la paroisse se dessinent en traits fins, lettre après lettre, puis se fondent dans la page quand elle est prête. Une seule fois par session.",
         "use": "<Preloader /> dans le gabarit de base, avec la variante line de <Mark>. Le dessin dure environ 1,2 s ; il n’est jamais rejoué pendant la navigation.",
         "a11y": "Décoratif (aria-hidden), ne retient pas le contenu plus que nécessaire. Mouvement réduit : le trait est déjà tracé, simple fondu."
       }

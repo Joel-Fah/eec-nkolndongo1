@@ -8,7 +8,7 @@ import Mark from '@eec/ui/astro/Mark.astro'
 ---
 
 <div class="eec-preloader" data-preloader aria-hidden="true">
-  <Mark variant="line" class="eec-preloader-mark" />
+  <Mark variant="lockup-line" class="eec-preloader-mark" />
 </div>
 
 <script>
@@ -16,7 +16,7 @@ import Mark from '@eec/ui/astro/Mark.astro'
   if (el) {
     const started = performance.now()
     const done = () => {
-      const wait = Math.max(0, 1250 - (performance.now() - started))
+      const wait = Math.max(0, 2600 - (performance.now() - started))
       window.setTimeout(() => {
         el.setAttribute('data-done', '')
         try {
@@ -42,7 +42,7 @@ import Mark from '@eec/ui/astro/Mark.astro'
     background: var(--bg);
     transition: opacity var(--duration-nav) var(--ease-soft), visibility var(--duration-nav);
     /* No-JS fallback: leave after the drawing has played. */
-    animation: eec-pre-out 0.6s var(--ease-soft) 2.2s forwards;
+    animation: eec-pre-out 0.6s var(--ease-soft) 3.4s forwards;
   }
   .eec-preloader[data-done] {
     opacity: 0;
@@ -52,7 +52,7 @@ import Mark from '@eec/ui/astro/Mark.astro'
     display: none;
   }
   .eec-preloader-mark {
-    width: min(38vw, 9rem);
+    width: min(86vw, 30rem);
     color: var(--primary);
   }
   .eec-preloader-mark svg {
@@ -61,17 +61,13 @@ import Mark from '@eec/ui/astro/Mark.astro'
     overflow: visible;
   }
   .eec-preloader svg {
-    stroke-width: 15;
+    width: 100%;
   }
   .eec-preloader .ln {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    animation: eec-draw 1.05s var(--ease-soft) forwards;
+    animation: eec-draw 0.9s var(--ease-soft) calc(var(--d, 0) * 1s) forwards;
   }
-  .eec-preloader .ln:nth-child(2) { animation-delay: 0.25s; }
-  .eec-preloader .ln:nth-child(3) { animation-delay: 0.4s; }
-  .eec-preloader .ln:nth-child(4) { animation-delay: 0.55s; }
-  .eec-preloader .ln:nth-child(5) { animation-delay: 0.75s; }
   @keyframes eec-draw {
     to {
       stroke-dashoffset: 0;

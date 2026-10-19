@@ -2,11 +2,10 @@
 /**
  * Horizontal lockup: the EEC mark + the parish name, in live text (Fraunces).
  *   one    → mark + « EEC NKOLNDONGO 1 » (single line, tightest spaces)
- *   two    → mark + « EEC » / « Paroisse de Nkolndongo 1 »
- *   three  → mark + « EEC » / « Paroisse de » / « Nkolndongo 1 »  (smaller spaces)
- *   auto   → three in narrow slots, two from 15 rem wide (container query)
- * "EEC" stays abbreviated in every variant. The slot (parent) sets the width; the font-size sets the
- * scale. Clear space is the caller's job. Mark ≥ 24 px tall.
+ *   two    → mark + « Église Évangélique du Cameroun » (dimmed) / « Paroisse de Nkolndongo 1 » (strong)
+ *   three  → mark + « EEC » (abbreviated, dimmed) / « Paroisse de » / « Nkolndongo 1 » (strong)
+ *   auto   → three in narrow slots, two from 22 rem wide (container query)
+ * The slot (parent) sets the width; the font-size sets the scale. Clear space is the caller's job.
  */
 import Mark from './Mark.astro'
 
@@ -16,6 +15,7 @@ interface Props {
   mark?: 'mark' | 'halo' | 'mono'
   /** Localised text (FR/EN), from packages/i18n — the lockup itself has no strings. */
   one: string
+  church: string
   eec: string
   parish: string
   parishLead: string
@@ -27,6 +27,7 @@ const {
   variant = 'auto',
   mark = 'mark',
   one,
+  church,
   eec,
   parish,
   parishLead,
@@ -39,7 +40,7 @@ const {
   <Mark variant={mark} class="eec-lockup-mark" />
   <span class="eec-lockup-one">{one}</span>
   <span class="eec-lockup-two">
-    <span class="eec-lockup-eec">{eec}</span>
+    <span class="eec-lockup-eec">{church}</span>
     <span class="eec-lockup-parish">{parish}</span>
   </span>
   <span class="eec-lockup-three">
@@ -83,26 +84,23 @@ const {
     line-height: 1.05;
   }
   .eec-lockup-eec {
-    font-size: 1.3em;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-size: 0.62em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
   }
   .eec-lockup-parish {
-    font-size: 0.98em;
-    font-weight: 500;
+    font-size: 1.15em;
+    font-weight: 600;
     min-width: 0;
   }
   .eec-lockup-three .eec-lockup-eec {
-    font-size: 1.15em;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.1em;
   }
   .eec-lockup-three .eec-lockup-parish {
-    font-size: 0.8em;
-    color: var(--ink-muted);
-  }
-  .eec-lockup-three .eec-lockup-place {
     font-size: 1em;
-    font-weight: 600;
-    color: inherit;
   }
 
   .eec-lockup[data-variant="one"] :is(.eec-lockup-two, .eec-lockup-three),
@@ -111,7 +109,7 @@ const {
   .eec-lockup[data-variant="auto"] :is(.eec-lockup-one, .eec-lockup-two) {
     display: none;
   }
-  @container (min-width: 15rem) {
+  @container (min-width: 22rem) {
     .eec-lockup[data-variant="auto"] .eec-lockup-three {
       display: none;
     }
