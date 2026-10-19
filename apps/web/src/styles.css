@@ -1,1 +1,6 @@
 @import "tailwindcss";
+@import "@eec/ui/tokens.css";
+@import "@eec/ui/styles/fonts.css";
+@import "@eec/ui/styles/base.css";
+
+@source "../../../packages/ui/astro";

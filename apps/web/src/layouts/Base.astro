@@ -1,28 +1,69 @@
 ---
+import { locales } from '@eec/i18n'
+import switzer from '@eec/ui/fonts/fontshare/switzer/Switzer-Variable.woff2?url'
+import '../styles.css'
 import { localeOf, useT } from '../lib/i18n'
+import { themeHeadScript } from '../lib/theme'
 
 interface Props {
   title: string
   description?: string
   noindex?: boolean
+  /** Path of this page in each locale, for hreflang and the language switcher. */
+  alternates?: Partial<Record<(typeof locales)[number], string>>
+  /** Extra font file to preload (the display face used above the fold). */
+  preloadDisplay?: string
+  season?: string
 }
 
-const { title, description, noindex = false } = Astro.props
+const { title, description, noindex = false, alternates = {}, preloadDisplay, season } = Astro.props
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const siteName = t('site.name')
+const canonical = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-season={season}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline set:html={themeHeadScript} />
     <title>{title === siteName ? title : `${title} · ${siteName}`}</title>
     {description && <meta name="description" content={description} />}
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    {
+      Object.entries(alternates).map(([lang, path]) => (
+        <link rel="alternate" hreflang={lang} href={new URL(path, Astro.site)} />
+      ))
+    }
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={switzer} as="font" type="font/woff2" crossorigin />
+    {preloadDisplay && <link rel="preload" href={preloadDisplay} as="font" type="font/woff2" crossorigin />}
+    <slot name="head" />
   </head>
   <body>
+    <a class="skip-link" href="#main">{t('common.skip_to_content')}</a>
     <slot />
   </body>
 </html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    color: var(--ink);
+    box-shadow: var(--elevation-2);
+  }
+  .skip-link:focus-visible {
+    inset-block-start: 1rem;
+  }
+</style>
