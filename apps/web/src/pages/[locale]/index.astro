@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro'
+import { localePaths, useT } from '../../lib/i18n'
+
+export const getStaticPaths = localePaths
+
+const t = useT(Astro.currentLocale)
+---
+
+<Base title={t('site.name')}>
+  <main>
+    <h1>{t('site.name')}</h1>
+    <p>{t('site.tagline')}</p>
+  </main>
+</Base>
