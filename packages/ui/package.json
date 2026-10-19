@@ -14,14 +14,19 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
+    "build": "node ../../scripts/fonts-fetch.ts",
+    "tokens": "node src/build-tokens.ts",
     "lint": "biome check .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "catalog:"
   },
   "devDependencies": {
     "@eec/config": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@types/node": "catalog:"
   }
 }

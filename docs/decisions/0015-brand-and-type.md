@@ -12,8 +12,9 @@ Our repo is public (AGPL).
   (cached). Each developer thus obtains their own copy from Fontshare, as the licence requires.
 - They are served **unmodified** (no subsetting). Official Switzer WOFF2s are already Latin-only:
   Regular ≈ 16.7 KB, Medium/Semibold ≈ 20 KB, Variable ≈ 43 KB.
-- Fontshare files lack U+202F (narrow no-break space, used before `; ! ?` in French). A `unicode-range`
-  face maps that single character to our OFL Fraunces subset.
+- None of the candidate fonts (Fontshare or Fraunces) has U+202F, the narrow no-break space used before
+  `; ! ?` in French. The browser falls back to the system font for that one blank character (Roboto,
+  Segoe UI and SF include it) — invisible, and no extra download.
 - **Fraunces** (SIL OFL 1.1, no Reserved Font Name) is subset (Latin + French), axis-pinned
   (opsz 72, SOFT 50, WONK 1) and committed with `OFL.txt` (`scripts/subset-fraunces.py`).
 - The repository licence (AGPL) does not cover fonts or the EEC logo (README).

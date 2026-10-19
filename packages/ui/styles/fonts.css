@@ -1,0 +1,116 @@
+/*
+ * Self-hosted fonts — no third-party requests.
+ * Switzer, Zodiak, Gambetta: Fontshare (ITF Free Font License) — fetched by `pnpm fonts:fetch`,
+ * served unmodified, never committed (decision 0015). Fraunces: SIL OFL 1.1, subset, committed.
+ * Only faces a page actually uses are downloaded. Preload: Switzer + one display weight (layout).
+ */
+
+@font-face {
+  font-family: "Switzer";
+  src: url("../fonts/fontshare/switzer/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Switzer";
+  src: url("../fonts/fontshare/switzer/Switzer-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces/Fraunces-Display.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces/Fraunces-DisplayItalic.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Zodiak";
+  src: url("../fonts/fontshare/zodiak/Zodiak-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Zodiak";
+  src: url("../fonts/fontshare/zodiak/Zodiak-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gambetta";
+  src: url("../fonts/fontshare/gambetta/Gambetta-Variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gambetta";
+  src: url("../fonts/fontshare/gambetta/Gambetta-VariableItalic.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Metric-matched system fallbacks: text doesn't jump when the web font swaps in (CLS). */
+@font-face {
+  font-family: "Switzer Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 103.6%;
+  ascent-override: 94.6%;
+  descent-override: 24.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Switzer Fallback Android";
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 101.8%;
+  ascent-override: 96.3%;
+  descent-override: 24.6%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Georgia");
+  size-adjust: 106.1%;
+  ascent-override: 92.2%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Fraunces Fallback Android";
+  src: local("Noto Serif"), local("NotoSerif-Regular");
+  size-adjust: 96.5%;
+  ascent-override: 101.3%;
+  descent-override: 26.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Zodiak Fallback";
+  src: local("Georgia");
+  size-adjust: 114%;
+  ascent-override: 86.8%;
+  descent-override: 22.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Gambetta Fallback";
+  src: local("Georgia");
+  size-adjust: 100.9%;
+  ascent-override: 92.2%;
+  descent-override: 28.7%;
+  line-gap-override: 0%;
+}

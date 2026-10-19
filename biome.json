@@ -13,6 +13,7 @@
       "!**/src/paraglide",
       "!**/routeTree.gen.ts",
       "!**/worker-configuration.d.ts",
+      "!packages/ui/tokens.css",
       "!packages/ui/fonts",
       "!packages/ui/brand/**/*.svg",
       "!packages/ui/illustrations/**/*.svg"
