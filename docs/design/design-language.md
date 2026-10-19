@@ -78,7 +78,8 @@ Hugeicons **stroke-rounded** only, 1.5px stroke, sizes 16/20/24. Colour = `curre
 Button (primary / secondary / ghost / link) · Input · Textarea · Select · Combobox · Dropdown menu ·
 Checkbox · Radio · Switch · Tabs · Accordion · Dialog · Sheet · Popover · Tooltip · Toast · Card ·
 Badge · Avatar · Skeleton · Empty state · Date picker · Data table (admin) · Command palette (admin).
-Built on Radix/Base UI primitives for accessibility; styles from tokens only.
+Public site: native platform elements (`<dialog>`, `popover`, `<details>`); admin: Base UI — one shared
+stylesheet, tokens only (decision 0016). Documented live in `/fr/_brand`.
 
 ## 9. Imagery
 Real parish photos (when available) > curated Pexels (no people) > illustrations. Warm grade, slight

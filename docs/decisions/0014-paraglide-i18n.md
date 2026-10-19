@@ -9,7 +9,8 @@ generated, gitignored, with `.d.ts`).
   with an **explicit locale** — `const t = useT(Astro.currentLocale)` — so prerendering never depends on
   global locale state, and no Paraglide middleware is needed.
 - `/` is the only on-demand route: it reads `Accept-Language` and redirects (302, `Vary: Accept-Language`).
-- **Admin** uses the Paraglide runtime strategy `localStorage → preferredLanguage → baseLocale`.
+- **Admin** uses a small provider (`apps/admin/src/lib/locale.tsx`) over the same `createT`: saved choice →
+  browser language → French, persisted in `localStorage`. It reuses `pickLocale` and the same messages.
 - `createT(locale)` applies `frTypo()` to French output, so messages are written with plain spaces
   (`"Bienvenue !"`) and rendered with correct no-break spaces.
 - A unit test fails if FR and EN key sets differ (our `i18n:check`).

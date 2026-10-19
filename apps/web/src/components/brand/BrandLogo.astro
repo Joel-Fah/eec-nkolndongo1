@@ -1,6 +1,6 @@
 ---
 import Mark from '@eec/ui/astro/Mark.astro'
-import official from '../../../../../assets/images/eec-logo-tr.png?url'
+import official from '../../assets/eec-logo-reference.webp?url'
 import { useT } from '../../lib/i18n'
 import SiteLockup from '../SiteLockup.astro'
 import Section from './Section.astro'
@@ -21,6 +21,8 @@ const darkOptions = [
         <Mark variant="full" label={t('site.church')} class="absolute inset-0 size-full" />
         <img
           class="official pointer-events-none absolute max-w-none opacity-0 transition-opacity"
+          loading="lazy"
+          decoding="async"
           src={official}
           alt=""
           width="900"

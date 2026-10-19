@@ -19,7 +19,7 @@ inspiration only — never trace or reproduce them.
 6. Optimise with SVGO (keep ids used by animation); target ≤ 15 KB gzipped.
 7. Accessibility: decorative → `aria-hidden="true"`; meaningful → `role="img"` + localised `<title>`.
 8. Optional motion: animate groups with GSAP (gentle float, blink, sprinkle marks), respect reduced motion.
-9. Save to `packages/ui/illustrations/<name>.svg` and add to the gallery page (admin `/design`).
+9. Save to `packages/ui/illustrations/<name>.svg` and document it in the living guide (`/fr/_brand` → Illustration).
 
 ## Subject library (our world)
 Hands holding a Bible / hymn book / drum / offering basket · choir in robes · the hill of Nkolndongo ·

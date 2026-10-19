@@ -20,3 +20,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0013 | Biome for lint and format | Accepted |
 | 0014 | Paraglide JS for i18n messages | Accepted |
 | 0015 | Brand and type (logo, lockups, Fraunces + Switzer, colours) | Accepted |
+| 0016 | Dual primitives: native Astro on the public site, Base UI in the admin | Accepted |
