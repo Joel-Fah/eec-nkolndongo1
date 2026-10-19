@@ -11,7 +11,7 @@ const t = useT(locale)
 const files = import.meta.glob<string>(
   [
     '../../../../../packages/ui/fonts/fontshare/switzer/Switzer-Variable.woff2',
-    '../../../../../packages/ui/fonts/fraunces/Fraunces-Display.woff2',
+    '../../../../../packages/ui/fonts/fontshare/erode/Erode-Variable.woff2',
   ],
   { query: '?inline', import: 'default', eager: true },
 )
@@ -22,7 +22,7 @@ const kb = (file: string) => {
   return formatBytes(Math.floor((base64.length * 3) / 4), locale)
 }
 
-const sizes = `Switzer ${kb('Switzer-Variable.woff2')} + Fraunces ${kb('Fraunces-Display.woff2')}`
+const sizes = `Switzer ${kb('Switzer-Variable.woff2')} + Erode ${kb('Erode-Variable.woff2')}`
 
 // A typographic sample only: Sunday 25 October 2026, 09:00 in Yaoundé.
 const sample = new Date('2026-10-25T08:00:00Z')

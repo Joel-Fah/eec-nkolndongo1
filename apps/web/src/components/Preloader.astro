@@ -1,31 +1,42 @@
 ---
 /**
- * First-visit preloader: the logo's line art draws itself, then the overlay fades out once the page has
- * loaded (at least ~1.2 s so the drawing finishes). Shown once per session; skipped with reduced motion
- * (a quick fade only). Works without JS: a CSS animation dismisses it after 2 s.
+ * First-visit preloader: a small centred badge where the EEC mark is drawn as line art, stroke by stroke,
+ * then its colours fill in; a thin bar tracks the drawing. The page stays hidden behind the cream until the
+ * drawing has finished (≈2 s) and the page has loaded, then the badge lifts away and the page rises in.
+ * Once per session. Reduced motion: no drawing, a short fade. No JS: CSS dismisses it after the drawing.
  */
 import Mark from '@eec/ui/astro/Mark.astro'
 ---
 
 <div class="eec-preloader" data-preloader aria-hidden="true">
-  <Mark variant="lockup-line" class="eec-preloader-mark" />
+  <div class="eec-preloader-badge">
+    <Mark variant="line" class="eec-preloader-line" />
+    <Mark variant="mark" class="eec-preloader-fill" />
+  </div>
+  <span class="eec-preloader-bar"><span></span></span>
 </div>
 
 <script>
   const el = document.querySelector<HTMLElement>('[data-preloader]')
   if (el) {
     const started = performance.now()
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+    // The drawing lasts 2 s (CSS); the page never shows half-drawn.
+    const minimum = reduced ? 300 : 2100
     const done = () => {
-      const wait = Math.max(0, 2600 - (performance.now() - started))
-      window.setTimeout(() => {
-        el.setAttribute('data-done', '')
-        try {
-          sessionStorage.setItem('eec-pre', '1')
-        } catch {
-          // storage blocked: the preloader may play again next time
-        }
-        window.setTimeout(() => el.remove(), 700)
-      }, wait)
+      window.setTimeout(
+        () => {
+          el.setAttribute('data-done', '')
+          document.documentElement.dataset.preloaded = ''
+          try {
+            sessionStorage.setItem('eec-pre', '1')
+          } catch {
+            // storage blocked: the preloader may play again next time
+          }
+          window.setTimeout(() => el.remove(), 700)
+        },
+        Math.max(0, minimum - (performance.now() - started)),
+      )
     }
     if (document.readyState === 'complete') done()
     else window.addEventListener('load', done, { once: true })
@@ -38,39 +49,128 @@ import Mark from '@eec/ui/astro/Mark.astro'
     inset: 0;
     z-index: 200;
     display: grid;
-    place-items: center;
+    place-content: center;
+    justify-items: center;
+    gap: 1.5rem;
     background: var(--bg);
-    transition: opacity var(--duration-nav) var(--ease-soft), visibility var(--duration-nav);
-    /* No-JS fallback: leave after the drawing has played. */
-    animation: eec-pre-out 0.6s var(--ease-soft) 3.4s forwards;
+    transition:
+      opacity var(--duration-nav) var(--ease-soft) 0.12s,
+      visibility 0s linear calc(var(--duration-nav) + 0.12s);
+    /* No-JS fallback: leave once the drawing has played. */
+    animation: eec-pre-out 0.5s var(--ease-soft) 2.6s forwards;
+  }
+  /* After the drawing, the page rises in under the lifting badge. */
+  .eec-preloader[data-done] ~ :is(header, main, footer) {
+    animation: eec-page-rise var(--duration-nav) var(--ease-soft) both;
+  }
+  @keyframes eec-page-rise {
+    from {
+      opacity: 0;
+      transform: translateY(calc(var(--rise) * 2));
+    }
+  }
+  html[data-preloaded] .eec-preloader:not([data-done]) {
+    display: none;
   }
   .eec-preloader[data-done] {
     opacity: 0;
     visibility: hidden;
   }
-  html[data-preloaded] .eec-preloader {
-    display: none;
+  .eec-preloader-badge {
+    position: relative;
+    display: grid;
+    width: 7.5rem;
+    aspect-ratio: 1;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-2);
+    transition:
+      transform var(--duration-nav) var(--ease-soft),
+      opacity var(--duration-ui) var(--ease-out);
   }
-  .eec-preloader-mark {
-    width: min(90vw, 38rem);
-    color: var(--primary);
+  .eec-preloader[data-done] .eec-preloader-badge {
+    transform: translateY(calc(var(--rise) * -1.5)) scale(0.92);
+    opacity: 0;
   }
-  .eec-preloader-mark svg {
+  .eec-preloader-badge > * {
+    grid-area: 1 / 1;
+  }
+  .eec-preloader-badge svg {
+    display: block;
     width: 100%;
     height: auto;
     overflow: visible;
   }
-  .eec-preloader svg {
-    width: 100%;
+  .eec-preloader-line {
+    color: var(--primary);
   }
-  .eec-preloader .ln {
+  .eec-preloader-line .ln {
+    stroke-width: 20;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    animation: eec-draw 0.9s var(--ease-soft) calc(var(--d, 0) * 1s) forwards;
+    animation: eec-draw 1s var(--ease-in-out) forwards;
+  }
+  /* Stroke order: the sail, then the three letters, then the cross. */
+  .eec-preloader-line .ln:nth-of-type(2) {
+    animation-delay: 0.25s;
+  }
+  .eec-preloader-line .ln:nth-of-type(3) {
+    animation-delay: 0.4s;
+  }
+  .eec-preloader-line .ln:nth-of-type(4) {
+    animation-delay: 0.55s;
+  }
+  .eec-preloader-line .ln:nth-of-type(5) {
+    animation-delay: 0.7s;
+  }
+  .eec-preloader-fill {
+    opacity: 0;
+    animation: eec-fill 0.5s var(--ease-out) 1.5s forwards;
+  }
+  .eec-preloader-line {
+    animation: eec-line-out 0.4s var(--ease-out) 1.6s forwards;
+  }
+  .eec-preloader-bar {
+    display: block;
+    width: 5rem;
+    height: 0.25rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+  }
+  .eec-preloader-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: eec-bar 2s var(--ease-in-out) forwards;
   }
   @keyframes eec-draw {
     to {
       stroke-dashoffset: 0;
+    }
+  }
+  @keyframes eec-fill {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes eec-line-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes eec-bar {
+    to {
+      transform: scaleX(1);
     }
   }
   @keyframes eec-pre-out {
@@ -80,12 +180,17 @@ import Mark from '@eec/ui/astro/Mark.astro'
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .eec-preloader .ln {
+    .eec-preloader-line {
+      display: none;
+    }
+    .eec-preloader-fill,
+    .eec-preloader-bar > span {
       animation: none;
-      stroke-dashoffset: 0;
+      opacity: 1;
+      transform: none;
     }
     .eec-preloader {
-      animation-delay: 0.6s;
+      animation-delay: 0.4s;
     }
   }
 </style>

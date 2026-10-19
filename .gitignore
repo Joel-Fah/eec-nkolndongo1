@@ -37,3 +37,6 @@ packages/ui/fonts/fontshare/
 
 # Local Worker secrets generated from .env.local
 apps/web/.dev.vars
+
+# Pexels placeholders with people: dev-only, never committed or deployed (scripts/pexels/import.ts)
+apps/web/public/placeholders/

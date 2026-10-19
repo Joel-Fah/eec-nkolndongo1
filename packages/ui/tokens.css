@@ -14,7 +14,7 @@
   --radius-lg: 20px;
   --radius-xl: 28px;
   --font-sans: "Switzer", "Switzer Fallback", "Switzer Fallback Android", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", "Fraunces Fallback", "Fraunces Fallback Android", ui-serif, Georgia, serif;
+  --font-display: "Erode", "Erode Fallback", "Erode Fallback Android", ui-serif, Georgia, serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);

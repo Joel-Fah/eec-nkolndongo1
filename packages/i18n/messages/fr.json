@@ -20,6 +20,17 @@
       "system": "Thème : celui de l’appareil",
       "light": "Thème : clair",
       "dark": "Thème : sombre"
+    },
+    "ph": {
+      "email": "nom@exemple.cm",
+      "name": "Marie Ngono",
+      "first_name": "Marie",
+      "last_name": "Ngono",
+      "password": "Votre mot de passe",
+      "new_password": "Une phrase facile à retenir",
+      "phone": "+237 6XX XX XX XX",
+      "notes": "Écrivez ici…",
+      "search": "Rechercher…"
     }
   },
   "nav": {
@@ -137,7 +148,8 @@
     "moissons": "Fête des Moissons"
   },
   "illo": {
-    "hymn_book": "Une main tend un recueil de cantiques ouvert à une autre main ; des notes de musique s’envolent des pages."
+    "hymn_book": "Une main tend un recueil de cantiques ouvert à une autre main ; des notes de musique s’envolent des pages.",
+    "sunday_welcome": "Une paroissienne accueille un visiteur à la porte du temple et lui tend un recueil de chants."
   },
   "lockup": {
     "short": "EEC NKOLNDONGO 1",
@@ -226,8 +238,8 @@
     },
     "type": {
       "title": "Typographie",
-      "lead": "Fraunces pour les titres, Switzer pour le texte et l’interface : la chaleur d’un titre doux, le calme d’une lecture facile.",
-      "pairing": "Fraunces + Switzer",
+      "lead": "Erode pour les titres, Switzer pour le texte et l’interface : un titre net et chaleureux, une lecture calme et facile.",
+      "pairing": "Erode + Switzer",
       "weight": "Poids des fichiers : {size}",
       "sample_label": "Exemple typographique, pas une information sur la paroisse.",
       "h1": "Bienvenue à la maison",
@@ -246,7 +258,7 @@
       "scale_base": "Texte courant, 17 à 18 px",
       "scale_xs": "Étiquettes",
       "rules_title": "Règles typographiques",
-      "rule1": "Titres en Fraunces (graisse 400 à 600), texte et interface en Switzer.",
+      "rule1": "Titres en Erode (graisse 400 à 600), texte et interface en Switzer.",
       "rule2": "Corps de texte 17 à 18 px, interligne 1,6 ; pas de texte courant en dessous de 14,5 px.",
       "rule3": "Chiffres alignés (tabular-nums) pour les heures, dates et montants.",
       "rule4": "Les titres s’équilibrent (text-wrap: balance), les paragraphes évitent les veuves (pretty)."
@@ -288,7 +300,12 @@
       "illustration_lead": "« Des mains se passent un recueil de cantiques » : dessin original, couleurs par jetons, quatre teintes de peau, animation douce désactivée en mouvement réduit.",
       "light": "Clair",
       "dark": "Sombre",
-      "size": "{size} gzippé"
+      "size": "{size} gzippé",
+      "scene_title": "Scènes de personnages (style « Cuate »)",
+      "scene_lead": "Des personnes entières aux proportions naturelles, une couleur d’accent (l’or, ou la couleur du temps liturgique), l’ardoise et des gris doux pour le décor. Tons de peau chauds variés. Couleurs par jetons : la scène suit le thème et la saison. Moins de 15 Ko compressé.",
+      "scene_light": "thème clair",
+      "scene_dark": "thème sombre",
+      "scene_avent": "accent du temps de l’Avent"
     },
     "page": {
       "status": "Guide vivant — interne",
@@ -306,7 +323,8 @@
       "icons": "Icônes",
       "illustration": "Illustration",
       "components": "Composants",
-      "rules": "Règles et entretien"
+      "rules": "Règles et entretien",
+      "patterns": "Motifs de page"
     },
     "identity": {
       "title": "Notre identité",
@@ -476,7 +494,7 @@
       },
       "fields": {
         "name": "Champs : texte, zone de texte, liste",
-        "desc": "Étiquette, aide et erreur autour du contrôle. La liste déroulante est la nôtre (une fenêtre native [popover] au même aspect que le menu Actions) ; un <select> caché garde les formulaires fonctionnels.",
+        "desc": "Étiquette, exemple (placeholder, obligatoire), aide et erreur autour du contrôle. Au focus : anneau vert de 2 px, halo doux, et l’étiquette prend la couleur. La liste déroulante est la nôtre (une fenêtre native [popover] au même aspect que le menu Actions) ; un <select> caché garde les formulaires fonctionnels.",
         "use": "<Field id label hint error>. L’erreur dit quoi faire, sans reproche. Les listes ne montrent jamais l’apparence du navigateur.",
         "a11y": "label relié au contrôle, aria-invalid et aria-describedby, erreur annoncée (role=alert), bordure d’erreur de 2 px en plus de la couleur."
       },
@@ -525,7 +543,7 @@
       },
       "footer": {
         "name": "Pied de page",
-        "desc": "Adresse, horaires, réseaux, informations légales, crédit photos, langue et thème. Les données de la paroisse sont des [À VALIDER] tant qu’elles ne sont pas confirmées.",
+        "desc": "Pied de page flottant : détaché des bords comme l’en-tête, arrondi à chaque coin. Une invitation, le plan du site, les liens pratiques, puis le nom « Nkolndongo » en très grand, coupé par le bas de la carte.",
         "use": "<Footer /> via le gabarit Site.",
         "a11y": "Titres h2 par colonne, liens de 44 px.",
         "demo": "Voir le pied de page en bas du site."
@@ -546,7 +564,7 @@
       },
       "preloader": {
         "name": "Préchargeur",
-        "desc": "À la première visite, le logo et le nom de la paroisse se dessinent en traits fins, lettre après lettre, puis se fondent dans la page quand elle est prête. Une seule fois par session.",
+        "desc": "À la première visite : un petit badge centré où le logo EEC se dessine trait par trait, puis ses couleurs apparaissent ; une fine barre suit le dessin. La page attend la fin du dessin (≈ 2 s), puis se lève sous le badge.",
         "use": "<Preloader /> dans le gabarit de base, avec la variante line de <Mark>. Le dessin dure environ 1,2 s ; il n’est jamais rejoué pendant la navigation.",
         "a11y": "Décoratif (aria-hidden), ne retient pas le contenu plus que nécessaire. Mouvement réduit : le trait est déjà tracé, simple fondu."
       }
@@ -565,16 +583,54 @@
       "manual3": "Mouvement réduit respecté.",
       "upkeep_title": "Entretenir ce guide",
       "upkeep": "Toute nouvelle couleur, composant, animation, transition ou règle s’ajoute à cette page dans la même modification que le code. Les textes sont écrits en français d’abord. Une décision importante reçoit aussi une fiche dans docs/decisions."
+    },
+    "patterns": {
+      "title": "Motifs de page",
+      "lead": "Les grands blocs qui donnent leur caractère aux pages publiques. Chaque page a sa propre idée ; ces motifs en sont le vocabulaire commun.",
+      "stream": {
+        "name": "Défilé de cartes (accueil)",
+        "desc": "Un jeu de cartes inclinées qui traverse l’écran d’un bord à l’autre : la communauté en photos, mêlée à des cartes-mots (Chanter, Prier…). Au survol, le défilé ralentit, la carte se redresse, se soulève et montre sa légende ; une lumière suit le pointeur. Animation CSS seule, piste rendue deux fois pour une boucle sans couture.",
+        "use": "<HeroStream />. Les photos de personnes Pexels n’existent qu’en développement ; en production, uniquement des cartes-mots jusqu’à l’arrivée de vraies photos de la paroisse (avec consentement).",
+        "a11y": "Bouton « Mettre en pause » (WCAG 2.2.2), pause aussi au survol. Mouvement réduit : pas de défilement, rangée à faire glisser avec des points d’arrêt. Save-Data : démarre en pause. La copie de la piste est aria-hidden."
+      },
+      "bento": {
+        "name": "Cartes « bento » et lumière au pointeur",
+        "desc": "Une grille de cartes de tailles différentes, chacune avec une idée. Au survol, la carte se soulève et une lueur douce de la couleur du temps suit le pointeur (attribut data-glow).",
+        "use": "class=\"bento-card\" + data-glow ; une carte = un lien entier. Grilles de 6 colonnes sur tablette et ordinateur, une colonne sur téléphone.",
+        "a11y": "La carte entière est un lien avec un titre ; la lueur est décorative. Pointeur fin uniquement."
+      },
+      "magnetic": {
+        "name": "Bouton magnétique",
+        "desc": "Le bouton principal se penche de quelques pixels vers le pointeur et revient avec un ressort quand on s’éloigne.",
+        "use": "Ajoutez data-magnetic sur un seul bouton par écran, l’action principale.",
+        "a11y": "Pointeur fin uniquement ; désactivé avec le mouvement réduit. Ne change ni la taille ni la zone cliquable."
+      },
+      "ring": {
+        "name": "Anneau de l’année liturgique",
+        "desc": "L’année en un anneau : un arc par temps liturgique, à sa vraie longueur cette année (calculée depuis Pâques), le temps actuel plus épais, un point pour aujourd’hui.",
+        "use": "<SeasonRing label=… />. Couleurs des temps par jetons ; suit le thème.",
+        "a11y": "role=img avec une étiquette qui dit le temps actuel."
+      },
+      "figures": {
+        "name": "Chiffres clés",
+        "desc": "De grands chiffres en Erode, qui comptent une fois en entrant dans l’écran.",
+        "use": "Ce sont des faits : valeur nulle tant qu’elle n’est pas validée (lib/stats.ts). En développement, un exemple marqué « exemple » ; en production, un chiffre non validé n’est pas affiché.",
+        "a11y": "Liste de définitions (dl) ; le décompte n’est pas annoncé et ne joue pas avec le mouvement réduit."
+      },
+      "account": {
+        "name": "Carte de compte (Mon espace)",
+        "desc": "Une seule carte, deux onglets (créer un compte / se connecter), jamais deux formulaires côte à côte. L’inscription se fait en trois petites étapes avec une barre de progression ; les consentements ne sont jamais cochés d’avance.",
+        "use": "AccountView.astro. Google viendra en premier (bouton présent, « Bientôt ») ; l’adresse e-mail reste toujours possible.",
+        "a11y": "Onglets au clavier (flèches), étape annoncée (aria-live), erreurs sous chaque champ reliées par aria-describedby, focus sur le premier champ en erreur.",
+        "open": "Voir la page Mon espace"
+      }
     }
   },
   "home": {
-    "title": "Bienvenue",
     "season": "Nous vivons le temps : {season}",
     "cta_discover": "Nous découvrir",
-    "cta_calendar": "Voir l’agenda",
-    "hero_note": "[À VALIDER : titre d’accueil de la page d’accueil]",
     "lead": "Une paroisse de l’Église Évangélique du Cameroun, au cœur de Nkolndongo, à Yaoundé : un lieu pour chanter, prier, écouter la Parole et avancer ensemble.",
-    "start_title": "Trois façons de commencer",
+    "start_title": "Par où commencer ?",
     "start1_t": "Venir un dimanche",
     "start1_p": "Découvrez le déroulement d’un culte et ce qui vous attend. Aucune tenue ni préparation nécessaire.",
     "start2_t": "Trouver votre place",
@@ -582,7 +638,50 @@
     "start3_t": "Faire connaissance",
     "start3_p": "Ce que nous croyons, ce qui nous rassemble, et le chemin pour nous rejoindre.",
     "verse": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
-    "verse_cite": "Matthieu 11 : 28"
+    "verse_cite": "Matthieu 11 : 28",
+    "title_a": "Une famille qui chante, prie et avance",
+    "title_b": "ensemble.",
+    "cta_visit": "Venir dimanche",
+    "start_eyebrow": "Premiers pas",
+    "more": "En savoir plus",
+    "season_eyebrow": "Le temps de l’Église",
+    "account_t": "Votre espace, en deux minutes",
+    "account_p": "Gardez le lien avec la paroisse : vos informations, vos choix, et bientôt vos inscriptions.",
+    "account_cta": "Créer mon espace",
+    "groups": {
+      "choirs": "Chorales",
+      "youth": "Jeunesse",
+      "women": "Femmes",
+      "men": "Hommes",
+      "children": "Enfants",
+      "readers": "Lecteurs",
+      "welcome": "Accueil"
+    },
+    "stats": {
+      "years": "ans de vie paroissiale",
+      "groups": "groupes et chorales",
+      "sundays": "dimanches de culte par an",
+      "members": "membres en lien avec nous",
+      "example": "exemple"
+    },
+    "stream": {
+      "label": "La vie de la paroisse en images",
+      "sing": "Chanter",
+      "sing_p": "Des voix qui se répondent.",
+      "pray": "Prier",
+      "pray_p": "Ensemble, chaque semaine.",
+      "grow": "Grandir",
+      "grow_p": "Dans la foi, à tout âge.",
+      "share": "Partager",
+      "share_p": "Le pain, le temps, la joie.",
+      "listen": "Écouter",
+      "listen_p": "La Parole, au cœur du culte.",
+      "welcome": "Accueillir",
+      "welcome_p": "Venez comme vous êtes.",
+      "credit": "Photo : {name} · Pexels",
+      "pause": "Mettre en pause",
+      "play": "Reprendre le défilement"
+    }
   },
   "soon": {
     "badge": "Bientôt",
@@ -607,7 +706,11 @@
     "credits": "Illustrations originales",
     "credits_pending": "Photos : crédits ajoutés avec les photos",
     "rights": "© EEC Nkolndongo 1",
-    "controls": "Langue et thème"
+    "controls": "Langue et thème",
+    "invite_title": "Venez nous voir dimanche",
+    "invite_text": "Personne ne vous demandera d’où vous venez. Asseyez-vous, écoutez, chantez si vous en avez envie : vous êtes attendu.",
+    "invite_find": "Nous trouver",
+    "invite_account": "Créer mon espace"
   },
   "admin": {
     "title": "Administration",
@@ -895,7 +998,8 @@
       "l3": "Vos inscriptions aux activités de la paroisse",
       "l4": "Plus tard, des services pour les membres",
       "s2_t": "Vos données vous appartiennent",
-      "s2_p": "Vous pourrez les consulter, les corriger, les exporter et les supprimer à tout moment. La connexion sera ouverte dans une prochaine étape."
+      "s2_p": "Vous pourrez les consulter, les corriger, les exporter et les supprimer à tout moment. La connexion sera ouverte dans une prochaine étape.",
+      "s2_p_short": "Vos données vous appartiennent : vous pourrez les consulter, les corriger, les exporter et les supprimer à tout moment."
     },
     "privacy": {
       "lead": "Votre vie privée compte. Voici, simplement, ce que fait ce site de vos informations.",
@@ -919,7 +1023,7 @@
       "s2_t": "Logo et marques",
       "s2_p": "Le logo de l’EEC appartient à l’Église Évangélique du Cameroun. Il est utilisé ici par la paroisse et ne peut être réutilisé sans autorisation.",
       "s3_t": "Code, polices et illustrations",
-      "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Fraunces (licence SIL OFL) et le texte en Switzer (licence ITF Free Font License). Les illustrations sont originales.",
+      "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Erode et le texte en Switzer (polices Fontshare, licence ITF Free Font License). Les illustrations sont originales.",
       "s4_t": "Hébergement",
       "s4_p": "Le site sera hébergé par Cloudflare. L’adresse et les informations de l’hébergeur seront indiquées ici à la mise en ligne."
     }
@@ -967,9 +1071,6 @@
   },
   "member": {
     "title": "Mon espace",
-    "signin_title": "J’ai déjà un compte",
-    "signup_title": "Créer mon compte",
-    "signup_lead": "Un compte gratuit, juste pour rester en lien avec la paroisse. Nous ne demandons que le nécessaire.",
     "first_name": "Prénom",
     "last_name": "Nom",
     "email": "Adresse e-mail",
@@ -984,8 +1085,32 @@
     "hello": "Bonjour {name}",
     "welcome": "Ravis de vous compter parmi nous. Votre espace s’enrichira bientôt.",
     "signout": "Me déconnecter",
-    "soon_title": "Bientôt dans votre espace",
-    "soon1": "Carte de Sainte-Cène — bientôt",
-    "soon2": "Mes groupes et mes inscriptions — bientôt"
+    "eyebrow": "Mon espace",
+    "h1": "Restez en lien avec votre paroisse",
+    "lead": "Un espace personnel, calme et privé : vos informations, vos choix, et bientôt vos inscriptions.",
+    "benefits_label": "Ce que vous offre votre espace",
+    "tab_signup": "Créer un compte",
+    "tab_signin": "Se connecter",
+    "google": "Continuer avec Google",
+    "soon": "Bientôt",
+    "or_email": "ou avec votre adresse e-mail",
+    "step": "Étape {n} sur {total}",
+    "step1_t": "Faisons connaissance",
+    "step2_t": "Protégez votre compte",
+    "step3_t": "Vos choix",
+    "next": "Continuer",
+    "back": "Retour",
+    "signin_lead": "Heureux de vous revoir.",
+    "forgot": "Mot de passe oublié ? Le secrétariat de la paroisse peut vous envoyer un lien pour en choisir un nouveau.",
+    "field_required": "Ce champ est nécessaire.",
+    "email_invalid": "Vérifiez l’adresse e-mail : elle ressemble à nom@exemple.cm.",
+    "tile_profile_t": "Mes informations",
+    "tile_profile_p": "Nom, adresse, téléphone : vous les gardez à jour vous-même.",
+    "tile_choices_t": "Mes choix",
+    "tile_choices_p": "Les nouvelles de la paroisse : oui ou non, c’est vous qui décidez.",
+    "tile_groups_t": "Mes groupes",
+    "tile_groups_p": "Les groupes et activités que vous suivez.",
+    "tile_card_t": "Carte de Sainte-Cène",
+    "tile_card_p": "Votre carte, toujours avec vous."
   }
 }

@@ -20,6 +20,17 @@
       "system": "Theme: device setting",
       "light": "Theme: light",
       "dark": "Theme: dark"
+    },
+    "ph": {
+      "email": "name@example.com",
+      "name": "Marie Ngono",
+      "first_name": "Marie",
+      "last_name": "Ngono",
+      "password": "Your password",
+      "new_password": "A phrase you’ll remember",
+      "phone": "+237 6XX XX XX XX",
+      "notes": "Write here…",
+      "search": "Search…"
     }
   },
   "nav": {
@@ -137,7 +148,8 @@
     "moissons": "Harvest Festival (Fête des Moissons)"
   },
   "illo": {
-    "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages."
+    "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages.",
+    "sunday_welcome": "A parishioner welcomes a visitor at the church door and hands him a hymn book."
   },
   "lockup": {
     "short": "EEC NKOLNDONGO 1",
@@ -226,8 +238,8 @@
     },
     "type": {
       "title": "Typography",
-      "lead": "Fraunces for headings, Switzer for text and interface: the warmth of a soft headline, the calm of easy reading.",
-      "pairing": "Fraunces + Switzer",
+      "lead": "Erode for headings, Switzer for text and interface: a crisp, warm headline and calm, easy reading.",
+      "pairing": "Erode + Switzer",
       "weight": "File weight: {size}",
       "sample_label": "Typographic sample, not information about the parish.",
       "h1": "Welcome home",
@@ -246,7 +258,7 @@
       "scale_base": "Body text, 17 to 18 px",
       "scale_xs": "Labels",
       "rules_title": "Type rules",
-      "rule1": "Headings in Fraunces (weights 400 to 600), text and interface in Switzer.",
+      "rule1": "Headings in Erode (weights 400 to 600), text and interface in Switzer.",
       "rule2": "Body 17 to 18 px, line height 1.6; no running text below 14.5 px.",
       "rule3": "Tabular figures for times, dates and amounts.",
       "rule4": "Headings balance (text-wrap: balance); paragraphs avoid orphans (pretty)."
@@ -288,7 +300,12 @@
       "illustration_lead": "“Hands passing a hymn book”: original drawing, token colours, four skin tones, a gentle animation turned off with reduced motion.",
       "light": "Light",
       "dark": "Dark",
-      "size": "{size} gzipped"
+      "size": "{size} gzipped",
+      "scene_title": "Character scenes (“Cuate” style)",
+      "scene_lead": "Whole people with natural proportions, one accent colour (gold, or the colour of the liturgical season), slate and soft greys for the setting. A range of warm skin tones. Colours come from tokens: the scene follows the theme and the season. Under 15 KB compressed.",
+      "scene_light": "light theme",
+      "scene_dark": "dark theme",
+      "scene_avent": "Advent season accent"
     },
     "page": {
       "status": "Living guide — internal",
@@ -306,7 +323,8 @@
       "icons": "Icons",
       "illustration": "Illustration",
       "components": "Components",
-      "rules": "Rules and upkeep"
+      "rules": "Rules and upkeep",
+      "patterns": "Page patterns"
     },
     "identity": {
       "title": "Our identity",
@@ -476,7 +494,7 @@
       },
       "fields": {
         "name": "Fields: text, textarea, select",
-        "desc": "Label, hint and error around the control. The dropdown is our own (a native [popover] looking like the Actions menu); a hidden <select> keeps forms working.",
+        "desc": "Label, example (placeholder, required), hint and error around the control. On focus: a 2 px green ring, a soft halo, and the label takes the colour. The dropdown is our own (a native [popover] looking like the Actions menu); a hidden <select> keeps forms working.",
         "use": "<Field id label hint error>. The error says what to do, without blame. Selects never show the browser’s default look.",
         "a11y": "Label tied to the control, aria-invalid and aria-describedby, error announced (role=alert), a 2 px error frame in addition to colour."
       },
@@ -525,7 +543,7 @@
       },
       "footer": {
         "name": "Footer",
-        "desc": "Address, times, socials, legal information, photo credit, language and theme. Parish data stays [TO CONFIRM] until confirmed.",
+        "desc": "Floating footer: lifted off the edges like the header, rounded on every corner. An invitation, the site map, practical links, then the name “Nkolndongo” set very large and cropped by the card’s bottom edge.",
         "use": "<Footer /> through the Site layout.",
         "a11y": "One h2 per column, 44 px links.",
         "demo": "See the footer at the bottom of the site."
@@ -546,7 +564,7 @@
       },
       "preloader": {
         "name": "Preloader",
-        "desc": "On the first visit, the logo and the parish name draw themselves in fine lines, letter after letter, then fade into the page once it is ready. Once per session.",
+        "desc": "On the first visit: a small centred badge where the EEC mark draws itself stroke by stroke, then its colours fill in; a thin bar follows the drawing. The page waits for the drawing to finish (≈2 s), then rises in under the badge.",
         "use": "<Preloader /> in the base layout, with the line variant of <Mark>. The drawing lasts about 1.2 s; it never replays during navigation.",
         "a11y": "Decorative (aria-hidden), holds the content no longer than needed. Reduced motion: the line is already drawn, a plain fade."
       }
@@ -565,16 +583,54 @@
       "manual3": "Reduced motion respected.",
       "upkeep_title": "Keeping this guide alive",
       "upkeep": "Every new colour, component, animation, transition or rule is added to this page in the same change as the code. Texts are written in French first. An important decision also gets a record in docs/decisions."
+    },
+    "patterns": {
+      "title": "Page patterns",
+      "lead": "The larger blocks that give the public pages their character. Each page has its own idea; these patterns are the shared vocabulary.",
+      "stream": {
+        "name": "Card stream (home)",
+        "desc": "A deck of tilted cards drifting from one edge of the screen to the other: the community in photos, mixed with word cards (Sing, Pray…). On hover the stream slows, the card straightens, lifts and shows its caption; a light follows the pointer. CSS animation only, track rendered twice for a seamless loop.",
+        "use": "<HeroStream />. Pexels photos of people exist only in development; production shows word cards only until real parish photos (with consent) arrive.",
+        "a11y": "“Pause” button (WCAG 2.2.2), also pauses on hover. Reduced motion: no drift, a row to swipe with snap points. Save-Data: starts paused. The track copy is aria-hidden."
+      },
+      "bento": {
+        "name": "Bento cards and pointer light",
+        "desc": "A grid of cards of different sizes, one idea each. On hover the card lifts and a soft glow in the season colour follows the pointer (data-glow attribute).",
+        "use": "class=\"bento-card\" + data-glow; one card = one whole link. 6-column grid on tablet and desktop, one column on phones.",
+        "a11y": "The whole card is a link with a heading; the glow is decorative. Fine pointers only."
+      },
+      "magnetic": {
+        "name": "Magnetic button",
+        "desc": "The main button leans a few pixels towards the pointer and springs back when it leaves.",
+        "use": "Add data-magnetic to one button per screen, the main action.",
+        "a11y": "Fine pointers only; off with reduced motion. Changes neither size nor hit area."
+      },
+      "ring": {
+        "name": "Liturgical year ring",
+        "desc": "The year as a ring: one arc per season at its real length this year (computed from Easter), the current season thicker, a dot for today.",
+        "use": "<SeasonRing label=… />. Season colours from tokens; follows the theme.",
+        "a11y": "role=img with a label naming the current season."
+      },
+      "figures": {
+        "name": "Key figures",
+        "desc": "Large figures in Erode that count up once when they enter the screen.",
+        "use": "These are facts: the value stays null until validated (lib/stats.ts). In development an example is shown, tagged “example”; in production an unvalidated figure is not shown.",
+        "a11y": "Definition list (dl); the count-up is not announced and doesn’t play with reduced motion."
+      },
+      "account": {
+        "name": "Account card (My space)",
+        "desc": "One card, two tabs (create an account / sign in), never two forms side by side. Sign-up takes three short steps with a progress bar; consents are never pre-ticked.",
+        "use": "AccountView.astro. Google will come first (button present, “Soon”); email stays available.",
+        "a11y": "Keyboard tabs (arrow keys), step announced (aria-live), errors under each field linked with aria-describedby, focus moves to the first field in error.",
+        "open": "Open the My space page"
+      }
     }
   },
   "home": {
-    "title": "Welcome",
     "season": "We are in the season of {season}",
     "cta_discover": "Get to know us",
-    "cta_calendar": "See the calendar",
-    "hero_note": "[TO CONFIRM: home page headline]",
     "lead": "A parish of the Evangelical Church of Cameroon in Nkolndongo, Yaoundé: a place to sing, pray, listen to the Word and walk together.",
-    "start_title": "Three ways to begin",
+    "start_title": "Where to begin?",
     "start1_t": "Come on a Sunday",
     "start1_p": "See how a service unfolds and what to expect. No dress code, no preparation needed.",
     "start2_t": "Find your place",
@@ -582,7 +638,50 @@
     "start3_t": "Get to know us",
     "start3_p": "What we believe, what gathers us, and the way to join us.",
     "verse": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
-    "verse_cite": "Matthew 11:28"
+    "verse_cite": "Matthew 11:28",
+    "title_a": "A family that sings, prays and moves forward",
+    "title_b": "together.",
+    "cta_visit": "Come on Sunday",
+    "start_eyebrow": "First steps",
+    "more": "Learn more",
+    "season_eyebrow": "The Church’s season",
+    "account_t": "Your space, in two minutes",
+    "account_p": "Stay connected with the parish: your details, your choices, and soon your sign-ups.",
+    "account_cta": "Create my space",
+    "groups": {
+      "choirs": "Choirs",
+      "youth": "Youth",
+      "women": "Women",
+      "men": "Men",
+      "children": "Children",
+      "readers": "Readers",
+      "welcome": "Welcome team"
+    },
+    "stats": {
+      "years": "years of parish life",
+      "groups": "groups and choirs",
+      "sundays": "Sundays of worship a year",
+      "members": "members connected with us",
+      "example": "example"
+    },
+    "stream": {
+      "label": "Parish life in pictures",
+      "sing": "Sing",
+      "sing_p": "Voices answering each other.",
+      "pray": "Pray",
+      "pray_p": "Together, every week.",
+      "grow": "Grow",
+      "grow_p": "In faith, at every age.",
+      "share": "Share",
+      "share_p": "Bread, time and joy.",
+      "listen": "Listen",
+      "listen_p": "The Word, at the heart of worship.",
+      "welcome": "Welcome",
+      "welcome_p": "Come as you are.",
+      "credit": "Photo: {name} · Pexels",
+      "pause": "Pause",
+      "play": "Resume the slideshow"
+    }
   },
   "soon": {
     "badge": "Coming soon",
@@ -607,7 +706,11 @@
     "credits": "Original illustrations",
     "credits_pending": "Photos: credits added with the photos",
     "rights": "© EEC Nkolndongo 1",
-    "controls": "Language and theme"
+    "controls": "Language and theme",
+    "invite_title": "Come and see us on Sunday",
+    "invite_text": "No one will ask where you come from. Sit down, listen, sing if you feel like it: you are expected.",
+    "invite_find": "Find us",
+    "invite_account": "Create my space"
   },
   "admin": {
     "title": "Administration",
@@ -895,7 +998,8 @@
       "l3": "Your sign-ups for parish activities",
       "l4": "Later, services for members",
       "s2_t": "Your data is yours",
-      "s2_p": "You will be able to view, correct, export and delete them at any time. Sign-in will open in a next step."
+      "s2_p": "You will be able to view, correct, export and delete them at any time. Sign-in will open in a next step.",
+      "s2_p_short": "Your data belongs to you: you will be able to view, correct, export and delete it at any time."
     },
     "privacy": {
       "lead": "Your privacy matters. Here, simply, is what this site does with your information.",
@@ -919,7 +1023,7 @@
       "s2_t": "Logo and marks",
       "s2_p": "The EEC logo belongs to the Evangelical Church of Cameroon. It is used here by the parish and may not be reused without permission.",
       "s3_t": "Code, fonts and illustrations",
-      "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Fraunces (SIL OFL licence) and text in Switzer (ITF Free Font License). The illustrations are original.",
+      "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Erode and text in Switzer (Fontshare fonts, ITF Free Font License). The illustrations are original.",
       "s4_t": "Hosting",
       "s4_p": "The site will be hosted by Cloudflare. The host’s address and details will be shown here at launch."
     }
@@ -967,9 +1071,6 @@
   },
   "member": {
     "title": "My space",
-    "signin_title": "I already have an account",
-    "signup_title": "Create my account",
-    "signup_lead": "A free account, just to stay in touch with the parish. We only ask for what we need.",
     "first_name": "First name",
     "last_name": "Last name",
     "email": "Email address",
@@ -984,8 +1085,32 @@
     "hello": "Hello {name}",
     "welcome": "Glad to have you with us. Your space will grow soon.",
     "signout": "Sign out",
-    "soon_title": "Soon in your space",
-    "soon1": "Holy Communion card — soon",
-    "soon2": "My groups and sign-ups — soon"
+    "eyebrow": "My space",
+    "h1": "Stay connected with your parish",
+    "lead": "A personal space, calm and private: your details, your choices, and soon your sign-ups.",
+    "benefits_label": "What your space offers",
+    "tab_signup": "Create an account",
+    "tab_signin": "Sign in",
+    "google": "Continue with Google",
+    "soon": "Soon",
+    "or_email": "or with your email address",
+    "step": "Step {n} of {total}",
+    "step1_t": "Let’s get acquainted",
+    "step2_t": "Protect your account",
+    "step3_t": "Your choices",
+    "next": "Continue",
+    "back": "Back",
+    "signin_lead": "Good to see you again.",
+    "forgot": "Forgot your password? The parish office can send you a link to choose a new one.",
+    "field_required": "This field is required.",
+    "email_invalid": "Check the email address: it should look like name@example.com.",
+    "tile_profile_t": "My details",
+    "tile_profile_p": "Name, address, phone: you keep them up to date yourself.",
+    "tile_choices_t": "My choices",
+    "tile_choices_p": "Parish news: yes or no, you decide.",
+    "tile_groups_t": "My groups",
+    "tile_groups_p": "The groups and activities you follow.",
+    "tile_card_t": "Communion card",
+    "tile_card_p": "Your card, always with you."
   }
 }

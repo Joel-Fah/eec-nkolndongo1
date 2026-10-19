@@ -19,7 +19,8 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0012 | Frugal CI/CD | Accepted |
 | 0013 | Biome for lint and format | Accepted |
 | 0014 | Paraglide JS for i18n messages | Accepted |
-| 0015 | Brand and type (logo, lockups, Fraunces + Switzer, colours) | Accepted |
+| 0015 | Brand and type (logo, lockups, Fraunces + Switzer, colours) | Font part superseded by 0023 |
 | 0016 | Dual primitives: native Astro on the public site, Base UI in the admin | Accepted |
 | 0017 | Single origin: site, admin, API and media on one Worker | Accepted |
 | 0018 | Auth: self-hosted Better Auth on our Neon database | Accepted |
+| 0023 | Erode replaces Fraunces for headings | Accepted |

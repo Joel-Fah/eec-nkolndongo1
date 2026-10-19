@@ -15,7 +15,8 @@ interface Props {
   error?: string
   required?: boolean
   disabled?: boolean
-  placeholder?: string
+  /** Required: an example of the expected answer, never a repeat of the label. */
+  placeholder: string
   value?: string
   rows?: number
   autocomplete?: string

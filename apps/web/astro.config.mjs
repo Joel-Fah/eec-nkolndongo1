@@ -1,4 +1,6 @@
 // @ts-check
+
+import { rm } from 'node:fs/promises'
 import cloudflare from '@astrojs/cloudflare'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
@@ -23,6 +25,16 @@ export default defineConfig({
     },
   },
   integrations: [
+    {
+      // Pexels photos of people are dev-only placeholders (apps/web/src/lib/placeholders.ts): Vite copies
+      // public/ into every build, so they are removed from the output before anything can deploy them.
+      name: 'eec:drop-dev-placeholders',
+      hooks: {
+        'astro:build:done': async ({ dir }) => {
+          await rm(new URL('placeholders/', dir), { recursive: true, force: true })
+        },
+      },
+    },
     sitemap({
       // Internal pages (`/_brand`, `/_ui`) never reach the sitemap.
       filter: (page) => !new URL(page).pathname.split('/').some((part) => part.startsWith('_')),

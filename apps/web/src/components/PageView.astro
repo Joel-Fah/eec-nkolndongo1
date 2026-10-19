@@ -9,7 +9,6 @@ import { seasonNames } from '@eec/ui/tokens'
 import { localeOf, useT } from '../lib/i18n'
 import { href, labelKey, pages } from '../lib/nav'
 import { content } from '../lib/pages'
-import AccountPanel from './AccountPanel.astro'
 
 interface Props {
   id: string
@@ -37,8 +36,6 @@ const colsClass = {
     </div>
     {page.art && <div class="rounded-xl bg-surface-2 p-4"><Illustration name={page.art} class="h-auto w-full" /></div>}
   </header>
-
-  {id === 'account' && <AccountPanel />}
 
   {
     page.blocks.map((block) => {

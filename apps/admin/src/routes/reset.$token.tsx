@@ -50,6 +50,7 @@ function Reset() {
           <>
             <TextField
               label={t('login.password')}
+              placeholder={t('common.ph.new_password')}
               name="password"
               type="password"
               autoComplete="new-password"

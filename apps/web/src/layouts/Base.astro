@@ -1,6 +1,7 @@
 ---
 import { getSeason } from '@eec/core'
 import { locales } from '@eec/i18n'
+import erode from '@eec/ui/fonts/fontshare/erode/Erode-Variable.woff2?url'
 import switzer from '@eec/ui/fonts/fontshare/switzer/Switzer-Variable.woff2?url'
 import '../styles.css'
 import Preloader from '../components/Preloader.astro'
@@ -13,12 +14,10 @@ interface Props {
   noindex?: boolean
   /** Path of this page in each locale, for hreflang and the language switcher. */
   alternates?: Partial<Record<(typeof locales)[number], string>>
-  /** Extra font file to preload (the display face used above the fold). */
-  preloadDisplay?: string
   season?: string
 }
 
-const { title, description, noindex = false, alternates = {}, preloadDisplay, season } = Astro.props
+const { title, description, noindex = false, alternates = {}, season } = Astro.props
 // Computed when the page is built; `moissons` will come from an admin-set range (Phase 02).
 const currentSeason = season ?? getSeason()
 const locale = localeOf(Astro.currentLocale)
@@ -46,7 +45,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={switzer} as="font" type="font/woff2" crossorigin />
-    {preloadDisplay && <link rel="preload" href={preloadDisplay} as="font" type="font/woff2" crossorigin />}
+    <link rel="preload" href={erode} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
   </head>
   <body>

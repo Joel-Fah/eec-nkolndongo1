@@ -70,6 +70,20 @@ const variants = [
         ))
       }
     </div>
+    <div>
+      <h3 class="text-xl">{t('brand.icons.scene_title')}</h3>
+      <p class="mt-1 max-w-[62ch] text-ink-muted">{t('brand.icons.scene_lead')}</p>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      {
+        (['light', 'dark', 'avent'] as const).map((v) => (
+          <figure data-theme={v === 'dark' ? 'dark' : 'light'} data-season={v === 'avent' ? 'avent' : undefined} class="grid gap-2 overflow-hidden rounded-xl bg-surface p-3 text-ink ring-1 ring-line" style={v === 'avent' ? '--gold:var(--season)' : undefined}>
+            <Illustration name="sunday-welcome" title={v === 'light' ? t('illo.sunday_welcome') : undefined} class="h-auto w-full" />
+            <figcaption class="px-2 pb-1 text-sm text-ink-muted"><code>sunday-welcome</code> · {t(`brand.icons.scene_${v}` as 'brand.icons.scene_light')}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
   </div>
 </Section>
 

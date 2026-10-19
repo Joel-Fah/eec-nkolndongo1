@@ -50,6 +50,7 @@ function Login() {
         </div>
         <TextField
           label={t('login.email')}
+          placeholder={t('common.ph.email')}
           name="email"
           type="email"
           autoComplete="username"
@@ -57,6 +58,7 @@ function Login() {
         />
         <TextField
           label={t('login.password')}
+          placeholder={t('common.ph.password')}
           name="password"
           type="password"
           autoComplete="current-password"

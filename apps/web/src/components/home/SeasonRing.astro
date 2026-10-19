@@ -1,0 +1,69 @@
+---
+/**
+ * The liturgical year as a ring: one arc per season (its real length this year, computed from the date of
+ * Easter), the current season thicker, a dot for today. Pure SVG, season colours from tokens
+ * ([data-season] on each arc), so it follows the theme.
+ */
+import { civilDateIn, getSeason, seasonRanges } from '@eec/core'
+
+interface Props {
+  class?: string
+  label: string
+}
+const { class: className, label } = Astro.props
+const now = new Date()
+const today = civilDateIn(now)
+const current = getSeason(now)
+const day = (d: { year: number; month: number; day: number }) =>
+  (Date.UTC(d.year, d.month - 1, d.day) - Date.UTC(d.year, 0, 1)) / 86_400_000
+const yearLength = day({ year: today.year, month: 12, day: 31 }) + 1
+const r = 42
+const c = 2 * Math.PI * r
+const gap = 0.6
+const arcs = seasonRanges(today.year).map((range) => {
+  const start = day(range.from) / yearLength
+  const length = (day(range.to) + 1) / yearLength - start
+  return { season: range.season, start, length }
+})
+const angle = (day(today) / yearLength) * 2 * Math.PI - Math.PI / 2
+const dot = { x: 50 + r * Math.cos(angle), y: 50 + r * Math.sin(angle) }
+---
+
+<svg class:list={['season-ring', className]} viewBox="0 0 100 100" role="img" aria-label={label}>
+  <g transform="rotate(-90 50 50)" fill="none">
+    {
+      arcs.map((arc) => (
+        <circle
+          data-season={arc.season}
+          class:list={['season-ring-arc', arc.season === current && 'is-current']}
+          cx="50"
+          cy="50"
+          r={r}
+          pathLength={c}
+          stroke-dasharray={`${Math.max(0.4, arc.length * c - gap)} ${c}`}
+          stroke-dashoffset={-arc.start * c}
+        />
+      ))
+    }
+  </g>
+  <circle class="season-ring-today" cx={dot.x} cy={dot.y} r="3.4" />
+</svg>
+
+<style is:global>
+  .season-ring-arc {
+    stroke: var(--season);
+    stroke-width: 6;
+    stroke-linecap: round;
+    opacity: 0.5;
+    transition: stroke-width var(--duration-ui) var(--ease-out), opacity var(--duration-ui) var(--ease-out);
+  }
+  .season-ring-arc.is-current {
+    stroke-width: 10;
+    opacity: 1;
+  }
+  .season-ring-today {
+    fill: var(--surface);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+  }
+</style>

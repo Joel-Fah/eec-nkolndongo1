@@ -1,6 +1,6 @@
 import { Button, TextField } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { LocaleSwitch, ThemeButton } from '../components/Controls'
 import { Mark } from '../components/Mark'
@@ -12,7 +12,6 @@ export const Route = createFileRoute('/invite/$token')({ component: Invite })
 function Invite() {
   const t = useT()
   const { token } = Route.useParams()
-  const navigate = useNavigate()
   const check = useQuery({
     queryKey: ['invite', token],
     queryFn: () => api<{ email: string }>(`/invitations/${token}`),
@@ -64,14 +63,22 @@ function Invite() {
           <>
             <TextField
               label={t('auth.invite.email')}
+              placeholder={t('common.ph.email')}
               name="email"
               type="email"
               value={check.data.email}
               readOnly
             />
-            <TextField label={t('auth.invite.name')} name="name" autoComplete="name" required />
+            <TextField
+              label={t('auth.invite.name')}
+              placeholder={t('common.ph.name')}
+              name="name"
+              autoComplete="name"
+              required
+            />
             <TextField
               label={t('login.password')}
+              placeholder={t('common.ph.new_password')}
               name="password"
               type="password"
               autoComplete="new-password"

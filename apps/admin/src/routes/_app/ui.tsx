@@ -64,9 +64,17 @@ function UiGallery() {
 
       <Block title={t('ui.fields')}>
         <div className="grid gap-5 md:grid-cols-2">
-          <TextField label={t('ui.field_name')} hint={t('ui.field_hint')} />
-          <TextField label={t('ui.field_name')} error={t('ui.field_error')} />
-          <TextField label={t('ui.field_notes')} textarea />
+          <TextField
+            label={t('ui.field_name')}
+            placeholder={t('common.ph.name')}
+            hint={t('ui.field_hint')}
+          />
+          <TextField
+            label={t('ui.field_name')}
+            placeholder={t('common.ph.name')}
+            error={t('ui.field_error')}
+          />
+          <TextField label={t('ui.field_notes')} placeholder={t('common.ph.notes')} textarea />
           <div className="grid content-start gap-5">
             <SelectField
               label={t('ui.select_label')}

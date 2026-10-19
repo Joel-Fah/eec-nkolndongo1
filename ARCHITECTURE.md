@@ -27,7 +27,7 @@ Database, auth, API modules and content are Phase 02+. Rationale for each choice
 | Styling | Tailwind CSS v4 + CSS custom-property tokens (generated from `packages/ui/src/tokens.ts`) | `packages/ui` |
 | Motion | **GSAP** (ScrollTrigger, SplitText, MorphSVG) + CSS | Per-page loading only |
 | Icons | Hugeicons free, stroke-rounded | `@hugeicons/core-free-icons` |
-| Fonts | **Switzer** (text/UI, Fontshare, fetched at build, not committed) + **Fraunces** (headings, OFL, subset, committed) | Self-hosted WOFF2, decision 0015 |
+| Fonts | **Switzer** (text/UI, Fontshare, fetched at build, not committed) + **Erode** (headings, Fontshare, fetched the same way — decision 0023) | Self-hosted WOFF2, decision 0015 |
 | Payments (later) | **pawaPay** | MTN MoMo + Orange Money Cameroon (XAF) |
 | Hosting | Cloudflare (Workers static assets / Pages) | Free plan |
 

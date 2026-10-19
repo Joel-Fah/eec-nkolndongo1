@@ -1,0 +1,72 @@
+---
+/** Page patterns: the larger building blocks of the public pages, with live demos. */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import '../../styles/patterns.css'
+import HeroStream from '../home/HeroStream.astro'
+import SeasonRing from '../home/SeasonRing.astro'
+import DocBlock from './DocBlock.astro'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+type Id = 'stream' | 'bento' | 'magnetic' | 'ring' | 'figures' | 'account'
+const doc = (id: Id) => ({
+  id: `p-${id}`,
+  name: t(`brand.patterns.${id}.name` as 'brand.patterns.stream.name'),
+  description: t(`brand.patterns.${id}.desc` as 'brand.patterns.stream.desc'),
+  usage: t(`brand.patterns.${id}.use` as 'brand.patterns.stream.use'),
+  a11y: t(`brand.patterns.${id}.a11y` as 'brand.patterns.stream.a11y'),
+})
+---
+
+<Section id="patterns" title={t('brand.patterns.title')} lead={t('brand.patterns.lead')}>
+  <DocBlock {...doc('stream')}>
+    <div class="-mx-5 overflow-hidden"><HeroStream /></div>
+  </DocBlock>
+
+  <DocBlock {...doc('bento')}>
+    <div class="grid gap-4 md:grid-cols-2">
+      <a class="bento-card" href="#p-bento" data-glow>
+        <span class="bento-icon"><Icon name="users" /></span>
+        <h4 class="text-2xl">{t('home.start2_t')}</h4>
+        <p class="text-ink-muted">{t('home.start2_p')}</p>
+        <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
+      </a>
+      <figure class="bento-card bento-verse">
+        <span class="bento-verse-mark" aria-hidden="true">{locale === 'fr' ? '«' : '“'}</span>
+        <blockquote class="bento-verse-text">{t('home.verse')}</blockquote>
+        <figcaption class="bento-verse-cite">{t('home.verse_cite')}</figcaption>
+      </figure>
+    </div>
+  </DocBlock>
+
+  <DocBlock {...doc('magnetic')}>
+    <div class="flex flex-wrap gap-3">
+      <Button size="lg" data-magnetic>{t('home.cta_visit')}<Icon name="arrowRight" /></Button>
+    </div>
+  </DocBlock>
+
+  <DocBlock {...doc('ring')}>
+    <SeasonRing class="h-32 w-32" label={t('brand.patterns.ring.name')} />
+  </DocBlock>
+
+  <DocBlock {...doc('figures')}>
+    <dl class="home-stats">
+      <div class="home-stat">
+        <dt>{t('home.stats.sundays')}</dt>
+        <dd><span class="home-stat-value">52</span><span class="home-stat-example">{t('home.stats.example')}</span></dd>
+      </div>
+    </dl>
+  </DocBlock>
+
+  <DocBlock {...doc('account')}>
+    <div class="grid max-w-md gap-4">
+      <p class="acct-or"><span>{t('member.or_email')}</span></p>
+      <div class="acct-progress" aria-hidden="true"><span data-on></span><span data-on></span><span></span></div>
+      <p class="acct-step">{t('member.step', { n: '2', total: '3' })} · {t('member.step2_t')}</p>
+      <a class="acct-link" style="padding:0" href={locale === 'fr' ? '/fr/mon-espace/' : '/en/my-space/'}>{t('brand.patterns.account.open')}<Icon name="external" size={16} /></a>
+    </div>
+  </DocBlock>
+</Section>

@@ -117,9 +117,9 @@ const doc = (id: Id) => ({
 
     <DocBlock {...doc('fields')}>
       <div class="grid gap-5 md:grid-cols-2">
-        <Field id="d-name" label={t('ui.field_name')} hint={t('ui.field_hint')} />
-        <Field id="d-name2" label={t('ui.field_name')} error={t('ui.field_error')} />
-        <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} />
+        <Field id="d-name" label={t('ui.field_name')} placeholder={t('common.ph.name')} hint={t('ui.field_hint')} />
+        <Field id="d-name2" label={t('ui.field_name')} placeholder={t('common.ph.name')} error={t('ui.field_error')} />
+        <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} placeholder={t('common.ph.notes')} />
         <Field id="d-dept" kind="select" label={t('ui.select_label')} placeholder={t('ui.select_placeholder')} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t(`ui.o${n}` as 'ui.o1') }))} />
       </div>
     </DocBlock>

@@ -15,7 +15,7 @@ Source of truth: `docs/design/design-language.md`. Tokens live in `packages/ui/t
 - **Floating navigation** (lifted off the edges, rounded all around); scrollbars rounded, auto-hidden inside panels; every nav entry has an icon.
 - **Document it:** add the component/animation/token to the living guide (`/fr/_brand`) in the same change.
 - **Icons:** Hugeicons stroke-rounded via the `<Icon>` wrapper in `packages/ui`; `currentColor`; 16/20/24.
-- **Type:** Switzer for text/UI, Fraunces for headings only. French spacing helper for `: ; ! ?` and « ».
+- **Type:** Switzer for text/UI, Erode for headings only. French spacing helper for `: ; ! ?` and « ».
 - **Primitives:** Radix/Base UI underneath for a11y (focus trap, roving focus, ARIA). Every dropdown, select, combobox, popover, dialog must look on-brand — never browser-default or library-default styling.
 - **States:** default, hover, active, focus-visible (gold ring, 2px offset), disabled, loading, error, empty.
 - **Touch targets** ≥ 44×44 px. Contrast AA in both themes.

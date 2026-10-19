@@ -57,6 +57,7 @@ export function Button({
 /* ── Field: label + control + hint + error ────────────────────────────── */
 export function TextField({
   label,
+  placeholder,
   hint,
   error,
   textarea,
@@ -64,6 +65,8 @@ export function TextField({
   ...rest
 }: {
   label: string
+  /** Required: an example of the expected answer (e.g. « marie@exemple.cm »), never a repeat of the label. */
+  placeholder: string
   hint?: string
   error?: string
   textarea?: boolean
@@ -73,9 +76,17 @@ export function TextField({
     <Field.Root invalid={!!error} className="field">
       <Field.Label className="field-label">{label}</Field.Label>
       {textarea ? (
-        <Field.Control render={<textarea className={cx('textarea', className)} />} {...rest} />
+        <Field.Control
+          render={<textarea className={cx('textarea', className)} />}
+          placeholder={placeholder}
+          {...rest}
+        />
       ) : (
-        <Field.Control render={<Input className={cx('input', className)} />} {...rest} />
+        <Field.Control
+          render={<Input className={cx('input', className)} />}
+          placeholder={placeholder}
+          {...rest}
+        />
       )}
       {hint && <Field.Description className="field-hint">{hint}</Field.Description>}
       {error && (
