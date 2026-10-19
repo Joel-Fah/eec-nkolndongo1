@@ -1,0 +1,31 @@
+{
+  "name": "@eec/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./columns": "./src/columns.ts",
+    "./node": "./src/node.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --env-file=../../.env.local src/cli/migrate.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.4",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/pg": "8.15.5",
+    "drizzle-kit": "0.31.11",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
