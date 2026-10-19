@@ -45,6 +45,9 @@ export const colors = {
   'illo-paper': { light: '#FFFDF8', dark: '#EAE3D3' },
   'illo-shadow': { light: '#16201A', dark: '#050906' },
   'illo-line': { light: '#B0461F', dark: '#C8603A' },
+  /** Photos: text and glass cards over an image stay light whatever the theme, on a dark scrim. */
+  'on-photo': { light: '#FFFFFF', dark: '#FFFFFF' },
+  scrim: { light: '#0B120E', dark: '#050906' },
   /** ⚑ Focus: gold ring + an outer ring that guarantees 3:1 (gold alone fails on cream). */
   'focus-outer': { light: '#1F5C3A', dark: '#0E1612' },
 } as const satisfies Record<string, Themed>

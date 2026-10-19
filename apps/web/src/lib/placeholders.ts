@@ -6,7 +6,12 @@
  */
 import data from '../content/placeholders.json'
 
-export type Placeholder = (typeof data)[number] & { landscape?: boolean }
+export type Placeholder = (typeof data)[number] & {
+  landscape?: boolean
+  hero?: boolean
+  width?: number
+  height?: number
+}
 
 /** `landscape`: the 4:3 crop (only for photos imported with --landscape). */
 export const photoSrc = (p: Placeholder, w: 480 | 800, ext: 'avif' | 'webp', landscape = false) =>
@@ -16,4 +21,18 @@ export const photoSrc = (p: Placeholder, w: 480 | 800, ext: 'avif' | 'webp', lan
 export function peoplePhotos(): Placeholder[] {
   if (!import.meta.env.DEV) return []
   return (data as Placeholder[]).filter((p) => p.people && p.replaceWith === null)
+}
+
+/** Wide hero files (imported with --hero): the photo's own proportions, 1280 and 1920 px wide. */
+export const heroSrc = (p: Placeholder, w: 1280 | 1920, ext: 'avif' | 'webp') =>
+  `/placeholders/${p.set}/${p.id}-h-${w}.${ext}`
+
+/**
+ * Photos by Pexels id, in the order given, only in `astro dev` (with and without people alike: the files
+ * are gitignored until the media library hosts our own photos). Unknown ids are skipped.
+ */
+export function photosById(ids: number[]): Placeholder[] {
+  if (!import.meta.env.DEV) return []
+  const all = data as Placeholder[]
+  return ids.flatMap((id) => all.filter((p) => p.id === id && p.replaceWith === null))
 }

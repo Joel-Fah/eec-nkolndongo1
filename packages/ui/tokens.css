@@ -68,6 +68,8 @@
   --color-illo-paper: var(--illo-paper);
   --color-illo-shadow: var(--illo-shadow);
   --color-illo-line: var(--illo-line);
+  --color-on-photo: var(--on-photo);
+  --color-scrim: var(--scrim);
   --color-focus-outer: var(--focus-outer);
   --color-season: var(--season);
   --color-season-ink: var(--season-ink);
@@ -136,6 +138,8 @@
   --illo-paper: #FFFDF8;
   --illo-shadow: #16201A;
   --illo-line: #B0461F;
+  --on-photo: #FFFFFF;
+  --scrim: #0B120E;
   --focus-outer: #1F5C3A;
   --elevation-1: 0 1px 2px rgb(22 32 26 / 0.05), 0 4px 14px -2px rgb(22 32 26 / 0.07);
   --elevation-2: 0 2px 4px rgb(22 32 26 / 0.05), 0 14px 32px -6px rgb(22 32 26 / 0.13);
@@ -175,6 +179,8 @@
   --illo-paper: #EAE3D3;
   --illo-shadow: #050906;
   --illo-line: #C8603A;
+  --on-photo: #FFFFFF;
+  --scrim: #050906;
   --focus-outer: #0E1612;
   --elevation-1: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
   --elevation-2: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 12px 28px -6px rgb(0 0 0 / 0.5);
@@ -215,6 +221,8 @@
     --illo-paper: #EAE3D3;
     --illo-shadow: #050906;
     --illo-line: #C8603A;
+    --on-photo: #FFFFFF;
+    --scrim: #050906;
     --focus-outer: #0E1612;
     --elevation-1: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
     --elevation-2: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 12px 28px -6px rgb(0 0 0 / 0.5);

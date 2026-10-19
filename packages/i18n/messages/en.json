@@ -616,6 +616,19 @@
         "use": "AccountView.astro. Google will come first (button present, “Soon”); email stays available.",
         "a11y": "Keyboard tabs (arrow keys), step announced (aria-live), errors under each field linked with aria-describedby, focus moves to the first field in error.",
         "open": "Open the My space page"
+      },
+      "pagehero": {
+        "name": "Page hero (PageHero)",
+        "desc": "Every page has its own hero, never the same: a near full-screen photo in a floating rounded frame, with cards laid over it (figures, information, steps, audio player, year strip, goal ring). 15 layouts: fullbleed, arch, stack, panorama, split, mosaic, path, ticket, duotone, goal, cover, listen, reading, gratitude, plain.",
+        "use": "lib/heroes.ts: one entry per page (layout, photos, cards). Figures are facts: null until validated (example shown in development, hidden in production). Without a photo, every layout keeps its shape on a tinted panel.",
+        "a11y": "One h1 per page. Text on photos sits on a dark scrim (contrast guaranteed); “glass” cards use light text. Motion (settling zoom, scroll drift, rising cards) is removed with reduced motion."
+      },
+      "pagebody": {
+        "name": "Page body",
+        "desc": "The content under the hero: numbered sections, a sticky heading on the left and editorial text on the right (drop cap on the first), lists as check cards, bento cards, verses in a wide gold band — long texts (the Creed) light up phrase by phrase as you scroll.",
+        "use": "PageView.astro, from the blocks in lib/pages.ts.",
+        "a11y": "h1 → h2 → h3 hierarchy, decorative numbers (aria-hidden), no scroll lighting with reduced motion.",
+        "demo": "See any public page, for example Our story or What we believe."
       }
     }
   },
@@ -1109,5 +1122,46 @@
     "tile_groups_p": "The groups and activities you follow.",
     "tile_card_t": "Communion card",
     "tile_card_p": "Your card, always with you."
+  },
+  "hero": {
+    "stats": {
+      "years": "years of parish life",
+      "pastors": "pastors who have served the parish",
+      "generations": "generations on the same pews",
+      "pastors_now": "pastors today",
+      "council": "council members",
+      "services_week": "gatherings every week",
+      "minutes": "minutes of Sunday worship",
+      "groups": "groups and choirs",
+      "ages": "ages, from childhood to wisdom",
+      "events_year": "gatherings in the year",
+      "families": "families who share"
+    },
+    "cultes_all_t": "Open to everyone",
+    "cultes_all_p": "No dress code or preparation needed: come as you are.",
+    "path_step": "Step by step, with the parish",
+    "next_t": "Next gathering",
+    "next_p": "Announced here as soon as it’s confirmed, ready to add to your calendar.",
+    "goal_label": "of the Festival’s goal",
+    "issue_t": "The parish journal",
+    "issue_p": "Announcements, reports and testimonies, week after week.",
+    "share_t": "Made to share",
+    "share_p": "Every story can be sent on WhatsApp in one tap.",
+    "player_t": "The latest message",
+    "player_p": "Soon to listen to here, light on your data plan.",
+    "weekly_t": "One meditation a week",
+    "weekly_p": "A few minutes of reading to nourish the week.",
+    "bulletin_t": "The bulletin",
+    "bulletin_p": "To download and keep on your phone.",
+    "momo_t": "MTN Mobile Money",
+    "om_t": "Orange Money",
+    "number_soon": "The number will be published here once the Council approves it.",
+    "privacy_t": "The minimum, nothing more",
+    "privacy_p": "What we keep, why, and how to delete it.",
+    "legal_t": "Who publishes this site",
+    "legal_p": "Publisher, hosting, licences and credits.",
+    "thanks": "Thank you",
+    "listen": "Listen",
+    "soon": "Soon"
   }
 }

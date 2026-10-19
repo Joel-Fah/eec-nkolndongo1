@@ -1,26 +1,26 @@
 ---
 import { getSeason } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
-import EmptyState from '@eec/ui/astro/EmptyState.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
-import Verse from '@eec/ui/astro/Verse.astro'
 import { seasonNames } from '@eec/ui/tokens'
 import { localeOf, useT } from '../lib/i18n'
 import { href, labelKey, pages } from '../lib/nav'
 import { content } from '../lib/pages'
+import '../styles/patterns.css'
 
 interface Props {
   id: string
+  /** The page has its own hero (components/page/PageHero.astro). */
+  hideHeader?: boolean
 }
-const { id } = Astro.props
+const { id, hideHeader = false } = Astro.props
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const page = content[id]
 if (!page) throw new Error(`No content for page: ${id}`)
 const season = getSeason()
 const pagePath = (pageId: string) => pages.find((p) => p.id === pageId)?.path[locale] ?? ''
-const findUs = pagePath('trouver')
 const colsClass = {
   2: 'md:grid-cols-2',
   3: 'md:grid-cols-2 lg:grid-cols-3',
@@ -28,34 +28,45 @@ const colsClass = {
 } as const
 ---
 
-<article class="mx-auto grid max-w-6xl gap-14 px-4 py-12 md:px-8 md:py-20">
+<article class:list={['pv', hideHeader && 'pv-after-hero']}>
+  {
+    !hideHeader && (
   <header class:list={['grid items-center gap-8', page.art && 'lg:grid-cols-[1.2fr_1fr]']}>
-    <div class="grid gap-4">
-      <h1 class="text-5xl" style="font-size:var(--text-4xl);line-height:1.08">{t(labelKey(id))}</h1>
-      <p class="max-w-[52ch] text-xl text-ink-muted">{t(page.lead)}</p>
-    </div>
-    {page.art && <div class="rounded-xl bg-surface-2 p-4"><Illustration name={page.art} class="h-auto w-full" /></div>}
-  </header>
+        <div class="grid gap-4">
+          <h1 class="text-5xl" style="font-size:var(--text-4xl);line-height:1.08">{t(labelKey(id))}</h1>
+          <p class="max-w-[52ch] text-xl text-ink-muted">{t(page.lead)}</p>
+        </div>
+        {page.art && <div class="rounded-xl bg-surface-2 p-4"><Illustration name={page.art} class="h-auto w-full" /></div>}
+      </header>
+    )
+  }
 
   {
-    page.blocks.map((block) => {
+    page.blocks.map((block, index) => {
+      const n = String(index + 1).padStart(2, '0')
       if (block.t === 'text') {
         return (
-          <section class="grid max-w-[68ch] gap-3">
-            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
-            {block.paras.map((k) => <p class="text-lg">{t(k)}</p>)}
+          <section class="pv-text">
+            <div class="pv-head">
+              <span class="pv-num" aria-hidden="true">{n}</span>
+              {block.title && <h2 class="text-4xl">{t(block.title)}</h2>}
+            </div>
+            <div class="pv-body">{block.paras.map((k) => <p>{t(k)}</p>)}</div>
           </section>
         )
       }
       if (block.t === 'list') {
         return (
-          <section class="grid max-w-[68ch] gap-3">
-            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
-            {block.intro && <p class="text-lg">{t(block.intro)}</p>}
-            <ul class="grid gap-2" role="list">
+          <section class="pv-section">
+            <div class="pv-head">
+              <span class="pv-num" aria-hidden="true">{n}</span>
+              {block.title && <h2 class="text-4xl">{t(block.title)}</h2>}
+              {block.intro && <p class="pv-intro">{t(block.intro)}</p>}
+            </div>
+            <ul class="pv-checks" role="list">
               {block.items.map((k) => (
-                <li class="flex items-start gap-3 rounded-md bg-surface px-4 py-3 shadow-1">
-                  <span class="mt-0.5 text-primary"><Icon name="check" /></span>
+                <li>
+                  <span class="pv-check"><Icon name="check" size={20} /></span>
                   <span>{t(k)}</span>
                 </li>
               ))}
@@ -65,13 +76,18 @@ const colsClass = {
       }
       if (block.t === 'cards') {
         return (
-          <section class="grid gap-5">
-            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
-            <div class:list={['grid gap-4', colsClass[block.cols ?? 3]]}>
+          <section class="pv-section">
+            {block.title && (
+              <div class="pv-head">
+                <span class="pv-num" aria-hidden="true">{n}</span>
+                <h2 class="text-4xl">{t(block.title)}</h2>
+              </div>
+            )}
+            <div class:list={['pv-cards', colsClass[block.cols ?? 3]]}>
               {block.cards.map((c) => (
-                <div class="card">
-                  <span class="mega-icon"><Icon name={c.icon} /></span>
-                  <h3 class="text-xl">{t(c.title)}</h3>
+                <div class="bento-card" data-glow>
+                  <span class="bento-icon"><Icon name={c.icon} /></span>
+                  <h3 class="text-2xl">{t(c.title)}</h3>
                   <p class="text-ink-muted">{t(c.text)}</p>
                 </div>
               ))}
@@ -80,24 +96,35 @@ const colsClass = {
         )
       }
       if (block.t === 'verse') {
+        // Long texts (the Creed) light up phrase by phrase as they scroll into view.
+        const lines = t(block.text).split(/(?<=[.;:])\s+/)
         return (
-          <div class="max-w-[68ch]">
-            <Verse mark={locale === 'fr' ? '«' : '“'} cite={t(block.cite)}>{t(block.text)}</Verse>
-          </div>
+          <figure class:list={['pv-verse', lines.length > 2 && 'is-long']}>
+            <span class="pv-verse-mark" aria-hidden="true">{locale === 'fr' ? '«' : '“'}</span>
+            <blockquote class="pv-verse-text">{lines.map((line) => <span class="pv-line">{line} </span>)}</blockquote>
+            <figcaption class="pv-verse-cite">{t(block.cite)}</figcaption>
+          </figure>
         )
       }
       if (block.t === 'empty') {
         return (
-          <EmptyState title={t(block.title)} text={t(block.text)}>
-            <Illustration slot="art" name="reading-book" class="h-auto w-full" />
-            {block.link && <Button href={href(locale, pagePath(block.link.page))} variant="secondary">{t(block.link.label)}</Button>}
-          </EmptyState>
+          <section class="pv-empty">
+            <Illustration name="reading-book" class="pv-empty-art" />
+            <div class="grid content-center gap-3">
+              <h2 class="text-3xl">{t(block.title)}</h2>
+              <p class="text-lg text-ink-muted">{t(block.text)}</p>
+              {block.link && <div><Button href={href(locale, pagePath(block.link.page))} variant="secondary">{t(block.link.label)}<Icon name="arrowRight" /></Button></div>}
+            </div>
+          </section>
         )
       }
       if (block.t === 'seasons') {
         return (
-          <section class="grid gap-5">
-            <h2 class="text-3xl">{t(block.title)}</h2>
+          <section class="pv-section">
+            <div class="pv-head">
+              <span class="pv-num" aria-hidden="true">{n}</span>
+              <h2 class="text-4xl">{t(block.title)}</h2>
+            </div>
             <p class="w-fit rounded-md bg-primary-soft px-4 py-2 font-medium text-primary">{t('pages.liturgie.now', { season: t(`season.${season}` as 'season.avent') })}</p>
             <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="list">
               {seasonNames.map((s) => (
@@ -114,23 +141,189 @@ const colsClass = {
           </section>
         )
       }
-      return <p class="max-w-[68ch] rounded-md bg-info-soft px-4 py-3 text-sm text-info">{t(block.text)}</p>
+      return (
+        <p class="pv-note">
+          <Icon name="info" size={20} />
+          <span>{t(block.text)}</span>
+        </p>
+      )
     })
   }
-
-  <aside class="grid gap-4 rounded-xl bg-gold-soft p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
-    <div class="grid gap-1">
-      <h2 class="text-2xl">{t('page.cta_title')}</h2>
-      <p class="text-ink-muted">{t('page.cta_text')}</p>
-    </div>
-    <div class="flex flex-wrap gap-3">
-      <Button href={href(locale, findUs)}>{t('page.cta_find')}</Button>
-      <Button href={href(locale, '')} variant="secondary">{t('page.cta_home')}</Button>
-    </div>
-  </aside>
 </article>
 
 <style is:global>
+  .pv {
+    display: grid;
+    gap: clamp(4rem, 8vw, 7rem);
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: clamp(3rem, 6vw, 5rem) 1rem 0;
+  }
+  @media (min-width: 48rem) {
+    .pv {
+      padding-inline: 2rem;
+    }
+  }
+  .pv-after-hero {
+    padding-block-start: clamp(4rem, 8vw, 7rem);
+  }
+  .pv-head {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+  }
+  .pv-num {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-style: italic;
+    color: var(--season-ink);
+  }
+  .pv-intro {
+    max-width: 44rem;
+    font-size: var(--text-lg);
+    color: var(--ink-muted);
+  }
+  /* Editorial text: the heading sticks on the left while the paragraphs scroll on the right. */
+  .pv-text {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 64rem) {
+    .pv-text {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+    }
+    .pv-text .pv-head {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+  }
+  .pv-body {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 44rem;
+    font-size: var(--text-xl);
+    line-height: 1.55;
+  }
+  .pv-text:first-of-type .pv-body p:first-child::first-letter {
+    float: inline-start;
+    margin: 0.06em 0.12em 0 0;
+    font-family: var(--font-display);
+    font-size: 3.4em;
+    line-height: 0.85;
+    color: var(--primary);
+  }
+  .pv-section {
+    display: grid;
+    gap: 2rem;
+  }
+  .pv-checks {
+    display: grid;
+    gap: 0.75rem;
+  }
+  @media (min-width: 48rem) {
+    .pv-checks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .pv-checks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1.125rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: var(--text-lg);
+  }
+  .pv-check {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .pv-cards {
+    display: grid;
+    gap: 1rem;
+  }
+  /* A verse: a wide, calm band; long texts light up phrase by phrase. */
+  .pv-verse {
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    margin: 0;
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 6vw, 6rem);
+    border-radius: var(--radius-xl);
+    background: var(--gold-soft);
+    text-align: center;
+  }
+  .pv-verse-mark {
+    font-family: var(--font-display);
+    font-size: 6rem;
+    line-height: 0.4;
+    color: var(--gold-ink);
+  }
+  .pv-verse-text {
+    max-width: 52rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+    font-style: italic;
+    line-height: 1.3;
+  }
+  .pv-verse.is-long .pv-verse-text {
+    font-size: clamp(1.25rem, 0.9rem + 1.1vw, 1.875rem);
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .pv-verse.is-long .pv-line {
+        animation: pv-light linear both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 45%;
+      }
+    }
+  }
+  @keyframes pv-light {
+    from {
+      opacity: 0.22;
+    }
+  }
+  .pv-verse-cite {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gold-ink);
+  }
+  .pv-empty {
+    display: grid;
+    gap: 2rem;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  @media (min-width: 48rem) {
+    .pv-empty {
+      grid-template-columns: minmax(0, 20rem) 1fr;
+      padding: 2.5rem 3rem;
+    }
+  }
+  .pv-note {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 52rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--info-soft);
+    color: var(--info);
+  }
+  .pv-note svg {
+    flex: none;
+    margin-top: 0.125rem;
+  }
   .season-card {
     display: flex;
     align-items: flex-start;

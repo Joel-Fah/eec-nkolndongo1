@@ -2,7 +2,9 @@
 /** Page patterns: the larger building blocks of the public pages, with live demos. */
 import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
+import { heroes } from '../../lib/heroes'
 import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
 import '../../styles/patterns.css'
 import HeroStream from '../home/HeroStream.astro'
 import SeasonStrip from '../home/SeasonStrip.astro'
@@ -11,7 +13,7 @@ import Section from './Section.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
-type Id = 'stream' | 'bento' | 'magnetic' | 'ring' | 'figures' | 'account'
+type Id = 'stream' | 'bento' | 'magnetic' | 'ring' | 'figures' | 'account' | 'pagehero' | 'pagebody'
 const doc = (id: Id) => ({
   id: `p-${id}`,
   name: t(`brand.patterns.${id}.name` as 'brand.patterns.stream.name'),
@@ -68,5 +70,23 @@ const doc = (id: Id) => ({
       <p class="acct-step">{t('member.step', { n: '2', total: '3' })} · {t('member.step2_t')}</p>
       <a class="acct-link" style="padding:0" href={locale === 'fr' ? '/fr/mon-espace/' : '/en/my-space/'}>{t('brand.patterns.account.open')}<Icon name="external" size={16} /></a>
     </div>
+  </DocBlock>
+  <DocBlock {...doc('pagehero')}>
+    <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list">
+      {
+        Object.entries(heroes).map(([id, h]) => (
+          <li>
+            <a class="flex items-center justify-between gap-3 rounded-md bg-surface px-4 py-3 text-sm ring-1 ring-line hover:ring-primary" href={href(locale, pages.find((p) => p.id === id)?.path[locale] ?? '')}>
+              <span>{t(labelKey(id))}</span>
+              <code class="text-ink-muted">{h.layout}</code>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </DocBlock>
+
+  <DocBlock {...doc('pagebody')}>
+    <p class="text-sm text-ink-muted">{t('brand.patterns.pagebody.demo')}</p>
   </DocBlock>
 </Section>

@@ -6,7 +6,9 @@
  * any placeholder with `people: true` (apps/web/src/lib/placeholders.ts).
  *
  * Usage: node --env-file=../.env.local pexels/import.ts --set people <id> <id> …
- *        add --landscape to also write 4:3 crops (<id>-l-480/800) for the given ids.
+ *        add --landscape to also write 4:3 crops (<id>-l-480/800) for the given ids;
+ *        add --hero for wide page heroes (<id>-h-1280/1920, the photo's own proportions);
+ *        --set place for photos without people.
  */
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -19,6 +21,7 @@ const { values, positionals } = parseArgs({
   options: {
     set: { type: 'string', default: 'people' },
     landscape: { type: 'boolean', default: false },
+    hero: { type: 'boolean', default: false },
   },
   allowPositionals: true,
 })
@@ -43,6 +46,9 @@ type Entry = {
   color: string
   blur: string
   landscape?: boolean
+  hero?: boolean
+  width?: number
+  height?: number
   replaceWith: string | null
 }
 const manifest: Entry[] = existsSync(manifestFile)
@@ -81,6 +87,58 @@ async function get(url: string, init?: RequestInit, tries = 4): Promise<Response
 
 for (const id of positionals.map(Number)) {
   const known = manifest.find((m) => m.id === id)
+  if (values.hero) {
+    const photo: PexelsPhoto = known
+      ? ({
+          ...(await (
+            await get(`https://api.pexels.com/v1/photos/${id}`, { headers: { Authorization: key } })
+          ).json()),
+        } as PexelsPhoto)
+      : await (
+          await get(`https://api.pexels.com/v1/photos/${id}`, { headers: { Authorization: key } })
+        ).json()
+    const big = join(cacheDir, `${id}-hero.jpg`)
+    if (!existsSync(big)) {
+      const img = await get(`${photo.src.original}?auto=compress&w=2400`)
+      await writeFile(big, Buffer.from(await img.arrayBuffer()))
+    }
+    const meta = await sharp(big).rotate().metadata()
+    for (const w of [1280, 1920]) {
+      const sized = sharp(big).rotate().resize({ width: w })
+      await sized
+        .clone()
+        .avif({ quality: 50, effort: 5 })
+        .toFile(join(outDir, `${id}-h-${w}.avif`))
+      await sized
+        .clone()
+        .webp({ quality: 70 })
+        .toFile(join(outDir, `${id}-h-${w}.webp`))
+    }
+    const tiny = await sharp(big).rotate().resize({ width: 16 }).webp({ quality: 40 }).toBuffer()
+    const entry: Entry = {
+      ...(known ?? {
+        id,
+        set,
+        people: set === 'people',
+        alt: photo.alt,
+        photographer: photo.photographer,
+        photographerUrl: photo.photographer_url,
+        pexelsUrl: photo.url,
+        color: photo.avg_color,
+        replaceWith: null,
+      }),
+      blur: known?.blur ?? `data:image/webp;base64,${tiny.toString('base64')}`,
+      hero: true,
+      width: meta.width,
+      height: meta.height,
+    } as Entry
+    const i = manifest.findIndex((m) => m.id === id)
+    if (i >= 0) manifest[i] = entry
+    else manifest.push(entry)
+    await writeFile(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`)
+    console.log(`✓ ${id} hero · ${photo.photographer}`)
+    continue
+  }
   if (known && existsSync(join(outDir, `${id}-800.webp`))) {
     if (values.landscape) {
       await landscape(id, join(cacheDir, `${id}.jpg`))

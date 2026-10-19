@@ -16,6 +16,11 @@ page with its own concept. Vertical slice done, **waiting for Joël's review** b
   active tab = soft tint; hero title on two lines, slower stream mixing portrait/landscape, eased pause on
   hover; footer split (CTA card, sober footer, legal line below); season strip with countdown.
 - Illustrations: Storyset Cuate, recoloured to our palette, never committed (decision 0024, `pnpm illos:fetch`).
+- Round 3: every page has its own hero (`lib/heroes.ts`, 15 layouts, near full-screen photo + cards) and
+  a restyled body (numbered editorial sections, check cards, bento cards, gold verse band; the Creed lights
+  up phrase by phrase). Hero figures are examples in dev only, hidden in production until validated.
+- ⚠ Privacy page text says no personal data is collected: false since Mon espace — rewrite with the data
+  protection docs (Phase 02 wrap-up) before any public launch.
 - Pexels photos of people: **dev-only** placeholders (gitignored, removed from builds; credits in
   `apps/web/src/content/placeholders.json`). Real, consented parish photos needed before launch.
 - Next after review: every other page gets its own concept (`docs/product/pages.md`), then Checkpoint B.
