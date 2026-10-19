@@ -1,0 +1,13 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "site": {
+    "name": "EEC Nkolndongo 1",
+    "parish": "Nkolndongo 1 Parish",
+    "church": "Evangelical Church of Cameroon",
+    "tagline": "[TO CONFIRM: parish welcome line]"
+  },
+  "common": {
+    "skip_to_content": "Skip to content",
+    "greeting": "Hello {name}"
+  }
+}
