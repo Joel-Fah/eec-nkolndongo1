@@ -1,0 +1,133 @@
+---
+import { contrastReport } from '@eec/ui/contrast'
+import { colors, type Season, seasonNames, seasons, skin } from '@eec/ui/tokens'
+import { useT } from '../../lib/i18n'
+import Section from './Section.astro'
+import Swatch from './Swatch.astro'
+
+const t = useT(Astro.currentLocale)
+const report = contrastReport()
+const failing = report.filter((row) => !row.pass).length
+const flagged = new Set(['line-strong', 'gold-ink', 'clay-ink', 'focus-outer', 'on-gold'])
+const changes = [
+  'brand.colour.change_gold',
+  'brand.colour.change_clay',
+  'brand.colour.change_focus',
+  'brand.colour.change_line',
+  'brand.colour.change_seasons',
+  'brand.colour.change_new_seasons',
+] as const
+const seasonLabel = (name: Season) => t(`season.${name}`)
+---
+
+<Section id="colour" title={t('brand.colour.title')} lead={t('brand.colour.lead')}>
+  <div class="grid gap-6 lg:grid-cols-2">
+    {
+      (['light', 'dark'] as const).map((theme) => (
+        <div data-theme={theme} class="grid gap-4 rounded-xl bg-bg p-5 text-ink ring-1 ring-line">
+          <h3 class="text-xl">{t(`brand.colour.${theme}`)}</h3>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {Object.entries(colors).map(([name, value]) => (
+              <Swatch name={name} hex={value[theme]} note={flagged.has(name) ? '⚑' : undefined} />
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="grid gap-4">
+    <div>
+      <h3 class="text-xl">{t('brand.colour.seasons')}</h3>
+      <p class="mt-1 text-ink-muted">{t('brand.colour.seasons_lead')}</p>
+    </div>
+    <div class="grid gap-4 lg:grid-cols-2">
+      {
+        (['light', 'dark'] as const).map((theme) => (
+          <div data-theme={theme} class="grid gap-3 rounded-xl bg-bg p-5 text-ink ring-1 ring-line">
+            {seasonNames.map((name) => {
+              const s = seasons[name][theme]
+              return (
+                <div class="grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-3">
+                  <span class="text-sm font-medium" style={`color:${s.ink}`}>
+                    {seasonLabel(name)}
+                  </span>
+                  <span
+                    class="flex h-9 items-center justify-between rounded-sm px-3 text-sm font-medium tabular-nums"
+                    style={`background:${s.fill};color:${s.on}`}
+                  >
+                    <span>{s.fill}</span>
+                    <span class="opacity-80">{s.ink}</span>
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-4">
+    <h3 class="text-xl">{t('brand.colour.skin')}</h3>
+    <div class="grid max-w-xl grid-cols-4 gap-4">
+      {skin.map((hex, i) => <Swatch name={`skin-${i + 1}`} hex={hex} />)}
+    </div>
+  </div>
+
+  <div class="grid gap-4">
+    <h3 class="text-xl">{t('brand.colour.changes')}</h3>
+    <ul class="grid max-w-[72ch] list-disc gap-2 ps-6">
+      {changes.map((key) => <li>{t(key)}</li>)}
+    </ul>
+  </div>
+
+  <details class="contrast rounded-lg bg-surface shadow-1">
+    <summary class="flex min-h-11 cursor-pointer items-center justify-between gap-4 rounded-lg px-5 py-3 font-medium">
+      <span>{t('brand.colour.contrast')}</span>
+      <span class="text-sm text-ink-muted">
+        {t('brand.colour.contrast_summary', { count: String(report.length), failing: String(failing) })}
+      </span>
+    </summary>
+    <div class="overflow-x-auto px-5 pb-5">
+      <table class="w-full min-w-[40rem] text-sm tabular-nums">
+        <thead class="text-start text-ink-muted">
+          <tr>
+            <th class="py-2 text-start font-medium">{t('brand.colour.col_theme')}</th>
+            <th class="py-2 text-start font-medium">{t('brand.colour.col_fg')}</th>
+            <th class="py-2 text-start font-medium">{t('brand.colour.col_bg')}</th>
+            <th class="py-2 text-end font-medium">{t('brand.colour.col_ratio')}</th>
+            <th class="py-2 text-end font-medium">{t('brand.colour.col_min')}</th>
+            <th class="py-2 text-end font-medium">{t('brand.colour.col_result')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            report.map((row) => (
+              <tr class="border-t border-line">
+                <td class="py-1.5">{t(`brand.colour.${row.theme}`)}</td>
+                <td class="py-1.5">
+                  <span class="inline-flex items-center gap-2">
+                    <span class="size-3 rounded-xs ring-1 ring-line" style={`background:${row.fgHex}`} />
+                    {row.fg}
+                  </span>
+                </td>
+                <td class="py-1.5">
+                  <span class="inline-flex items-center gap-2">
+                    <span class="size-3 rounded-xs ring-1 ring-line" style={`background:${row.bgHex}`} />
+                    {row.bg}
+                  </span>
+                </td>
+                <td class="py-1.5 text-end">{row.ratio.toFixed(2)}</td>
+                <td class="py-1.5 text-end">{row.min}</td>
+                <td class={`py-1.5 text-end font-medium ${row.pass ? 'text-primary' : 'text-danger'}`}>
+                  {row.min <= 1 ? t('brand.colour.info') : row.pass ? t('brand.colour.pass') : t('brand.colour.fail')}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</Section>

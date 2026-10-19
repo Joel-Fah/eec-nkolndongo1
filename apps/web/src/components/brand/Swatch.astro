@@ -1,0 +1,16 @@
+---
+interface Props {
+  name: string
+  hex: string
+  note?: string
+}
+const { name, hex, note } = Astro.props
+---
+
+<div class="grid gap-2">
+  <div class="h-16 rounded-md border border-line" style={`background:${hex}`}></div>
+  <div class="text-sm leading-tight">
+    <code class="font-medium text-ink">{name}</code>
+    <span class="block text-ink-muted tabular-nums">{hex}{note && ` · ${note}`}</span>
+  </div>
+</div>
