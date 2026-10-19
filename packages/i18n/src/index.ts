@@ -1,4 +1,4 @@
-export { formatDate, formatTime, formatXAF } from './format.ts'
+export { formatBytes, formatDate, formatTime, formatXAF } from './format.ts'
 export {
   baseLocale,
   intlLocale,

@@ -31,3 +31,10 @@ export function formatXAF(amount: number, locale: Locale): string {
   )
   return `${number}${NBSP}FCFA`
 }
+
+/** File sizes: `34,1 Ko` / `34.1 KB` (1 KB = 1024 bytes). */
+export function formatBytes(bytes: number, locale: Locale): string {
+  const kb = bytes / 1024
+  const number = new Intl.NumberFormat(intlLocale[locale], { maximumFractionDigits: 1 }).format(kb)
+  return `${number}${NBSP}${locale === 'fr' ? 'Ko' : 'KB'}`
+}

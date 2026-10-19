@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatTime, formatXAF } from './format.ts'
+import { formatBytes, formatDate, formatTime, formatXAF } from './format.ts'
 import { pickLocale } from './locales.ts'
 import { frTypo, NBSP, NNBSP } from './typography.ts'
 
@@ -41,6 +41,10 @@ describe('formatters', () => {
   it('formats CFA francs', () => {
     expect(formatXAF(5000, 'fr')).toBe(`5${NNBSP}000${NBSP}FCFA`)
     expect(formatXAF(5000, 'en')).toBe(`5,000${NBSP}FCFA`)
+  })
+  it('formats file sizes', () => {
+    expect(formatBytes(34_918, 'fr')).toBe(`34,1${NBSP}Ko`)
+    expect(formatBytes(34_918, 'en')).toBe(`34.1${NBSP}KB`)
   })
 })
 
