@@ -1,0 +1,16 @@
+---
+/** Friendly empty state: illustration slot + title + text + optional actions slot. */
+interface Props {
+  title: string
+  text?: string
+  class?: string
+}
+const { title, text, class: className } = Astro.props
+---
+
+<div class:list={['empty', className]}>
+  <div class="empty-art"><slot name="art" /></div>
+  <p class="empty-title">{title}</p>
+  {text && <p class="empty-text">{text}</p>}
+  <div class="mt-2 flex flex-wrap justify-center gap-3"><slot /></div>
+</div>

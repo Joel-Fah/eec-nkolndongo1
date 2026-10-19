@@ -1,0 +1,11 @@
+---
+/** Surface. Pass `href` to make the whole card a link (lifts on hover). */
+interface Props {
+  href?: string
+  class?: string
+}
+const { href, class: className } = Astro.props
+const Tag = href ? 'a' : 'div'
+---
+
+<Tag class:list={['card', className]} href={href}><slot /></Tag>

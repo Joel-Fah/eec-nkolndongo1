@@ -1,0 +1,14 @@
+---
+/** Initials (2 letters) or an image. Decorative when next to the name; pass `label` otherwise. */
+interface Props {
+  initials?: string
+  src?: string
+  label?: string
+  class?: string
+}
+const { initials, src, label, class: className } = Astro.props
+---
+
+<span class:list={['avatar', className]} role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+  {src ? <img src={src} alt="" loading="lazy" /> : initials}
+</span>

@@ -1,0 +1,64 @@
+---
+/**
+ * Label + control + hint + error. `kind`: input | textarea | select (native, styled).
+ * Options for select go in the default slot as <option>s. Pass localised strings.
+ */
+interface Props {
+  id: string
+  label: string
+  kind?: 'input' | 'textarea' | 'select'
+  type?: string
+  name?: string
+  hint?: string
+  error?: string
+  required?: boolean
+  disabled?: boolean
+  placeholder?: string
+  value?: string
+  rows?: number
+  autocomplete?: string
+}
+const {
+  id,
+  label,
+  kind = 'input',
+  type = 'text',
+  name = id,
+  hint,
+  error,
+  required,
+  disabled,
+  placeholder,
+  value,
+  rows,
+  autocomplete,
+} = Astro.props
+const describedby =
+  [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(' ') || undefined
+const common = {
+  id,
+  name,
+  required,
+  disabled,
+  'aria-invalid': error ? 'true' : undefined,
+  'aria-describedby': describedby,
+}
+---
+
+<div class="field">
+  <label class="field-label" for={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>
+  {
+    kind === 'textarea' ? (
+      <textarea class="textarea" rows={rows} placeholder={placeholder} {...common}>{value}</textarea>
+    ) : kind === 'select' ? (
+      <span class="select-wrap">
+        <select class="select" {...common}><slot /></select>
+        <span class="eec-chevron" aria-hidden="true" />
+      </span>
+    ) : (
+      <input class="input" type={type} placeholder={placeholder} value={value} autocomplete={autocomplete} {...common} />
+    )
+  }
+  {hint && <p class="field-hint" id={`${id}-hint`}>{hint}</p>}
+  {error && <p class="field-error" id={`${id}-error`} role="alert"><span aria-hidden="true">⚠</span>{error}</p>}
+</div>

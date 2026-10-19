@@ -14,7 +14,9 @@
     "./tokens": "./src/tokens.ts",
     "./contrast": "./src/contrast.ts",
     "./icons": "./src/icons.ts",
-    "./motion": "./src/motion.ts"
+    "./motion": "./src/motion.ts",
+    "./primitives": "./src/primitives.ts",
+    "./react": "./react/index.tsx"
   },
   "scripts": {
     "build": "node ../../scripts/fonts-fetch.ts",
@@ -31,6 +33,16 @@
     "typescript": "catalog:",
     "vitest": "catalog:",
     "@types/node": "catalog:",
-    "@eec/core": "workspace:*"
+    "@eec/core": "workspace:*",
+    "@base-ui/react": "1.9.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@base-ui/react": "1.9.0"
   }
 }

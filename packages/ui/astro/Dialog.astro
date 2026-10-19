@@ -1,0 +1,24 @@
+---
+/**
+ * Native <dialog>: focus trap, Esc, focus return, scroll lock for free. Open with
+ * <button data-dialog-open="id">; close with <button data-dialog-close>. `side` makes a sheet.
+ */
+interface Props {
+  id: string
+  title: string
+  closeLabel: string
+  side?: 'start' | 'end' | 'bottom' | 'full'
+  class?: string
+}
+const { id, title, closeLabel, side, class: className } = Astro.props
+---
+
+<dialog id={id} class:list={[side ? 'sheet' : 'dialog', className]} data-side={side} data-light-dismiss aria-labelledby={`${id}-title`}>
+  <div class="dialog-body">
+    <h2 id={`${id}-title`} class="dialog-title">{title}</h2>
+    <slot />
+    <div class="dialog-actions">
+      <slot name="actions"><button type="button" class="btn btn-secondary" data-dialog-close>{closeLabel}</button></slot>
+    </div>
+  </div>
+</dialog>

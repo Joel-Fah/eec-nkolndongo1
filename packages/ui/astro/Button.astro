@@ -1,0 +1,47 @@
+---
+/** Button / link-button. `loading` sets aria-busy (keeps width, shows a spinner). Icon-only needs `label`. */
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
+  size?: 'sm' | 'md' | 'lg'
+  href?: string
+  type?: 'button' | 'submit' | 'reset'
+  loading?: boolean
+  disabled?: boolean
+  /** Square icon-only button: pass an accessible `label`. */
+  iconOnly?: boolean
+  label?: string
+  class?: string
+  [attr: string]: unknown
+}
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  loading = false,
+  disabled = false,
+  iconOnly = false,
+  label,
+  class: className,
+  ...rest
+} = Astro.props
+const classes = [
+  'btn',
+  `btn-${variant}`,
+  size !== 'md' && `btn-${size}`,
+  iconOnly && 'btn-icon',
+  className,
+]
+---
+
+{
+  href && !disabled ? (
+    <a href={href} class:list={classes} aria-label={label} aria-busy={loading || undefined} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class:list={classes} disabled={disabled} aria-label={label} aria-busy={loading || undefined} {...rest}>
+      <slot />
+    </button>
+  )
+}

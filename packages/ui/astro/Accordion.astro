@@ -1,0 +1,17 @@
+---
+/** Native <details>: works without JS. `name` makes the items exclusive (one open at a time). */
+interface Props {
+  items: { title: string; body: string; open?: boolean }[]
+  name?: string
+}
+const { items, name } = Astro.props
+---
+
+<div class="accordion">
+  {items.map((item) => (
+    <details class="accordion-item" name={name} open={item.open}>
+      <summary class="accordion-trigger"><span>{item.title}</span><span class="eec-chevron" aria-hidden="true" /></summary>
+      <p class="accordion-panel">{item.body}</p>
+    </details>
+  ))}
+</div>
