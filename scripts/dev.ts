@@ -20,6 +20,8 @@ const procs = [
   child.stdout.on('data', out(process.stdout))
   child.stderr.on('data', out(process.stderr))
   child.on('exit', (code) => {
+    // Astro may detach its dev server (background mode) and exit 0: that is not a failure.
+    if (name.trim() === 'site' && code === 0) return
     console.log(`${name} exited (${code}). Stopping the others.`)
     stop()
   })
@@ -27,6 +29,7 @@ const procs = [
 })
 
 function stop() {
+  spawnSync('pnpm', ['--filter', '@eec/web', 'exec', 'astro', 'dev', 'stop'], { stdio: 'ignore' })
   for (const p of procs) if (!p.killed) p.kill('SIGTERM')
   setTimeout(() => process.exit(0), 500)
 }

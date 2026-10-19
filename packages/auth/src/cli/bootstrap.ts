@@ -15,6 +15,11 @@ directUrl()
 const force = process.argv.includes('--force')
 const origin = process.env.APP_ORIGIN ?? 'http://localhost:8080'
 const rl = createInterface({ input: process.stdin, output: process.stdout })
+// Piped input (scripts, tests) can end before the database answers: read those lines up front.
+const piped: string[] = []
+if (!process.stdin.isTTY) for await (const line of rl) piped.push(line)
+const ask = async (question: string) =>
+  process.stdin.isTTY ? rl.question(question) : (console.log(question), piped.shift() ?? '')
 const { db, close } = await connectDirect()
 
 try {
@@ -34,10 +39,10 @@ try {
     process.exitCode = 1
   } else {
     if (existing.length) {
-      const typed = await rl.question('Type "AJOUTER UN SUPER ADMIN" to confirm: ')
+      const typed = await ask('Type "AJOUTER UN SUPER ADMIN" to confirm: ')
       if (typed.trim() !== 'AJOUTER UN SUPER ADMIN') throw new Error('Cancelled.')
     }
-    const email = (await rl.question('Super admin email: ')).trim().toLowerCase()
+    const email = (await ask('Super admin email: ')).trim().toLowerCase()
     if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error('That does not look like an email address.')
     const [taken] = await db
       .select({ id: schema.user.id })
