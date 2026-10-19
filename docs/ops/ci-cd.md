@@ -19,6 +19,11 @@ meaningful**. Content publishing never triggers CI (edge cache purge instead —
 9. Dependabot/Renovate: grouped, **monthly**.
 10. Any new workflow or trigger needs a line in this file explaining why.
 
+## Workflows
+| File | Trigger | Why |
+|---|---|---|
+| `.github/workflows/check.yml` | `pull_request` → `main` (ready, code paths only) | Rule 2. Also fetches the Fontshare fonts (cached by script hash) because their licence forbids committing them (see decision 0015). |
+
 ## Commit & branch flow
 `main` (protected, always deployable) ← short-lived `feat/*`, `fix/*` branches ← squash merge.
 Releases tagged `vYYYY.MM.N` when a phase milestone ships.

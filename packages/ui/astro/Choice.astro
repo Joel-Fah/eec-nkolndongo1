@@ -1,0 +1,27 @@
+---
+/** Checkbox, radio or switch with its label (≥ 44 px row). */
+interface Props {
+  kind?: 'checkbox' | 'radio' | 'switch'
+  id: string
+  name?: string
+  value?: string
+  label: string
+  checked?: boolean
+  disabled?: boolean
+}
+const { kind = 'checkbox', id, name = id, value, label, checked, disabled } = Astro.props
+---
+
+<label class="check-row" for={id}>
+  <input
+    id={id}
+    name={name}
+    value={value}
+    type={kind === 'switch' ? 'checkbox' : kind}
+    role={kind === 'switch' ? 'switch' : undefined}
+    class={kind === 'switch' ? 'switch' : kind}
+    checked={checked}
+    disabled={disabled}
+  />
+  <span>{label}</span>
+</label>

@@ -1,0 +1,99 @@
+---
+/**
+ * Verse — our way to show a quotation, a verse, a testimony.
+ * A page from the hymn book: a soft gold sheet with a turned corner (the page-turn of our transitions) and
+ * the gold bookmark ribbon from our illustrations hanging from its top edge, carrying the opening mark.
+ * Words in Fraunces italic; the reference in a small rounded tag. No frame, no side rule.
+ */
+interface Props {
+  /** Opening mark: « for French, “ for English. */
+  mark?: string
+  /** Reference: « Matthieu 11 : 28 », a name, a place. */
+  cite?: string
+  class?: string
+}
+const { mark = '«', cite, class: className } = Astro.props
+---
+
+<figure class:list={['eec-verse', className]}>
+  <span class="eec-verse-ribbon" aria-hidden="true">{mark}</span>
+  <blockquote class="eec-verse-text"><slot /></blockquote>
+  {cite && <figcaption class="eec-verse-ref">{cite}</figcaption>}
+</figure>
+
+<style is:global>
+  .eec-verse {
+    --fold: 2.25rem;
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding: 1.75rem 2rem 1.75rem 6rem;
+    border-radius: var(--radius-xl);
+    border-start-end-radius: 0;
+    background: var(--gold-soft);
+    color: var(--ink);
+    clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
+  }
+  /* The turned corner: the back of the page, in a deeper gold. */
+  .eec-verse::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    width: var(--fold);
+    height: var(--fold);
+    background: color-mix(in oklab, var(--gold) 55%, var(--gold-soft));
+    border-end-start-radius: var(--radius-sm);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+  }
+  /* The bookmark ribbon, with a swallow-tail notch, hanging from the top edge. */
+  .eec-verse-ribbon {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 1.5rem;
+    display: grid;
+    place-items: start center;
+    width: 3rem;
+    height: 5rem;
+    padding-block-start: 0.5rem;
+    background: var(--gold);
+    color: var(--on-gold);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 0.9rem), 0 100%);
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 600;
+    line-height: 1;
+    user-select: none;
+  }
+  .eec-verse-text {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--text-xl);
+    line-height: 1.35;
+    text-wrap: pretty;
+  }
+  .eec-verse-ref {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding-inline: 0.625rem;
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    color: var(--gold-ink);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  @media (max-width: 30rem) {
+    .eec-verse {
+      padding-inline-start: 5rem;
+    }
+    .eec-verse-ribbon {
+      inset-inline-start: 1rem;
+      width: 2.75rem;
+    }
+  }
+</style>

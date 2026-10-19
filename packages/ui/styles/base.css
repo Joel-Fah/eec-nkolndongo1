@@ -1,0 +1,77 @@
+/* Base element styles shared by the public site and the admin. Tokens only. */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-synthesis-weight: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  :root {
+    --scroll-thumb: color-mix(in oklab, var(--ink) 28%, transparent);
+    --scroll-thumb-hover: color-mix(in oklab, var(--ink) 46%, transparent);
+  }
+
+  /* Native modal dialogs don't lock page scroll by themselves. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: var(--gold-soft);
+    color: var(--ink);
+  }
+
+  /*
+   * Focus: a gold ring 2px off the element, plus an outer ring that guarantees 3:1 in light
+   * (gold alone is 1.7:1 on cream). Containers on another background set --focus-gap.
+   * The transparent outline keeps focus visible in forced-colours mode.
+   */
+  :focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--focus-gap, var(--bg)),
+      0 0 0 4px var(--gold),
+      0 0 0 6px var(--focus-outer);
+  }
+
+  [hidden] {
+    /* biome-ignore lint/complexity/noImportantStyles: `hidden` must win over any display utility */
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: user's reduced-motion preference must win */
+    scroll-behavior: auto !important;
+    /* biome-ignore lint/complexity/noImportantStyles: user's reduced-motion preference must win */
+    animation-iteration-count: 1 !important;
+  }
+}

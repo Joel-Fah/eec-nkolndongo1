@@ -1,0 +1,48 @@
+{
+  "name": "@eec/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./styles/*": "./styles/*",
+    "./fonts/*": "./fonts/*",
+    "./brand/*": "./brand/*",
+    "./illustrations/*": "./illustrations/*",
+    "./astro/*": "./astro/*",
+    "./react/*": "./react/*",
+    "./tokens": "./src/tokens.ts",
+    "./contrast": "./src/contrast.ts",
+    "./icons": "./src/icons.ts",
+    "./motion": "./src/motion.ts",
+    "./primitives": "./src/primitives.ts",
+    "./react": "./react/index.tsx"
+  },
+  "scripts": {
+    "build": "node ../../scripts/fonts-fetch.ts",
+    "tokens": "node src/build-tokens.ts",
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hugeicons/core-free-icons": "catalog:"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "@eec/core": "workspace:*",
+    "@base-ui/react": "1.9.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@base-ui/react": "1.9.0"
+  }
+}

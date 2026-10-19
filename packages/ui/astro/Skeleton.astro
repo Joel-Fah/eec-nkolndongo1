@@ -1,0 +1,9 @@
+---
+/** Placeholder block while content loads. Size with width/height utilities. */
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+---
+
+<span class:list={['skeleton', className]} aria-hidden="true"></span>

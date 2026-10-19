@@ -1,0 +1,15 @@
+---
+/** Hugeicons stroke-rounded icon, rendered at build time (zero JS). Decorative unless `label`. */
+import { type IconName, iconSvg } from '../src/icons.ts'
+
+interface Props {
+  name: IconName
+  size?: 16 | 20 | 24
+  label?: string
+  class?: string
+}
+
+const { name, size = 20, label, class: className } = Astro.props
+---
+
+<Fragment set:html={iconSvg(name, { size, label, className })} />

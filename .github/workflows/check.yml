@@ -1,0 +1,58 @@
+# Frugal CI — see docs/ops/ci-cd.md. One check on ready-for-review PRs to main that touch code.
+name: check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'assets/images/illustration_references/**'
+
+concurrency:
+  group: check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+  TURBO_TELEMETRY_DISABLED: 1
+
+jobs:
+  check:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # turbo --affected compares against the base branch
+
+      - uses: pnpm/action-setup@v6 # version from package.json "packageManager"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Turborepo cache
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
+      # Fontshare fonts can't live in the repo (ITF licence) — fetched once, then cached.
+      - name: Fontshare fonts cache
+        uses: actions/cache@v6
+        with:
+          path: packages/ui/fonts/fontshare
+          key: fontshare-${{ hashFiles('scripts/fonts-fetch.ts') }}
+      - run: pnpm fonts:fetch
+
+      - run: pnpm turbo run lint typecheck test build --affected --cache-dir=.turbo/cache

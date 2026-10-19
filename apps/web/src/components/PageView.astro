@@ -1,0 +1,156 @@
+---
+import { getSeason } from '@eec/core'
+import Button from '@eec/ui/astro/Button.astro'
+import EmptyState from '@eec/ui/astro/EmptyState.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Verse from '@eec/ui/astro/Verse.astro'
+import { seasonNames } from '@eec/ui/tokens'
+import { localeOf, useT } from '../lib/i18n'
+import { href, labelKey, pages } from '../lib/nav'
+import { content } from '../lib/pages'
+
+interface Props {
+  id: string
+}
+const { id } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const page = content[id]
+if (!page) throw new Error(`No content for page: ${id}`)
+const season = getSeason()
+const pagePath = (pageId: string) => pages.find((p) => p.id === pageId)?.path[locale] ?? ''
+const findUs = pagePath('trouver')
+const colsClass = {
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-2 lg:grid-cols-3',
+  4: 'md:grid-cols-2 lg:grid-cols-4',
+} as const
+---
+
+<article class="mx-auto grid max-w-6xl gap-14 px-4 py-12 md:px-8 md:py-20">
+  <header class:list={['grid items-center gap-8', page.art && 'lg:grid-cols-[1.2fr_1fr]']}>
+    <div class="grid gap-4">
+      <h1 class="text-5xl" style="font-size:var(--text-4xl);line-height:1.08">{t(labelKey(id))}</h1>
+      <p class="max-w-[52ch] text-xl text-ink-muted">{t(page.lead)}</p>
+    </div>
+    {page.art && <div class="rounded-xl bg-surface-2 p-4"><Illustration name={page.art} class="h-auto w-full" /></div>}
+  </header>
+
+  {
+    page.blocks.map((block) => {
+      if (block.t === 'text') {
+        return (
+          <section class="grid max-w-[68ch] gap-3">
+            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
+            {block.paras.map((k) => <p class="text-lg">{t(k)}</p>)}
+          </section>
+        )
+      }
+      if (block.t === 'list') {
+        return (
+          <section class="grid max-w-[68ch] gap-3">
+            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
+            {block.intro && <p class="text-lg">{t(block.intro)}</p>}
+            <ul class="grid gap-2" role="list">
+              {block.items.map((k) => (
+                <li class="flex items-start gap-3 rounded-md bg-surface px-4 py-3 shadow-1">
+                  <span class="mt-0.5 text-primary"><Icon name="check" /></span>
+                  <span>{t(k)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      if (block.t === 'cards') {
+        return (
+          <section class="grid gap-5">
+            {block.title && <h2 class="text-3xl">{t(block.title)}</h2>}
+            <div class:list={['grid gap-4', colsClass[block.cols ?? 3]]}>
+              {block.cards.map((c) => (
+                <div class="card">
+                  <span class="mega-icon"><Icon name={c.icon} /></span>
+                  <h3 class="text-xl">{t(c.title)}</h3>
+                  <p class="text-ink-muted">{t(c.text)}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      }
+      if (block.t === 'verse') {
+        return (
+          <div class="max-w-[68ch]">
+            <Verse mark={locale === 'fr' ? '«' : '“'} cite={t(block.cite)}>{t(block.text)}</Verse>
+          </div>
+        )
+      }
+      if (block.t === 'empty') {
+        return (
+          <EmptyState title={t(block.title)} text={t(block.text)}>
+            <Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" />
+            {block.link && <Button href={href(locale, pagePath(block.link.page))} variant="secondary">{t(block.link.label)}</Button>}
+          </EmptyState>
+        )
+      }
+      if (block.t === 'seasons') {
+        return (
+          <section class="grid gap-5">
+            <h2 class="text-3xl">{t(block.title)}</h2>
+            <p class="w-fit rounded-md bg-primary-soft px-4 py-2 font-medium text-primary">{t('pages.liturgie.now', { season: t(`season.${season}` as 'season.avent') })}</p>
+            <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="list">
+              {seasonNames.map((s) => (
+                <li data-season={s} class:list={['season-card', s === season && 'is-current']}>
+                  <span class="season-dot" aria-hidden="true"></span>
+                  <div>
+                    <h3 class="text-lg">{t(`season.${s}` as 'season.avent')}</h3>
+                    <p class="text-sm text-ink-muted">{t(`pages.liturgie.season_${s}` as 'pages.liturgie.season_avent')}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p class="text-sm text-ink-muted">{t(block.footnote)}</p>
+          </section>
+        )
+      }
+      return <p class="max-w-[68ch] rounded-md bg-info-soft px-4 py-3 text-sm text-info">{t(block.text)}</p>
+    })
+  }
+
+  <aside class="grid gap-4 rounded-xl bg-gold-soft p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+    <div class="grid gap-1">
+      <h2 class="text-2xl">{t('page.cta_title')}</h2>
+      <p class="text-ink-muted">{t('page.cta_text')}</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <Button href={href(locale, findUs)}>{t('page.cta_find')}</Button>
+      <Button href={href(locale, '')} variant="secondary">{t('page.cta_home')}</Button>
+    </div>
+  </aside>
+</article>
+
+<style is:global>
+  .season-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .season-card.is-current {
+    box-shadow: inset 0 0 0 2px var(--season), var(--elevation-1);
+  }
+  .season-dot {
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--season);
+  }
+  .season-card h3 {
+    color: var(--season-ink);
+  }
+</style>

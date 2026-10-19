@@ -1,0 +1,22 @@
+---
+import { locales } from '@eec/i18n'
+import PageView from '../../components/PageView.astro'
+import Site from '../../layouts/Site.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey, pages } from '../../lib/nav'
+import { content } from '../../lib/pages'
+
+export function getStaticPaths() {
+  return locales.flatMap((locale) =>
+    pages.map((page) => ({ params: { locale, slug: page.path[locale] }, props: { id: page.id } })),
+  )
+}
+
+const { id } = Astro.props
+const t = useT(localeOf(Astro.currentLocale))
+const page = content[id]
+---
+
+<Site title={t(labelKey(id))} description={page ? t(page.lead) : undefined}>
+  <PageView id={id} />
+</Site>

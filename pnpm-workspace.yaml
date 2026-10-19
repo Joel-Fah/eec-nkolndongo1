@@ -1,0 +1,25 @@
+packages:
+  - apps/*
+  - packages/*
+  - scripts
+
+# One version per shared dependency, pinned exactly.
+catalog:
+  "@types/node": 24.19.2
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  react: 19.3.1
+  react-dom: 19.3.1
+  typescript: 6.0.3
+  vitest: 5.0.5
+  vite: 8.3.4
+  tailwindcss: 4.3.3
+  "@tailwindcss/vite": 4.3.3
+  "@hugeicons/core-free-icons": 4.3.5
+  "@inlang/paraglide-js": 2.29.0
+
+# Dependencies allowed to run install scripts (pnpm blocks them by default).
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true

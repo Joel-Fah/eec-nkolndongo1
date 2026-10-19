@@ -1,0 +1,21 @@
+---
+/**
+ * Menu button + native [popover] menu. Items: <a|button role="menuitem" class="menu-item" data-close>.
+ * Arrow keys / Home / End move; Esc and outside click close; focus returns to the button.
+ */
+interface Props {
+  id: string
+  label: string
+  align?: 'start' | 'end'
+  buttonClass?: string
+}
+const { id, label, align = 'start', buttonClass = 'btn btn-secondary' } = Astro.props
+---
+
+<button type="button" class={buttonClass} popovertarget={id} aria-haspopup="menu" aria-expanded="false">
+  <slot name="trigger">{label}</slot>
+  <span class="eec-chevron" aria-hidden="true"></span>
+</button>
+<div id={id} class="eec-popover" popover="auto" role="menu" aria-label={label} data-align={align}>
+  <slot />
+</div>

@@ -1,0 +1,49 @@
+---
+import { useT } from '../../lib/i18n'
+
+interface Props {
+  id: string
+  name: string
+  description: string
+  usage: string
+  a11y: string
+  status?: 'stable' | 'draft'
+  /** Dark surface for the demo (marks, halos). */
+  dark?: boolean
+}
+const { id, name, description, usage, a11y, status = 'stable', dark = false } = Astro.props
+const t = useT(Astro.currentLocale)
+---
+
+<article id={`c-${id}`} class="grid scroll-mt-20 gap-5 rounded-xl bg-surface p-5 shadow-1 md:p-7" aria-labelledby={`c-${id}-title`}>
+  <header class="flex flex-wrap items-center gap-3">
+    <h3 id={`c-${id}-title`} class="text-xl">{name}</h3>
+    <span
+      class:list={[
+        'rounded-xs px-2 py-0.5 text-xs font-semibold',
+        status === 'stable' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning',
+      ]}
+    >
+      {status === 'stable' ? t('brand.components.status_stable') : t('brand.components.status_draft')}
+    </span>
+  </header>
+  <p class="max-w-[68ch] text-ink-muted">{description}</p>
+  <div
+    role="group"
+    aria-label={`${t('brand.components.demo')} — ${name}`}
+    data-theme={dark ? 'dark' : undefined}
+    class="grid min-h-24 content-center gap-4 rounded-lg bg-surface-2 p-5 text-ink"
+  >
+    <slot />
+  </div>
+  <dl class="grid gap-4 text-sm md:grid-cols-2">
+    <div class="grid gap-1 rounded-md bg-surface-2 p-4">
+      <dt class="font-semibold">{t('brand.components.usage')}</dt>
+      <dd class="text-ink-muted">{usage}</dd>
+    </div>
+    <div class="grid gap-1 rounded-md bg-surface-2 p-4">
+      <dt class="font-semibold">{t('brand.components.a11y')}</dt>
+      <dd class="text-ink-muted">{a11y}</dd>
+    </div>
+  </dl>
+</article>

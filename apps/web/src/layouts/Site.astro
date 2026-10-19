@@ -1,0 +1,60 @@
+---
+import { ClientRouter } from 'astro:transitions'
+import Footer from '../components/Footer.astro'
+import Header from '../components/Header.astro'
+import { alternates } from '../lib/nav'
+import Base from './Base.astro'
+
+interface Props {
+  title: string
+  description?: string
+  noindex?: boolean
+}
+const { title, description, noindex } = Astro.props
+---
+
+<Base title={title} description={description} noindex={noindex} alternates={alternates(Astro.url.pathname)}>
+  <ClientRouter slot="head" />
+  <Header />
+  <main id="main" class="page" tabindex="-1">
+    <slot />
+  </main>
+  <Footer />
+</Base>
+
+<style is:global>
+  /* Page turn: the old page slides away a little and fades, the new one arrives from the other side. */
+  @keyframes eec-page-out {
+    to {
+      opacity: 0;
+      transform: translateX(calc(var(--rise) * -2));
+    }
+  }
+  @keyframes eec-page-in {
+    from {
+      opacity: 0;
+      transform: translateX(calc(var(--rise) * 2));
+    }
+  }
+  ::view-transition-old(root) {
+    animation: eec-page-out var(--duration-micro) var(--ease-in-out) both;
+  }
+  ::view-transition-new(root) {
+    animation: eec-page-in var(--duration-ui) var(--ease-out) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-name: eec-fade;
+      animation-duration: 0.12s;
+    }
+    @keyframes eec-fade {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+  .page:focus {
+    outline: none;
+  }
+</style>

@@ -1,0 +1,199 @@
+---
+import Accordion from '@eec/ui/astro/Accordion.astro'
+import Avatar from '@eec/ui/astro/Avatar.astro'
+import Badge from '@eec/ui/astro/Badge.astro'
+import Button from '@eec/ui/astro/Button.astro'
+import Card from '@eec/ui/astro/Card.astro'
+import Choice from '@eec/ui/astro/Choice.astro'
+import Dialog from '@eec/ui/astro/Dialog.astro'
+import EmptyState from '@eec/ui/astro/EmptyState.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Mark from '@eec/ui/astro/Mark.astro'
+import Menu from '@eec/ui/astro/Menu.astro'
+import Ornament from '@eec/ui/astro/Ornament.astro'
+import Skeleton from '@eec/ui/astro/Skeleton.astro'
+import Tabs from '@eec/ui/astro/Tabs.astro'
+import Tooltip from '@eec/ui/astro/Tooltip.astro'
+import Verse from '@eec/ui/astro/Verse.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import SiteLockup from '../SiteLockup.astro'
+import ThemeToggle from '../ThemeToggle.astro'
+import DocBlock from './DocBlock.astro'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+type Id =
+  | 'icon'
+  | 'mark'
+  | 'lockup'
+  | 'illustration'
+  | 'theme'
+  | 'verse'
+  | 'ornament'
+  | 'docblock'
+  | 'motion_idle'
+  | 'button'
+  | 'fields'
+  | 'choices'
+  | 'overlays'
+  | 'disclosure'
+  | 'feedback'
+  | 'surfaces'
+  | 'header'
+  | 'mobile'
+  | 'footer'
+  | 'transitions'
+  | 'adminshell'
+  | 'preloader'
+const doc = (id: Id) => ({
+  id: id.replace('_', '-'),
+  name: t(`brand.components.${id}.name` as 'brand.components.icon.name'),
+  description: t(`brand.components.${id}.desc` as 'brand.components.icon.desc'),
+  usage: t(`brand.components.${id}.use` as 'brand.components.icon.use'),
+  a11y: t(`brand.components.${id}.a11y` as 'brand.components.icon.a11y'),
+})
+---
+
+<Section id="components" title={t('brand.components.title')} lead={t('brand.components.lead')}>
+  <div class="grid gap-6">
+    <DocBlock {...doc('icon')}>
+      <div class="flex flex-wrap items-center gap-5">
+        <Icon name="calendar" size={16} /><Icon name="church" size={20} /><Icon name="heart" size={24} />
+        <Icon name="whatsapp" size={24} label="WhatsApp" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('mark')}>
+      <div class="flex flex-wrap items-end gap-8">
+        <Mark variant="mark" class="h-20 w-auto" />
+        <Mark variant="mono" class="h-20 w-auto" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('lockup')}>
+      <div class="grid gap-4">
+        <div class="w-[min(100%,14rem)] text-[1.125rem]"><SiteLockup /></div>
+        <div class="w-[min(100%,30rem)] text-[1.25rem]"><SiteLockup /></div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('illustration')}>
+      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" />
+    </DocBlock>
+
+    <DocBlock {...doc('motion_idle')}>
+      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" animate />
+    </DocBlock>
+
+    <DocBlock {...doc('theme')}>
+      <div class="w-fit"><ThemeToggle /></div>
+    </DocBlock>
+
+    <DocBlock {...doc('verse')}>
+      <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('brand.components.verse.demo_cite')}>{t('brand.components.verse.demo')}</Verse>
+    </DocBlock>
+
+    <DocBlock {...doc('ornament')}>
+      <Ornament />
+    </DocBlock>
+
+    <DocBlock {...doc('button')}>
+      <div class="flex flex-wrap items-center gap-3">
+        <Button>{t('ui.btn_primary')}</Button>
+        <Button variant="secondary">{t('ui.btn_secondary')}</Button>
+        <Button variant="ghost">{t('ui.btn_ghost')}</Button>
+        <Button variant="danger">{t('ui.btn_danger')}</Button>
+        <Button variant="link">{t('ui.btn_link')}</Button>
+        <Button size="sm">{t('ui.btn_small')}</Button>
+        <Button size="lg">{t('ui.btn_large')}</Button>
+        <Button loading>{t('ui.btn_loading')}</Button>
+        <Button disabled>{t('ui.btn_disabled')}</Button>
+        <Button iconOnly label={t('nav.search')}><Icon name="search" /></Button>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('fields')}>
+      <div class="grid gap-5 md:grid-cols-2">
+        <Field id="d-name" label={t('ui.field_name')} hint={t('ui.field_hint')} />
+        <Field id="d-name2" label={t('ui.field_name')} error={t('ui.field_error')} />
+        <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} />
+        <Field id="d-dept" kind="select" label={t('ui.select_label')} placeholder={t('ui.select_placeholder')} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t(`ui.o${n}` as 'ui.o1') }))} />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('choices')}>
+      <div class="flex flex-wrap gap-6">
+        <Choice id="d-c1" label={t('ui.check')} checked />
+        <Choice id="d-r1" kind="radio" name="d-r" label={t('ui.o1')} checked />
+        <Choice id="d-r2" kind="radio" name="d-r" label={t('ui.o2')} />
+        <Choice id="d-s1" kind="switch" label={t('ui.switch')} />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('overlays')}>
+      <div class="flex flex-wrap items-center gap-3">
+        <Button data-dialog-open="doc-dialog">{t('ui.dialog_open')}</Button>
+        <Button variant="secondary" data-dialog-open="doc-sheet">{t('ui.sheet_open')}</Button>
+        <Menu id="doc-menu" label={t('ui.menu')}>
+          <button type="button" class="menu-item" role="menuitem" data-close>{t('ui.menu_edit')}</button>
+          <button type="button" class="menu-item" role="menuitem" data-close>{t('ui.menu_copy')}</button>
+          <button type="button" class="menu-item" role="menuitem" data-close>{t('ui.menu_delete')}</button>
+        </Menu>
+        <Tooltip id="doc-tip" text={t('ui.tooltip_text')}><Button variant="ghost">{t('ui.tooltip')}</Button></Tooltip>
+      </div>
+      <Dialog id="doc-dialog" title={t('ui.dialog_title')} closeLabel={t('ui.close')}><p class="text-ink-muted">{t('ui.dialog_text')}</p></Dialog>
+      <Dialog id="doc-sheet" side="end" title={t('ui.sheet_title')} closeLabel={t('ui.close')}><p class="text-ink-muted">{t('ui.dialog_text')}</p></Dialog>
+    </DocBlock>
+
+    <DocBlock {...doc('disclosure')}>
+      <div class="grid gap-6 md:grid-cols-2">
+        <Tabs id="doc-tabs" label={t('ui.disclosure')} tabs={[{ id: 'a', label: t('ui.tab1') }, { id: 'b', label: t('ui.tab2') }]}>
+          <p slot="a">{t('ui.tab1_text')}</p>
+          <p slot="b">{t('ui.tab2_text')}</p>
+        </Tabs>
+        <Accordion name="doc-acc" items={[{ title: t('ui.acc1'), body: t('ui.acc1_text'), open: true }, { title: t('ui.acc2'), body: t('ui.acc2_text') }]} />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('feedback')}>
+      <div class="flex flex-wrap items-center gap-3">
+        <Button variant="secondary" data-toast={t('ui.toast_text')} data-tone="success" data-close={t('ui.close')}>{t('ui.toast_btn')}</Button>
+        <Badge tone="success">{t('ui.state_success')}</Badge>
+        <Badge tone="warning">{t('ui.state_warning')}</Badge>
+        <Badge tone="danger">{t('ui.state_danger')}</Badge>
+        <Badge tone="info">{t('ui.state_info')}</Badge>
+        <Badge tone="gold">{t('soon.badge')}</Badge>
+        <Skeleton class="h-4 w-40" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('surfaces')}>
+      <div class="grid gap-4 md:grid-cols-2">
+        <Card><div class="flex items-center gap-3"><Avatar initials="EE" /><h4 class="text-lg">{t('ui.card_title')}</h4></div><p class="text-ink-muted">{t('ui.card_text')}</p></Card>
+        <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" /></EmptyState>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('preloader')}>
+      <div class="preloader-demo text-primary"><Mark variant="lockup-line" class="w-full max-w-md" /></div>
+    </DocBlock>
+
+    <DocBlock {...doc('header')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>
+    <DocBlock {...doc('mobile')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>
+    <DocBlock {...doc('footer')}><p class="text-sm text-ink-muted">{t('brand.components.footer.demo')}</p></DocBlock>
+    <DocBlock {...doc('transitions')}><p class="text-sm text-ink-muted">{t('brand.components.transitions.demo')}</p></DocBlock>
+    <DocBlock {...doc('adminshell')}><p class="text-sm text-ink-muted">{t('brand.components.adminshell.demo')}</p></DocBlock>
+
+    <DocBlock {...doc('docblock')} status="stable">
+      <p class="text-sm text-ink-muted">{t('brand.components.docblock.desc')}</p>
+    </DocBlock>
+  </div>
+
+  <div class="grid gap-3 rounded-xl bg-surface-2 p-6">
+    <h3 class="text-xl">{t('brand.components.upcoming_title')}</h3>
+    <p class="text-ink-muted">{t('brand.components.upcoming')}</p>
+  </div>
+</Section>

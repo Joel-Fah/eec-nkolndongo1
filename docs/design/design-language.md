@@ -2,7 +2,7 @@
 
 Mood: **modern, gentle, subtle, sleek, welcoming, charming, elegant — with a smirk.**
 Reference for *feel only* (do not replicate): maree-lndev.vercel.app.
-Values below are **proposals** until approved on the brand board.
+Palette, logo and fonts approved on the brand board (decision 0015); other values are still provisional.
 
 ## 1. Brand mark
 - Source: `assets/images/eec-logo-tr.png` (EEC universal logo). To be redrawn as clean SVG
@@ -45,6 +45,12 @@ Generous but not pill-shaped radii, standard `border-radius` (no `corner-shape: 
 | `--radius-xl` | 28px | Sheets, dialogs, hero media |
 
 - **Concentric rule:** inner radius = outer radius − padding (never inner > outer).
+- **No one-sided borders, ever** (no side rule on quotes, no `border-bottom` dividers). Frames are
+  complete or absent; separate with space, a tint, shadow or the hand-drawn `<Ornament>`. Quotations use
+  `<Verse>` (soft gold panel + oversized mark). Checked by `scripts/check-design-rules.ts`.
+- **Floating navigation:** headers, sidebars and sheets are lifted off the viewport edges, rounded on every
+  corner, blurred. On mobile they open full screen and lock the page scroll.
+- **Scrollbars** are always rounded; inside panels they float inside and only show on hover.
 - Buttons are *not* fully rounded; only avatars and the theme toggle knob are circles.
 
 ## 4. Elevation
@@ -53,10 +59,9 @@ black. 3 levels: `--shadow-1` (cards), `--shadow-2` (dropdowns/popovers), `--sha
 In dark mode, elevation = lighter surface + faint top highlight border rather than shadow.
 
 ## 5. Typography
-- **Text & UI:** **Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
+- **Headings: Fraunces** (SIL OFL; opsz 72, soft, wonk — decision 0015). **Text & UI: Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
   No Inter, no Geist.
-- **Display:** expressive serif, shortlist for the brand board: **Fraunces** (soft/wonk axes),
-  **Zodiak**, **Gambetta** (Fontshare).
+- **Display:** **Fraunces** for headings — chosen by Joël (decision 0015) over Zodiak / Gambetta / General Sans.
 - Fluid type scale (clamp), ratio ~1.25 mobile / 1.333 desktop. Body 17–18px, line-height 1.6.
 - French typography: non-breaking space before `: ; ! ?` and inside « guillemets » (handled by an i18n
   helper), proper apostrophe `’`.
@@ -76,7 +81,8 @@ Hugeicons **stroke-rounded** only, 1.5px stroke, sizes 16/20/24. Colour = `curre
 Button (primary / secondary / ghost / link) · Input · Textarea · Select · Combobox · Dropdown menu ·
 Checkbox · Radio · Switch · Tabs · Accordion · Dialog · Sheet · Popover · Tooltip · Toast · Card ·
 Badge · Avatar · Skeleton · Empty state · Date picker · Data table (admin) · Command palette (admin).
-Built on Radix/Base UI primitives for accessibility; styles from tokens only.
+Public site: native platform elements (`<dialog>`, `popover`, `<details>`); admin: Base UI — one shared
+stylesheet, tokens only (decision 0016). Documented live in `/fr/_brand`.
 
 ## 9. Imagery
 Real parish photos (when available) > curated Pexels (no people) > illustrations. Warm grade, slight

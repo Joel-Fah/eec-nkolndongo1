@@ -1,0 +1,17 @@
+{
+  "name": "@eec/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fonts:fetch": "node fonts-fetch.ts",
+    "contrast": "node contrast-check.ts",
+    "brand:icons": "node brand-icons.ts",
+    "lint": "biome check . && node check-design-rules.ts"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "sharp": "0.35.5",
+    "svgo": "4.1.0"
+  }
+}

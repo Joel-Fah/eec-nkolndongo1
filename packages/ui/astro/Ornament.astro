@@ -1,0 +1,39 @@
+---
+/**
+ * Ornament — a small hand-drawn wave with two dots; separates sections instead of a rule.
+ * Decorative (aria-hidden). Colour: gold; `--ornament` overrides.
+ */
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+---
+
+<svg
+  class:list={['eec-ornament', className]}
+  viewBox="0 0 132 16"
+  width="132"
+  height="16"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <circle cx="6" cy="8" r="2.5" fill="var(--ornament, var(--gold))" />
+  <path
+    d="M18 8c9-9 16 9 25 0s16 9 25 0 16 9 25 0 12 4 21 0"
+    stroke="var(--ornament, var(--gold))"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="126" cy="8" r="2.5" fill="var(--ornament, var(--gold))" />
+</svg>
+
+<style is:global>
+  .eec-ornament {
+    display: block;
+    margin-inline: auto;
+    max-width: 100%;
+    height: auto;
+  }
+</style>

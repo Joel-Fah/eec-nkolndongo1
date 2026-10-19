@@ -1,0 +1,2 @@
+# Copy to .dev.vars (gitignored). No variables needed in Phase 01.
+# DATABASE_URL=

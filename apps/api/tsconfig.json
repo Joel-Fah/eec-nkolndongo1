@@ -1,0 +1,4 @@
+{
+  "extends": "@eec/config/tsconfig/worker.json",
+  "include": ["src"]
+}

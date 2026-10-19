@@ -1,0 +1,39 @@
+---
+import Icon from '@eec/ui/astro/Icon.astro'
+import { useT } from '../lib/i18n'
+
+const t = useT(Astro.currentLocale)
+---
+
+<button
+  type="button"
+  class="theme-toggle inline-grid size-11 place-items-center rounded-md text-ink transition-colors hover:bg-surface-2"
+  data-theme-toggle
+  data-label-system={t('common.theme.system')}
+  data-label-light={t('common.theme.light')}
+  data-label-dark={t('common.theme.dark')}
+  aria-label={t('common.theme.system')}
+  title={t('common.theme.toggle')}
+>
+  <span class="icon-system"><Icon name="system" /></span>
+  <span class="icon-light"><Icon name="sun" /></span>
+  <span class="icon-dark"><Icon name="moon" /></span>
+</button>
+
+<style>
+  .theme-toggle > span {
+    display: none;
+  }
+  :global(html:not([data-theme-choice])) .icon-system,
+  :global(html[data-theme-choice="system"]) .icon-system,
+  :global(html[data-theme-choice="light"]) .icon-light,
+  :global(html[data-theme-choice="dark"]) .icon-dark {
+    display: inline-grid;
+  }
+</style>
+
+<script>
+  import { initThemeToggles } from '../lib/theme'
+  initThemeToggles()
+  document.addEventListener('astro:page-load', initThemeToggles)
+</script>

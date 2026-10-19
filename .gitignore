@@ -13,6 +13,7 @@ coverage/
 !.env.example
 .dev.vars
 .dev.vars.*
+!.dev.vars.example
 
 # OS / editors
 .DS_Store
@@ -24,3 +25,11 @@ Thumbs.db
 # local tooling
 .claude/settings.local.json
 scripts/.cache/
+
+# generated
+**/src/paraglide/
+worker-configuration.d.ts
+
+# Fontshare fonts: ITF FFL forbids redistribution via a repository.
+# Fetched from Fontshare at build time (`pnpm fonts:fetch`). See docs/decisions/0015.
+packages/ui/fonts/fontshare/

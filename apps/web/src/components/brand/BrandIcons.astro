@@ -1,0 +1,79 @@
+---
+import { formatBytes } from '@eec/i18n'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import { icons } from '@eec/ui/icons'
+import illustration from '@eec/ui/illustrations/hymn-book-handover.svg?raw'
+import { localeOf, useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const names = Object.keys(icons) as (keyof typeof icons)[]
+const gzipped = await new Response(
+  new Blob([illustration]).stream().pipeThrough(new CompressionStream('gzip')),
+).arrayBuffer()
+const gzipKb = formatBytes(gzipped.byteLength, locale)
+const variants = [
+  { theme: 'light', label: t('brand.icons.light'), hands: ['--skin-2', '--skin-4'] },
+  { theme: 'dark', label: t('brand.icons.dark'), hands: ['--skin-1', '--skin-3'] },
+  { theme: 'light', season: 'avent', label: t('season.avent'), hands: ['--skin-3', '--skin-1'] },
+  {
+    theme: 'dark',
+    season: 'pentecote',
+    label: t('season.pentecote'),
+    hands: ['--skin-4', '--skin-2'],
+  },
+] as const
+---
+
+<Section id="icons" title={t('brand.icons.title')} lead={t('brand.icons.lead')}>
+  <ul class="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-8" role="list">
+    {
+      names.map((name) => (
+        <li class="grid justify-items-center gap-2 rounded-md bg-surface px-2 py-4 text-center">
+          <span class="flex items-end gap-3 text-ink">
+            <Icon name={name} size={16} />
+            <Icon name={name} size={20} />
+            <Icon name={name} size={24} />
+          </span>
+          <code class="text-xs text-ink-muted">{name}</code>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="grid gap-5">
+    <div>
+      <h3 class="text-xl">{t('brand.icons.illustration')}</h3>
+      <p class="mt-1 max-w-[62ch] text-ink-muted">
+        {t('brand.icons.illustration_lead')} {t('brand.icons.size', { size: gzipKb })}
+      </p>
+    </div>
+    <div class="grid gap-4 md:grid-cols-2">
+      {
+        variants.map((variant, i) => (
+          <figure
+            data-theme={variant.theme}
+            data-season={'season' in variant ? variant.season : undefined}
+            class="grid gap-2 overflow-hidden rounded-xl bg-bg p-3 text-ink ring-1 ring-line"
+            style={`--hand-a:var(${variant.hands[0]});--hand-b:var(${variant.hands[1]})`}
+          >
+            <Illustration
+              name="hymn-book-handover"
+              title={i === 0 ? t('illo.hymn_book') : undefined}
+              class="h-auto w-full"
+              animate
+            />
+            <figcaption class="px-2 pb-1 text-sm text-ink-muted">{variant.label}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</Section>
+
+<script>
+  import { animateIllustrations } from '../../scripts/illustration-idle'
+  animateIllustrations()
+</script>

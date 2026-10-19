@@ -1,6 +1,7 @@
 # Architecture
 
-Status: **agreed design, not yet implemented.** Rationale for each choice lives in `docs/decisions/`.
+Status: **foundations built (Phase 01)**: monorepo, brand, tokens, primitives, public shell and admin shell.
+Database, auth, API modules and content are Phase 02+. Rationale for each choice lives in `docs/decisions/`.
 
 ## 1. Goals that shape the architecture
 
@@ -15,7 +16,7 @@ Status: **agreed design, not yet implemented.** Rationale for each choice lives 
 |---|---|---|
 | Monorepo | pnpm workspaces + Turborepo | Shared TS config, cached tasks |
 | Public site | **Astro** (+ React islands only where needed) | Static by default, on-demand rendering for live content, built-in i18n routing, View Transitions |
-| Admin | **Vite + React + TypeScript** | TanStack Router, TanStack Query, React Hook Form + Zod, Radix/Base UI primitives skinned with our tokens |
+| Admin | **Vite + React + TypeScript** | TanStack Router, TanStack Query, React Hook Form + Zod, **Base UI** primitives skinned with our shared CSS (decision 0016) |
 | API | **Hono** on **Cloudflare Workers** | Single place for validation and permission checks |
 | Database | **Neon Postgres** (free plan) | Accessed with **Drizzle ORM**; connection via Hyperdrive or Neon serverless driver |
 | Auth | **Neon Auth** (managed Better Auth) | Identity only. Authorization is ours (see §5) |
@@ -23,10 +24,10 @@ Status: **agreed design, not yet implemented.** Rationale for each choice lives 
 | Video | **YouTube** | Embedded with a click-to-load facade |
 | Archive | **Google Drive** | Raw originals / backups only — never served to the site |
 | Email | **Brevo** (transactional + newsletter) | Templates in React Email (`packages/emails`). Needs a domain → later |
-| Styling | Tailwind CSS v4 + CSS custom-property tokens | `packages/ui` |
+| Styling | Tailwind CSS v4 + CSS custom-property tokens (generated from `packages/ui/src/tokens.ts`) | `packages/ui` |
 | Motion | **GSAP** (ScrollTrigger, SplitText, MorphSVG) + CSS | Per-page loading only |
 | Icons | Hugeicons free, stroke-rounded | `@hugeicons/core-free-icons` |
-| Fonts | Switzer (text/UI) + display serif (TBD on brand board) | Self-hosted, subset WOFF2 |
+| Fonts | **Switzer** (text/UI, Fontshare, fetched at build, not committed) + **Fraunces** (headings, OFL, subset, committed) | Self-hosted WOFF2, decision 0015 |
 | Payments (later) | **pawaPay** | MTN MoMo + Orange Money Cameroon (XAF) |
 | Hosting | Cloudflare (Workers static assets / Pages) | Free plan |
 
@@ -40,10 +41,12 @@ apps/
 packages/
   db/             Drizzle schema, migrations, query helpers
   auth/           Neon Auth client + session helpers + permission checker
-  ui/             Design tokens (CSS vars), Tailwind preset, shared primitives, icon wrapper
+  ui/             Tokens, shared CSS, brand SVGs, illustrations, Astro + React primitives, icon registry
   i18n/           FR/EN dictionaries, formatters (dates, XAF), locale utils
   emails/         React Email templates
-  config/         tsconfig, eslint, prettier presets
+  config/         tsconfig bases, Biome config (decision 0013)
+  core/           framework-free utilities: liturgical calendar, slugs
+  scripts/        (workspace) fonts fetch, contrast check, brand icons, design-rules check, brand tracing
 modules/
   <module>/       One folder per feature (see §4)
 scripts/          One-off tooling (pexels curation, seeding, image optimisation)
@@ -122,3 +125,9 @@ modules/events/
 | production | deploy on merge/tag to `main` (path-filtered) | Neon main branch |
 
 CI/CD rules: `docs/ops/ci-cd.md`. Domain: not chosen yet — `*.workers.dev` / `*.pages.dev` until then.
+
+## 10. Design system documentation
+`/fr/_brand` and `/en/_brand` (apps/web) are the **living brand guidelines and design-system docs**: identity,
+voice and tone, logo, colour, type, shape, motion, icons, illustration, every component and rule. They are
+`noindex`, unlinked and out of the sitemap — **unlisted, not private**; access control comes with auth
+(Phase 02). New components, animations and tokens are documented there in the same change.

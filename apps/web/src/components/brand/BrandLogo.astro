@@ -1,0 +1,191 @@
+---
+import Mark from '@eec/ui/astro/Mark.astro'
+import official from '../../assets/eec-logo-reference.webp?url'
+import { useT } from '../../lib/i18n'
+import SiteLockup from '../SiteLockup.astro'
+import Section from './Section.astro'
+
+const t = useT(Astro.currentLocale)
+const darkOptions = [
+  { key: 'brand.logo.dark_plain', variant: 'full', tile: false },
+  { key: 'brand.logo.dark_halo', variant: 'full-halo', tile: false },
+  { key: 'brand.logo.dark_mono', variant: 'full-mono', tile: false },
+  { key: 'brand.logo.dark_tile', variant: 'full', tile: true },
+] as const
+---
+
+<Section id="logo" title={t('brand.logo.title')} lead={t('brand.logo.lead')}>
+  <div class="overlay-wrap grid gap-4">
+    <figure data-theme="light" class="relative mx-auto w-full max-w-[560px] rounded-xl bg-surface p-6 shadow-1 md:p-10">
+      <div class="relative" style="aspect-ratio: 850 / 826">
+        <Mark variant="full" label={t('site.church')} class="absolute inset-0 size-full" />
+        <img
+          class="official pointer-events-none absolute max-w-none opacity-0 transition-opacity"
+          loading="lazy"
+          decoding="async"
+          src={official}
+          alt=""
+          width="900"
+          height="843"
+          style="left:-1.647%;top:0;width:105.882%;height:102.058%"
+        />
+      </div>
+    </figure>
+    <label class="mx-auto flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-3 font-medium">
+      <input type="checkbox" class="size-5 accent-[var(--primary)]" />
+      {t('brand.logo.overlay')}
+    </label>
+    <p class="mx-auto max-w-[60ch] text-center text-sm text-ink-muted">
+      {`${t('brand.logo.overlay_hint')} ${t('brand.logo.fidelity')}`}
+    </p>
+  </div>
+
+  <div class="grid gap-3">
+    <h3 class="text-xl">{t('brand.logo.notes_title')}</h3>
+    <ul class="grid list-disc gap-1 ps-6 text-ink-muted">
+      <li>{t('brand.logo.note_notch')}</li>
+      <li>{t('brand.logo.note_cross')}</li>
+      <li>{t('brand.logo.note_text')}</li>
+    </ul>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-xl">{t('brand.logo.variants')}</h3>
+    <div class="grid gap-4 sm:grid-cols-3">
+      <figure class="grid gap-3 rounded-lg bg-surface p-6 shadow-1">
+        <Mark variant="full" class="mx-auto h-40 w-auto" />
+        <figcaption class="text-center text-sm text-ink-muted">{t('brand.logo.full')}</figcaption>
+      </figure>
+      <figure class="grid gap-3 rounded-lg bg-surface p-6 shadow-1">
+        <Mark variant="mark" class="mx-auto h-40 w-auto" />
+        <figcaption class="text-center text-sm text-ink-muted">{t('brand.logo.mark')}</figcaption>
+      </figure>
+      <figure class="grid gap-3 rounded-lg bg-surface p-6 text-ink shadow-1">
+        <Mark variant="full-mono" class="mx-auto h-40 w-auto" />
+        <figcaption class="text-center text-sm text-ink-muted">{t('brand.logo.mono')}</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-xl">{t('brand.logo.dark_title')}</h3>
+    <div data-theme="dark" class="grid gap-4 rounded-xl bg-bg p-4 sm:grid-cols-2 lg:grid-cols-4 md:p-6">
+      {
+        darkOptions.map((option) => (
+          <figure class="grid gap-3 rounded-lg bg-surface p-5 text-ink">
+            {option.tile ? (
+              <div data-theme="light" class="mx-auto rounded-lg bg-bg p-4">
+                <Mark variant="full" class="h-32 w-auto" />
+              </div>
+            ) : (
+              <Mark variant={option.variant} class="mx-auto h-40 w-auto" />
+            )}
+            <figcaption class="text-center text-sm text-ink-muted">{t(option.key)}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-xl">{t('brand.logo.rules')}</h3>
+    <div class="grid items-start gap-6 md:grid-cols-2">
+      <figure class="grid gap-3">
+        <div class="clearspace mx-auto rounded-md bg-surface">
+          <Mark variant="mark" class="block h-36 w-auto" />
+        </div>
+        <figcaption class="text-sm text-ink-muted">{t('brand.logo.clearspace')}</figcaption>
+      </figure>
+      <figure class="grid gap-3">
+        <div class="flex items-end justify-center gap-6 rounded-md bg-surface p-6">
+          {[24, 32, 48, 64].map((size) => <Mark variant="mark" class="w-auto" style={`height:${size}px`} />)}
+        </div>
+        <figcaption class="text-sm text-ink-muted">{t('brand.logo.minsize')}</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <div>
+      <h3 class="text-xl">{t('brand.logo.lockups')}</h3>
+      <p class="mt-2 max-w-[62ch] text-ink-muted">{t('brand.logo.lockups_lead')}</p>
+    </div>
+    <div class="grid gap-4 lg:grid-cols-3">
+      <div data-theme="light" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
+        <SiteLockup variant="one" class="text-[1.375rem]" />
+        <SiteLockup variant="two" class="text-[1.375rem]" />
+        <SiteLockup variant="three" class="text-[1.375rem]" />
+      </div>
+      <div data-theme="dark" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
+        <SiteLockup variant="one" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="two" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="three" mark="halo" class="text-[1.375rem]" />
+      </div>
+      <div data-theme="light" class="grid gap-6 rounded-lg bg-surface-2 p-6 text-ink">
+        <SiteLockup variant="one" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="two" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="three" mark="mono" class="text-[1.375rem]" />
+      </div>
+    </div>
+    <div class="grid gap-3 rounded-xl bg-surface-2 p-5">
+      <h4 class="text-lg">{t('brand.logo.lockup_rules_title')}</h4>
+      <ul class="grid list-disc gap-1 ps-5">{(['brand.logo.lr1', 'brand.logo.lr2', 'brand.logo.lr3', 'brand.logo.lr4'] as const).map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+    <div class="grid gap-3">
+      <h4 class="text-lg">{t('brand.logo.lockup_auto')}</h4>
+      <p class="max-w-[62ch] text-sm text-ink-muted">{t('brand.logo.lockup_auto_lead')}</p>
+      <div class="grid gap-3">
+        {
+          ['14rem', '20rem', '26rem', '36rem'].map((width) => (
+            <div class="rounded-md bg-surface p-4 text-ink shadow-1" style={`width:min(100%, ${width})`}>
+              <SiteLockup class="text-[1.25rem]" />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid content-start gap-2 rounded-lg bg-success-soft p-5">
+      <h3 class="text-lg text-success">{t('brand.logo.usage_title')} · ✓</h3>
+      <ul class="grid list-disc gap-1 ps-5 text-ink">{(['brand.logo.do1', 'brand.logo.do2', 'brand.logo.do3'] as const).map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+    <div class="grid content-start gap-2 rounded-lg bg-danger-soft p-5">
+      <h3 class="text-lg text-danger">{t('brand.logo.usage_title')} · ✗</h3>
+      <ul class="grid list-disc gap-1 ps-5 text-ink">{(['brand.logo.dont1', 'brand.logo.dont2', 'brand.logo.dont3'] as const).map((k) => <li>{t(k)}</li>)}</ul>
+    </div>
+  </div>
+
+  <div class="grid gap-5">
+    <h3 class="text-xl">{t('brand.logo.icons')}</h3>
+    <p class="max-w-[62ch] text-ink-muted">{t('brand.logo.admin_icon')}</p>
+    <div class="flex flex-wrap items-end gap-6">
+      {
+        (['light', 'dark'] as const).map((theme) => (
+          <div data-theme={theme} class="flex flex-wrap items-end gap-5 rounded-lg bg-bg p-5">
+            <img src="/favicon.svg" alt="" width="16" height="16" />
+            <img src="/favicon.svg" alt="" width="32" height="32" />
+            <img src="/favicon.ico" alt="" width="32" height="32" />
+            <img src="/apple-touch-icon.png" alt="" width="90" height="90" class="rounded-lg" />
+            <img src="/icon-192.png" alt="" width="96" height="96" class="rounded-full" />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</Section>
+
+<style>
+  .overlay-wrap:has(input:checked) .official {
+    opacity: 0.5;
+  }
+  .clearspace {
+    /* Clear space = height of one « E » (≈ 28 % of the mark's height). */
+    padding: calc(9rem * 0.28);
+    outline: 1.5px dashed var(--line-strong);
+    outline-offset: -1px;
+    background-image: linear-gradient(var(--surface), var(--surface)), linear-gradient(var(--gold-soft), var(--gold-soft));
+    background-clip: content-box, padding-box;
+  }
+</style>

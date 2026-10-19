@@ -1,0 +1,927 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "site": {
+    "name": "EEC Nkolndongo 1",
+    "parish": "Nkolndongo 1 Parish",
+    "church": "Evangelical Church of Cameroon",
+    "tagline": "Come as you are: there is room for you."
+  },
+  "common": {
+    "skip_to_content": "Skip to content",
+    "greeting": "Hello {name}",
+    "noindex_note": "Internal page, not indexed",
+    "language": {
+      "label": "Language",
+      "switch_to": "Français",
+      "switch_label": "Lire cette page en français"
+    },
+    "theme": {
+      "toggle": "Change theme",
+      "system": "Theme: device setting",
+      "light": "Theme: light",
+      "dark": "Theme: dark"
+    }
+  },
+  "nav": {
+    "discover": "Discover",
+    "live": "Live",
+    "calendar": "Calendar",
+    "news": "News",
+    "give": "Give",
+    "account": "My space",
+    "search": "Search",
+    "items": {
+      "histoire": {
+        "label": "Our story",
+        "desc": "The road our community has walked."
+      },
+      "croyances": {
+        "label": "What we believe",
+        "desc": "What gathers us and keeps us moving."
+      },
+      "pasteurs": {
+        "label": "Pastors and Council",
+        "desc": "Those who serve and lead the parish."
+      },
+      "trouver": {
+        "label": "Find us",
+        "desc": "How to come and join us."
+      },
+      "cultes": {
+        "label": "Services and times",
+        "desc": "The gatherings of the week."
+      },
+      "departements": {
+        "label": "Departments",
+        "desc": "The parish groups: find your place."
+      },
+      "pratique": {
+        "label": "Practical life",
+        "desc": "Baptism, marriage, bereavement, joining: step by step."
+      },
+      "evenements": {
+        "label": "Events",
+        "desc": "What is happening soon."
+      },
+      "liturgie": {
+        "label": "Liturgical year",
+        "desc": "The seasons of the year, their colours and meaning."
+      },
+      "moissons": {
+        "label": "Harvest Festival",
+        "desc": "The festival of generosity and gratitude."
+      },
+      "nouvelles": {
+        "label": "News",
+        "desc": "The latest news from the parish."
+      },
+      "predications": {
+        "label": "Sermons",
+        "desc": "Listen or listen again to a message."
+      },
+      "meditations": {
+        "label": "Meditations and bulletin",
+        "desc": "A word for the week, and the bulletin to take away."
+      },
+      "give": {
+        "label": "Give",
+        "desc": "Support the life and projects of the parish."
+      },
+      "account": {
+        "label": "My space",
+        "desc": "Your member account."
+      },
+      "privacy": {
+        "label": "Privacy",
+        "desc": "How we protect your data."
+      },
+      "legal": {
+        "label": "Legal notice",
+        "desc": "Legal information about the site."
+      }
+    },
+    "main": "Main menu",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "home": "Home",
+    "utilities": "Tools",
+    "panel": {
+      "discover": {
+        "title": "Getting to know us",
+        "text": "Where we come from, what gathers us, and the way to join us."
+      },
+      "live": {
+        "title": "One house, a thousand ways to live in it",
+        "text": "Services, groups, and the steps of a life of faith."
+      },
+      "calendar": {
+        "title": "A time for everything",
+        "text": "Gatherings, the seasons of the year, and the feasts."
+      },
+      "news": {
+        "title": "What brings us together",
+        "text": "News, messages to listen to, and meditations to take along."
+      }
+    },
+    "language_short": "Change language"
+  },
+  "season": {
+    "avent": "Advent",
+    "noel": "Christmas",
+    "epiphanie": "Epiphany",
+    "careme": "Lent",
+    "semaine-sainte": "Holy Week",
+    "paques": "Easter",
+    "pentecote": "Pentecost",
+    "ordinaire": "Ordinary Time",
+    "moissons": "Harvest Festival (Fête des Moissons)"
+  },
+  "illo": {
+    "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages."
+  },
+  "lockup": {
+    "short": "EEC NKOLNDONGO 1",
+    "long_church": "Église Évangélique du Cameroun",
+    "long_parish": "Paroisse de Nkolndongo 1",
+    "eec": "EEC",
+    "parish_lead": "Paroisse de",
+    "parish_place": "Nkolndongo 1"
+  },
+  "brand": {
+    "title": "Brand board",
+    "status": "Approved — logo, colours, fonts",
+    "intro": "A working board to approve the logo, colours, typography and style before building the site. Nothing here is final.",
+    "toc": "On this page",
+    "logo": {
+      "title": "The logo",
+      "lead": "Faithfully redrawn from the official logo (900 px PNG): shapes, proportions and colours unchanged, with clean, light paths.",
+      "overlay": "Overlay the original at 50%",
+      "overlay_hint": "The official PNG is shown on top of the redraw: any difference appears doubled.",
+      "fidelity": "Measured overlap: yellow 98.9%, green 98.9%. Remaining differences ≤ 1–2 px (the cross is slightly skewed in the scanned original, anti-aliasing).",
+      "notes_title": "Kept exactly as in the original",
+      "note_notch": "The gap in the outline at the bottom left of the sail.",
+      "note_cross": "The cross's top arm, slightly wider than the shaft (46.7 vs 40). To confirm.",
+      "note_text": "The arched text, retraced letter by letter (original typeface unknown).",
+      "variants": "Variants",
+      "full": "Full, with the arched text",
+      "mark": "Without the text",
+      "mono": "Monochrome (line art)",
+      "dark_title": "On dark backgrounds: four options",
+      "dark_plain": "A · As is — black outlines and text disappear",
+      "dark_halo": "B · Cream halo — recommended",
+      "dark_mono": "C · Cream monochrome",
+      "dark_tile": "D · On a light tile",
+      "rules": "Usage rules",
+      "clearspace": "Clear space: the height of one “E” of the mark on every side.",
+      "minsize": "Minimum size: 24 px tall without text; 200 px with the arched text, which is unreadable below that.",
+      "minsize_demo": "The mark without text at 24, 32, 48 and 64 px",
+      "lockups": "Horizontal lockups",
+      "lockups_lead": "The mark and the parish name, in live text: one line for the tiniest spaces, two lines by default, three lines when room is short.",
+      "lockup_short": "Short",
+      "lockup_long": "Long",
+      "icons": "Favicons and app icons",
+      "lockup_auto": "Adaptive",
+      "lockup_auto_lead": "One composition picks two or three lines from the width available (from 22 rem).",
+      "usage_title": "Do and don’t",
+      "do1": "Use the files in packages/ui/brand, unmodified.",
+      "do2": "Keep the clear space around the logo.",
+      "do3": "On dark backgrounds: cream halo (B) or cream line art (C).",
+      "dont1": "Stretch, rotate, recolour or redraw the logo.",
+      "dont2": "Place the logo on a busy photo or a green background.",
+      "dont3": "Set the parish name in a font other than the lockups’.",
+      "lockup_rules_title": "Lockup rules",
+      "lr1": "Two lines: “Église Évangélique du Cameroun” in full, dimmed, then “Paroisse de Nkolndongo 1” strong.",
+      "lr2": "Three lines, for smaller spaces: “EEC” abbreviated and dimmed, then “Paroisse de” and “Nkolndongo 1” strong.",
+      "lr3": "One line (“EEC NKOLNDONGO 1”) only when height is tight.",
+      "lr4": "The lockup picks between two and three lines by itself from the width available (from 22 rem).",
+      "admin_icon": "The administration has its own icon: dark only, terminal-flavoured (the sail as a green line and a blinking gold prompt)."
+    },
+    "colour": {
+      "title": "Colour",
+      "lead": "Drawn from the logo — green, yellow, black, white — then softened, with the state colours. Every text/background pair is checked (WCAG AA) in both themes.",
+      "light": "Light theme",
+      "dark": "Dark theme",
+      "seasons": "Liturgical season colours",
+      "seasons_lead": "A decorative tint, a text-safe tint (4.5:1) and the colour of text placed on it.",
+      "skin": "Illustration skin tones",
+      "contrast": "Contrast check",
+      "contrast_summary": "{count} pairs checked, {failing} failing.",
+      "col_theme": "Theme",
+      "col_fg": "Text",
+      "col_bg": "Background",
+      "col_ratio": "Contrast",
+      "col_min": "Minimum",
+      "col_result": "Result",
+      "pass": "Pass",
+      "fail": "Fail",
+      "info": "Info",
+      "changes": "Changes required by contrast",
+      "change_gold": "Gold on cream: 1.7:1. Gold is never used for text in the light theme; new gold-ink token for gold text and icons.",
+      "change_clay": "Clay on cream: 3.4:1, large text only; new clay-ink token for small text.",
+      "change_focus": "Focus ring: gold, plus an outer forest-green ring in the light theme (gold alone doesn't reach 3:1).",
+      "change_line": "Field borders: new line-strong token (3:1) so fields can be told apart.",
+      "change_seasons": "Seasons: a decorative tint, a text tint and an on-colour for each; lighter tints in the dark theme.",
+      "change_new_seasons": "Epiphany and Holy Week weren't defined: proposed gold (as Christmas) and crimson. To confirm.",
+      "change_states": "States: success, warning, danger and info, each with a text-safe tint and a soft background tint, passing in both themes."
+    },
+    "type": {
+      "title": "Typography",
+      "lead": "Fraunces for headings, Switzer for text and interface: the warmth of a soft headline, the calm of easy reading.",
+      "pairing": "Fraunces + Switzer",
+      "weight": "File weight: {size}",
+      "sample_label": "Typographic sample, not information about the parish.",
+      "h1": "Welcome home",
+      "h2": "A Sunday in Nkolndongo",
+      "h3": "Singing together",
+      "h4": "Next gathering",
+      "lead_text": "A place to sing, pray and grow together.",
+      "body": "Whether you're passing through or have been here all your life, there's a place for you. Come in, take a seat: the singing is about to begin.",
+      "small": "Secondary text, captions and notes.",
+      "button": "Plan a visit",
+      "quote": "“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”",
+      "quote_ref": "Matthew 11:28",
+      "punctuation": "Come as you are; there's room for everyone! A question? Write to us.",
+      "numbers": "Dates and amounts",
+      "scale": "Type scale",
+      "scale_base": "Body text, 17 to 18 px",
+      "scale_xs": "Labels",
+      "rules_title": "Type rules",
+      "rule1": "Headings in Fraunces (weights 400 to 600), text and interface in Switzer.",
+      "rule2": "Body 17 to 18 px, line height 1.6; no running text below 14.5 px.",
+      "rule3": "Tabular figures for times, dates and amounts.",
+      "rule4": "Headings balance (text-wrap: balance); paragraphs avoid orphans (pretty)."
+    },
+    "shape": {
+      "title": "Shape, elevation and motion",
+      "radius": "Corner radii",
+      "radius_lead": "Generous but never pill-shaped: 6, 10, 14, 20 and 28 px.",
+      "tag": "Tag",
+      "chip": "Filter",
+      "button": "Button",
+      "input": "Your name",
+      "card": "Card",
+      "dialog": "Dialog",
+      "concentric": "Concentric radii: inner radius = outer radius − padding.",
+      "elevation": "Elevation",
+      "elevation_dark": "In the dark theme: a lighter surface and a faint top highlight instead of a shadow.",
+      "level": "Level {level}",
+      "motion": "Motion",
+      "micro": "Micro · {ms} ms",
+      "ui": "Interface · {ms} ms",
+      "story": "Narrative · {ms} ms",
+      "replay": "Replay",
+      "reduce": "Simulate reduced motion",
+      "reduced_note": "Reduced motion: no movement or animated scrolling, only short fades (≤ 150 ms).",
+      "rules_title": "Shape rules",
+      "rule1": "Standard radii (6, 10, 14, 20, 28 px); never pills, never squircles.",
+      "rule2": "Never a one-sided border. We separate with space, a tint, a full frame or the ornament.",
+      "rule3": "Concentric radii: inner radius = outer radius − padding.",
+      "rule4": "Touch targets at least 44 × 44 px; a visible focus ring everywhere.",
+      "rule5": "Floating navigation: bars, sidebars and sheets are lifted off the edges, rounded on every corner, with a light blur.",
+      "rule6": "Scrollbars are always rounded. Those inside panels (sheets, dialogs, menus, lists) float within and only appear on hover.",
+      "rule7": "An avatar is a circle; its container, if any, is a circle too: never a circle inside a rounded rectangle."
+    },
+    "icons": {
+      "title": "Icons and illustration",
+      "lead": "Hugeicons, stroke-rounded only: 1.5 px, text colour, at 16, 20 and 24 px.",
+      "illustration": "Sample illustration",
+      "illustration_lead": "“Hands passing a hymn book”: original drawing, token colours, four skin tones, a gentle animation turned off with reduced motion.",
+      "light": "Light",
+      "dark": "Dark",
+      "size": "{size} gzipped"
+    },
+    "page": {
+      "status": "Living guide — internal",
+      "intro": "This is where our identity and our design system live: who we are, how we speak, how we look, and every component, animation and transition of the site. Whatever is added to the site is added here.",
+      "private_note": "Internal page, not indexed and not linked from the site. Access will be restricted to the team in phase 02."
+    },
+    "nav": {
+      "identity": "Identity",
+      "voice": "Voice and tone",
+      "logo": "Logo",
+      "colour": "Colour",
+      "type": "Typography",
+      "shape": "Shape and elevation",
+      "motion": "Motion",
+      "icons": "Icons",
+      "illustration": "Illustration",
+      "components": "Components",
+      "rules": "Rules and upkeep"
+    },
+    "identity": {
+      "title": "Our identity",
+      "lead": "This guide says who we are and how we want to be recognised. It is written in the first person plural: this house belongs to everyone who comes through its doors, and a parish never speaks in an agency’s voice.",
+      "draft": "Proposed text, for the Parish Council to review before it is published. It describes a brand intention, not facts about the parish.",
+      "essence_title": "Our essence",
+      "essence": "A parish is first of all people finding one another. Our image should make you want to come in, sit down, stay. It does not show a building: it invites a people on the move.",
+      "signature_title": "Signature ideas",
+      "signature": "Come in, there is room. · An open house. · [TO CONFIRM: line chosen by the Council]",
+      "pillars_title": "Three pillars",
+      "p1_name": "Community",
+      "p1": "We walk together. Every face counts, every age has a place. Our images show hands, gestures, gatherings — never a staged individual.",
+      "p2_name": "Movement",
+      "p2": "We are not standing still: we walk towards God, towards one another, towards tomorrow. The site breathes, changes with the seasons of the liturgical year, and never freezes into a shop window.",
+      "p3_name": "Invitation",
+      "p3": "Everything starts with a gesture: reaching out a hand. Every page says, in its own way: come, there is room for you. We invite; we never demand.",
+      "look_title": "What it looks like",
+      "look1": "Forest green and gold, warm and bright, like the logo.",
+      "look2": "Rounded, welcoming shapes, never pills.",
+      "look3": "Hands, hymn books, baskets, drums: our world, drawn by us.",
+      "look4": "Gentle movement, always optional, never blocking.",
+      "look5": "A small smile in the details, never in solemn moments."
+    },
+    "voice": {
+      "title": "Our voice",
+      "lead": "We speak the way you greet someone at the door: simply, warmly, without fuss. Ours is the voice of a “we” speaking to a respected “you”.",
+      "traits_title": "Four traits",
+      "t1_name": "Warm",
+      "t1": "We say hello, thank you, welcome. We are not an administration.",
+      "t2_name": "Simple",
+      "t2": "Short sentences, everyday words. A teenager and a grandmother read the same page.",
+      "t3_name": "Respectful",
+      "t3": "We say “vous”. We do not judge, guilt or rush anyone.",
+      "t4_name": "Hopeful",
+      "t4": "Even in hardship we look towards the light — without playing down the pain.",
+      "examples_title": "Say it, don’t say it",
+      "yes": "We say",
+      "no": "We avoid",
+      "e1_yes": "Come as you are.",
+      "e1_no": "Sign up now!",
+      "e2_yes": "Nothing planned that day. Come back soon, there will be news.",
+      "e2_no": "No results.",
+      "e3_yes": "Your message reached us. Thank you!",
+      "e3_no": "Operation successful.",
+      "e4_yes": "This page wandered off, like a lost sheep. Let’s head back home.",
+      "e4_no": "Error 404: resource not found.",
+      "tone_title": "Our tone, moment by moment",
+      "m1_name": "Welcome",
+      "m1": "Warm and direct. We reach out first.",
+      "m2_name": "Practical",
+      "m2": "Clear and factual: where, when, how. Nothing more, nothing less.",
+      "m3_name": "Feasts and joy",
+      "m3": "Livelier, brighter. Exclamation marks are allowed, one per sentence at most.",
+      "m4_name": "Grief and hardship",
+      "m4": "Quiet, slow, no humour, no exclamation marks. We accompany; we do not explain.",
+      "m5_name": "Youth",
+      "m5": "Lighter and more direct, always respectful. Never forced “youth speak”.",
+      "m6_name": "Errors and waiting",
+      "m6": "Reassuring, never blaming. We say what happened and what can be done. A small smile is welcome.",
+      "rules_title": "Writing rules",
+      "r1": "We address visitors and members as “vous” (formal you).",
+      "r2": "One idea per sentence, short sentences, action verbs.",
+      "r3": "We invite: “Plan a visit”, “Join us”. Never “Click here”.",
+      "r4": "The words of the house: service, Holy Communion, Parish Council, offering, Fête des Moissons — no jargon, no unexplained acronyms.",
+      "r5": "We invent nothing about the parish: a time, a name or a date comes from a validated source.",
+      "r6": "French typography: no-break space before “: ; ! ?” and inside « », curly apostrophe ’. Times read 09h00, amounts 5,000 FCFA.",
+      "r7": "We write in French first, then adapt to English — never word for word. Proper names (JAPE, Fête des Moissons) stay in French, with a short gloss the first time.",
+      "sample_title": "The voice in action",
+      "sample_body": "Whether you are coming for the first time or have always been here, there is a place for you. Come in, sit down: the singing is about to begin.",
+      "sample_cite": "Example of the welcome tone"
+    },
+    "motion": {
+      "title": "Motion",
+      "lead": "Motion serves the story and never blocks content. Gentle, short, reversible, and always optional.",
+      "rules_title": "Principles",
+      "rule1": "Enter: fade and a small rise (8 to 16 px). Exit: faster than enter. No bounce on the interface.",
+      "rule2": "Only transform and opacity animate. CSS is enough for hovers and fades; GSAP loads only on pages that need it.",
+      "rule3": "Reduced motion or data saver: no travel, no loops, only fades of 150 ms at most, and GSAP isn’t even downloaded.",
+      "rule4": "All content reads before JavaScript runs.",
+      "catalog_title": "Catalogue",
+      "rule5": "Navigation (headers, sheets, menus) unfolds more slowly: 480 ms, soft curve. Icons drift slightly in the direction of the opening.",
+      "rule6": "Sliding indicators (tabs) use a light spring. Disclosures (accordion) take 520 ms."
+    },
+    "illustration": {
+      "title": "Illustration",
+      "lead": "We draw our own images: flat, bold shapes, oversized objects, accent lines over the fills. References are inspiration only, never traced.",
+      "rules_title": "What we do",
+      "rule1": "Our palette (green, gold, clay, cream, ink) and the season’s tint.",
+      "rule2": "Four warm skin tones, mixed from one image to the next; every age, every gender.",
+      "rule3": "Our world: hands, Bible, hymn book, drum, offering basket, choir robes, the hill of Nkolndongo.",
+      "rule4": "Never the face of God or Christ, never caricature.",
+      "rule5": "Where? Empty states, loaders, banners, seasonal heroes, 404, key moments. Elsewhere: icons.",
+      "photo_title": "Photography",
+      "photo": "Real parish photos first; otherwise curated photos without people; otherwise illustration. Warm grade, never cold or glossy. Every photo has alt text and a credit."
+    },
+    "components": {
+      "title": "Components",
+      "lead": "Every interface element, pattern and animation of the site is documented here, with a live demo, its usage and its accessibility requirements. A component without an entry is not finished.",
+      "status_stable": "Stable",
+      "status_draft": "Draft",
+      "usage": "Usage",
+      "a11y": "Accessibility",
+      "demo": "Demo",
+      "upcoming_title": "To document as we build",
+      "upcoming": "Date picker · Data table · File upload · Audio player · Season banner · News and event cards · Pagination",
+      "icon": {
+        "name": "Icon",
+        "desc": "Stroke-rounded Hugeicons, rendered at build time: no JavaScript.",
+        "use": "<Icon name=\"calendar\" size=\"20\" />. 16, 20 or 24 px, text colour. Add the icon to packages/ui/src/icons.ts first.",
+        "a11y": "Decorative (aria-hidden) unless a label is given; never carries information alone."
+      },
+      "mark": {
+        "name": "Mark",
+        "desc": "The EEC logo as inline SVG, in six variants (full, without text, mono, halo).",
+        "use": "<Mark variant=\"halo\" />. Halo on dark backgrounds, mono for one colour. Minimum height 24 px.",
+        "a11y": "Give it a label when alone; decorative when the parish name sits next to it."
+      },
+      "lockup": {
+        "name": "Lockup",
+        "desc": "The mark and the parish name in live text: one, two or three lines; the church line is dimmed.",
+        "use": "<SiteLockup /> (variant auto: three lines when small, two lines from 22 rem) or variant one / two / three.",
+        "a11y": "Real text, readable by screen readers and translatable."
+      },
+      "illustration": {
+        "name": "Illustration",
+        "desc": "An original illustration as inline SVG, coloured by tokens (theme, season, skin tones).",
+        "use": "<Illustration name=\"hymn-book-handover\" animate />. Layers carry data-part attributes GSAP can target. 15 KB gzipped at most.",
+        "a11y": "Decorative by default; with a title it becomes role=img. Animation stops under reduced motion."
+      },
+      "theme": {
+        "name": "Theme toggle",
+        "desc": "Cycles device → light → dark, remembered per browser, no flash on load.",
+        "use": "<ThemeToggle /> in the header. A tiny <head> script applies the choice before first paint.",
+        "a11y": "44 px target; the label announces the current theme; storage access is wrapped in try/catch."
+      },
+      "verse": {
+        "name": "Verse",
+        "desc": "Our way to quote: a page from the hymn book, corner turned (the gesture of our page transitions), with the gold bookmark from our illustrations hanging from the edge and carrying the opening mark. No frame, no rule.",
+        "use": "<Verse mark=\"“\" cite=\"Matthew 11:28\">…</Verse>. One verse per screen at most. The bookmark always carries the opening mark; the reference goes in the tag.",
+        "a11y": "blockquote + figcaption; the decorative mark is hidden. Text and reference contrast verified.",
+        "demo": "“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”",
+        "demo_cite": "Matthew 11:28"
+      },
+      "ornament": {
+        "name": "Ornament",
+        "desc": "A small hand-drawn wave between two dots, separating sections in place of a rule.",
+        "use": "<Ornament /> between sections. Gold; --ornament changes it. Space around it, never a line.",
+        "a11y": "Purely decorative: aria-hidden."
+      },
+      "docblock": {
+        "name": "Component entry",
+        "desc": "This page’s frame: name, status, description, demo, usage, accessibility.",
+        "use": "Add one <DocBlock> per component in BrandComponents.astro, with its texts in packages/i18n.",
+        "a11y": "One h3 per entry; the demo sits in a labelled region."
+      },
+      "motion_idle": {
+        "name": "Illustration idle animation",
+        "desc": "Floating notes and breathing sparkles in a gentle loop; paused off-screen.",
+        "use": "<Illustration animate /> + scripts/illustration-idle.ts. GSAP is imported dynamically, never globally.",
+        "a11y": "Absent under reduced motion and data saver (GSAP isn’t downloaded)."
+      },
+      "button": {
+        "name": "Button",
+        "desc": "Five variants, three sizes, an icon-only version. While loading the label stays and a small circular ornament (a wave between two dots) turns in front of it.",
+        "use": "<Button variant=\"primary\" size=\"lg\">. One primary button per screen. 14 px radius, never a pill. Loading keeps the width (aria-busy).",
+        "a11y": "Target at least 44 px, visible gold focus, a label is mandatory for icon-only, disabled at 50 % opacity."
+      },
+      "fields": {
+        "name": "Fields: text, textarea, select",
+        "desc": "Label, hint and error around the control. The dropdown is our own (a native [popover] looking like the Actions menu); a hidden <select> keeps forms working.",
+        "use": "<Field id label hint error>. The error says what to do, without blame. Selects never show the browser’s default look.",
+        "a11y": "Label tied to the control, aria-invalid and aria-describedby, error announced (role=alert), a 2 px error frame in addition to colour."
+      },
+      "choices": {
+        "name": "Checkbox, radio, switch",
+        "desc": "Choice controls drawn by us on real <input>s: keyboard and screen readers work out of the box.",
+        "use": "<Choice kind=\"checkbox|radio|switch\">. The whole row is clickable (44 px). A switch acts at once; a checkbox waits for submit.",
+        "a11y": "The switch has role=switch. State is never carried by colour alone: shape and position change too."
+      },
+      "overlays": {
+        "name": "Dialog, sheet, menu, tooltip",
+        "desc": "Dialog and sheet on native <dialog>; the sheet floats, rounded on every corner, with a discreet scrollbar. Menu and list on the popover attribute. Soft in, faster out.",
+        "use": "<Dialog>, <Dialog side=\"end\">, <Menu>, <Tooltip>. Dialog to decide, sheet to filter or navigate, menu for actions. Never a dialog over a dialog.",
+        "a11y": "Focus trap, Esc closes, focus returns to the trigger, page scroll locked. Menu: arrows, Home/End. Tooltip: Esc, hover and focus."
+      },
+      "disclosure": {
+        "name": "Tabs and accordion",
+        "desc": "Tabs switch views: a single indicator slides elastically from one to the next, and idle tabs light up on hover. The accordion, native on <details>, unfolds slowly and works without JavaScript.",
+        "use": "<Tabs> for 2 to 5 sibling views; <Accordion> for questions. The name attribute makes the accordion exclusive.",
+        "a11y": "Tabs: role=tablist, arrows, Home/End. Accordion: focusable summary, decorative chevron."
+      },
+      "feedback": {
+        "name": "Toast, badge, skeleton",
+        "desc": "A toast stacks its siblings like a deck (newest in front), spreads on hover and shows a progress ring around a large close cross, tinted by tone. State badges and skeleton complete the set.",
+        "use": "toast(message,  tone ). One tone per meaning: success, warning, danger, info. Five seconds; hovering pauses.",
+        "a11y": "role=status (alert for danger), labelled close button. Meaning is in the text too, not just colour."
+      },
+      "surfaces": {
+        "name": "Card, avatar, empty state",
+        "desc": "Soft surfaces (20 px) on shadow 1. The empty state hosts an illustration, a kind title and an action.",
+        "use": "<Card href> becomes a whole-card link. <EmptyState>: always say what to do next.",
+        "a11y": "A link card has a single link (the whole card). The avatar is decorative when next to the name."
+      },
+      "header": {
+        "name": "Site header and navigation",
+        "desc": "A floating bar: lockup, five tabs with icons, and discreet tools (search, language, theme, account). Each tab opens a mega menu: the pages with their icon and description, and an illustration specific to the theme.",
+        "use": "<Header /> through the Site layout. Panels open on mouse intent (120 ms), click and keyboard. The active page has a gold stroke. Every entry, even nested, carries an icon.",
+        "a11y": "aria-expanded buttons, arrows to move, Esc closes and returns focus, skip link to the content.",
+        "demo": "See the header at the top of the site’s home page."
+      },
+      "mobile": {
+        "name": "Mobile menu",
+        "desc": "A full screen: floating cards with icons, tabs as soft accordions, tools at the bottom, a big close button within thumb reach. A slow circular reveal; the page behind does not scroll.",
+        "use": "Below 1024 px, the menu button opens the <dialog>. Under reduced motion, a plain fade.",
+        "a11y": "Modal <dialog>: trapped focus, Esc, focus returned. 52 px targets."
+      },
+      "footer": {
+        "name": "Footer",
+        "desc": "Address, times, socials, legal information, photo credit, language and theme. Parish data stays [TO CONFIRM] until confirmed.",
+        "use": "<Footer /> through the Site layout.",
+        "a11y": "One h2 per column, 44 px links.",
+        "demo": "See the footer at the bottom of the site."
+      },
+      "transitions": {
+        "name": "Page transitions",
+        "desc": "A page-turn effect: the old page slides a little and fades, the new one arrives from the other side.",
+        "use": "Astro ClientRouter in the Site layout. 150 ms out, 260 ms in. Scripts re-run on astro:page-load.",
+        "a11y": "Reduced motion: a plain 120 ms fade. Focus and scroll are handled by the router.",
+        "demo": "Navigate between two site pages to see it."
+      },
+      "adminshell": {
+        "name": "Admin shell",
+        "desc": "Floating sidebar and top bar (lifted off the edges, rounded, blurred), collapsible by groups. On mobile the menu opens full screen and locks page scrolling. Same tokens and fonts as the site; a dedicated dark icon.",
+        "use": "apps/admin. ⌘K or Ctrl+K opens quick search. The React components are shown at /ui in the admin.",
+        "a11y": "Skip link, labelled navigation, current page via aria-current, mobile drawer with a clickable scrim.",
+        "demo": "See the administration: pnpm dev then http://localhost:5173."
+      },
+      "preloader": {
+        "name": "Preloader",
+        "desc": "On the first visit, the logo and the parish name draw themselves in fine lines, letter after letter, then fade into the page once it is ready. Once per session.",
+        "use": "<Preloader /> in the base layout, with the line variant of <Mark>. The drawing lasts about 1.2 s; it never replays during navigation.",
+        "a11y": "Decorative (aria-hidden), holds the content no longer than needed. Reduced motion: the line is already drawn, a plain fade."
+      }
+    },
+    "rules": {
+      "title": "Rules and upkeep",
+      "lead": "These rules keep the system coherent. Some are checked automatically on every code check.",
+      "auto_title": "Checked automatically",
+      "auto1": "No one-sided border, no squircle (pnpm lint).",
+      "auto2": "Every text/background pair meets WCAG AA in both themes (pnpm contrast, unit test).",
+      "auto3": "French and English have exactly the same text keys.",
+      "auto4": "CSS tokens are generated from a single file and checked for freshness.",
+      "manual_title": "To check by hand",
+      "manual1": "Light and dark, French and English, at 320 px wide.",
+      "manual2": "Keyboard only: visible focus, Esc closes overlays.",
+      "manual3": "Reduced motion respected.",
+      "upkeep_title": "Keeping this guide alive",
+      "upkeep": "Every new colour, component, animation, transition or rule is added to this page in the same change as the code. Texts are written in French first. An important decision also gets a record in docs/decisions."
+    }
+  },
+  "home": {
+    "title": "Welcome",
+    "season": "We are in the season of {season}",
+    "cta_discover": "Get to know us",
+    "cta_calendar": "See the calendar",
+    "hero_note": "[TO CONFIRM: home page headline]",
+    "lead": "A parish of the Evangelical Church of Cameroon in Nkolndongo, Yaoundé: a place to sing, pray, listen to the Word and walk together.",
+    "start_title": "Three ways to begin",
+    "start1_t": "Come on a Sunday",
+    "start1_p": "See how a service unfolds and what to expect. No dress code, no preparation needed.",
+    "start2_t": "Find your place",
+    "start2_p": "Choir, youth, the Women’s Union, catechism: there is a group to serve, learn and share.",
+    "start3_t": "Get to know us",
+    "start3_p": "What we believe, what gathers us, and the way to join us.",
+    "verse": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
+    "verse_cite": "Matthew 11:28"
+  },
+  "soon": {
+    "badge": "Coming soon",
+    "title": "This page is on its way",
+    "text": "We are preparing it with care. Meanwhile, head back home or explore the rest of the site.",
+    "note": "[TO CONFIRM: content for this page]",
+    "home": "Back to home"
+  },
+  "notfound": {
+    "title": "This page wandered off",
+    "text": "Like a lost sheep, it left the flock. Let’s head back home."
+  },
+  "footer": {
+    "about": "A parish of the Evangelical Church of Cameroon, in Yaoundé. An open house.",
+    "visit": "Visit us",
+    "address": "Nkolndongo, Yaoundé, Cameroon. The exact address and a map are coming soon.",
+    "hours_title": "Times",
+    "hours": "Service times will be published here as soon as they are confirmed.",
+    "follow": "Follow us",
+    "social_pending": "link soon",
+    "legal": "Information",
+    "credits": "Original illustrations",
+    "credits_pending": "Photos: credits added with the photos",
+    "rights": "© EEC Nkolndongo 1",
+    "controls": "Language and theme"
+  },
+  "admin": {
+    "title": "Administration",
+    "skip": "Skip to content",
+    "sidebar": "Administration navigation",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "dashboard": "Dashboard",
+    "dashboard_text": "Welcome to the administration. Modules are added here as we build.",
+    "groups": {
+      "content": "Content",
+      "parish": "Parish life",
+      "members": "Members",
+      "finance": "Finance",
+      "settings": "Settings"
+    },
+    "items": {
+      "news": "News",
+      "sermons": "Sermons",
+      "bulletin": "Meditations and bulletin",
+      "media": "Media library",
+      "events": "Events",
+      "departments": "Departments",
+      "services": "Services and times",
+      "liturgy": "Liturgical year",
+      "people": "Members",
+      "roles": "Roles and permissions",
+      "giving": "Giving",
+      "parish": "Parish",
+      "modules": "Modules",
+      "audit": "Audit log",
+      "ui": "Components"
+    },
+    "soon_title": "This module is on its way",
+    "soon_text": "It will be built in a later phase. Nothing to set up for now.",
+    "user": {
+      "menu": "Account menu",
+      "name": "Account (sample)",
+      "profile": "My profile",
+      "signout": "Sign out",
+      "pending": "Available with authentication (phase 02)."
+    },
+    "palette": {
+      "open": "Open quick search",
+      "title": "Quick search",
+      "placeholder": "Go to… (module, page)",
+      "empty": "Nothing matches.",
+      "hint": "↑ ↓ to choose · Enter to open · Esc to close"
+    },
+    "locale": "Language"
+  },
+  "login": {
+    "title": "Sign in",
+    "lead": "Access the parish administration.",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Keep me signed in on this device",
+    "submit": "Sign in",
+    "forgot": "Forgot your password?",
+    "pending": "Sign-in will be enabled in phase 02. This screen is a mock-up.",
+    "error_email": "Enter a valid email address.",
+    "error_password": "Enter your password.",
+    "back": "Back to the dashboard"
+  },
+  "ui": {
+    "title": "Components (administration)",
+    "lead": "The administration’s React elements, built on Base UI with the same stylesheet as the public site. The full guide lives in the brand guidelines.",
+    "buttons": "Buttons",
+    "fields": "Fields",
+    "field_name": "Name",
+    "field_hint": "As it appears on your card.",
+    "field_error": "This field is required.",
+    "field_notes": "Notes",
+    "select_label": "Department",
+    "select_placeholder": "Choose a department",
+    "combo_label": "Search a department",
+    "o1": "Choir",
+    "o2": "Youth",
+    "o3": "Women’s Union",
+    "o4": "Catechism",
+    "choices": "Choices",
+    "check": "Receive the news",
+    "switch": "Draft mode",
+    "overlays": "Overlays and menus",
+    "dialog_open": "Open a dialog",
+    "dialog_title": "Publish this article?",
+    "dialog_text": "It will be visible to all visitors.",
+    "sheet_open": "Open a side sheet",
+    "sheet_title": "Filters",
+    "close": "Close",
+    "menu": "Actions",
+    "menu_edit": "Edit",
+    "menu_copy": "Duplicate",
+    "menu_delete": "Delete",
+    "popover": "More info",
+    "popover_text": "A popover holds a short piece of content tied to a button.",
+    "tooltip": "Short help",
+    "tooltip_text": "A tooltip clarifies an icon or a button.",
+    "disclosure": "Tabs and accordion",
+    "tab1": "Overview",
+    "tab2": "Details",
+    "tab1_text": "The Overview tab’s content.",
+    "tab2_text": "The Details tab’s content.",
+    "acc1": "Who can publish?",
+    "acc1_text": "Depending on each role’s permissions.",
+    "acc2": "Where is the history?",
+    "acc2_text": "In the audit log.",
+    "feedback": "Feedback and surfaces",
+    "toast_btn": "Show a notification",
+    "toast_text": "Saved. Thank you!",
+    "badges": "Badges",
+    "state_success": "Published",
+    "state_warning": "Pending",
+    "state_danger": "Rejected",
+    "state_info": "Draft",
+    "card_title": "A card",
+    "card_text": "Cards group content on a soft surface.",
+    "empty_title": "Nothing here yet",
+    "empty_text": "When there are items, they will show up here.",
+    "btn_primary": "Primary",
+    "btn_secondary": "Secondary",
+    "btn_ghost": "Ghost",
+    "btn_danger": "Delete",
+    "btn_link": "Link",
+    "btn_small": "Small",
+    "btn_large": "Large",
+    "btn_loading": "Sending",
+    "btn_disabled": "Unavailable",
+    "menu_item_demo": "Menu"
+  },
+  "page": {
+    "cta_title": "A question, a memory, a wish to come?",
+    "cta_text": "Start by finding us, or head back home.",
+    "cta_find": "Find us",
+    "cta_home": "Back home",
+    "soon_note": "This section will grow with the parish."
+  },
+  "pages": {
+    "histoire": {
+      "lead": "A parish is a story written by faces: those who sowed, those who kept watch, those who arrive today.",
+      "s1_t": "A story still being written",
+      "s1_p1": "Nkolndongo means the hill. Our story is told like a climb: one step after another, with those walking beside us.",
+      "s1_p2": "We are gathering the parish’s memories with care: accounts, photographs, testimonies. Nothing is published before it has been checked and, when it concerns people, agreed to by them.",
+      "s2_t": "Do you have a memory to share?",
+      "s2_p": "An old photo, a story, the name of someone who mattered: entrust them to the parish. Every detail helps keep memory alive."
+    },
+    "croyances": {
+      "lead": "We are an evangelical Christian church: we believe God loves us and has made himself known in Jesus Christ.",
+      "s1_t": "The Apostles’ Creed",
+      "s1_p": "Since the early centuries, Christians around the world have confessed these few lines together. They say the heart of the faith.",
+      "creed": "I believe in God, the Father almighty, creator of heaven and earth. I believe in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried; he descended to the dead. On the third day he rose again; he ascended into heaven, he is seated at the right hand of the Father, and he will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.",
+      "creed_cite": "The Apostles’ Creed",
+      "s2_t": "Four words for faith",
+      "c1_t": "The Bible",
+      "c1_p": "The Word of God, which lights and guides us. We read it, listen to it, share it.",
+      "c2_t": "Grace",
+      "c2_p": "Salvation is a gift from God, not a wage. We receive it with gratitude.",
+      "c3_t": "Prayer",
+      "c3_p": "Speaking to God as to a Father, alone or together, in joy and in hardship.",
+      "c4_t": "Community",
+      "c4_p": "No one believes alone. The Church is a family where everyone carries and is carried. Baptism and Holy Communion are its signs.",
+      "note": "This is a simple summary, not the Church’s full confession of faith: the Parish Council will add its reference texts."
+    },
+    "pasteurs": {
+      "lead": "A parish is served by people who give their time, their listening and their faith.",
+      "s1_t": "A ministry of service",
+      "s1_p": "Everyone has a role, no one rules: we serve together and decide together about the parish’s affairs.",
+      "r1_t": "The pastor",
+      "r1_p": "Proclaims the Word, celebrates the sacraments, accompanies everyone in joys and hardships.",
+      "r2_t": "Church elders",
+      "r2_p": "Watch over the parish’s spiritual life and support the pastor.",
+      "r3_t": "Deacons",
+      "r3_p": "Serve people: visiting, mutual help, attention to the most vulnerable.",
+      "r4_t": "Catechists",
+      "r4_p": "Teach the faith to children, young people and those preparing for baptism.",
+      "r5_t": "The Parish Council",
+      "r5_p": "Brings leaders together to take the decisions of parish life together.",
+      "s3_t": "Faces are coming soon",
+      "s3_p": "The team’s names and portraits will be published here with each person’s agreement."
+    },
+    "trouver": {
+      "lead": "You are welcome, even if it is your first time.",
+      "s1_t": "Where to find us",
+      "s1_p": "We are in Nkolndongo, Yaoundé, Cameroon. The map, the exact address and directions will be shown here, with a map that only loads if you ask, to spare your data.",
+      "s2_t": "For a first visit",
+      "l1": "Come as you are: there is no required dress.",
+      "l2": "Don’t hesitate to ask the way: someone will gladly guide you.",
+      "l3": "Children are welcome.",
+      "l4": "Listen, sing if you wish, and ask your questions afterwards: we love questions."
+    },
+    "cultes": {
+      "lead": "Worship is the heart of parish life: we gather to sing, pray, hear the Bible and support one another.",
+      "s1_t": "How a service unfolds",
+      "s1_p": "Each service has its own rhythm, changing a little with the Sundays and feasts. You will generally find:",
+      "l1": "The welcome and the songs",
+      "l2": "Prayer",
+      "l3": "The Bible reading and the message",
+      "l4": "The offering, given with gratitude",
+      "l5": "The blessing and the sending",
+      "s2_t": "Times",
+      "s2_p": "Service times and the week’s gatherings will be published here as soon as the parish confirms them. We would rather wait than give you an approximate time."
+    },
+    "departements": {
+      "lead": "Everyone has a place. The parish groups let you serve, learn and share according to your age and gifts.",
+      "s1_t": "Groups for every age",
+      "g1_t": "The choirs",
+      "g1_p": "Song carries the parish’s praise. You come to sing and stay for the friendship.",
+      "g2_t": "Youth (JAPE)",
+      "g2_p": "A space for young people: learn, talk, serve, have fun, grow in faith.",
+      "g3_t": "The Women’s Union (UFC)",
+      "g3_p": "The parish’s women support one another, pray together and serve the community.",
+      "g4_t": "Catechism",
+      "g4_p": "Children and those preparing for baptism discover the faith step by step.",
+      "s2_t": "Where is your place?",
+      "s2_p": "Soon, a short three-question quiz will help you find the group that suits you. Meanwhile, come and ask."
+    },
+    "pratique": {
+      "lead": "Life’s big moments are better lived accompanied. Here is how the parish walks with you.",
+      "c1_t": "Baptism",
+      "c1_p": "Being baptised, or having your child baptised: it all begins with a meeting with the pastor, to talk about what it means.",
+      "c2_t": "Marriage",
+      "c2_p": "Marrying in church means placing your commitment before God and before the community. A time of preparation with the pastor comes before the celebration.",
+      "c3_t": "Bereavement",
+      "c3_p": "When someone close leaves us, the parish is there: to pray with the family, to accompany, and to arrange a time of remembrance.",
+      "c4_t": "Becoming a member",
+      "c4_p": "Joining the parish starts with meeting and discovering one another. Come, talk to someone: the rest follows.",
+      "note": "The exact steps (documents, timelines, who to contact) will be detailed here, step by step, with the parish office."
+    },
+    "evenements": {
+      "lead": "The parish calendar will live here: gatherings, feasts, retreats, outings.",
+      "empty_t": "Nothing announced yet",
+      "empty_p": "As soon as a gathering is confirmed it will appear here, with a way to add it to your calendar. Come back soon.",
+      "link": "Explore the liturgical year"
+    },
+    "liturgie": {
+      "lead": "The liturgical year gives faith a rhythm: season after season, we revisit Jesus’ life and let it change us.",
+      "now": "We are in the season of {season}",
+      "s1_t": "The seasons of the year",
+      "season_avent": "Waiting and hope: the four weeks that prepare Christmas.",
+      "season_noel": "The birth of Jesus: God with us, light in the night.",
+      "season_epiphanie": "Jesus makes himself known to all peoples.",
+      "season_careme": "A time of returning to God before Easter: prayer, sharing, simplicity.",
+      "season_semaine-sainte": "Jesus’ last week: from the entry into Jerusalem to the cross.",
+      "season_paques": "The resurrection: life is stronger than death. The great joy of the year.",
+      "season_pentecote": "The Holy Spirit is given: the Church is born and sets out.",
+      "season_ordinaire": "The time of everyday life: we learn to follow Jesus, day after day.",
+      "season_moissons": "A time of gratitude for what the earth gives, and of sharing.",
+      "s2_p": "The site’s colours change with the season: you will see them evolve through the year."
+    },
+    "moissons": {
+      "lead": "The Harvest Festival is a time of gratitude: we thank God for what the earth gives, and we share.",
+      "s1_t": "Giving thanks and sharing",
+      "s1_p1": "People bring fruits of the earth and of labour and offer them with gratitude. It is a simple, joyful festival, turned towards others.",
+      "s1_p2": "The dates, the projects supported and how to take part will be announced here as soon as the parish decides them."
+    },
+    "nouvelles": {
+      "lead": "News from the parish: announcements, reports, testimonies.",
+      "empty_t": "No news yet",
+      "empty_p": "The first news is on its way. You will be able to read it here and share it on WhatsApp in one tap."
+    },
+    "predications": {
+      "lead": "Listen or listen again to a message: worship goes on at home.",
+      "empty_t": "Messages are on their way",
+      "empty_p": "Sermons will be sorted by series, preacher and book of the Bible. Audio is designed to stay light on your data plan."
+    },
+    "meditations": {
+      "lead": "A word for the week, and the parish bulletin to take away.",
+      "empty_t": "A meditation to come",
+      "empty_p": "Each week, a short meditation to read in a few minutes, and the bulletin to download."
+    },
+    "give": {
+      "lead": "Giving is a way of saying thank you: to God for what he gives us, and to others by sharing.",
+      "s1_t": "Why we give",
+      "s1_p": "Offerings and gifts keep the parish and its projects alive: worship, welcome, upkeep of the place, service to others. Every gift, small or large, matters and is received with gratitude.",
+      "s2_t": "How to give",
+      "s2_p": "The ways to give (during worship, by mobile money, by transfer) will be set out here. We will never show a number or account before it has been verified with the treasurer: your trust matters more than speed.",
+      "s3_t": "In full transparency",
+      "s3_p": "We want to explain simply what gifts are used for, and to report on their use to the community."
+    },
+    "account": {
+      "lead": "Your personal space: quiet, simple and private.",
+      "s1_t": "What you will find here soon",
+      "l1": "Your details, which you keep up to date yourself",
+      "l2": "Your choices and consents, never ticked for you",
+      "l3": "Your sign-ups for parish activities",
+      "l4": "Later, services for members",
+      "s2_t": "Your data is yours",
+      "s2_p": "You will be able to view, correct, export and delete them at any time. Sign-in will open in a next step."
+    },
+    "privacy": {
+      "lead": "Your privacy matters. Here, simply, is what this site does with your information.",
+      "s1_t": "In short",
+      "s1_p": "For now, this site collects no personal data. It uses no tracking cookie, no analytics tool and no third-party service: everything you see (fonts, icons, images) comes from this site itself.",
+      "s2_t": "On your device",
+      "s2_p": "Your choice of theme (light or dark) and language is remembered in your browser so you don’t have to redo it. It stays on your device and is never sent anywhere.",
+      "s3_t": "Our commitments for what follows",
+      "l1": "We will only ask for what we truly need.",
+      "l2": "You will always give your agreement explicitly: no box ticked in advance.",
+      "l3": "We will say how long we keep each piece of information, then delete it.",
+      "l4": "You will be able to view, correct, export and delete your data.",
+      "l5": "We will not collect sensitive information (origin, political opinions, health) without an explicit, documented decision.",
+      "s4_t": "The legal framework",
+      "s4_p": "We comply with Cameroonian law no. 2024/017 of 23 December 2024 on personal data protection. The data contact will be shown here before any collection begins."
+    },
+    "legal": {
+      "lead": "The legal information about this site.",
+      "s1_t": "Publisher",
+      "s1_p": "Parish EEC Nkolndongo 1, Evangelical Church of Cameroon, Yaoundé, Cameroon. The name of the publication manager and how to reach them will be added here by the Parish Council.",
+      "s2_t": "Logo and marks",
+      "s2_p": "The EEC logo belongs to the Evangelical Church of Cameroon. It is used here by the parish and may not be reused without permission.",
+      "s3_t": "Code, fonts and illustrations",
+      "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Fraunces (SIL OFL licence) and text in Switzer (ITF Free Font License). The illustrations are original.",
+      "s4_t": "Hosting",
+      "s4_p": "The site will be hosted by Cloudflare. The host’s address and details will be shown here at launch."
+    }
+  }
+}

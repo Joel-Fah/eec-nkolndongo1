@@ -2,30 +2,31 @@
 
 _Last updated: 2026-10-19_
 
-## Current phase: 0 — Framing ✅ → Brand board (next)
+## Current phase: 01 — Brand & Foundations ✅ → Phase 02 (data, auth, first modules) next
 
-## Done
-- Scope, stack, architecture and module system agreed (see `ARCHITECTURE.md`, `docs/decisions/`).
-- Navigation (5 tabs) and page experience concepts drafted (`docs/product/`).
-- Design language direction set (`docs/design/`).
-- Draft research content imported and flagged for validation (`docs/content/`).
-- Repo docs and Claude skills set up.
+## Done in Phase 01 (report: `docs/phases/PHASE_01_REPORT.md`)
+- Monorepo (pnpm 12 + Turborepo), Biome, Vitest, strict TypeScript; frugal CI check workflow.
+- Brand: EEC mark redrawn as SVG (98.9 % overlap), lockups, favicons; Fraunces + Switzer; palette with
+  state colours and nine liturgical seasons (158 contrast pairs pass); original illustration.
+- Tokens generated from one file; shared primitives CSS; Astro (native) and React (Base UI) primitives.
+- Public shell: header with mega-panels, mobile menu, footer, page transitions, localised placeholder
+  pages, home, 404, SEO basics. Admin shell: sidebar, top bar, ⌘K palette, login UI, components gallery.
+- Living brand guidelines and design-system docs at `/fr/_brand` (unlisted, noindex).
+- Liturgical season util; FR/EN message system with French typography.
 
-## Next
-1. **Brand board** — SVG redraw of the EEC mark, two lockups (short / long), palette, display-font
-   shortlist (Fraunces / Zodiak / Gambetta) with Switzer, radius & shadow scale, 1 sample illustration.
-2. Scaffold monorepo (pnpm + Turborepo, apps/web, apps/admin, apps/api, packages/*).
-3. Design tokens + core UI primitives (button, input, select, dropdown, dialog, toast) in both themes.
-4. Auth + roles/permissions foundation.
-5. Phase 1 modules (see `docs/product/roadmap.md`).
+## Next — Phase 02
+Database (Neon + Drizzle), auth (Neon Auth) and RBAC, settings and media modules, R2, first content
+modules (news, events), access control for `/_brand`, deploy workflows. See the report's suggestions.
 
 ## Waiting on (people)
-- Content validation partner — confirm service times, history, council members, department list.
+- Content validation partner — service times, history, council members, department list, address, socials.
 - Real photos (in progress) — Pexels curation used meanwhile.
-- MoMo / Orange Money merchant details + bank account (for "Donner" page and later pawaPay).
+- MoMo / Orange Money merchant details + bank account (for "Donner").
 - Domain — **on hold**, do not register.
 - Pexels API key (Joël will provide at build time).
+- Parish Council review of the brand-voice text (identity, tone) in `/_brand`.
 
 ## Open questions
-- Display serif choice (decided on the brand board).
+- Épiphanie / Pentecôte season end dates and the Épiphanie + Semaine sainte colours (proposed, to confirm).
 - Is the Délivrance ministry presented publicly? (council decision)
+- Signature line for the parish (candidates in `/_brand` → Identité).

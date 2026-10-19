@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@eec/ui/tokens.css";
+@import "@eec/ui/styles/fonts.css";
+@import "@eec/ui/styles/base.css";
+@import "@eec/ui/styles/components.css";
+
+@import "./admin.css";
+
+@source "../../../packages/ui/react";

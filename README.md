@@ -23,3 +23,5 @@ Français d'abord · English · Thème clair / sombre · Léger en données mobi
 ## Licence
 
 [GNU AGPL v3](LICENSE). Le logo de l'EEC appartient à l'Église Évangélique du Cameroun et n'est pas couvert par cette licence.
+Les polices non plus : Switzer et General Sans (ITF Free Font License) ne sont pas dans le dépôt — elles sont
+téléchargées depuis Fontshare par `pnpm fonts:fetch`.

@@ -1,0 +1,54 @@
+---
+/**
+ * Select with the same list as the Menu (a native [popover], never the browser's default list).
+ * A visually hidden native <select> stays in the DOM, so forms, `name` and `change` keep working.
+ */
+interface Option {
+  value: string
+  label: string
+}
+interface Props {
+  id: string
+  name?: string
+  options: Option[]
+  value?: string
+  placeholder?: string
+  disabled?: boolean
+  invalid?: boolean
+  describedby?: string
+}
+const { id, name = id, options, value, placeholder, disabled, invalid, describedby } = Astro.props
+const selected = options.find((o) => o.value === value)
+const listId = `${id}-list`
+---
+
+<div class="select-custom" data-select>
+  <select class="select-native" id={`${id}-native`} name={name} tabindex="-1" aria-hidden="true" disabled={disabled}>
+    {placeholder && <option value="" selected={!selected}>{placeholder}</option>}
+    {options.map((o) => <option value={o.value} selected={o.value === value}>{o.label}</option>)}
+  </select>
+  <button
+    type="button"
+    class="select"
+    id={id}
+    popovertarget={listId}
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-invalid={invalid ? 'true' : undefined}
+    aria-describedby={describedby}
+    disabled={disabled}
+  >
+    <span data-select-value data-placeholder={selected ? undefined : ''} class:list={[!selected && 'text-ink-muted']}>{selected?.label ?? placeholder ?? ''}</span>
+    <span class="eec-chevron" aria-hidden="true"></span>
+  </button>
+  <div id={listId} class="eec-popover" popover="auto" role="listbox" data-select-list data-match-width aria-labelledby={id}>
+    {
+      options.map((o) => (
+        <button type="button" class="menu-item" role="option" data-value={o.value} data-label={o.label} aria-selected={o.value === value ? 'true' : 'false'}>
+          <span class="eec-check-icon" aria-hidden="true"></span>
+          {o.label}
+        </button>
+      ))
+    }
+  </div>
+</div>

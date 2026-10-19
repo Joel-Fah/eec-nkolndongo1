@@ -1,0 +1,91 @@
+---
+/**
+ * First-visit preloader: the logo's line art draws itself, then the overlay fades out once the page has
+ * loaded (at least ~1.2 s so the drawing finishes). Shown once per session; skipped with reduced motion
+ * (a quick fade only). Works without JS: a CSS animation dismisses it after 2 s.
+ */
+import Mark from '@eec/ui/astro/Mark.astro'
+---
+
+<div class="eec-preloader" data-preloader aria-hidden="true">
+  <Mark variant="lockup-line" class="eec-preloader-mark" />
+</div>
+
+<script>
+  const el = document.querySelector<HTMLElement>('[data-preloader]')
+  if (el) {
+    const started = performance.now()
+    const done = () => {
+      const wait = Math.max(0, 2600 - (performance.now() - started))
+      window.setTimeout(() => {
+        el.setAttribute('data-done', '')
+        try {
+          sessionStorage.setItem('eec-pre', '1')
+        } catch {
+          // storage blocked: the preloader may play again next time
+        }
+        window.setTimeout(() => el.remove(), 700)
+      }, wait)
+    }
+    if (document.readyState === 'complete') done()
+    else window.addEventListener('load', done, { once: true })
+  }
+</script>
+
+<style is:global>
+  .eec-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    transition: opacity var(--duration-nav) var(--ease-soft), visibility var(--duration-nav);
+    /* No-JS fallback: leave after the drawing has played. */
+    animation: eec-pre-out 0.6s var(--ease-soft) 3.4s forwards;
+  }
+  .eec-preloader[data-done] {
+    opacity: 0;
+    visibility: hidden;
+  }
+  html[data-preloaded] .eec-preloader {
+    display: none;
+  }
+  .eec-preloader-mark {
+    width: min(90vw, 38rem);
+    color: var(--primary);
+  }
+  .eec-preloader-mark svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .eec-preloader svg {
+    width: 100%;
+  }
+  .eec-preloader .ln {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: eec-draw 0.9s var(--ease-soft) calc(var(--d, 0) * 1s) forwards;
+  }
+  @keyframes eec-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes eec-pre-out {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eec-preloader .ln {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .eec-preloader {
+      animation-delay: 0.6s;
+    }
+  }
+</style>

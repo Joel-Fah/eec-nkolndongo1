@@ -1,0 +1,13 @@
+---
+/** Wraps one focusable element. The text is exposed with aria-describedby; Esc dismisses it. */
+interface Props {
+  id: string
+  text: string
+}
+const { id, text } = Astro.props
+---
+
+<span class="tip" aria-describedby={id}>
+  <slot />
+  <span class="tip-body" role="tooltip" id={id}>{text}</span>
+</span>

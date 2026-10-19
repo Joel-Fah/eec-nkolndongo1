@@ -1,0 +1,78 @@
+---
+import { motion, radius } from '@eec/ui/tokens'
+import { useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const t = useT(Astro.currentLocale)
+const lanes = [
+  { key: 'brand.shape.micro', duration: 'var(--duration-micro)', ms: motion.duration.micro.normal },
+  { key: 'brand.shape.ui', duration: 'var(--duration-ui)', ms: motion.duration.ui.normal },
+  { key: 'brand.shape.story', duration: 'var(--duration-story)', ms: motion.duration.story.normal },
+] as const
+---
+
+<Section id="shape" title={t('brand.shape.title')}>
+  <div class="grid gap-5">
+    <div>
+      <h3 class="text-xl">{t('brand.shape.radius')}</h3>
+      <p class="mt-1 text-ink-muted">{t('brand.shape.radius_lead')}</p>
+    </div>
+    <div class="flex flex-wrap items-end gap-5">
+      <figure class="grid justify-items-start gap-2">
+        <span class="rounded-xs bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">{t('brand.shape.tag')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">xs · {radius.xs}px</figcaption>
+      </figure>
+      <figure class="grid justify-items-start gap-2">
+        <span class="inline-flex min-h-9 items-center rounded-sm border border-line-strong px-3 text-sm">{t('brand.shape.chip')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">sm · {radius.sm}px</figcaption>
+      </figure>
+      <figure class="grid justify-items-start gap-2">
+        <span class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 font-medium text-on-primary">{t('brand.shape.button')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">md · {radius.md}px</figcaption>
+      </figure>
+      <figure class="grid justify-items-start gap-2">
+        <span class="inline-flex min-h-11 w-56 items-center rounded-md border border-line-strong bg-surface px-4 text-ink-muted">{t('brand.shape.input')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">md · {radius.md}px</figcaption>
+      </figure>
+      <figure class="grid justify-items-start gap-2">
+        <span class="grid h-24 w-40 place-items-center rounded-lg bg-surface shadow-1">{t('brand.shape.card')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">lg · {radius.lg}px</figcaption>
+      </figure>
+      <figure class="grid justify-items-start gap-2">
+        <span class="grid h-32 w-52 place-items-center rounded-xl bg-surface-raised shadow-3">{t('brand.shape.dialog')}</span>
+        <figcaption class="text-xs text-ink-muted tabular-nums">xl · {radius.xl}px</figcaption>
+      </figure>
+    </div>
+    <figure class="grid max-w-md gap-3">
+      <div class="rounded-xl bg-surface-2 p-3.5">
+        <div class="grid h-28 place-items-center rounded-md bg-surface text-sm text-ink-muted shadow-1">28 − 14 = 14</div>
+      </div>
+      <figcaption class="text-sm text-ink-muted">{t('brand.shape.concentric')}</figcaption>
+    </figure>
+  </div>
+
+  <div class="grid gap-5">
+    <div>
+      <h3 class="text-xl">{t('brand.shape.elevation')}</h3>
+      <p class="mt-1 text-ink-muted">{t('brand.shape.elevation_dark')}</p>
+    </div>
+    <div class="grid gap-4 lg:grid-cols-2">
+      {
+        (['light', 'dark'] as const).map((theme) => (
+          <div data-theme={theme} class="grid grid-cols-3 gap-4 rounded-xl bg-bg p-6 text-ink">
+            <div class="grid h-24 place-items-center rounded-lg bg-surface text-sm shadow-1">{t('brand.shape.level', { level: '1' })}</div>
+            <div class="grid h-24 place-items-center rounded-lg bg-surface-raised text-sm shadow-2">{t('brand.shape.level', { level: '2' })}</div>
+            <div class="grid h-24 place-items-center rounded-lg bg-surface-raised text-sm shadow-3">{t('brand.shape.level', { level: '3' })}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-3">
+    <h3 class="text-xl">{t('brand.shape.rules_title')}</h3>
+    <ul class="grid max-w-[72ch] list-disc gap-2 ps-6">
+      {(['brand.shape.rule1', 'brand.shape.rule2', 'brand.shape.rule3', 'brand.shape.rule4', 'brand.shape.rule5', 'brand.shape.rule6', 'brand.shape.rule7'] as const).map((key) => <li>{t(key)}</li>)}
+    </ul>
+  </div>
+</Section>
