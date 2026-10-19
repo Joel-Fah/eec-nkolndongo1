@@ -30,6 +30,16 @@
     text-wrap: pretty;
   }
 
+  :root {
+    --scroll-thumb: color-mix(in oklab, var(--ink) 28%, transparent);
+    --scroll-thumb-hover: color-mix(in oklab, var(--ink) 46%, transparent);
+  }
+
+  /* Native modal dialogs don't lock page scroll by themselves. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
   ::selection {
     background: var(--gold-soft);
     color: var(--ink);

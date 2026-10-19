@@ -47,6 +47,7 @@ type Id =
   | 'footer'
   | 'transitions'
   | 'adminshell'
+  | 'preloader'
 const doc = (id: Id) => ({
   id: id.replace('_', '-'),
   name: t(`brand.components.${id}.name` as 'brand.components.icon.name'),
@@ -119,9 +120,7 @@ const doc = (id: Id) => ({
         <Field id="d-name" label={t('ui.field_name')} hint={t('ui.field_hint')} />
         <Field id="d-name2" label={t('ui.field_name')} error={t('ui.field_error')} />
         <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} />
-        <Field id="d-dept" kind="select" label={t('ui.select_label')}>
-          {[1, 2, 3, 4].map((n) => <option>{t(`ui.o${n}` as 'ui.o1')}</option>)}
-        </Field>
+        <Field id="d-dept" kind="select" label={t('ui.select_label')} placeholder={t('ui.select_placeholder')} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t(`ui.o${n}` as 'ui.o1') }))} />
       </div>
     </DocBlock>
 
@@ -176,6 +175,10 @@ const doc = (id: Id) => ({
         <Card><div class="flex items-center gap-3"><Avatar initials="EE" /><h4 class="text-lg">{t('ui.card_title')}</h4></div><p class="text-ink-muted">{t('ui.card_text')}</p></Card>
         <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" /></EmptyState>
       </div>
+    </DocBlock>
+
+    <DocBlock {...doc('preloader')}>
+      <div class="preloader-demo text-primary"><Mark variant="line" class="h-24 w-auto" /></div>
     </DocBlock>
 
     <DocBlock {...doc('header')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>

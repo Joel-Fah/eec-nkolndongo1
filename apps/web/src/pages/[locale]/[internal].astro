@@ -65,17 +65,19 @@ const toc = [
 
   <div class="mx-auto grid max-w-[88rem] gap-10 px-4 md:px-8 lg:grid-cols-[14rem_minmax(0,1fr)]">
     <nav aria-label={t('brand.toc')} class="hidden lg:block">
-      <ul class="sticky top-24 grid gap-1 rounded-xl bg-surface p-3 shadow-1" role="list">
-        {
-          toc.map(([id, key]) => (
-            <li>
-              <a href={`#${id}`} class="flex min-h-11 items-center rounded-md px-3 text-sm font-medium hover:bg-surface-2">
-                {t(key)}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="brand-toc" data-toc>
+        <p class="toc-title">{t('brand.title')}</p>
+        <ul role="list" class="toc-list">
+          {
+            toc.map(([id, key]) => (
+              <li data-toc-item={id}>
+                <a href={`#${id}`} class="toc-link">{t(key)}</a>
+                <div class="toc-sub"><ul class="toc-sub-list" role="list" /></div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </nav>
 
     <main id="main" class="min-w-0 pb-24">
@@ -113,7 +115,96 @@ const toc = [
   </div>
 </Base>
 
+<script>
+  import { initBrandToc } from '../../scripts/brand-toc'
+  initBrandToc()
+</script>
+
 <style is:global>
+  .brand-toc {
+    position: sticky;
+    inset-block-start: 6.25rem;
+    max-height: calc(100dvh - 7.5rem);
+    overflow-y: auto;
+    padding: 0.75rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .toc-title {
+    max-height: 0;
+    margin: 0;
+    padding-inline: 0.75rem;
+    overflow: hidden;
+    opacity: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    line-height: 1.2;
+    transition:
+      max-height var(--duration-nav) var(--ease-soft),
+      opacity var(--duration-nav) var(--ease-soft),
+      margin var(--duration-nav) var(--ease-soft);
+  }
+  .brand-toc[data-title] .toc-title {
+    max-height: 3rem;
+    margin-block: 0.25rem 0.5rem;
+    opacity: 1;
+  }
+  .toc-list {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .toc-link,
+  .toc-sublink {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      background-color var(--duration-ui) var(--ease-soft),
+      color var(--duration-ui) var(--ease-soft);
+  }
+  .toc-link {
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  .toc-sublink {
+    min-height: 2.25rem;
+    padding-inline: 1.5rem 0.75rem;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .toc-link:hover,
+  .toc-sublink:hover {
+    background: var(--surface-2);
+  }
+  .toc-link[aria-current="true"],
+  .toc-sublink[aria-current="true"] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .toc-sub {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-nav) var(--ease-soft);
+  }
+  .toc-sub > .toc-sub-list {
+    min-height: 0;
+    overflow: hidden;
+  }
+  [data-toc-item][data-active] > .toc-sub {
+    grid-template-rows: 1fr;
+  }
+  [data-toc-item][data-active] > .toc-sub > .toc-sub-list {
+    display: grid;
+    gap: 0.125rem;
+    padding-block: 0.25rem 0.375rem;
+  }
   html {
     scroll-behavior: smooth;
   }

@@ -15,6 +15,7 @@ function placePopover(pop: HTMLElement, trigger: HTMLElement) {
   const t = trigger.getBoundingClientRect()
   const margin = 8
   const align = pop.dataset.align ?? 'start'
+  if (pop.hasAttribute('data-match-width')) pop.style.minWidth = `${t.width}px`
   const width = pop.offsetWidth
   const rtl = getComputedStyle(pop).direction === 'rtl'
   let left = align === 'end' ? (rtl ? t.left : t.right - width) : rtl ? t.right - width : t.left
@@ -31,8 +32,19 @@ function placePopover(pop: HTMLElement, trigger: HTMLElement) {
 }
 
 const items = (menu: HTMLElement) => [
-  ...menu.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([aria-disabled="true"])'),
+  ...menu.querySelectorAll<HTMLElement>(
+    '[role^="menuitem"]:not([aria-disabled="true"]), [role="option"]',
+  ),
 ]
+
+/** Slide the tab indicator under the selected tab (CSS spring does the easing). */
+function placeIndicator(list: HTMLElement) {
+  const indicator = list.querySelector<HTMLElement>('.tabs-indicator')
+  const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+  if (!indicator || !tab) return
+  indicator.style.setProperty('--tab-left', `${tab.offsetLeft}px`)
+  indicator.style.setProperty('--tab-width', `${tab.offsetWidth}px`)
+}
 
 function selectTab(tab: HTMLElement, focus = false) {
   const list = tab.closest<HTMLElement>('[role="tablist"]')
@@ -45,7 +57,27 @@ function selectTab(tab: HTMLElement, focus = false) {
     const el = panel ? document.getElementById(panel) : null
     if (el) el.hidden = !selected
   }
+  placeIndicator(list)
   if (focus) tab.focus()
+}
+
+/** Custom select: the list is a [popover]; a hidden native <select> keeps forms and `change` events working. */
+function chooseOption(option: HTMLElement) {
+  const list = option.closest<HTMLElement>('[data-select-list]')
+  const root = list?.closest<HTMLElement>('[data-select]')
+  const native = root?.querySelector<HTMLSelectElement>('select')
+  if (!list || !root || !native) return
+  native.value = option.dataset.value ?? ''
+  for (const o of list.querySelectorAll<HTMLElement>('[role="option"]'))
+    o.setAttribute('aria-selected', String(o === option))
+  const label = root.querySelector<HTMLElement>('[data-select-value]')
+  if (label) {
+    label.textContent = option.dataset.label ?? option.textContent ?? ''
+    label.removeAttribute('data-placeholder')
+  }
+  native.dispatchEvent(new Event('change', { bubbles: true }))
+  list.hidePopover()
+  root.querySelector<HTMLElement>('button.select')?.focus()
 }
 
 export type ToastOptions = {
@@ -54,7 +86,17 @@ export type ToastOptions = {
   ms?: number
 }
 
-/** Shows a toast (role=status). Keeps motion off for reduced-motion users via CSS. */
+const CLOSE_ICON =
+  '<svg class="toast-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+
+/** Newest toast = index 0 (front of the deck). */
+function restack() {
+  if (!toastRegion) return
+  const items = [...toastRegion.querySelectorAll<HTMLElement>('.toast:not([data-leaving])')]
+  for (const [i, el] of items.entries()) el.style.setProperty('--i', String(items.length - 1 - i))
+}
+
+/** Shows a toast (role=status): a stacked deck, a progress ring around the close button. */
 export function toast(
   message: string,
   { tone = 'neutral', closeLabel = 'Close', ms = 5000 }: ToastOptions = {},
@@ -69,27 +111,35 @@ export function toast(
   const el = document.createElement('div')
   el.className = 'toast'
   el.dataset.tone = tone
+  el.style.setProperty('--toast-ms', `${ms}ms`)
   el.setAttribute('role', tone === 'danger' ? 'alert' : 'status')
   const text = document.createElement('p')
   text.className = 'toast-text'
   text.textContent = message
+  const wrap = document.createElement('span')
+  wrap.className = 'toast-close'
+  wrap.innerHTML =
+    '<svg class="toast-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" pathLength="100"/></svg>'
   const close = document.createElement('button')
   close.type = 'button'
-  close.className = 'btn btn-ghost btn-icon btn-sm'
+  close.className = 'btn btn-ghost'
   close.setAttribute('aria-label', closeLabel)
-  close.innerHTML = '<span aria-hidden="true">×</span>'
-  let timer = 0
+  close.innerHTML = CLOSE_ICON
+  wrap.append(close)
   const dismiss = () => {
-    window.clearTimeout(timer)
+    if (el.dataset.leaving !== undefined) return
     el.dataset.leaving = ''
-    window.setTimeout(() => el.remove(), 160)
+    restack()
+    window.setTimeout(() => {
+      el.remove()
+      restack()
+    }, 180)
   }
   close.addEventListener('click', dismiss)
-  el.addEventListener('mouseenter', () => window.clearTimeout(timer))
-  el.addEventListener('mouseleave', () => (timer = window.setTimeout(dismiss, ms)))
-  el.append(text, close)
+  wrap.querySelector('circle')?.addEventListener('animationend', dismiss)
+  el.append(text, wrap)
   toastRegion.append(el)
-  timer = window.setTimeout(dismiss, ms)
+  restack()
   return dismiss
 }
 
@@ -119,6 +169,11 @@ export function initPrimitives() {
         event.clientY >= r.top &&
         event.clientY <= r.bottom
       if (!inside) target.close()
+      return
+    }
+    const option = target.closest<HTMLElement>('[data-select-list] [role="option"]')
+    if (option) {
+      chooseOption(option)
       return
     }
     const tab = target.closest<HTMLElement>('[role="tab"]')
@@ -162,7 +217,7 @@ export function initPrimitives() {
       return
     }
 
-    const menu = target.closest<HTMLElement>('[role="menu"]')
+    const menu = target.closest<HTMLElement>('[role="menu"], [role="listbox"]')
     if (menu) {
       const list = items(menu)
       const i = list.indexOf(target)
@@ -187,7 +242,7 @@ export function initPrimitives() {
     const trigger = target.closest<HTMLElement>('[popovertarget]')
     if (trigger && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
       const pop = document.getElementById(trigger.getAttribute('popovertarget') ?? '')
-      if (pop?.getAttribute('role') === 'menu') {
+      if (pop?.getAttribute('role') === 'menu' || pop?.getAttribute('role') === 'listbox') {
         event.preventDefault()
         pop.showPopover({ source: trigger })
       }
@@ -216,10 +271,25 @@ export function initPrimitives() {
       trigger?.setAttribute('aria-expanded', String(state === 'open'))
       if (state !== 'open') return
       if (trigger) placePopover(pop, trigger)
-      if (pop.getAttribute('role') === 'menu') items(pop)[0]?.focus()
+      // After the browser has finished opening the popover (and its own focus handling).
+      requestAnimationFrame(() => {
+        const role = pop.getAttribute('role')
+        if (role === 'menu') items(pop)[0]?.focus()
+        if (role === 'listbox')
+          (pop.querySelector<HTMLElement>('[aria-selected="true"]') ?? items(pop)[0])?.focus()
+      })
     },
     true,
   )
+
+  const placeAll = () => {
+    for (const list of document.querySelectorAll<HTMLElement>('[role="tablist"]'))
+      placeIndicator(list)
+  }
+  placeAll()
+  document.fonts?.ready.then(placeAll)
+  document.addEventListener('astro:page-load', placeAll)
+  window.addEventListener('resize', placeAll)
 
   window.addEventListener('resize', () => {
     for (const pop of document.querySelectorAll<HTMLElement>('.eec-popover:popover-open')) {

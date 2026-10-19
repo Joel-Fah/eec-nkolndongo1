@@ -112,17 +112,24 @@ const darkOptions = [
     </div>
     <div class="grid gap-4 lg:grid-cols-3">
       <div data-theme="light" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
-        <SiteLockup variant="short" class="text-[1.375rem]" />
-        <SiteLockup variant="long" class="text-[1.375rem]" />
+        <SiteLockup variant="one" class="text-[1.375rem]" />
+        <SiteLockup variant="two" class="text-[1.375rem]" />
+        <SiteLockup variant="three" class="text-[1.375rem]" />
       </div>
       <div data-theme="dark" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
-        <SiteLockup variant="short" mark="halo" class="text-[1.375rem]" />
-        <SiteLockup variant="long" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="one" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="two" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="three" mark="halo" class="text-[1.375rem]" />
       </div>
       <div data-theme="light" class="grid gap-6 rounded-lg bg-surface-2 p-6 text-ink">
-        <SiteLockup variant="short" mark="mono" class="text-[1.375rem]" />
-        <SiteLockup variant="long" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="one" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="two" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="three" mark="mono" class="text-[1.375rem]" />
       </div>
+    </div>
+    <div class="grid gap-3 rounded-xl bg-surface-2 p-5">
+      <h4 class="text-lg">{t('brand.logo.lockup_rules_title')}</h4>
+      <ul class="grid list-disc gap-1 ps-5">{(['brand.logo.lr1', 'brand.logo.lr2', 'brand.logo.lr3', 'brand.logo.lr4'] as const).map((k) => <li>{t(k)}</li>)}</ul>
     </div>
     <div class="grid gap-3">
       <h4 class="text-lg">{t('brand.logo.lockup_auto')}</h4>
@@ -152,6 +159,7 @@ const darkOptions = [
 
   <div class="grid gap-5">
     <h3 class="text-xl">{t('brand.logo.icons')}</h3>
+    <p class="max-w-[62ch] text-ink-muted">{t('brand.logo.admin_icon')}</p>
     <div class="flex flex-wrap items-end gap-6">
       {
         (['light', 'dark'] as const).map((theme) => (

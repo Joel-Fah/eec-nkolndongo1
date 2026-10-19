@@ -34,5 +34,6 @@ const t = useT(Astro.currentLocale)
 
 <script>
   import { initThemeToggles } from '../lib/theme'
+  initThemeToggles()
   document.addEventListener('astro:page-load', initThemeToggles)
 </script>

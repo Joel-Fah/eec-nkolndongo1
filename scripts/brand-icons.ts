@@ -83,4 +83,15 @@ for (const dir of targets) {
   for (const [name, data] of Object.entries(outputs)) await writeFile(join(dir, name), data)
 }
 await copyFile(join(brand, 'mark.svg'), join(targets[0] ?? '', 'mark.svg'))
+
+// Admin: its own dark-only, terminal-flavoured icon (never the public mark).
+const adminDir = join(root, 'apps/admin/public')
+const adminSvg = await readFile(join(root, 'scripts/brand-assets/admin-favicon.svg'))
+const adminPng = (size: number) =>
+  sharp(adminSvg, { density: 600 }).resize(size, size).png({ compressionLevel: 9 }).toBuffer()
+await writeFile(join(adminDir, 'favicon.svg'), adminSvg)
+await writeFile(join(adminDir, 'favicon.ico'), ico(await adminPng(32), 32))
+await writeFile(join(adminDir, 'apple-touch-icon.png'), await adminPng(180))
+await writeFile(join(adminDir, 'icon-192.png'), await adminPng(192))
+await writeFile(join(adminDir, 'icon-512.png'), await adminPng(512))
 console.log(`Icons written to ${targets.length} apps: ${Object.keys(outputs).join(', ')}`)

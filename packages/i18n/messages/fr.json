@@ -4,7 +4,7 @@
     "name": "EEC Nkolndongo 1",
     "parish": "Paroisse de Nkolndongo 1",
     "church": "Église Évangélique du Cameroun",
-    "tagline": "[À VALIDER : phrase d’accueil de la paroisse]"
+    "tagline": "Venez comme vous êtes : il y a de la place pour vous."
   },
   "common": {
     "skip_to_content": "Aller au contenu",
@@ -104,7 +104,26 @@
     "open_menu": "Ouvrir le menu",
     "close_menu": "Fermer le menu",
     "home": "Accueil",
-    "utilities": "Outils"
+    "utilities": "Outils",
+    "panel": {
+      "discover": {
+        "title": "Faire connaissance",
+        "text": "D’où nous venons, ce qui nous rassemble, et le chemin pour nous rejoindre."
+      },
+      "live": {
+        "title": "Une maison, mille façons d’y vivre",
+        "text": "Les cultes, les groupes et les démarches de la vie de foi."
+      },
+      "calendar": {
+        "title": "Un temps pour chaque chose",
+        "text": "Les rendez-vous, les saisons de l’année et les fêtes."
+      },
+      "news": {
+        "title": "Ce qui nous rassemble",
+        "text": "Nouvelles, messages à écouter et méditations à emporter."
+      }
+    },
+    "language_short": "Changer de langue"
   },
   "season": {
     "avent": "Avent",
@@ -123,7 +142,10 @@
   "lockup": {
     "short": "EEC NKOLNDONGO 1",
     "long_church": "Église Évangélique du Cameroun",
-    "long_parish": "Paroisse de Nkolndongo 1"
+    "long_parish": "Paroisse de Nkolndongo 1",
+    "eec": "EEC",
+    "parish_lead": "Paroisse de",
+    "parish_place": "Nkolndongo 1"
   },
   "brand": {
     "title": "Charte graphique",
@@ -154,19 +176,25 @@
       "minsize": "Taille minimale : 24 px de haut sans texte ; 200 px avec le texte en arc, illisible en dessous.",
       "minsize_demo": "Le logo sans texte à 24, 32, 48 et 64 px",
       "lockups": "Logotypes horizontaux",
-      "lockups_lead": "Le logo et le nom de la paroisse, en texte vivant. Le court est pour les petits espaces, le long pour les grands.",
+      "lockups_lead": "Le logo et le nom de la paroisse, en texte vivant. « EEC » reste toujours abrégé. Sur une ligne pour les très petits espaces, sur deux lignes en général, sur trois lignes quand la place manque.",
       "lockup_short": "Court",
       "lockup_long": "Long",
       "icons": "Favicons et icônes d’application",
       "lockup_auto": "Adaptatif",
-      "lockup_auto_lead": "Une seule composition choisit court ou long selon la largeur disponible (à partir de 22 rem).",
+      "lockup_auto_lead": "Une seule composition choisit deux ou trois lignes selon la largeur disponible (à partir de 15 rem).",
       "usage_title": "Bon et mauvais usage",
       "do1": "Utiliser les fichiers de packages/ui/brand, sans les modifier.",
       "do2": "Laisser la zone de protection autour du logo.",
       "do3": "Sur fond sombre : halo crème (B) ou traits crème (C).",
       "dont1": "Déformer, pivoter, recolorer ou redessiner le logo.",
       "dont2": "Poser le logo sur une photo chargée ou un fond vert.",
-      "dont3": "Réécrire le nom de la paroisse dans une autre police que celle des logotypes."
+      "dont3": "Réécrire le nom de la paroisse dans une autre police que celle des logotypes.",
+      "lockup_rules_title": "Règles des logotypes",
+      "lr1": "Deux lignes : « EEC » puis « Paroisse de Nkolndongo 1 ».",
+      "lr2": "Trois lignes, pour les petits espaces : « EEC », « Paroisse de », « Nkolndongo 1 ».",
+      "lr3": "Une ligne (« EEC NKOLNDONGO 1 ») seulement si la hauteur est comptée.",
+      "lr4": "Le logotype choisit seul entre deux et trois lignes selon la largeur disponible (à partir de 15 rem).",
+      "admin_icon": "L’administration a sa propre icône : sombre uniquement, d’esprit terminal (la voile en trait vert et une invite dorée clignotante)."
     },
     "colour": {
       "title": "Couleurs",
@@ -248,7 +276,10 @@
       "rule1": "Arrondis standard (6, 10, 14, 20, 28 px) ; jamais en pilule, jamais en squircle.",
       "rule2": "Jamais de bordure d’un seul côté. On sépare avec de l’espace, une teinte, un cadre complet ou l’ornement.",
       "rule3": "Rayons concentriques : rayon intérieur = rayon extérieur − marge.",
-      "rule4": "Cibles tactiles d’au moins 44 × 44 px ; anneau de focus visible partout."
+      "rule4": "Cibles tactiles d’au moins 44 × 44 px ; anneau de focus visible partout.",
+      "rule5": "Navigation flottante : barres, panneaux latéraux et volets sont décollés des bords, arrondis sur tous les angles, avec un léger flou.",
+      "rule6": "Les barres de défilement sont toujours arrondies. Celles des panneaux (volets, fenêtres, menus, listes) flottent à l’intérieur et ne s’affichent qu’au survol.",
+      "rule7": "Un avatar est un cercle ; son conteneur, s’il y en a un, est aussi un cercle : jamais un cercle dans un rectangle arrondi."
     },
     "icons": {
       "title": "Icônes et illustration",
@@ -355,7 +386,9 @@
       "rule2": "Seuls transform et opacity s’animent. Le CSS suffit pour les survols et fondus ; GSAP n’est chargé que sur les pages qui en ont besoin.",
       "rule3": "Mouvement réduit ou économie de données : plus de déplacement ni de boucle, seulement des fondus de 150 ms au plus, et GSAP n’est même pas téléchargé.",
       "rule4": "Tout contenu se lit avant l’exécution de JavaScript.",
-      "catalog_title": "Catalogue"
+      "catalog_title": "Catalogue",
+      "rule5": "La navigation (en-têtes, volets, menus) se déploie plus lentement : 480 ms, courbe douce. Les icônes bougent un peu dans le sens de l’ouverture.",
+      "rule6": "Les indicateurs qui glissent (onglets) utilisent un ressort léger. Les dépliants (accordéon) prennent 520 ms."
     },
     "illustration": {
       "title": "Illustration",
@@ -393,8 +426,8 @@
       },
       "lockup": {
         "name": "Logotype",
-        "desc": "La marque et le nom de la paroisse en texte vivant ; court ou long selon la place disponible.",
-        "use": "<SiteLockup /> dans l’en-tête (variant auto). Le conteneur fixe la largeur, la taille de police l’échelle.",
+        "desc": "La marque et le nom de la paroisse en texte vivant : une, deux ou trois lignes, « EEC » toujours abrégé.",
+        "use": "<SiteLockup /> (variant auto : trois lignes en petit, deux lignes dès 15 rem) ou variant one / two / three.",
         "a11y": "Texte réel, lisible par les lecteurs d’écran et traduisible."
       },
       "illustration": {
@@ -411,7 +444,7 @@
       },
       "verse": {
         "name": "Verset",
-        "desc": "Notre façon de citer : un verset, un témoignage, un mot. Panneau doux et arrondi, grand guillemet doré, référence en étiquette.",
+        "desc": "Notre façon de citer. Un panneau doux et arrondi ; le grand guillemet doré chevauche son bord supérieur (à moitié dedans, à moitié dehors) ; des ornements ondulés longent deux de ses côtés ; la référence est une étiquette.",
         "use": "<Verse mark=\"«\" cite=\"Matthieu 11 : 28\">…</Verse>. Pas de filet latéral, jamais. Un verset par écran au plus.",
         "a11y": "blockquote + figcaption ; le guillemet décoratif est masqué. Contraste du texte et de la référence vérifié.",
         "demo": "« Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos. »",
@@ -437,13 +470,13 @@
       },
       "button": {
         "name": "Bouton",
-        "desc": "Cinq variantes (principal, secondaire, discret, danger, lien), trois tailles, état de chargement et version icône seule.",
+        "desc": "Cinq variantes, trois tailles, version icône seule. En chargement, le libellé reste et un petit ornement circulaire (une vague entre deux points) tourne devant.",
         "use": "<Button variant=\"primary\" size=\"lg\">. Un seul bouton principal par écran. Arrondi 14 px, jamais en pilule. Le chargement garde la largeur (aria-busy).",
         "a11y": "Cible d’au moins 44 px, focus doré visible, un label obligatoire pour l’icône seule, bouton désactivé à 50 % d’opacité."
       },
       "fields": {
         "name": "Champs : texte, zone de texte, liste",
-        "desc": "Étiquette, aide et erreur autour du contrôle. La liste de l’interface publique est un <select> natif habillé ; celle de l’administration est un composant Base UI au même aspect.",
+        "desc": "Étiquette, aide et erreur autour du contrôle. La liste déroulante est la nôtre (une fenêtre native [popover] au même aspect que le menu Actions) ; un <select> caché garde les formulaires fonctionnels.",
         "use": "<Field id label hint error>. L’erreur dit quoi faire, sans reproche. Les listes ne montrent jamais l’apparence du navigateur.",
         "a11y": "label relié au contrôle, aria-invalid et aria-describedby, erreur annoncée (role=alert), bordure d’erreur de 2 px en plus de la couleur."
       },
@@ -455,19 +488,19 @@
       },
       "overlays": {
         "name": "Fenêtre, volet, menu, infobulle",
-        "desc": "Fenêtre et volet sur <dialog> natif ; menu sur l’attribut popover ; infobulle en CSS. Entrée en fondu et petite montée, sortie plus rapide.",
+        "desc": "Fenêtre et volet sur <dialog> natif ; le volet flotte, arrondi sur tous les angles, avec sa barre de défilement discrète. Menu et liste sur l’attribut popover. Entrée douce, sortie plus rapide.",
         "use": "<Dialog>, <Dialog side=\"end\">, <Menu>, <Tooltip>. La fenêtre pour décider, le volet pour filtrer ou naviguer, le menu pour des actions. Jamais de fenêtre sur fenêtre.",
         "a11y": "Piège du focus, Échap ferme, le focus revient au bouton, défilement de la page bloqué. Menu : flèches, Début/Fin. Infobulle : Échap, survol et focus."
       },
       "disclosure": {
         "name": "Onglets et accordéon",
-        "desc": "Les onglets alternent des vues ; l’accordéon, natif sur <details>, déplie des réponses et fonctionne sans JavaScript.",
+        "desc": "Les onglets alternent des vues : un seul indicateur glisse élastiquement de l’un à l’autre, et les onglets inactifs s’éclairent au survol. L’accordéon, natif sur <details>, se déplie lentement et fonctionne sans JavaScript.",
         "use": "<Tabs> pour 2 à 5 vues sœurs ; <Accordion> pour des questions. L’attribut name rend l’accordéon exclusif.",
         "a11y": "Onglets : role=tablist, flèches, Début/Fin. Accordéon : résumé focalisable, chevron décoratif."
       },
       "feedback": {
         "name": "Notification, étiquette, squelette",
-        "desc": "Retours courts : une notification qui disparaît seule, des étiquettes d’état, un squelette pendant le chargement.",
+        "desc": "Une notification empile ses sœurs comme un jeu de cartes (la plus récente devant), se déploie au survol et affiche un anneau de progression autour d’une grande croix de fermeture, teintée selon le ton. Étiquettes d’état et squelette complètent l’ensemble.",
         "use": "toast(message,  tone ). Un ton par sens : succès, avertissement, danger, information. Cinq secondes ; le survol suspend.",
         "a11y": "role=status (alert pour le danger), bouton de fermeture étiqueté. Le sens passe aussi par le texte, pas seulement la couleur."
       },
@@ -479,14 +512,14 @@
       },
       "header": {
         "name": "En-tête et navigation du site",
-        "desc": "Logotype, cinq onglets à panneaux, recherche, langue, thème et Mon espace. Il se cache en descendant, réapparaît en remontant, et devient translucide avec un flou.",
-        "use": "<Header /> via le gabarit Site. Panneaux à l’intention de la souris (120 ms), au clic et au clavier. Page active : trait doré sous l’onglet.",
+        "desc": "Une barre flottante : logotype, cinq onglets avec icône, et des outils discrets (recherche, langue, thème, compte). Chaque onglet ouvre un méga-menu : les pages avec leur icône et leur description, et une illustration propre au thème.",
+        "use": "<Header /> via le gabarit Site. Les panneaux s’ouvrent à l’intention de la souris (120 ms), au clic et au clavier. La page active a un trait doré. Chaque entrée, même imbriquée, porte une icône.",
         "a11y": "Boutons aria-expanded, flèches pour parcourir, Échap ferme et rend le focus, lien d’évitement vers le contenu.",
         "demo": "Voir l’en-tête en haut de la page d’accueil du site."
       },
       "mobile": {
         "name": "Menu mobile",
-        "desc": "Un volet plein écran : onglets en accordéon, outils en bas, grand bouton de fermeture à portée du pouce. Il s’ouvre par un révélateur circulaire doux.",
+        "desc": "Un écran plein : cartes flottantes avec icônes, onglets en accordéon doux, outils en bas, grand bouton de fermeture à portée du pouce. Révélation circulaire lente ; la page derrière ne défile pas.",
         "use": "Sous 1024 px, le bouton menu ouvre le <dialog>. En mouvement réduit, simple fondu.",
         "a11y": "<dialog> modal : focus piégé, Échap, focus rendu. Cibles de 52 px."
       },
@@ -506,10 +539,16 @@
       },
       "adminshell": {
         "name": "Coque de l’administration",
-        "desc": "Barre latérale repliable par groupes, barre du haut (recherche rapide, langue, thème, compte), contenu. Mêmes jetons et polices que le site.",
+        "desc": "Barre latérale et barre du haut flottantes (décollées des bords, arrondies, floutées), repliable par groupes. Sur mobile, le menu s’ouvre en plein écran et bloque le défilement de la page. Même jetons et polices que le site ; icône dédiée sombre.",
         "use": "apps/admin. ⌘K ou Ctrl+K ouvre la recherche rapide. Les composants React sont montrés dans /ui de l’administration.",
         "a11y": "Lien d’évitement, navigation étiquetée, page courante en aria-current, volet mobile avec fond cliquable.",
         "demo": "Voir l’administration : pnpm dev puis http://localhost:5173."
+      },
+      "preloader": {
+        "name": "Préchargeur",
+        "desc": "À la première visite, le logo se dessine en traits fins puis se fond dans la page quand elle est prête. Une seule fois par session ; sans JavaScript, il s’efface seul.",
+        "use": "<Preloader /> dans le gabarit de base, avec la variante line de <Mark>. Le dessin dure environ 1,2 s ; il n’est jamais rejoué pendant la navigation.",
+        "a11y": "Décoratif (aria-hidden), ne retient pas le contenu plus que nécessaire. Mouvement réduit : le trait est déjà tracé, simple fondu."
       }
     },
     "rules": {
@@ -533,7 +572,17 @@
     "season": "Nous vivons le temps : {season}",
     "cta_discover": "Nous découvrir",
     "cta_calendar": "Voir l’agenda",
-    "hero_note": "[À VALIDER : titre d’accueil de la page d’accueil]"
+    "hero_note": "[À VALIDER : titre d’accueil de la page d’accueil]",
+    "lead": "Une paroisse de l’Église Évangélique du Cameroun, au cœur de Nkolndongo, à Yaoundé : un lieu pour chanter, prier, écouter la Parole et avancer ensemble.",
+    "start_title": "Trois façons de commencer",
+    "start1_t": "Venir un dimanche",
+    "start1_p": "Découvrez le déroulement d’un culte et ce qui vous attend. Aucune tenue ni préparation nécessaire.",
+    "start2_t": "Trouver votre place",
+    "start2_p": "Chorale, jeunesse, Union des Femmes, catéchèse : il y a un groupe pour servir, apprendre et partager.",
+    "start3_t": "Faire connaissance",
+    "start3_p": "Ce que nous croyons, ce qui nous rassemble, et le chemin pour nous rejoindre.",
+    "verse": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
+    "verse_cite": "Matthieu 11 : 28"
   },
   "soon": {
     "badge": "Bientôt",
@@ -547,16 +596,16 @@
     "text": "Comme une brebis, elle a quitté le troupeau. Revenons à l’accueil."
   },
   "footer": {
-    "about": "Une paroisse de l’Église Évangélique du Cameroun, à Yaoundé.",
+    "about": "Une paroisse de l’Église Évangélique du Cameroun, à Yaoundé. Une maison ouverte.",
     "visit": "Nous rendre visite",
-    "address": "[À VALIDER : adresse de la paroisse]",
+    "address": "Nkolndongo, Yaoundé, Cameroun. L’adresse précise et le plan arrivent bientôt.",
     "hours_title": "Horaires",
-    "hours": "[À VALIDER : horaires des cultes]",
+    "hours": "Les horaires des cultes seront publiés ici dès qu’ils sont confirmés.",
     "follow": "Nous suivre",
-    "social_pending": "[À VALIDER : lien]",
+    "social_pending": "lien bientôt",
     "legal": "Informations",
-    "credits": "Photos : Pexels",
-    "credits_pending": "[À VALIDER : crédits photos]",
+    "credits": "Illustrations originales",
+    "credits_pending": "Photos : crédits ajoutés avec les photos",
     "rights": "© EEC Nkolndongo 1",
     "controls": "Langue et thème"
   },
@@ -688,5 +737,191 @@
     "btn_loading": "Envoi",
     "btn_disabled": "Indisponible",
     "menu_item_demo": "Menu"
+  },
+  "page": {
+    "cta_title": "Une question, un souvenir, une envie de venir ?",
+    "cta_text": "Commencez par nous trouver, ou revenez à l’accueil.",
+    "cta_find": "Nous trouver",
+    "cta_home": "Retour à l’accueil",
+    "soon_note": "Cette section grandira avec la paroisse."
+  },
+  "pages": {
+    "histoire": {
+      "lead": "Une paroisse est une histoire écrite par des visages : ceux qui ont semé, ceux qui ont veillé, ceux qui arrivent aujourd’hui.",
+      "s1_t": "Une histoire en train de s’écrire",
+      "s1_p1": "Nkolndongo veut dire la colline. Notre histoire se raconte comme une montée : un pas après l’autre, avec ceux qui marchent à côté de nous.",
+      "s1_p2": "Nous rassemblons avec soin les souvenirs de la paroisse : récits, photographies, témoignages. Rien n’est publié avant d’avoir été vérifié et, quand il s’agit de personnes, accepté par elles.",
+      "s2_t": "Vous avez un souvenir à partager ?",
+      "s2_p": "Une vieille photo, un récit, le nom de quelqu’un qui a compté : confiez-les à la paroisse. Chaque détail aide à garder la mémoire vivante."
+    },
+    "croyances": {
+      "lead": "Nous sommes une Église chrétienne évangélique : nous croyons que Dieu nous aime et qu’il s’est fait connaître en Jésus-Christ.",
+      "s1_t": "Le Credo des Apôtres",
+      "s1_p": "Depuis les premiers siècles, les chrétiens du monde entier confessent ensemble ces quelques lignes. Elles disent l’essentiel de la foi.",
+      "creed": "Je crois en Dieu, le Père tout-puissant, créateur du ciel et de la terre. Et en Jésus-Christ, son Fils unique, notre Seigneur, qui a été conçu du Saint-Esprit, est né de la vierge Marie, a souffert sous Ponce Pilate, a été crucifié, est mort, a été enseveli, est descendu dans le séjour des morts ; le troisième jour, il est ressuscité des morts, est monté au ciel, est assis à la droite de Dieu le Père tout-puissant, d’où il viendra pour juger les vivants et les morts. Je crois au Saint-Esprit, à la sainte Église universelle, à la communion des saints, au pardon des péchés, à la résurrection de la chair et à la vie éternelle. Amen.",
+      "creed_cite": "Credo des Apôtres",
+      "s2_t": "Quatre mots pour dire la foi",
+      "c1_t": "La Bible",
+      "c1_p": "La Parole de Dieu, qui nous éclaire et nous guide. Nous la lisons, nous l’écoutons, nous la partageons.",
+      "c2_t": "La grâce",
+      "c2_p": "Le salut est un don de Dieu, pas un salaire. Nous le recevons avec reconnaissance.",
+      "c3_t": "La prière",
+      "c3_p": "Parler à Dieu comme à un Père, seul ou ensemble, dans la joie comme dans l’épreuve.",
+      "c4_t": "La communauté",
+      "c4_p": "On ne croit pas seul. L’Église est une famille où chacun porte et est porté. Le baptême et la Sainte-Cène en sont les signes.",
+      "note": "Ceci est un résumé simple, pas la confession de foi complète de l’Église : le Conseil paroissial y ajoutera ses textes de référence."
+    },
+    "pasteurs": {
+      "lead": "Une paroisse est servie par des personnes qui donnent leur temps, leur écoute et leur foi.",
+      "s1_t": "Un ministère de service",
+      "s1_p": "Chacun a un rôle, personne ne règne : on sert ensemble, et on décide ensemble des affaires de la paroisse.",
+      "r1_t": "Le pasteur",
+      "r1_p": "Annonce la Parole, célèbre les sacrements, accompagne chacun dans ses joies et ses épreuves.",
+      "r2_t": "Les anciens d’Église",
+      "r2_p": "Veillent sur la vie spirituelle de la paroisse et soutiennent le pasteur.",
+      "r3_t": "Les diacres",
+      "r3_p": "Sont au service des personnes : visite, entraide, attention aux plus fragiles.",
+      "r4_t": "Les catéchistes",
+      "r4_p": "Enseignent la foi aux enfants, aux jeunes et à ceux qui se préparent au baptême.",
+      "r5_t": "Le Conseil paroissial",
+      "r5_p": "Réunit les responsables pour prendre ensemble les décisions de la vie de la paroisse.",
+      "s3_t": "Les visages arrivent bientôt",
+      "s3_p": "Les noms et portraits de l’équipe seront publiés ici avec l’accord de chaque personne."
+    },
+    "trouver": {
+      "lead": "Vous êtes les bienvenus, même si c’est la première fois.",
+      "s1_t": "Où nous trouver",
+      "s1_p": "Nous sommes à Nkolndongo, à Yaoundé, au Cameroun. Le plan, l’adresse précise et l’itinéraire seront affichés ici, avec une carte qui ne se charge que si vous le demandez, pour ménager vos données.",
+      "s2_t": "Pour une première visite",
+      "l1": "Venez comme vous êtes : il n’y a pas de tenue obligatoire.",
+      "l2": "N’hésitez pas à demander votre chemin : on vous guidera volontiers.",
+      "l3": "Les enfants sont les bienvenus.",
+      "l4": "Écoutez, chantez si vous le souhaitez, et posez vos questions après : nous aimons les questions."
+    },
+    "cultes": {
+      "lead": "Le culte est le cœur de la vie de la paroisse : on s’y retrouve pour chanter, prier, écouter la Bible et se soutenir.",
+      "s1_t": "Comment se déroule un culte",
+      "s1_p": "Chaque culte a son rythme, qui change un peu selon les dimanches et les fêtes. On y trouve en général :",
+      "l1": "L’accueil et les chants",
+      "l2": "La prière",
+      "l3": "La lecture de la Bible et le message",
+      "l4": "L’offrande, offerte avec reconnaissance",
+      "l5": "La bénédiction et l’envoi",
+      "s2_t": "Les horaires",
+      "s2_p": "Les horaires des cultes et des rencontres de la semaine seront publiés ici dès qu’ils auront été confirmés par la paroisse. Nous préférons attendre plutôt que de vous donner une heure approximative."
+    },
+    "departements": {
+      "lead": "Chacun a sa place. Les groupes de la paroisse permettent de servir, d’apprendre et de partager selon son âge et ses dons.",
+      "s1_t": "Des groupes pour chaque âge",
+      "g1_t": "Les chorales",
+      "g1_p": "Le chant porte la louange de la paroisse. On y vient pour chanter, et on y reste pour l’amitié.",
+      "g2_t": "La jeunesse (JAPE)",
+      "g2_p": "Un espace pour les jeunes : apprendre, discuter, servir, s’amuser, grandir dans la foi.",
+      "g3_t": "L’Union des Femmes (UFC)",
+      "g3_p": "Les femmes de la paroisse se soutiennent, prient ensemble et servent la communauté.",
+      "g4_t": "La catéchèse",
+      "g4_p": "Les enfants et ceux qui se préparent au baptême découvrent la foi pas à pas.",
+      "s2_t": "Où est votre place ?",
+      "s2_p": "Bientôt, un petit questionnaire de trois questions vous aidera à trouver le groupe qui vous ressemble. En attendant, n’hésitez pas à venir et à demander."
+    },
+    "pratique": {
+      "lead": "Les grands moments de la vie se vivent mieux accompagnés. Voici comment la paroisse vous accompagne.",
+      "c1_t": "Baptême",
+      "c1_p": "Se faire baptiser, ou faire baptiser son enfant : tout commence par une rencontre avec le pasteur, pour parler de ce que cela signifie.",
+      "c2_t": "Mariage",
+      "c2_p": "Se marier à l’Église, c’est placer son engagement devant Dieu et devant la communauté. Un temps de préparation avec le pasteur précède la célébration.",
+      "c3_t": "Deuil",
+      "c3_p": "Quand un proche nous quitte, la paroisse est là : pour prier avec la famille, accompagner, et organiser un temps de recueillement.",
+      "c4_t": "Devenir membre",
+      "c4_p": "Rejoindre la paroisse, c’est d’abord se rencontrer et se découvrir. Venez, parlez-en à quelqu’un : le reste suit.",
+      "note": "Les démarches précises (documents, délais, personnes à contacter) seront détaillées ici, pas à pas, avec le secrétariat de la paroisse."
+    },
+    "evenements": {
+      "lead": "L’agenda de la paroisse vivra ici : rencontres, fêtes, retraites, sorties.",
+      "empty_t": "Rien d’annoncé pour l’instant",
+      "empty_p": "Dès qu’un rendez-vous sera confirmé, il apparaîtra ici, avec la possibilité de l’ajouter à votre calendrier. Revenez bientôt.",
+      "link": "Découvrir l’année liturgique"
+    },
+    "liturgie": {
+      "lead": "L’année liturgique donne un rythme à la foi : saison après saison, on revisite la vie de Jésus et on s’y laisse transformer.",
+      "now": "Nous sommes dans le temps : {season}",
+      "s1_t": "Les saisons de l’année",
+      "season_avent": "L’attente et l’espérance : les quatre semaines qui préparent Noël.",
+      "season_noel": "La naissance de Jésus : Dieu avec nous, la lumière dans la nuit.",
+      "season_epiphanie": "Jésus se fait connaître à tous les peuples.",
+      "season_careme": "Un temps de retour à Dieu avant Pâques : prière, partage, simplicité.",
+      "season_semaine-sainte": "La dernière semaine de Jésus : de l’entrée à Jérusalem à la croix.",
+      "season_paques": "La résurrection : la vie est plus forte que la mort. C’est la grande joie de l’année.",
+      "season_pentecote": "L’Esprit saint est donné : l’Église naît et se met en route.",
+      "season_ordinaire": "Le temps du quotidien : on apprend à suivre Jésus, jour après jour.",
+      "season_moissons": "Un temps de gratitude pour ce que la terre donne, et de partage.",
+      "s2_p": "Les couleurs du site changent avec la saison : vous les verrez évoluer au fil de l’année."
+    },
+    "moissons": {
+      "lead": "La Fête des Moissons est un temps de gratitude : on remercie Dieu pour ce que la terre donne, et on partage.",
+      "s1_t": "Remercier et partager",
+      "s1_p1": "On apporte des fruits de la terre et du travail, et on les offre avec reconnaissance. C’est une fête simple, joyeuse, tournée vers les autres.",
+      "s1_p2": "Les dates, les projets soutenus et la façon d’y participer seront annoncés ici dès qu’ils seront décidés par la paroisse."
+    },
+    "nouvelles": {
+      "lead": "Les nouvelles de la paroisse : annonces, comptes rendus, témoignages.",
+      "empty_t": "Pas encore de nouvelles",
+      "empty_p": "Les premières nouvelles arrivent bientôt. Vous pourrez les lire ici et les partager par WhatsApp en un geste."
+    },
+    "predications": {
+      "lead": "Écouter ou réécouter un message : le culte continue chez vous.",
+      "empty_t": "Les messages arrivent",
+      "empty_p": "Les prédications seront classées par série, par prédicateur et par livre de la Bible. L’audio est pensé pour rester léger sur votre forfait."
+    },
+    "meditations": {
+      "lead": "Un mot pour la semaine, et le bulletin de la paroisse à emporter.",
+      "empty_t": "Une méditation à venir",
+      "empty_p": "Chaque semaine, une courte méditation à lire en quelques minutes, et le bulletin en version à télécharger."
+    },
+    "give": {
+      "lead": "Donner, c’est dire merci : à Dieu pour ce qu’il nous donne, et aux autres en partageant.",
+      "s1_t": "Pourquoi nous donnons",
+      "s1_p": "Les offrandes et les dons font vivre la paroisse et ses projets : les cultes, l’accueil, l’entretien du lieu, le service des autres. Chaque don, petit ou grand, compte et est reçu avec reconnaissance.",
+      "s2_t": "Comment donner",
+      "s2_p": "Les moyens de donner (pendant le culte, par mobile money, par virement) seront précisés ici. Nous n’afficherons jamais un numéro ou un compte avant qu’il ait été vérifié avec le trésorier : votre confiance compte plus que la rapidité.",
+      "s3_t": "En toute transparence",
+      "s3_p": "Nous voulons expliquer simplement à quoi servent les dons, et rendre compte de leur usage à la communauté."
+    },
+    "account": {
+      "lead": "Votre espace personnel : calme, simple et privé.",
+      "s1_t": "Ce que vous y trouverez bientôt",
+      "l1": "Vos informations, que vous gardez à jour vous-même",
+      "l2": "Vos choix et consentements, jamais cochés pour vous",
+      "l3": "Vos inscriptions aux activités de la paroisse",
+      "l4": "Plus tard, des services pour les membres",
+      "s2_t": "Vos données vous appartiennent",
+      "s2_p": "Vous pourrez les consulter, les corriger, les exporter et les supprimer à tout moment. La connexion sera ouverte dans une prochaine étape."
+    },
+    "privacy": {
+      "lead": "Votre vie privée compte. Voici, simplement, ce que fait ce site de vos informations.",
+      "s1_t": "En bref",
+      "s1_p": "Pour l’instant, ce site ne collecte aucune donnée personnelle. Il n’utilise ni cookie de suivi, ni outil d’analyse, ni service tiers : tout ce que vous voyez (polices, icônes, images) vient de ce site lui-même.",
+      "s2_t": "Sur votre appareil",
+      "s2_p": "Votre choix de thème (clair ou sombre) et de langue est mémorisé dans votre navigateur pour vous éviter de le refaire. Il reste sur votre appareil et n’est jamais envoyé nulle part.",
+      "s3_t": "Nos engagements pour la suite",
+      "l1": "Nous ne demanderons que ce dont nous avons vraiment besoin.",
+      "l2": "Vous donnerez toujours votre accord de façon explicite : aucune case cochée d’avance.",
+      "l3": "Nous dirons combien de temps nous gardons chaque information, puis nous la supprimerons.",
+      "l4": "Vous pourrez consulter, corriger, exporter et supprimer vos données.",
+      "l5": "Nous ne recueillerons pas d’informations sensibles (origine, opinions politiques, santé) sans une décision explicite et documentée.",
+      "s4_t": "Le cadre légal",
+      "s4_p": "Nous nous conformons à la loi camerounaise n° 2024/017 du 23 décembre 2024 relative à la protection des données personnelles. Le contact du responsable des données sera indiqué ici avant toute collecte."
+    },
+    "legal": {
+      "lead": "Les informations légales sur ce site.",
+      "s1_t": "Éditeur",
+      "s1_p": "Paroisse EEC Nkolndongo 1, Église Évangélique du Cameroun, Yaoundé, Cameroun. Le nom du responsable de la publication et le moyen de le contacter seront ajoutés ici par le Conseil paroissial.",
+      "s2_t": "Logo et marques",
+      "s2_p": "Le logo de l’EEC appartient à l’Église Évangélique du Cameroun. Il est utilisé ici par la paroisse et ne peut être réutilisé sans autorisation.",
+      "s3_t": "Code, polices et illustrations",
+      "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Fraunces (licence SIL OFL) et le texte en Switzer (licence ITF Free Font License). Les illustrations sont originales.",
+      "s4_t": "Hébergement",
+      "s4_p": "Le site sera hébergé par Cloudflare. L’adresse et les informations de l’hébergeur seront indiquées ici à la mise en ligne."
+    }
   }
 }

@@ -4,7 +4,7 @@ const order = ['system', 'light', 'dark'] as const
 type Choice = (typeof order)[number]
 
 /** Inline in <head> (as a string): no flash of the wrong theme. Storage access may throw. */
-export const themeHeadScript = `(()=>{let c='system';try{c=localStorage.getItem('${THEME_KEY}')||'system'}catch(e){}const r=document.documentElement;r.dataset.themeChoice=c;if(c==='light'||c==='dark')r.dataset.theme=c;else r.removeAttribute('data-theme')})()`
+export const themeHeadScript = `(()=>{let c='system';try{c=localStorage.getItem('${THEME_KEY}')||'system'}catch(e){}const r=document.documentElement;r.dataset.themeChoice=c;if(c==='light'||c==='dark')r.dataset.theme=c;else r.removeAttribute('data-theme');try{if(sessionStorage.getItem('eec-pre'))r.dataset.preloaded=''}catch(e){}})()`
 
 function apply(choice: Choice) {
   const root = document.documentElement
@@ -24,7 +24,10 @@ function label(button: HTMLElement, choice: Choice) {
 }
 
 export function initThemeToggles() {
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    '[data-theme-toggle]:not([data-bound])',
+  )) {
+    button.setAttribute('data-bound', '')
     const current = () => (document.documentElement.dataset.themeChoice ?? 'system') as Choice
     label(button, current())
     button.addEventListener('click', () => {

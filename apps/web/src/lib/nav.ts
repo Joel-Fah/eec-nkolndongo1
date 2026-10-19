@@ -3,58 +3,83 @@
  * One source for the header, the mobile menu, the footer, the language switcher and the routes.
  */
 import type { Locale, MessageKey } from '@eec/i18n'
+import type { IconName } from '@eec/ui/icons'
 
 type Slugs = Record<Locale, string>
 
-export type NavChild = { id: string; slug: Slugs }
+export type NavChild = { id: string; slug: Slugs; icon: IconName }
 export type NavTab = {
   id: 'discover' | 'live' | 'calendar' | 'news' | 'give'
   slug: Slugs
+  icon: IconName
+  /** Illustration shown in the mega menu (packages/ui/illustrations). */
+  art?: string
   children: NavChild[]
 }
 
 export const tabs: NavTab[] = [
   {
     id: 'discover',
+    icon: 'compass',
+    art: 'nav-discover',
     slug: { fr: 'decouvrir', en: 'discover' },
     children: [
-      { id: 'histoire', slug: { fr: 'notre-histoire', en: 'our-story' } },
-      { id: 'croyances', slug: { fr: 'ce-que-nous-croyons', en: 'what-we-believe' } },
-      { id: 'pasteurs', slug: { fr: 'pasteurs-et-conseil', en: 'pastors-and-council' } },
-      { id: 'trouver', slug: { fr: 'nous-trouver', en: 'find-us' } },
+      { id: 'histoire', slug: { fr: 'notre-histoire', en: 'our-story' }, icon: 'hourglass' },
+      {
+        id: 'croyances',
+        slug: { fr: 'ce-que-nous-croyons', en: 'what-we-believe' },
+        icon: 'bible',
+      },
+      {
+        id: 'pasteurs',
+        slug: { fr: 'pasteurs-et-conseil', en: 'pastors-and-council' },
+        icon: 'account',
+      },
+      { id: 'trouver', slug: { fr: 'nous-trouver', en: 'find-us' }, icon: 'location' },
     ],
   },
   {
     id: 'live',
+    icon: 'heart',
+    art: 'nav-live',
     slug: { fr: 'vivre', en: 'live' },
     children: [
-      { id: 'cultes', slug: { fr: 'cultes-et-horaires', en: 'services-and-times' } },
-      { id: 'departements', slug: { fr: 'departements', en: 'departments' } },
-      { id: 'pratique', slug: { fr: 'vie-pratique', en: 'practical-life' } },
+      {
+        id: 'cultes',
+        slug: { fr: 'cultes-et-horaires', en: 'services-and-times' },
+        icon: 'church',
+      },
+      { id: 'departements', slug: { fr: 'departements', en: 'departments' }, icon: 'users' },
+      { id: 'pratique', slug: { fr: 'vie-pratique', en: 'practical-life' }, icon: 'checklist' },
     ],
   },
   {
     id: 'calendar',
+    icon: 'calendar',
+    art: 'nav-calendar',
     slug: { fr: 'agenda', en: 'calendar' },
     children: [
-      { id: 'evenements', slug: { fr: 'evenements', en: 'events' } },
-      { id: 'liturgie', slug: { fr: 'annee-liturgique', en: 'liturgical-year' } },
-      { id: 'moissons', slug: { fr: 'fete-des-moissons', en: 'harvest-festival' } },
+      { id: 'evenements', slug: { fr: 'evenements', en: 'events' }, icon: 'calendar' },
+      { id: 'liturgie', slug: { fr: 'annee-liturgique', en: 'liturgical-year' }, icon: 'sun' },
+      { id: 'moissons', slug: { fr: 'fete-des-moissons', en: 'harvest-festival' }, icon: 'plant' },
     ],
   },
   {
     id: 'news',
+    icon: 'newspaper',
+    art: 'nav-news',
     slug: { fr: 'actualites', en: 'news' },
     children: [
-      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' } },
-      { id: 'predications', slug: { fr: 'predications', en: 'sermons' } },
+      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper' },
+      { id: 'predications', slug: { fr: 'predications', en: 'sermons' }, icon: 'headphones' },
       {
         id: 'meditations',
         slug: { fr: 'meditations-et-bulletin', en: 'meditations-and-bulletin' },
+        icon: 'book',
       },
     ],
   },
-  { id: 'give', slug: { fr: 'donner', en: 'give' }, children: [] },
+  { id: 'give', slug: { fr: 'donner', en: 'give' }, icon: 'gift', children: [] },
 ]
 
 /** Pages outside the tabs. */

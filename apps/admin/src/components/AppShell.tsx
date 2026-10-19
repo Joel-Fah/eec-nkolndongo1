@@ -1,6 +1,6 @@
 import { Menu } from '@base-ui/react/menu'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useT } from '../lib/locale'
 import { groups } from '../lib/nav'
 import { CommandPalette } from './CommandPalette'
@@ -21,6 +21,10 @@ export function AppShell() {
   })
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
+    return () => document.documentElement.removeAttribute('data-nav-open')
+  }, [mobileOpen])
   const path = useRouterState({ select: (s) => s.location.pathname })
   const toggle = () =>
     setCollapsed((c) => {
@@ -44,6 +48,14 @@ export function AppShell() {
       </a>
       <aside className="admin-sidebar" aria-label={t('admin.sidebar')}>
         <div className="admin-brand">
+          <button
+            type="button"
+            className="btn btn-ghost btn-icon admin-close"
+            onClick={() => setMobileOpen(false)}
+            aria-label={t('nav.close_menu')}
+          >
+            <Icon name="close" size={24} />
+          </button>
           <Link to="/" aria-label={t('admin.dashboard')} className="admin-brand-link">
             <Mark className="admin-mark" />
             <span className="admin-brand-text">{t('site.name')}</span>
@@ -132,11 +144,8 @@ export function AppShell() {
             <LocaleSwitch />
             <ThemeButton />
             <Menu.Root>
-              <Menu.Trigger className="btn btn-ghost admin-user" aria-label={t('admin.user.menu')}>
-                <span className="avatar" aria-hidden="true">
-                  EE
-                </span>
-                <span className="eec-chevron" aria-hidden="true" />
+              <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
+                EE
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">

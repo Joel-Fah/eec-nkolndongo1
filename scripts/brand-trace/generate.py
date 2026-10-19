@@ -98,6 +98,16 @@ def svg(p: str, body, with_text: bool, attrs: str = '') -> str:
     )
 
 
+def line_art() -> str:
+    """Stroke-only mark for the preloader: every outline is one path with pathLength=1, so CSS can draw it."""
+    outlines = [SAIL_OUTLINE] + LETTERS + [CROSS]
+    paths = ''.join(f'<path class="ln" pathLength="1" d="{d}"/>' for d in outlines)
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{VIEWBOX}" role="img" fill="none" stroke="currentColor" '
+        f'stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><title>{TITLE}</title>{paths}</svg>\n'
+    )
+
+
 OUT.mkdir(parents=True, exist_ok=True)
 files = {
     'mark-full.svg': svg('eecf-', colour, True),
@@ -106,6 +116,7 @@ files = {
     'mark-full-mono.svg': svg('eecfm-', mono, True),
     'mark-halo.svg': svg('eech-', halo, False),
     'mark-full-halo.svg': svg('eecfh-', halo, True),
+    'mark-line.svg': line_art(),
 }
 for file, content in files.items():
     (OUT / file).write_text(content)

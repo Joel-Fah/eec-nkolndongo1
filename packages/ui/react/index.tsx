@@ -285,6 +285,7 @@ export function TabsBox({ tabs }: { tabs: { id: string; label: string; content: 
   return (
     <Tabs.Root defaultValue={tabs[0]?.id}>
       <Tabs.List className="tabs-list">
+        <Tabs.Indicator className="tabs-indicator" />
         {tabs.map((t) => (
           <Tabs.Tab key={t.id} value={t.id} className="tab">
             {t.label}
@@ -338,13 +339,29 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
       toast={toast}
       className="toast"
       data-tone={(toast.data as { tone?: string } | undefined)?.tone}
+      style={{ '--toast-ms': `${toast.timeout ?? 5000}ms` } as React.CSSProperties}
     >
       <Toast.Content className="toast-text">
         <Toast.Title />
       </Toast.Content>
-      <Toast.Close className="btn btn-ghost btn-icon btn-sm" aria-label={closeLabel}>
-        <span aria-hidden="true">×</span>
-      </Toast.Close>
+      <span className="toast-close">
+        <svg className="toast-ring" viewBox="0 0 36 36" aria-hidden="true">
+          <circle cx="18" cy="18" r="16" pathLength="100" />
+        </svg>
+        <Toast.Close className="btn btn-ghost" aria-label={closeLabel}>
+          <svg
+            className="toast-close-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </Toast.Close>
+      </span>
     </Toast.Root>
   ))
 }

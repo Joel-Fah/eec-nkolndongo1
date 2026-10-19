@@ -3,7 +3,7 @@ import Lockup from '@eec/ui/astro/Lockup.astro'
 import { useT } from '../lib/i18n'
 
 interface Props {
-  variant?: 'auto' | 'short' | 'long'
+  variant?: 'auto' | 'one' | 'two' | 'three'
   mark?: 'mark' | 'halo' | 'mono'
   class?: string
 }
@@ -13,7 +13,9 @@ const t = useT(Astro.currentLocale)
 
 <Lockup
   {...Astro.props}
-  short={t('lockup.short')}
-  church={t('lockup.long_church')}
+  one={t('lockup.short')}
+  eec={t('lockup.eec')}
   parish={t('lockup.long_parish')}
+  parishLead={t('lockup.parish_lead')}
+  parishPlace={t('lockup.parish_place')}
 />

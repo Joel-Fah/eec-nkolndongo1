@@ -3,6 +3,7 @@ import { getSeason } from '@eec/core'
 import { locales } from '@eec/i18n'
 import switzer from '@eec/ui/fonts/fontshare/switzer/Switzer-Variable.woff2?url'
 import '../styles.css'
+import Preloader from '../components/Preloader.astro'
 import { localeOf, useT } from '../lib/i18n'
 import { themeHeadScript } from '../lib/theme'
 
@@ -49,6 +50,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
     <slot name="head" />
   </head>
   <body>
+    <Preloader />
     <a class="skip-link" href="#main">{t('common.skip_to_content')}</a>
     <slot />
     <script>

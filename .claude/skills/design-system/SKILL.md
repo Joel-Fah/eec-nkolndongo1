@@ -12,6 +12,7 @@ Source of truth: `docs/design/design-language.md`. Tokens live in `packages/ui/t
 - **Both themes** (`[data-theme="light"|"dark"]` + `prefers-color-scheme`) and **both locales** checked for every component. French strings run ~20% longer — design for it.
 - **Shape:** rounded, Apple-like. `--radius-md` (14px) buttons/inputs, `--radius-lg` (20px) cards/dropdowns, `--radius-xl` (28px) dialogs/sheets. **No pills, no squircles.** Concentric rule: inner = outer − padding.
 - **No one-sided borders** (never `border-t/b/s/e/l/r`, no side rule on quotes) — `<Verse>` for quotes, `<Ornament>` for dividers.
+- **Floating navigation** (lifted off the edges, rounded all around); scrollbars rounded, auto-hidden inside panels; every nav entry has an icon.
 - **Document it:** add the component/animation/token to the living guide (`/fr/_brand`) in the same change.
 - **Icons:** Hugeicons stroke-rounded via the `<Icon>` wrapper in `packages/ui`; `currentColor`; 16/20/24.
 - **Type:** Switzer for text/UI, Fraunces for headings only. French spacing helper for `: ; ! ?` and « ».

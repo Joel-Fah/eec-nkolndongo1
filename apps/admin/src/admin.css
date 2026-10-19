@@ -2,21 +2,26 @@
 .admin-shell {
   display: grid;
   grid-template-columns: 16.5rem minmax(0, 1fr);
+  gap: 0.75rem;
   min-height: 100dvh;
+  padding: 0.75rem;
   background: var(--bg);
+  transition: grid-template-columns var(--duration-nav) var(--ease-soft);
 }
 .admin-shell[data-collapsed] {
   grid-template-columns: 4.75rem minmax(0, 1fr);
 }
 .admin-sidebar {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: 0.75rem;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 0.5rem;
-  height: 100dvh;
+  height: calc(100dvh - 1.5rem);
   padding: 0.75rem;
+  border-radius: var(--radius-xl);
   background: var(--surface);
+  box-shadow: var(--elevation-2);
   overflow: hidden;
   z-index: 30;
 }
@@ -79,6 +84,9 @@
 .admin-collapse {
   justify-content: flex-start;
 }
+.admin-collapse > span:first-child {
+  transition: transform var(--duration-nav) var(--ease-soft);
+}
 .admin-shell[data-collapsed] .admin-brand-text,
 .admin-shell[data-collapsed] .admin-link > span:last-child,
 .admin-shell[data-collapsed] .admin-group-title,
@@ -95,15 +103,17 @@
 }
 .admin-topbar {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: 0.75rem;
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: color-mix(in oklab, var(--bg) 85%, transparent);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--elevation-1);
+  padding: 0.5rem 0.625rem 0.5rem 0.75rem;
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: var(--elevation-2);
 }
 .admin-topbar-tools {
   display: flex;
@@ -129,11 +139,22 @@
   font-size: var(--text-xs);
   font-weight: 600;
 }
-.admin-user {
-  padding-inline: 0.25rem 0.5rem;
+.admin-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  cursor: pointer;
+  transition: box-shadow var(--duration-ui) var(--ease-soft);
+}
+.admin-avatar:hover,
+.admin-avatar[data-popup-open] {
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+.admin-close {
+  display: none;
+  margin-inline-start: auto;
 }
 .admin-content {
-  padding: 1.5rem 1rem 4rem;
+  padding: 1.75rem 0.75rem 4rem;
   max-width: 80rem;
 }
 .admin-burger,
@@ -182,23 +203,33 @@
   .admin-shell[data-collapsed] {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Opens full screen, floating over the page, with its own soft reveal; the page behind can't scroll. */
   .admin-sidebar {
     position: fixed;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: min(86vw, 18rem);
-    transform: translateX(-102%);
-    transition: transform var(--duration-ui) var(--ease-out);
-    box-shadow: var(--elevation-3);
+    inset: 0;
+    z-index: 60;
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    padding: 1rem;
+    clip-path: circle(0% at 2.5rem 2.5rem);
+    visibility: hidden;
+    transition:
+      clip-path calc(var(--duration-nav) * 1.5) var(--ease-soft),
+      visibility calc(var(--duration-nav) * 1.5);
   }
   .admin-shell[data-mobile-open] .admin-sidebar {
-    transform: none;
+    clip-path: circle(150% at 2.5rem 2.5rem);
+    visibility: visible;
   }
   .admin-shell[data-collapsed] .admin-brand-text,
   .admin-shell[data-collapsed] .admin-link > span:last-child,
   .admin-shell[data-collapsed] .admin-group-title,
   .admin-shell[data-collapsed] .admin-collapse-text {
     display: inline;
+  }
+  .admin-close {
+    display: inline-flex;
   }
   .admin-collapse {
     display: none;
@@ -207,11 +238,7 @@
     display: inline-flex;
   }
   .admin-scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 25;
-    background: color-mix(in oklab, var(--ink) 45%, transparent);
+    display: none;
   }
   .admin-search-text,
   .admin-kbd {
@@ -223,6 +250,16 @@
     padding-inline: 0;
     justify-content: center;
   }
+  .admin-link {
+    min-height: 3.25rem;
+    background: var(--surface-2);
+  }
+  .admin-nav {
+    gap: 0.375rem;
+  }
+}
+html[data-nav-open] {
+  overflow: hidden;
 }
 @media (prefers-reduced-motion: reduce) {
   .admin-sidebar {

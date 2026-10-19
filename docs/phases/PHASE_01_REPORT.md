@@ -27,14 +27,24 @@ Brand & Foundations · branch `feat/phase-01-foundations` · 2026-10-19
 - **Other:** liturgical season util (computus, Africa/Douala, tests 2024–2030), FR/EN messages with French
   typography helper, design-rules check in `pnpm lint` (no one-sided borders, no squircles).
 
+## Round 2 (after Joël's review)
+Floating navigation everywhere (site header, admin sidebar and top bar, sheets); mega menus with an icon on
+every entry and an original illustration per menu; lockups on one, two (EEC / Paroisse de Nkolndongo 1) or
+three lines; line-art preloader; custom select list that matches the Actions menu; circular-ornament loader
+that keeps the label; sliding elastic tab indicator and hover tint; gentler accordion and nav motion; stacked
+toasts with a progress ring and a tone-tinted close; the quote (`Verse`) straddling its edge with ornaments;
+rounded, auto-hiding scrollbars; consistent avatar; dark terminal-style admin favicon; brand-guide sidebar with
+a title, scrollspy and nested sections; real copy on every page (no invented facts: addresses, times and names
+stay as clear "coming soon" notes).
+
 ## Budgets (measured on the production build)
 | Page | JS (gz) | Total first load | LCP* | CLS | 3rd-party |
 |---|---|---|---|---|---|
-| `/fr/` (home) | 5.4 KB | 106 KB (fonts 76) | 1.3 s | 0.000 | 0 |
-| `/fr/vivre/departements/` | 5.4 KB | 106 KB | 1.3 s | 0.000 | 0 |
-| `/404` | 0 KB | 92 KB | 1.0 s | 0.000 | 0 |
-\*Mobile profile: 4× CPU slowdown, 1.6 Mbps / 150 ms. Lighthouse mobile (simulated): **home 96 / 100 / 100 /
-100**, placeholder **95 / 100 / 100 / 100** (performance / accessibility / best practices / SEO).
+| `/fr/` (home) | 7.6 KB | 168 KB (fonts 119) | 1.5 s | 0.000 | 0 |
+| `/fr/decouvrir/ce-que-nous-croyons/` | 7.6 KB | 168 KB | 1.4 s | 0.039 | 0 |
+| `/404` | 2.2 KB | 96 KB | 1.0 s | 0.000 | 0 |
+\*Mobile profile: 4× CPU slowdown, 1.6 Mbps / 150 ms. Lighthouse mobile (simulated, measured before round 2): **home 96 / 100 / 100 /
+100**, placeholder **95 / 100 / 100 / 100** — re-run before release (performance / accessibility / best practices / SEO).
 Admin (behind login, outside the public budget): ≈ 245 KB JS gz. `/_brand` is internal and heavier (≈ 600 KB
 before the overlay image was shrunk from 386 KB to 42 KB).
 

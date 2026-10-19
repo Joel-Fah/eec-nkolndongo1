@@ -24,7 +24,8 @@ describe('messages', () => {
   it('translates per call and applies French typography', () => {
     expect(createT('en')('common.greeting', { name: 'Joël' })).toBe('Hello Joël')
     expect(createT('fr')('common.greeting', { name: 'Joël' })).toBe('Bonjour Joël')
-    expect(createT('fr')('site.tagline')).toContain(`VALIDER${' '}:`)
+    // French typography: a no-break space before the colon.
+    expect(createT('fr')('site.tagline')).toContain('êtes\u00A0:')
     expect(NNBSP).toBe(' ')
   })
 })

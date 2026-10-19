@@ -106,26 +106,6 @@
     width: 2.75rem;
     padding-inline: 0;
   }
-  .btn[aria-busy="true"] {
-    pointer-events: none;
-    color: transparent;
-  }
-  .btn[aria-busy="true"]::after {
-    content: "";
-    position: absolute;
-    width: 1.1rem;
-    height: 1.1rem;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, transparent 0 25%, var(--btn-ink, var(--ink)) 25% 100%);
-    -webkit-mask: radial-gradient(circle, transparent 55%, black 58%);
-    mask: radial-gradient(circle, transparent 55%, black 58%);
-    animation: eec-spin 0.8s linear infinite;
-  }
-  @keyframes eec-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
 
   /* ── Field, inputs ───────────────────────────────────────────────────────────────────── */
   .field {
@@ -407,9 +387,6 @@
     .skeleton {
       animation: none;
     }
-    .btn[aria-busy="true"]::after {
-      animation-duration: 2.4s;
-    }
   }
   .empty {
     display: grid;
@@ -495,9 +472,15 @@
   .accordion-trigger::-webkit-details-marker {
     display: none;
   }
-  /* biome-ignore lint/style/noDescendingSpecificity: state selectors intentionally follow the base .eec-chevron rule */
-  .accordion-item[open] > .accordion-trigger .eec-chevron,
-  .accordion-trigger[aria-expanded="true"] .eec-chevron,
+  /* biome-ignore lint/style/noDescendingSpecificity: state selector intentionally follows the base .eec-chevron rule */
+  .accordion-item[open] > .accordion-trigger .eec-chevron {
+    transform: rotate(180deg);
+  }
+  /* biome-ignore lint/style/noDescendingSpecificity: state selector intentionally follows the base .eec-chevron rule */
+  .accordion-trigger[aria-expanded="true"] .eec-chevron {
+    transform: rotate(180deg);
+  }
+  /* biome-ignore lint/style/noDescendingSpecificity: state selector intentionally follows the base .eec-chevron rule */
   .accordion-trigger[data-panel-open] .eec-chevron {
     transform: rotate(180deg);
   }
@@ -742,67 +725,6 @@
     visibility: hidden;
     opacity: 0;
   }
-
-  /* Toast */
-  .toast-region {
-    position: fixed;
-    inset-inline: 1rem;
-    inset-block-end: 1rem;
-    z-index: 60;
-    display: grid;
-    justify-items: center;
-    gap: 0.5rem;
-    pointer-events: none;
-  }
-  .toast {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: min(100%, 26rem);
-    padding: 0.75rem 0.75rem 0.75rem 1rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface-raised);
-    color: var(--ink);
-    box-shadow: var(--elevation-3);
-    pointer-events: auto;
-    animation: eec-toast-in var(--duration-ui) var(--ease-out);
-    --focus-gap: var(--surface-raised);
-  }
-  .toast[data-tone="success"] {
-    background: var(--success-soft);
-    color: var(--success);
-  }
-  .toast[data-tone="warning"] {
-    background: var(--warning-soft);
-    color: var(--warning);
-  }
-  .toast[data-tone="danger"] {
-    background: var(--danger-soft);
-    color: var(--danger);
-  }
-  .toast[data-tone="info"] {
-    background: var(--info-soft);
-    color: var(--info);
-  }
-  .toast-text {
-    flex: 1;
-    min-width: 0;
-  }
-  .toast[data-leaving] {
-    animation: eec-toast-out var(--duration-micro) var(--ease-in-out) forwards;
-  }
-  @keyframes eec-toast-in {
-    from {
-      opacity: 0;
-      transform: translateY(var(--rise));
-    }
-  }
-  @keyframes eec-toast-out {
-    to {
-      opacity: 0;
-      transform: translateY(calc(var(--rise) * 0.5));
-    }
-  }
 }
 
 /* ── Base UI popups (admin): positioner, tooltip, trigger states ───────────────────────── */
@@ -896,5 +818,404 @@
   .checkbox[data-checked],
   .switch[data-checked] {
     background: var(--primary);
+  }
+}
+
+/* ═════════════ Round 2: floating sheets, custom select, ornament loader, tabs, accordion, toast ═════════════ */
+@layer components {
+  /* Loader: a wavy ring with a dot at each end — the ornament, curled into a circle. Keeps the label. */
+  .btn[aria-busy="true"] {
+    pointer-events: none;
+    cursor: progress;
+  }
+  .btn[aria-busy="true"]::before {
+    content: "";
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M19.75%2013.98%20L19.74%2014.45%20L19.78%2014.95%20L19.77%2015.47%20L19.67%2015.96%20L19.45%2016.39%20L19.10%2016.75%20L18.63%2017.00%20L18.09%2017.15%20L17.52%2017.24%20L16.99%2017.30%20L16.52%2017.38%20L16.14%2017.54%20L15.86%2017.82%20L15.64%2018.23%20L15.46%2018.76%20L15.26%2019.37%20L15.01%2020.00%20L14.68%2020.56%20L14.26%2020.98%20L13.77%2021.19%20L13.23%2021.16%20L12.68%2020.90%20L12.17%2020.45%20L11.71%2019.88%20L11.32%2019.29%20L10.98%2018.77%20L10.66%2018.40%20L10.32%2018.24%20L9.92%2018.28%20L9.43%2018.50%20L8.84%2018.84%20L8.17%2019.21%20L7.45%2019.50%20L6.75%2019.64%20L6.14%2019.58%20L5.68%2019.28%20L5.41%2018.78%20L5.34%2018.11%20L5.46%2017.35%20L5.71%2016.59%20L5.99%2015.88%20L6.21%2015.29%20L6.30%2014.82%20L6.19%2014.48%20L5.85%2014.22%20L5.31%2014.00%20L4.62%2013.76%20L3.87%2013.46%20L3.19%2013.07%20L2.65%2012.60%20L2.36%2012.07%20L2.36%2011.53%20L2.64%2011.01%20L3.16%2010.55%20L3.84%2010.19%20L4.58%209.90%20L5.27%209.68%20L5.82%209.47%20L6.19%209.23%20L6.35%208.90%20L6.32%208.46%20L6.17%207.89%20L5.97%207.21%20L5.80%206.48%20L5.74%205.76%20L5.85%205.13%20L6.12%204.64%20L6.57%204.35%20L7.14%204.26%20L7.78%204.36%20L8.44%204.58%20L9.06%204.87%20L9.62%205.14%20L10.09%205.32%20L10.51%205.35%20L10.87%205.22%20L11.23%204.95%20L11.62%204.57%20L12.04%204.15%20L12.51%203.77%20L13.01%203.49%20L13.52%203.36%20L14.02%203.41%20L14.48%203.61%20L14.89%203.94%20L15.24%204.35%20L15.56%204.76%20L15.87%205.14%20L16.21%205.43%20L16.69%205.52'/%3E%3Ccircle%20cx='19.75'%20cy='13.98'%20r='1.4'%20fill='black'%20stroke='none'/%3E%3Ccircle%20cx='16.69'%20cy='5.52'%20r='1.4'%20fill='black'%20stroke='none'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M19.75%2013.98%20L19.74%2014.45%20L19.78%2014.95%20L19.77%2015.47%20L19.67%2015.96%20L19.45%2016.39%20L19.10%2016.75%20L18.63%2017.00%20L18.09%2017.15%20L17.52%2017.24%20L16.99%2017.30%20L16.52%2017.38%20L16.14%2017.54%20L15.86%2017.82%20L15.64%2018.23%20L15.46%2018.76%20L15.26%2019.37%20L15.01%2020.00%20L14.68%2020.56%20L14.26%2020.98%20L13.77%2021.19%20L13.23%2021.16%20L12.68%2020.90%20L12.17%2020.45%20L11.71%2019.88%20L11.32%2019.29%20L10.98%2018.77%20L10.66%2018.40%20L10.32%2018.24%20L9.92%2018.28%20L9.43%2018.50%20L8.84%2018.84%20L8.17%2019.21%20L7.45%2019.50%20L6.75%2019.64%20L6.14%2019.58%20L5.68%2019.28%20L5.41%2018.78%20L5.34%2018.11%20L5.46%2017.35%20L5.71%2016.59%20L5.99%2015.88%20L6.21%2015.29%20L6.30%2014.82%20L6.19%2014.48%20L5.85%2014.22%20L5.31%2014.00%20L4.62%2013.76%20L3.87%2013.46%20L3.19%2013.07%20L2.65%2012.60%20L2.36%2012.07%20L2.36%2011.53%20L2.64%2011.01%20L3.16%2010.55%20L3.84%2010.19%20L4.58%209.90%20L5.27%209.68%20L5.82%209.47%20L6.19%209.23%20L6.35%208.90%20L6.32%208.46%20L6.17%207.89%20L5.97%207.21%20L5.80%206.48%20L5.74%205.76%20L5.85%205.13%20L6.12%204.64%20L6.57%204.35%20L7.14%204.26%20L7.78%204.36%20L8.44%204.58%20L9.06%204.87%20L9.62%205.14%20L10.09%205.32%20L10.51%205.35%20L10.87%205.22%20L11.23%204.95%20L11.62%204.57%20L12.04%204.15%20L12.51%203.77%20L13.01%203.49%20L13.52%203.36%20L14.02%203.41%20L14.48%203.61%20L14.89%203.94%20L15.24%204.35%20L15.56%204.76%20L15.87%205.14%20L16.21%205.43%20L16.69%205.52'/%3E%3Ccircle%20cx='19.75'%20cy='13.98'%20r='1.4'%20fill='black'%20stroke='none'/%3E%3Ccircle%20cx='16.69'%20cy='5.52'%20r='1.4'%20fill='black'%20stroke='none'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    animation: eec-spin 1.6s linear infinite;
+  }
+  @keyframes eec-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn[aria-busy="true"]::before {
+      animation-duration: 4s;
+    }
+  }
+
+  /* Select: input-looking trigger, Actions-looking list */
+  .select-custom {
+    position: relative;
+    display: grid;
+  }
+  .select-native {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  button.select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    text-align: start;
+    cursor: pointer;
+  }
+  button.select[aria-expanded="true"] {
+    box-shadow: inset 0 0 0 2px var(--primary);
+  }
+  button.select[aria-expanded="true"] .eec-chevron {
+    transform: rotate(180deg);
+  }
+  .eec-popover[role="listbox"] .menu-item[aria-selected="true"] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .eec-popover[role="listbox"] .menu-item .eec-check-icon {
+    visibility: hidden;
+  }
+  .eec-popover[role="listbox"] .menu-item[aria-selected="true"] .eec-check-icon {
+    visibility: visible;
+  }
+
+  /* Tabs: a hover tint on idle tabs and one indicator that slides between them with a gentle spring. */
+  .tabs-list {
+    position: relative;
+    isolation: isolate;
+  }
+  .tab {
+    position: relative;
+    z-index: 1;
+  }
+  .tab:hover:not([aria-selected="true"], [data-selected]) {
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+    color: var(--ink);
+  }
+  .tab[aria-selected="true"],
+  .tab[data-selected] {
+    background: transparent;
+    box-shadow: none;
+  }
+  .tabs-indicator {
+    position: absolute;
+    z-index: 0;
+    inset-block: 0.25rem;
+    inset-inline-start: var(--tab-left, var(--active-tab-left, 0.25rem));
+    width: var(--tab-width, var(--active-tab-width, 0));
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    transition:
+      inset-inline-start var(--duration-reveal) var(--ease-spring),
+      width var(--duration-reveal) var(--ease-spring);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tabs-indicator {
+      transition-duration: 0.01s;
+    }
+  }
+
+  /* Accordion: slow, soft height animation (native <details> and Base UI) */
+  :root {
+    interpolate-size: allow-keywords;
+  }
+  .accordion-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      block-size var(--duration-reveal) var(--ease-soft),
+      opacity calc(var(--duration-reveal) * 0.8) var(--ease-soft),
+      content-visibility var(--duration-reveal) allow-discrete;
+  }
+  .accordion-item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+  .accordion-panel {
+    height: var(--accordion-panel-height, auto);
+    overflow: hidden;
+    transition:
+      height var(--duration-reveal) var(--ease-soft),
+      opacity var(--duration-reveal) var(--ease-soft);
+  }
+  .accordion-panel[data-starting-style],
+  .accordion-panel[data-ending-style] {
+    height: 0;
+    opacity: 0;
+  }
+  .accordion-trigger .eec-chevron {
+    transition: transform var(--duration-reveal) var(--ease-soft);
+  }
+
+  /* Sheets float: inset from the viewport, rounded on every corner. */
+  .sheet {
+    inset: 0.75rem 0.75rem 0.75rem auto;
+    width: min(calc(100vw - 1.5rem), 26rem);
+    height: calc(100dvh - 1.5rem);
+    border-radius: var(--radius-xl);
+  }
+  .sheet[data-side="start"] {
+    inset: 0.75rem auto 0.75rem 0.75rem;
+    border-radius: var(--radius-xl);
+  }
+  .sheet[data-side="bottom"] {
+    inset: auto 0.75rem 0.75rem 0.75rem;
+    width: auto;
+    height: auto;
+    max-height: calc(85dvh - 1.5rem);
+    border-radius: var(--radius-xl);
+  }
+  .sheet[data-side="full"] {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+  }
+  .sheet,
+  .dialog,
+  .eec-popover,
+  .eec-popup {
+    transition-duration: var(--duration-nav);
+    transition-timing-function: var(--ease-soft);
+  }
+  .sheet[open],
+  .dialog[open],
+  .eec-popover:popover-open {
+    transition-duration: var(--duration-nav);
+    transition-timing-function: var(--ease-soft);
+  }
+
+  /* Toast: a stacked deck (newest in front), tone-tinted, with a progress ring around a large close icon */
+  .toast-region {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 1rem;
+    z-index: 60;
+    display: grid;
+    justify-items: center;
+    align-items: end;
+    padding-inline: 1rem;
+    pointer-events: none;
+  }
+  .toast {
+    --idx: var(--toast-index, var(--i, 0));
+    --toast-hover: color-mix(in oklab, var(--surface-2) 70%, var(--ink));
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: min(100%, 26rem);
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-raised);
+    color: var(--ink);
+    box-shadow: var(--elevation-3);
+    pointer-events: auto;
+    transform-origin: 50% 100%;
+    transform: translateY(calc(var(--idx) * -0.8rem)) scale(calc(1 - var(--idx) * 0.05));
+    opacity: calc(1 - var(--idx) * 0.28);
+    z-index: calc(100 - var(--idx));
+    transition:
+      transform var(--duration-nav) var(--ease-soft),
+      opacity var(--duration-nav) var(--ease-soft);
+    animation: eec-toast-in var(--duration-nav) var(--ease-soft);
+    --focus-gap: var(--surface-raised);
+  }
+  .toast[data-tone="success"] {
+    background: var(--success-soft);
+    color: var(--success);
+    --toast-hover: color-mix(in oklab, var(--success-soft) 72%, var(--success));
+  }
+  .toast[data-tone="warning"] {
+    background: var(--warning-soft);
+    color: var(--warning);
+    --toast-hover: color-mix(in oklab, var(--warning-soft) 72%, var(--warning));
+  }
+  .toast[data-tone="danger"] {
+    background: var(--danger-soft);
+    color: var(--danger);
+    --toast-hover: color-mix(in oklab, var(--danger-soft) 72%, var(--danger));
+  }
+  .toast[data-tone="info"] {
+    background: var(--info-soft);
+    color: var(--info);
+    --toast-hover: color-mix(in oklab, var(--info-soft) 72%, var(--info));
+  }
+  .toast-region:hover .toast,
+  .toast-region:focus-within .toast {
+    transform: translateY(calc(var(--idx) * (-100% - 0.5rem)));
+    opacity: 1;
+  }
+  .toast:nth-last-child(n + 5) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toast-text,
+  .toast-text * {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .toast-close {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+  }
+  .toast-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    rotate: -90deg;
+    pointer-events: none;
+  }
+  .toast-ring circle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+    animation: eec-ring var(--toast-ms, 5000ms) linear forwards;
+  }
+  .toast:hover .toast-ring circle,
+  .toast:focus-within .toast-ring circle {
+    animation-play-state: paused;
+  }
+  @keyframes eec-ring {
+    to {
+      stroke-dashoffset: 100;
+    }
+  }
+  .toast-close .btn {
+    width: 2.25rem;
+    min-height: 2.25rem;
+    padding: 0;
+    border-radius: 50%;
+    color: inherit;
+  }
+  .toast-close .btn:hover {
+    background: var(--toast-hover);
+  }
+  .toast-close-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .toast[data-leaving] {
+    animation: eec-toast-out var(--duration-micro) var(--ease-in-out) forwards;
+  }
+  @keyframes eec-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(1.5rem) scale(0.96);
+    }
+  }
+  @keyframes eec-toast-out {
+    to {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.96);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toast {
+      animation: none;
+      transition-duration: 0.12s;
+    }
+  }
+}
+
+/* Scrollbars: always rounded. The page's stays visible; those inside panels (sheets, dialogs, menus,
+   lists) float inside the panel and only appear on hover / focus. */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    background-clip: padding-box;
+    border: 0.25rem solid transparent;
+    border-radius: var(--radius-md);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scroll-thumb-hover);
+    background-clip: padding-box;
+  }
+  .sheet::-webkit-scrollbar-thumb,
+  .dialog::-webkit-scrollbar-thumb,
+  .eec-popover::-webkit-scrollbar-thumb,
+  .eec-popup::-webkit-scrollbar-thumb,
+  .palette-list::-webkit-scrollbar-thumb,
+  .admin-nav::-webkit-scrollbar-thumb,
+  .mobile-menu-nav::-webkit-scrollbar-thumb,
+  .brand-toc::-webkit-scrollbar-thumb {
+    background: transparent;
+    background-clip: padding-box;
+  }
+  .sheet:hover::-webkit-scrollbar-thumb,
+  .dialog:hover::-webkit-scrollbar-thumb,
+  .eec-popover:hover::-webkit-scrollbar-thumb,
+  .eec-popup:hover::-webkit-scrollbar-thumb,
+  .palette-list:hover::-webkit-scrollbar-thumb,
+  .admin-nav:hover::-webkit-scrollbar-thumb,
+  .mobile-menu-nav:hover::-webkit-scrollbar-thumb,
+  .brand-toc:hover::-webkit-scrollbar-thumb,
+  .sheet:focus-within::-webkit-scrollbar-thumb,
+  .dialog:focus-within::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    background-clip: padding-box;
+  }
+}
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+  }
+  .sheet,
+  .dialog,
+  .eec-popover,
+  .eec-popup,
+  .palette-list,
+  .admin-nav,
+  .mobile-menu-nav,
+  .brand-toc {
+    scrollbar-color: transparent transparent;
+  }
+  .sheet:hover,
+  .dialog:hover,
+  .eec-popover:hover,
+  .eec-popup:hover,
+  .palette-list:hover,
+  .admin-nav:hover,
+  .mobile-menu-nav:hover,
+  .brand-toc:hover {
+    scrollbar-color: var(--scroll-thumb) transparent;
   }
 }

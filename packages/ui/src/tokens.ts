@@ -123,12 +123,24 @@ export const fonts = {
 } as const
 
 export const motion = {
-  ease: { out: 'cubic-bezier(0.22, 1, 0.36, 1)', 'in-out': 'cubic-bezier(0.65, 0, 0.35, 1)' },
+  ease: {
+    out: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    'in-out': 'cubic-bezier(0.65, 0, 0.35, 1)',
+    /** Softer, longer settle: navigation, sheets, menus. */
+    soft: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    /** A gentle elastic overshoot (tab indicator). */
+    spring:
+      'linear(0, 0.0418 2.8%, 0.1482 5.6%, 0.2933 8.3%, 0.455 11.1%, 0.6159 13.9%, 0.7635 16.7%, 0.8897 19.4%, 0.9903 22.2%, 1.0642 25.0%, 1.113 27.8%, 1.1395 30.6%, 1.1477 33.3%, 1.142 36.1%, 1.1265 38.9%, 1.1052 41.7%, 1.0814 44.4%, 1.0576 47.2%, 1.0357 50.0%, 1.0169 52.8%, 1.0019 55.6%, 0.9908 58.3%, 0.9835 61.1%, 0.9795 63.9%, 0.9782 66.7%, 0.979 69.4%, 0.9812 72.2%, 0.9843 75.0%, 0.9878 77.8%, 0.9914 80.6%, 0.9946 83.3%, 0.9974 86.1%, 0.9996 88.9%, 1.0013 91.7%, 1.0024 94.4%, 1.003 97.2%, 1)',
+  },
   /** ms — reduced motion: UI ≤ 120, narrative becomes a 150 ms fade. */
   duration: {
     micro: { normal: 150, reduced: 100 },
     ui: { normal: 260, reduced: 120 },
     story: { normal: 900, reduced: 150 },
+    /** Navigation, sheets, menus: gentler than UI. */
+    nav: { normal: 480, reduced: 120 },
+    /** Accordion and other disclosures. */
+    reveal: { normal: 520, reduced: 120 },
   },
   /** Enter = fade + rise; no rise when motion is reduced. */
   rise: { normal: 12, reduced: 0 },

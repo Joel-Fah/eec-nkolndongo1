@@ -1,9 +1,10 @@
 ---
 import { locales } from '@eec/i18n'
-import ComingSoon from '../../components/ComingSoon.astro'
+import PageView from '../../components/PageView.astro'
 import Site from '../../layouts/Site.astro'
 import { localeOf, useT } from '../../lib/i18n'
 import { labelKey, pages } from '../../lib/nav'
+import { content } from '../../lib/pages'
 
 export function getStaticPaths() {
   return locales.flatMap((locale) =>
@@ -13,9 +14,9 @@ export function getStaticPaths() {
 
 const { id } = Astro.props
 const t = useT(localeOf(Astro.currentLocale))
-const title = t(labelKey(id))
+const page = content[id]
 ---
 
-<Site title={title} description={t('soon.text')}>
-  <ComingSoon pageTitle={title} />
+<Site title={t(labelKey(id))} description={page ? t(page.lead) : undefined}>
+  <PageView id={id} />
 </Site>

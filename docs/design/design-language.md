@@ -48,6 +48,9 @@ Generous but not pill-shaped radii, standard `border-radius` (no `corner-shape: 
 - **No one-sided borders, ever** (no side rule on quotes, no `border-bottom` dividers). Frames are
   complete or absent; separate with space, a tint, shadow or the hand-drawn `<Ornament>`. Quotations use
   `<Verse>` (soft gold panel + oversized mark). Checked by `scripts/check-design-rules.ts`.
+- **Floating navigation:** headers, sidebars and sheets are lifted off the viewport edges, rounded on every
+  corner, blurred. On mobile they open full screen and lock the page scroll.
+- **Scrollbars** are always rounded; inside panels they float inside and only show on hover.
 - Buttons are *not* fully rounded; only avatars and the theme toggle knob are circles.
 
 ## 4. Elevation

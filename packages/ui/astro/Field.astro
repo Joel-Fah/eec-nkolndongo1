@@ -1,7 +1,9 @@
 ---
+import Select from './Select.astro'
+
 /**
- * Label + control + hint + error. `kind`: input | textarea | select (native, styled).
- * Options for select go in the default slot as <option>s. Pass localised strings.
+ * Label + control + hint + error. `kind`: input | textarea | select (custom list, see Select.astro).
+ * Pass `options` for a select. Pass localised strings.
  */
 interface Props {
   id: string
@@ -17,6 +19,8 @@ interface Props {
   value?: string
   rows?: number
   autocomplete?: string
+  /** For kind="select". */
+  options?: { value: string; label: string }[]
 }
 const {
   id,
@@ -32,6 +36,7 @@ const {
   value,
   rows,
   autocomplete,
+  options = [],
 } = Astro.props
 const describedby =
   [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(' ') || undefined
@@ -51,10 +56,7 @@ const common = {
     kind === 'textarea' ? (
       <textarea class="textarea" rows={rows} placeholder={placeholder} {...common}>{value}</textarea>
     ) : kind === 'select' ? (
-      <span class="select-wrap">
-        <select class="select" {...common}><slot /></select>
-        <span class="eec-chevron" aria-hidden="true" />
-      </span>
+      <Select id={id} name={name} options={options} value={value} placeholder={placeholder} disabled={disabled} invalid={!!error} describedby={describedby} />
     ) : (
       <input class="input" type={type} placeholder={placeholder} value={value} autocomplete={autocomplete} {...common} />
     )

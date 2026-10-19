@@ -1,7 +1,10 @@
 ---
 import { getSeason } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
+import Card from '@eec/ui/astro/Card.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
+import Verse from '@eec/ui/astro/Verse.astro'
 import Site from '../../layouts/Site.astro'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages, tabs } from '../../lib/nav'
@@ -14,16 +17,20 @@ const season = getSeason()
 const seasonLabel = t(`season.${season}` as 'season.avent')
 const discover = tabs.find((x) => x.id === 'discover')?.slug[locale] ?? ''
 const calendar = tabs.find((x) => x.id === 'calendar')?.slug[locale] ?? ''
-void pages
+const pathOf = (id: string) => pages.find((p) => p.id === id)?.path[locale] ?? ''
+const start = [
+  { icon: 'church', title: 'home.start1_t', text: 'home.start1_p', to: pathOf('cultes') },
+  { icon: 'users', title: 'home.start2_t', text: 'home.start2_p', to: pathOf('departements') },
+  { icon: 'compass', title: 'home.start3_t', text: 'home.start3_p', to: pathOf('histoire') },
+] as const
 ---
 
-<Site title={t('site.name')} description={t('site.tagline')}>
+<Site title={t('site.name')} description={t('home.lead')}>
   <section class="hero mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 md:px-8 md:py-24 lg:grid-cols-2">
     <div class="grid content-center gap-6">
       <p class="season-chip w-fit rounded-md px-3 py-1.5 text-sm font-semibold">{t('home.season', { season: seasonLabel })}</p>
-      <h1 class="text-5xl md:text-6xl" style="font-size:var(--text-4xl)">{t('home.title')}</h1>
-      <p class="max-w-[46ch] text-lg text-ink-muted">{t('site.tagline')}</p>
-      <p class="text-sm text-ink-muted">{t('home.hero_note')}</p>
+      <h1 class="text-5xl md:text-6xl" style="font-size:var(--text-4xl);line-height:1.08">{t('home.title')}</h1>
+      <p class="max-w-[46ch] text-lg text-ink-muted">{t('home.lead')}</p>
       <div class="flex flex-wrap gap-3">
         <Button href={href(locale, discover)} size="lg">{t('home.cta_discover')}</Button>
         <Button href={href(locale, calendar)} size="lg" variant="secondary">{t('home.cta_calendar')}</Button>
@@ -33,6 +40,25 @@ void pages
       <div class="hero-blob" aria-hidden="true"></div>
       <Illustration name="hymn-book-handover" class="relative h-auto w-full" animate />
     </div>
+  </section>
+
+  <section class="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:px-8">
+    <h2 class="text-3xl">{t('home.start_title')}</h2>
+    <div class="grid gap-4 md:grid-cols-3">
+      {
+        start.map((card) => (
+          <Card href={href(locale, card.to)} class="group">
+            <span class="mega-icon"><Icon name={card.icon} /></span>
+            <h3 class="text-xl">{t(card.title)}</h3>
+            <p class="text-ink-muted">{t(card.text)}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 py-10 md:px-8">
+    <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('home.verse_cite')}>{t('home.verse')}</Verse>
   </section>
 </Site>
 

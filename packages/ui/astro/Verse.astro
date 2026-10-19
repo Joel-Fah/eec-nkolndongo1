@@ -1,8 +1,9 @@
 ---
 /**
  * Verse — our way to show a quotation, a verse, a testimony.
- * A soft rounded panel with an oversized gold opening mark peeking out of its corner, the words in
- * Fraunces italic, and the reference in a small rounded tag. No side rule, no one-sided border.
+ * A soft rounded panel; an oversized gold opening mark straddling its top edge (half in, half out);
+ * hand-drawn ornament waves running along two edges; the words in Fraunces italic; the reference in a
+ * small rounded tag. No side rule, no one-sided border.
  */
 interface Props {
   /** Opening mark: « for French, “ for English. */
@@ -16,6 +17,16 @@ const { mark = '«', cite, class: className } = Astro.props
 
 <figure class:list={['eec-verse', className]}>
   <span class="eec-verse-mark" aria-hidden="true">{mark}</span>
+  <svg class="eec-verse-orn eec-verse-orn-edge" viewBox="0 0 132 16" width="132" height="16" fill="none" aria-hidden="true" focusable="false">
+    <circle cx="6" cy="8" r="2.5" fill="currentColor" />
+    <path d="M18 8c9-9 16 9 25 0s16 9 25 0 16 9 25 0 12 4 21 0" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="126" cy="8" r="2.5" fill="currentColor" />
+  </svg>
+  <svg class="eec-verse-orn eec-verse-orn-base" viewBox="0 0 132 16" width="132" height="16" fill="none" aria-hidden="true" focusable="false">
+    <circle cx="6" cy="8" r="2.5" fill="currentColor" />
+    <path d="M18 8c9-9 16 9 25 0s16 9 25 0 16 9 25 0 12 4 21 0" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="126" cy="8" r="2.5" fill="currentColor" />
+  </svg>
   <blockquote class="eec-verse-text"><slot /></blockquote>
   {cite && <figcaption class="eec-verse-ref">{cite}</figcaption>}
 </figure>
@@ -26,24 +37,41 @@ const { mark = '«', cite, class: className } = Astro.props
     display: grid;
     gap: 1rem;
     justify-items: start;
-    padding: 2.25rem 1.5rem 1.5rem;
+    margin-block-start: 2.5rem;
+    padding: 2.5rem 1.75rem 1.75rem;
     border-radius: var(--radius-xl);
     background: var(--gold-soft);
     color: var(--ink);
-    isolation: isolate;
   }
   .eec-verse-mark {
     position: absolute;
-    inset-block-start: -0.35em;
-    inset-inline-start: 0.7rem;
-    z-index: -1;
+    inset-block-start: 0;
+    inset-inline-start: 1.25rem;
+    z-index: 1;
+    translate: 0 -64%;
     font-family: var(--font-display);
-    font-size: 6.5rem;
+    font-size: 6rem;
     font-weight: 600;
     line-height: 1;
     color: var(--gold);
     pointer-events: none;
     user-select: none;
+  }
+  .eec-verse-orn {
+    position: absolute;
+    color: var(--gold);
+    pointer-events: none;
+  }
+  /* A vertical wave riding the right edge, a horizontal one riding the bottom edge. */
+  .eec-verse-orn-edge {
+    inset-block-start: 3.5rem;
+    inset-inline-end: calc(-66px + 4px);
+    rotate: 90deg;
+  }
+  .eec-verse-orn-base {
+    inset-block-end: -8px;
+    inset-inline-start: 2.25rem;
+    width: 6.5rem;
   }
   .eec-verse-text {
     margin: 0;
