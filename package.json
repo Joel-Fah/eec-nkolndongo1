@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@neon/config": "^1.9.2",
+    "@neon/env": "^1.6.3",
     "turbo": "2.11.9",
     "typescript": "catalog:"
   }
