@@ -1,8 +1,9 @@
 import { Menu } from '@base-ui/react/menu'
-import { Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useT } from '../lib/locale'
 import { groups } from '../lib/nav'
+import { useMe, useSessionActions } from '../lib/session'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
@@ -25,6 +26,15 @@ export function AppShell() {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
   }, [mobileOpen])
+  const me = useMe().data
+  const { signOut } = useSessionActions()
+  const navigate = useNavigate()
+  const initials = (me?.user.name ?? '??')
+    .split(/\s+/)
+    .map((w) => w[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
   const path = useRouterState({ select: (s) => s.location.pathname })
   const toggle = () =>
     setCollapsed((c) => {

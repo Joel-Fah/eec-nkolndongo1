@@ -34,3 +34,6 @@ worker-configuration.d.ts
 # Fetched from Fontshare at build time (`pnpm fonts:fetch`). See docs/decisions/0015.
 packages/ui/fonts/fontshare/
 .neon
+
+# Local Worker secrets generated from .env.local
+apps/web/.dev.vars

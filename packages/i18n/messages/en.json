@@ -923,5 +923,69 @@
       "s4_t": "Hosting",
       "s4_p": "The site will be hosted by Cloudflare. The host’s address and details will be shown here at launch."
     }
+  },
+  "auth": {
+    "err": {
+      "invalid_credentials": "Incorrect email or password.",
+      "rate_limited": "Too many attempts. Wait a minute and try again.",
+      "password_too_short": "The password needs at least 10 characters.",
+      "password_too_long": "The password is too long (72 characters at most).",
+      "password_too_common": "That password is too common. Choose a phrase only you know.",
+      "invalid_link": "This link is no longer valid: it was already used or it expired. Ask for a new one.",
+      "email_taken": "An account already exists with this address.",
+      "generic": "Something went wrong. Please try again in a moment.",
+      "network": "Can’t reach the server. Check your connection."
+    },
+    "login": {
+      "title": "Sign in",
+      "lead": "Access the parish administration.",
+      "hint": "Forgot your password? Ask the secretariat for a reset link."
+    },
+    "invite": {
+      "title": "Welcome to the team",
+      "lead": "Choose your name and a password to activate your account. This link works only once.",
+      "name": "Your name",
+      "email": "Invited address",
+      "submit": "Activate my account",
+      "checking": "Checking the link…"
+    },
+    "reset": {
+      "title": "New password",
+      "lead": "Choose a new password. You will be signed out everywhere else.",
+      "submit": "Save the password",
+      "done": "Password changed. You can sign in now."
+    },
+    "password": {
+      "hint": "At least 10 characters. A short phrase works well."
+    },
+    "signout": "Sign out",
+    "loading": "Loading…",
+    "forbidden": {
+      "title": "Restricted access",
+      "text": "Your account doesn’t have access to this page. If this is a mistake, talk to the secretariat."
+    }
+  },
+  "member": {
+    "title": "My space",
+    "signin_title": "I already have an account",
+    "signup_title": "Create my account",
+    "signup_lead": "A free account, just to stay in touch with the parish. We only ask for what we need.",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email address",
+    "password": "Password",
+    "phone": "Phone (optional)",
+    "consent_privacy": "I have read the privacy policy and agree that the parish keeps this information to manage my account.",
+    "consent_privacy_link": "Read the privacy policy",
+    "consent_news": "I would like to receive parish news later (optional).",
+    "consent_required": "This box is needed to create an account.",
+    "signup_submit": "Create my account",
+    "signin_submit": "Sign in",
+    "hello": "Hello {name}",
+    "welcome": "Glad to have you with us. Your space will grow soon.",
+    "signout": "Sign out",
+    "soon_title": "Soon in your space",
+    "soon1": "Holy Communion card — soon",
+    "soon2": "My groups and sign-ups — soon"
   }
 }

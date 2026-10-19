@@ -7,15 +7,19 @@
     "node": ">=22.22.0"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "node scripts/dev.ts",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "check": "turbo run lint typecheck test build",
+    "db:migrate": "pnpm --filter @eec/db db:migrate",
+    "db:seed": "pnpm --filter @eec/auth db:seed",
+    "admin:bootstrap": "pnpm --filter @eec/auth admin:bootstrap",
     "fonts:fetch": "pnpm --filter @eec/scripts fonts:fetch",
-    "contrast": "pnpm --filter @eec/scripts contrast"
+    "contrast": "pnpm --filter @eec/scripts contrast",
+    "dev:turbo": "turbo run dev"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

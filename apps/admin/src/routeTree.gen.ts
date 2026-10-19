@@ -13,6 +13,8 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppUiRouteImport } from './routes/_app/ui'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ResetTokenRouteImport } from './routes/reset.$token'
 import { Route as AppPIdRouteImport } from './routes/_app/p.$id'
 
 const AppRoute = AppRouteImport.update({
@@ -34,6 +36,16 @@ const AppUiRoute = AppUiRouteImport.update({
   path: '/ui',
   getParentRoute: () => AppRoute,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetTokenRoute = ResetTokenRouteImport.update({
+  id: '/reset/$token',
+  path: '/reset/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppPIdRoute = AppPIdRouteImport.update({
   id: '/p/$id',
   path: '/p/$id',
@@ -44,11 +56,15 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/ui': typeof AppUiRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
   '/p/$id': typeof AppPIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/ui': typeof AppUiRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
   '/': typeof AppIndexRoute
   '/p/$id': typeof AppPIdRoute
 }
@@ -57,20 +73,33 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/ui': typeof AppUiRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
   '/_app/': typeof AppIndexRoute
   '/_app/p/$id': typeof AppPIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/ui' | '/p/$id'
+  fullPaths:
+    '/' | '/login' | '/ui' | '/invite/$token' | '/reset/$token' | '/p/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/ui' | '/' | '/p/$id'
-  id: '__root__' | '/_app' | '/login' | '/_app/ui' | '/_app/' | '/_app/p/$id'
+  to: '/login' | '/ui' | '/invite/$token' | '/reset/$token' | '/' | '/p/$id'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/ui'
+    | '/invite/$token'
+    | '/reset/$token'
+    | '/_app/'
+    | '/_app/p/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  InviteTokenRoute: typeof InviteTokenRoute
+  ResetTokenRoute: typeof ResetTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -103,6 +132,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset/$token': {
+      id: '/reset/$token'
+      path: '/reset/$token'
+      fullPath: '/reset/$token'
+      preLoaderRoute: typeof ResetTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/p/$id': {
       id: '/_app/p/$id'
       path: '/p/$id'
@@ -130,6 +173,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  InviteTokenRoute: InviteTokenRoute,
+  ResetTokenRoute: ResetTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

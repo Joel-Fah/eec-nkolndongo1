@@ -923,5 +923,69 @@
       "s4_t": "Hébergement",
       "s4_p": "Le site sera hébergé par Cloudflare. L’adresse et les informations de l’hébergeur seront indiquées ici à la mise en ligne."
     }
+  },
+  "auth": {
+    "err": {
+      "invalid_credentials": "Adresse ou mot de passe incorrect.",
+      "rate_limited": "Trop d’essais. Patientez une minute puis réessayez.",
+      "password_too_short": "Le mot de passe doit avoir au moins 10 caractères.",
+      "password_too_long": "Le mot de passe est trop long (72 caractères au plus).",
+      "password_too_common": "Ce mot de passe est trop courant. Choisissez une phrase que vous seul connaissez.",
+      "invalid_link": "Ce lien n’est plus valable : il a déjà servi ou il a expiré. Demandez-en un nouveau.",
+      "email_taken": "Un compte existe déjà avec cette adresse.",
+      "generic": "Une erreur est survenue. Réessayez dans un instant.",
+      "network": "Impossible de joindre le serveur. Vérifiez votre connexion."
+    },
+    "login": {
+      "title": "Connexion",
+      "lead": "Accédez à l’administration de la paroisse.",
+      "hint": "Un mot de passe oublié ? Demandez un lien de réinitialisation au secrétariat."
+    },
+    "invite": {
+      "title": "Bienvenue dans l’équipe",
+      "lead": "Choisissez votre nom et un mot de passe pour activer votre compte. Ce lien ne sert qu’une fois.",
+      "name": "Votre nom",
+      "email": "Adresse invitée",
+      "submit": "Activer mon compte",
+      "checking": "Vérification du lien…"
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "lead": "Choisissez un nouveau mot de passe. Vous serez déconnecté partout ailleurs.",
+      "submit": "Enregistrer le mot de passe",
+      "done": "Mot de passe changé. Vous pouvez vous connecter."
+    },
+    "password": {
+      "hint": "10 caractères au moins. Une petite phrase est idéale."
+    },
+    "signout": "Se déconnecter",
+    "loading": "Chargement…",
+    "forbidden": {
+      "title": "Accès réservé",
+      "text": "Votre compte n’a pas le droit d’accès à cette page. Si c’est une erreur, parlez-en au secrétariat."
+    }
+  },
+  "member": {
+    "title": "Mon espace",
+    "signin_title": "J’ai déjà un compte",
+    "signup_title": "Créer mon compte",
+    "signup_lead": "Un compte gratuit, juste pour rester en lien avec la paroisse. Nous ne demandons que le nécessaire.",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "phone": "Téléphone (facultatif)",
+    "consent_privacy": "J’ai lu la politique de confidentialité et j’accepte que la paroisse conserve ces informations pour gérer mon compte.",
+    "consent_privacy_link": "Lire la politique de confidentialité",
+    "consent_news": "Je souhaite recevoir plus tard les nouvelles de la paroisse (facultatif).",
+    "consent_required": "Cette case est nécessaire pour créer un compte.",
+    "signup_submit": "Créer mon compte",
+    "signin_submit": "Me connecter",
+    "hello": "Bonjour {name}",
+    "welcome": "Ravis de vous compter parmi nous. Votre espace s’enrichira bientôt.",
+    "signout": "Me déconnecter",
+    "soon_title": "Bientôt dans votre espace",
+    "soon1": "Carte de Sainte-Cène — bientôt",
+    "soon2": "Mes groupes et mes inscriptions — bientôt"
   }
 }

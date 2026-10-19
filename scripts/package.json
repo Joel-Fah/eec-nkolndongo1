@@ -7,7 +7,9 @@
     "fonts:fetch": "node fonts-fetch.ts",
     "contrast": "node contrast-check.ts",
     "brand:icons": "node brand-icons.ts",
-    "lint": "biome check . && node check-design-rules.ts"
+    "lint": "biome check . && node check-design-rules.ts",
+    "dev:vars": "node dev-vars.ts",
+    "dev:gateway": "node dev-gateway.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",

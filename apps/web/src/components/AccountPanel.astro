@@ -1,0 +1,132 @@
+---
+/**
+ * Mon espace: sign-up, sign-in, and the signed-in greeting. One small vanilla script (no framework): the
+ * member page stays well inside the performance budget. All text arrives as data attributes from i18n.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Choice from '@eec/ui/astro/Choice.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import { localeOf, useT } from '../lib/i18n'
+import { href, pages } from '../lib/nav'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const privacyPath = pages.find((p) => p.id === 'privacy')?.path[locale] ?? ''
+const errors = [
+  'invalid_credentials',
+  'rate_limited',
+  'password_too_short',
+  'password_too_long',
+  'password_too_common',
+  'email_taken',
+  'generic',
+  'network',
+] as const
+const messages = Object.fromEntries(
+  errors.map((e) => [e, t(`auth.err.${e}` as 'auth.err.generic')]),
+)
+---
+
+<section class="account" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} aria-live="polite">
+  <div data-when="out" class="grid gap-6 lg:grid-cols-2" hidden>
+    <form class="card" data-form="signup" novalidate>
+      <h2 class="text-2xl">{t('member.signup_title')}</h2>
+      <p class="text-ink-muted">{t('member.signup_lead')}</p>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <Field id="su-first" name="firstName" label={t('member.first_name')} autocomplete="given-name" required />
+        <Field id="su-last" name="lastName" label={t('member.last_name')} autocomplete="family-name" required />
+      </div>
+      <Field id="su-email" name="email" type="email" label={t('member.email')} autocomplete="email" required />
+      <Field id="su-pass" name="password" type="password" label={t('member.password')} hint={t('auth.password.hint')} autocomplete="new-password" required />
+      <Field id="su-phone" name="phone" type="tel" label={t('member.phone')} autocomplete="tel" />
+      <!-- Consents: never pre-ticked. -->
+      <div class="grid gap-1">
+        <Choice id="su-privacy" name="acceptPrivacy" label={t('member.consent_privacy')} />
+        <a class="text-sm underline underline-offset-4" href={href(locale, privacyPath)}>{t('member.consent_privacy_link')}</a>
+        <p class="field-error" data-privacy-error hidden role="alert">{t('member.consent_required')}</p>
+      </div>
+      <Choice id="su-news" name="acceptNews" label={t('member.consent_news')} />
+      <p class="field-error" data-error hidden role="alert"></p>
+      <Button type="submit" size="lg">{t('member.signup_submit')}</Button>
+    </form>
+
+    <form class="card content-start" data-form="signin" novalidate>
+      <h2 class="text-2xl">{t('member.signin_title')}</h2>
+      <Field id="si-email" name="email" type="email" label={t('member.email')} autocomplete="username" required />
+      <Field id="si-pass" name="password" type="password" label={t('member.password')} autocomplete="current-password" required />
+      <p class="field-error" data-error hidden role="alert"></p>
+      <Button type="submit" variant="secondary" size="lg">{t('member.signin_submit')}</Button>
+    </form>
+  </div>
+
+  <div data-when="in" class="card" hidden>
+    <h2 class="text-3xl" data-hello-target></h2>
+    <p class="text-ink-muted">{t('member.welcome')}</p>
+    <h3 class="text-xl">{t('member.soon_title')}</h3>
+    <ul class="grid gap-2 text-ink-muted"><li>{t('member.soon1')}</li><li>{t('member.soon2')}</li></ul>
+    <div><Button variant="secondary" data-signout>{t('member.signout')}</Button></div>
+  </div>
+</section>
+
+<script>
+  const found = document.querySelector<HTMLElement>('[data-account]')
+  if (found) {
+    const root: HTMLElement = found
+    const errors = JSON.parse(root.dataset.errors ?? '{}') as Record<string, string>
+    const show = (state: 'in' | 'out') => {
+      for (const el of root.querySelectorAll<HTMLElement>('[data-when]')) el.hidden = el.dataset.when !== state
+    }
+    const msg = (code: string) => errors[code] ?? errors.generic ?? ''
+    async function call(path: string, body?: unknown) {
+      try {
+        const res = await fetch(`/api${path}`, { method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', headers: body === undefined ? undefined : { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
+        const json = await res.json().catch(() => ({}))
+        if (res.ok) return { ok: true as const, json }
+        const code = res.status === 429 ? 'rate_limited' : (json.error?.code ?? (json.code ? String(json.code).toLowerCase() : 'generic'))
+        return { ok: false as const, code: code === 'invalid_email_or_password' ? 'invalid_credentials' : code }
+      } catch {
+        return { ok: false as const, code: 'network' }
+      }
+    }
+    async function refresh() {
+      const me = await call('/me')
+      if (me.ok) {
+        const target = root.querySelector('[data-hello-target]')
+        if (target) target.textContent = (root.dataset.hello ?? '').replace('{name}', me.json.user.firstName || me.json.user.name)
+        show('in')
+      } else show('out')
+    }
+    const field = (form: HTMLFormElement, name: string) => (form.elements.namedItem(name) as HTMLInputElement | null)
+    for (const form of root.querySelectorAll<HTMLFormElement>('[data-form]')) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const err = form.querySelector<HTMLElement>('[data-error]')
+        const button = form.querySelector<HTMLButtonElement>('button[type=submit]')
+        if (err) err.hidden = true
+        const isSignup = form.dataset.form === 'signup'
+        if (isSignup) {
+          const missing = !field(form, 'acceptPrivacy')?.checked
+          const priv = form.querySelector<HTMLElement>('[data-privacy-error]')
+          if (priv) priv.hidden = !missing
+          if (missing) return
+        }
+        button?.setAttribute('aria-busy', 'true')
+        const v = (n: string) => field(form, n)?.value.trim() ?? ''
+        const result = isSignup
+          ? await call('/members/signup', { firstName: v('firstName'), lastName: v('lastName'), email: v('email'), password: field(form, 'password')?.value ?? '', phone: v('phone') || undefined, acceptPrivacy: true, acceptNews: !!field(form, 'acceptNews')?.checked })
+          : await call('/auth/sign-in/email', { email: v('email'), password: field(form, 'password')?.value ?? '' })
+        button?.removeAttribute('aria-busy')
+        if (result.ok) await refresh()
+        else if (err) {
+          err.textContent = msg(result.code)
+          err.hidden = false
+        }
+      })
+    }
+    root.querySelector('[data-signout]')?.addEventListener('click', async () => {
+      await call('/auth/sign-out', {})
+      show('out')
+    })
+    refresh()
+  }
+</script>
