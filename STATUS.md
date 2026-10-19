@@ -11,7 +11,7 @@ _Last updated: 2026-10-19_
 - Draft research content imported and flagged for validation (`docs/content/`).
 - Repo docs and Claude skills set up.
 
-## Next
+## Next — Phase 01 (Brand & Foundations): `docs/phases/PHASE_01_INSTRUCTIONS.md`
 1. **Brand board** — SVG redraw of the EEC mark, two lockups (short / long), palette, display-font
    shortlist (Fraunces / Zodiak / Gambetta) with Switzer, radius & shadow scale, 1 sample illustration.
 2. Scaffold monorepo (pnpm + Turborepo, apps/web, apps/admin, apps/api, packages/*).

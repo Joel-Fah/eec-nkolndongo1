@@ -8,6 +8,7 @@
 | [decisions/](decisions/) | Decision records (ADRs) — one short file per decision |
 | [legal/](legal/) | Data protection (Loi n°2024/017) obligations and implementation |
 | [ops/](ops/) | CI/CD budget rules, environments, maintenance |
+| [phases/](phases/) | Per-phase instructions, prompts and reports for Claude Code (`PHASE_NN_*.md`) |
 | [research/](research/) | Raw research inputs (unverified — see warning inside) |
 
 Conventions: Markdown, English for technical docs, French for user-facing copy. Keep files short and
