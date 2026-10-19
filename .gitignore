@@ -40,3 +40,7 @@ apps/web/.dev.vars
 
 # Pexels placeholders with people: dev-only, never committed or deployed (scripts/pexels/import.ts)
 apps/web/public/placeholders/
+
+# Storyset illustrations: licence forbids redistributing the files (decision 0024) — fetched by pnpm illos:fetch
+apps/web/public/illustrations/
+apps/admin/public/illustrations/

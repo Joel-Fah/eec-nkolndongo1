@@ -4,7 +4,7 @@ import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import HeroStream from '../../components/home/HeroStream.astro'
-import SeasonRing from '../../components/home/SeasonRing.astro'
+import SeasonStrip from '../../components/home/SeasonStrip.astro'
 import Site from '../../layouts/Site.astro'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages } from '../../lib/nav'
@@ -31,7 +31,8 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
         <Icon name="arrowRight" size={16} />
       </a>
       <h1 class="home-title">
-        {t('home.title_a')} <span class="home-title-mark">{t('home.title_b')}<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 17C58 7 122 5 176 9s84 6 120 2" /></svg></span>
+        <span class="home-title-line">{t('home.title_a')}</span>
+        <span class="home-title-line">{t('home.title_b')} <span class="home-title-mark">{t('home.title_c')}<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 17C58 7 122 5 176 9s84 6 120 2" /></svg></span></span>
       </h1>
       <p class="home-lead">{t('home.lead')}</p>
       <div class="flex flex-wrap justify-center gap-3">
@@ -72,7 +73,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
           <h3 class="text-2xl">{t('home.start1_t')}</h3>
           <p class="text-ink-muted">{t('home.start1_p')}</p>
         </div>
-        <Illustration name="sunday-welcome" class="bento-art" />
+        <Illustration name="together" class="bento-art" />
         <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
       </a>
 
@@ -89,12 +90,12 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       </a>
 
       <a class="bento-card bento-season" href={pathOf('liturgie')} data-glow>
-        <SeasonRing class="bento-ring" label={t('home.season', { season: seasonLabel })} />
         <div class="grid gap-1">
           <p class="home-eyebrow">{t('home.season_eyebrow')}</p>
           <h3 class="text-2xl">{seasonLabel}</h3>
           <p class="text-sm text-ink-muted">{t(`pages.liturgie.season_${season}` as 'pages.liturgie.season_avent')}</p>
         </div>
+        <SeasonStrip />
       </a>
 
       <figure class="bento-card bento-verse">
@@ -184,7 +185,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     display: grid;
     justify-items: center;
     gap: 1.5rem;
-    max-width: 58rem;
+    max-width: 76rem;
     padding-inline: 1rem;
     text-align: center;
   }
@@ -219,10 +220,14 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     }
   }
   .home-title {
-    font-size: clamp(2.75rem, 1.6rem + 5.4vw, 6.25rem);
+    font-size: clamp(2.5rem, 1.3rem + 4.3vw, 5.25rem);
     font-weight: 500;
     line-height: 0.98;
     letter-spacing: -0.035em;
+  }
+  /* Two lines on tablet and desktop; on phones each line may wrap. */
+  .home-title-line {
+    display: block;
   }
   .home-title-mark {
     position: relative;

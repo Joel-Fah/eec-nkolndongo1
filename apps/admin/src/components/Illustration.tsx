@@ -1,14 +1,24 @@
-import art from '@eec/ui/illustrations/hymn-book-handover.svg?raw'
-
-/** The hymn-book illustration (decorative), coloured by tokens. */
-export function Illustration() {
+/** A Storyset illustration (decision 0024): light and dark files from /admin/illustrations/, decorative. */
+export function Illustration({ name = 'reading-book' }: { name?: string }) {
+  const base = `${import.meta.env.BASE_URL}illustrations/${name}`
   return (
-    <span
-      aria-hidden="true"
-      className="block w-full"
-      dangerouslySetInnerHTML={{
-        __html: art.replace('<svg ', '<svg style="width:100%;height:auto" aria-hidden="true" '),
-      }}
-    />
+    <span className="illo" aria-hidden="true">
+      <img
+        className="illo-light"
+        src={`${base}-light.svg`}
+        alt=""
+        width={500}
+        height={500}
+        loading="lazy"
+      />
+      <img
+        className="illo-dark"
+        src={`${base}-dark.svg`}
+        alt=""
+        width={500}
+        height={500}
+        loading="lazy"
+      />
+    </span>
   )
 }

@@ -21,7 +21,7 @@ export const tabs: NavTab[] = [
   {
     id: 'discover',
     icon: 'compass',
-    art: 'nav-discover',
+    art: 'church',
     slug: { fr: 'decouvrir', en: 'discover' },
     children: [
       { id: 'histoire', slug: { fr: 'notre-histoire', en: 'our-story' }, icon: 'hourglass' },
@@ -41,7 +41,7 @@ export const tabs: NavTab[] = [
   {
     id: 'live',
     icon: 'heart',
-    art: 'nav-live',
+    art: 'community',
     slug: { fr: 'vivre', en: 'live' },
     children: [
       {
@@ -56,7 +56,7 @@ export const tabs: NavTab[] = [
   {
     id: 'calendar',
     icon: 'calendar',
-    art: 'nav-calendar',
+    art: 'events',
     slug: { fr: 'agenda', en: 'calendar' },
     children: [
       { id: 'evenements', slug: { fr: 'evenements', en: 'events' }, icon: 'calendar' },
@@ -67,7 +67,7 @@ export const tabs: NavTab[] = [
   {
     id: 'news',
     icon: 'newspaper',
-    art: 'nav-news',
+    art: 'news',
     slug: { fr: 'actualites', en: 'news' },
     children: [
       { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper' },

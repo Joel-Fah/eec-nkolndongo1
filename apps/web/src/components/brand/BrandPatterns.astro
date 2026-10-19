@@ -5,7 +5,7 @@ import Icon from '@eec/ui/astro/Icon.astro'
 import { localeOf, useT } from '../../lib/i18n'
 import '../../styles/patterns.css'
 import HeroStream from '../home/HeroStream.astro'
-import SeasonRing from '../home/SeasonRing.astro'
+import SeasonStrip from '../home/SeasonStrip.astro'
 import DocBlock from './DocBlock.astro'
 import Section from './Section.astro'
 
@@ -49,7 +49,7 @@ const doc = (id: Id) => ({
   </DocBlock>
 
   <DocBlock {...doc('ring')}>
-    <SeasonRing class="h-32 w-32" label={t('brand.patterns.ring.name')} />
+    <div class="max-w-sm"><SeasonStrip /></div>
   </DocBlock>
 
   <DocBlock {...doc('figures')}>

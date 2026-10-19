@@ -21,7 +21,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/choir-singing-inside-the-church-7520369/",
     "color": "#6D696F",
     "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADQAQCdASoMABAAA4BaJZwAAlzthrhBAAD+3M8cfVlb6hFmQM2+2zuMErC7j/YuiIuzjycf1mdw7ruJZzX31OYpmQXqQuaOmANDyglqs8AAAA==",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 11536521,
@@ -57,7 +58,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/kids-and-an-elderly-woman-in-traditional-clothing-19783489/",
     "color": "#9C8575",
     "blur": "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAABQAgCdASoMABAAA4BaJagCdAYvXa/vjCz+vAAA/cdQ0RShLNKNblHgweLwJzh2IFpo3IU+hERyzM9cmssFspMoeUfDvYu5Akao0fmoo0OOxNhD+9zA0tgxFSVjdtt/1LaKybhM4exs0SFWtSSCBj1AAAA=",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 4262410,
@@ -69,7 +71,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/family-gathering-for-a-group-hug-4262410/",
     "color": "#AC998C",
     "blur": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAABQAgCdASoMABAAA4BaJZgCdAYtLwhpiOlcPAAA/vPO6BfThXmErPI9z2OSoBG16grFUZ131iol8+w3g9W1Y28gvHd9li5ZSHOoKXqrBkaMp91dyd8RD3zaKZRtZVMEzkdyvT48gXx+8m4pihJ76AAA",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 35276949,
@@ -81,7 +84,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/joyful-portrait-of-african-family-outdoors-35276949/",
     "color": "#54433C",
     "blur": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAABwAgCdASoMABAAA4BaJQBOgMXD6m+zcTQLhVYAAP6b3k/qx6UZJiV70msj+3502/yHTUCI5Ww/lGIokXP2r2PM8OG/oAHhyYNSGnPdqKyMHd47IRp740kWK1rg1k+HUoPnkATHmnWTsfQAAAA=",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 29643853,
@@ -105,7 +109,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/crowd-of-people-dancing-and-singing-during-a-festival-13228189/",
     "color": "#918079",
     "blur": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAABQAgCdASoMABAAA4BaJYwCdAYsjbO7EQWsmjAA/VLpiz1zsC8vLvcGf6pXoZamYeA6VALWQeaAk/VXDw/VTrXWGINI/AxR0Z3etrswTVQFQjbSTljWxKDmfvxNhLfI+tpGh6bgL6+lbbwAAAA=",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 15234466,
@@ -117,7 +122,8 @@
     "pexelsUrl": "https://www.pexels.com/photo/young-boys-and-girls-during-a-traditional-ceremony-15234466/",
     "color": "#A0A19C",
     "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwAgCdASoMABAAA4BaJYwCdG1/AoyTu8gvvG4AAP5fB2Jo4ZM3Q5vVWSR3dWIk4kYcb5vG47JSZbnNfopCmpNbnE8+SJsoXf/PC/jFgrzKuYe5SyRHQyoIJiOHR5H7IH8YAMgAAAA=",
-    "replaceWith": null
+    "replaceWith": null,
+    "landscape": true
   },
   {
     "id": 31914895,

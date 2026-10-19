@@ -6,13 +6,14 @@
  */
 import data from '../content/placeholders.json'
 
-export type Placeholder = (typeof data)[number]
+export type Placeholder = (typeof data)[number] & { landscape?: boolean }
 
-export const photoSrc = (p: Placeholder, w: 480 | 800, ext: 'avif' | 'webp') =>
-  `/placeholders/${p.set}/${p.id}-${w}.${ext}`
+/** `landscape`: the 4:3 crop (only for photos imported with --landscape). */
+export const photoSrc = (p: Placeholder, w: 480 | 800, ext: 'avif' | 'webp', landscape = false) =>
+  `/placeholders/${p.set}/${p.id}-${landscape ? 'l-' : ''}${w}.${ext}`
 
 /** Photos of people, only in `astro dev`. */
 export function peoplePhotos(): Placeholder[] {
   if (!import.meta.env.DEV) return []
-  return data.filter((p) => p.people && p.replaceWith === null)
+  return (data as Placeholder[]).filter((p) => p.people && p.replaceWith === null)
 }

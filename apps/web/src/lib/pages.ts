@@ -21,7 +21,7 @@ const p = (key: string) => `pages.${key}` as K
 export const content: Record<string, PageContent> = {
   histoire: {
     lead: p('histoire.lead'),
-    art: 'nav-discover',
+    art: 'church',
     blocks: [
       { t: 'text', title: p('histoire.s1_t'), paras: [p('histoire.s1_p1'), p('histoire.s1_p2')] },
       { t: 'text', title: p('histoire.s2_t'), paras: [p('histoire.s2_p')] },
@@ -29,7 +29,7 @@ export const content: Record<string, PageContent> = {
   },
   croyances: {
     lead: p('croyances.lead'),
-    art: 'nav-discover',
+    art: 'church',
     blocks: [
       { t: 'text', title: p('croyances.s1_t'), paras: [p('croyances.s1_p')] },
       { t: 'verse', text: p('croyances.creed'), cite: p('croyances.creed_cite') },
@@ -49,7 +49,7 @@ export const content: Record<string, PageContent> = {
   },
   pasteurs: {
     lead: p('pasteurs.lead'),
-    art: 'nav-discover',
+    art: 'church',
     blocks: [
       { t: 'text', title: p('pasteurs.s1_t'), paras: [p('pasteurs.s1_p')] },
       {
@@ -68,7 +68,7 @@ export const content: Record<string, PageContent> = {
   },
   trouver: {
     lead: p('trouver.lead'),
-    art: 'nav-discover',
+    art: 'church',
     blocks: [
       { t: 'text', title: p('trouver.s1_t'), paras: [p('trouver.s1_p')] },
       {
@@ -80,7 +80,7 @@ export const content: Record<string, PageContent> = {
   },
   cultes: {
     lead: p('cultes.lead'),
-    art: 'nav-live',
+    art: 'community',
     blocks: [
       {
         t: 'list',
@@ -93,7 +93,7 @@ export const content: Record<string, PageContent> = {
   },
   departements: {
     lead: p('departements.lead'),
-    art: 'nav-live',
+    art: 'community',
     blocks: [
       {
         t: 'cards',
@@ -111,7 +111,7 @@ export const content: Record<string, PageContent> = {
   },
   pratique: {
     lead: p('pratique.lead'),
-    art: 'nav-live',
+    art: 'community',
     blocks: [
       {
         t: 'cards',
@@ -128,7 +128,7 @@ export const content: Record<string, PageContent> = {
   },
   evenements: {
     lead: p('evenements.lead'),
-    art: 'nav-calendar',
+    art: 'events',
     blocks: [
       {
         t: 'empty',
@@ -140,34 +140,34 @@ export const content: Record<string, PageContent> = {
   },
   liturgie: {
     lead: p('liturgie.lead'),
-    art: 'nav-calendar',
+    art: 'events',
     blocks: [{ t: 'seasons', title: p('liturgie.s1_t'), footnote: p('liturgie.s2_p') }],
   },
   moissons: {
     lead: p('moissons.lead'),
-    art: 'nav-calendar',
+    art: 'events',
     blocks: [
       { t: 'text', title: p('moissons.s1_t'), paras: [p('moissons.s1_p1'), p('moissons.s1_p2')] },
     ],
   },
   nouvelles: {
     lead: p('nouvelles.lead'),
-    art: 'nav-news',
+    art: 'news',
     blocks: [{ t: 'empty', title: p('nouvelles.empty_t'), text: p('nouvelles.empty_p') }],
   },
   predications: {
     lead: p('predications.lead'),
-    art: 'nav-news',
+    art: 'news',
     blocks: [{ t: 'empty', title: p('predications.empty_t'), text: p('predications.empty_p') }],
   },
   meditations: {
     lead: p('meditations.lead'),
-    art: 'nav-news',
+    art: 'news',
     blocks: [{ t: 'empty', title: p('meditations.empty_t'), text: p('meditations.empty_p') }],
   },
   give: {
     lead: p('give.lead'),
-    art: 'hymn-book-handover',
+    art: 'reading-book',
     blocks: [
       { t: 'text', title: p('give.s1_t'), paras: [p('give.s1_p')] },
       { t: 'text', title: p('give.s2_t'), paras: [p('give.s2_p')] },

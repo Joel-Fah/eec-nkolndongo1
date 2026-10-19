@@ -232,11 +232,18 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .navlink[aria-expanded="true"] .eec-chevron {
     transform: rotate(180deg);
   }
+  /* Current section: a soft green tint, green label and icon (no underline). */
   .navlink[aria-current] {
-    text-decoration: underline;
-    text-decoration-color: var(--gold);
-    text-decoration-thickness: 3px;
-    text-underline-offset: 0.45em;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .navlink[aria-current] > svg {
+    color: var(--primary);
+  }
+  .navlink[aria-current]:hover,
+  .navlink[aria-current][aria-expanded="true"] {
+    background: color-mix(in oklab, var(--primary) 16%, var(--surface));
   }
   .site-nav-list {
     display: flex;

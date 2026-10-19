@@ -1,30 +1,24 @@
 ---
 name: svg-illustration
-description: Draw or edit original SVG illustrations (empty states, banners, loaders, seasonal heroes, 404, story moments) in the EEC Nkolndongo 1 bold flat style. Use whenever an illustration is needed.
+description: Add, choose or theme an illustration (empty states, banners, menus, 404, story moments) for EEC Nkolndongo 1. Illustrations are Storyset "Cuate" SVGs recoloured into our palette (decision 0024). Use whenever an illustration is needed.
 ---
 
-# SVG illustration
+# Illustrations (Storyset Cuate)
 
-Guide: `docs/design/illustration-guide.md`. References in `assets/images/illustration_references/` are
-inspiration only — never trace or reproduce them.
+Guide: `docs/design/illustration-guide.md`. Decision 0024. We do **not** draw our own scenes any more.
 
 ## Workflow
-1. Write the **brief**: scenario (e.g. "empty agenda"), one idea, emotion (calm, joy, hope, gentle humour),
-   size (banner 16:9 / square / inline 1:1).
-2. Compose: one subject, exaggerated scale, generous negative space, a few accent marks.
-3. Draw in SVG by hand: simple paths, `viewBox` set, grouped layers with ids (`#subject`, `#hand`, `#marks`, `#shadow`).
-4. Colour with CSS variables only: `var(--primary)`, `var(--gold)`, `var(--clay)`, `var(--ink)`,
-   `var(--surface)`, `var(--season)`, skin tones `var(--skin-1..4)` — so themes and seasons apply.
-5. Line accents on top of fills (round caps, 2–3px at 1×). Small black/ink shadow shapes for depth. No gradients, no filters.
-6. Optimise with SVGO (keep ids used by animation); target ≤ 15 KB gzipped.
-7. Accessibility: decorative → `aria-hidden="true"`; meaningful → `role="img"` + localised `<title>`.
-8. Optional motion: animate groups with GSAP (gentle float, blink, sprinkle marks), respect reduced motion.
-9. Save to `packages/ui/illustrations/<name>.svg` and document it in the living guide (`/fr/_brand` → Illustration).
-
-## Subject library (our world)
-Hands holding a Bible / hymn book / drum / offering basket · choir in robes · the hill of Nkolndongo ·
-the temple · sheep (404) · dove (Pentecôte) · lamp/star (Avent/Noël) · harvest produce (Moissons) ·
-phone with WhatsApp bubble · child asleep on a pew (empty state).
+1. Brief: scenario (e.g. "empty agenda"), one idea, emotion (calm, joy, welcome).
+2. Find a Cuate illustration on storyset.com: page `https://storyset.com/illustration/<slug>/cuate`.
+   No baked-in text, nothing that misrepresents the parish, no depiction of God or Christ's face.
+3. Take the main SVG URL (first `contentUrl` in the page's ld+json) and add
+   `{ name, url, background, use }` to `packages/ui/illustrations/storyset.json`.
+4. `pnpm illos:fetch` (`--force` to redo). Read the "kept as is" colours it prints; extend the mapping in
+   `scripts/illos-fetch.ts` if a colour should follow the theme.
+5. Check light **and** dark on `/fr/_brand` → Icônes et illustrations.
+6. Use `<Illustration name="…" />` (Astro, `@eec/ui/astro/Illustration.astro`; pass `eager` above the fold,
+   `title` when meaningful) or the admin's `<Illustration name="…" />`.
 
 ## Never
-Depict the face of God/Christ · caricature · single skin tone for everyone · copy reference compositions.
+Commit the SVG files (licence) · inline them in the shell (13–30 KB each) · loop-animate them ·
+remove the « Illustrations : Storyset » credit.

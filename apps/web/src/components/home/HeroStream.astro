@@ -27,7 +27,7 @@ const words: { key: string; icon: IconName; tone: 'primary' | 'gold' | 'clay' | 
 ]
 
 type Card =
-  | { kind: 'photo'; photo: (typeof photos)[number]; label: string }
+  | { kind: 'photo'; photo: (typeof photos)[number]; label: string; wide: boolean }
   | { kind: 'word'; key: string; icon: IconName; tone: string }
 const labels = ['sing', 'pray', 'grow', 'share', 'listen', 'welcome']
 /** What each placeholder photo shows (dev-only photos; real photos will carry their own caption). */
@@ -49,11 +49,14 @@ const captionOf: Record<number, string> = {
 }
 const cards: Card[] = []
 if (photos.length) {
-  // Two photos, one word card, repeated.
+  // Two photos, one word card, repeated. Portrait and landscape alternate where a 4:3 crop exists.
+  let wideCount = 0
   photos.forEach((photo, i) => {
+    const wide = !!photo.landscape && wideCount++ % 2 === 0
     cards.push({
       kind: 'photo',
       photo,
+      wide,
       label: t(
         `home.stream.${captionOf[photo.id] ?? labels[i % labels.length]}` as 'home.stream.sing',
       ),
@@ -74,12 +77,12 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
     [0, 1].map((copy) => (
       <ul class="stream-track" role="list" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? t('home.stream.label') : undefined}>
         {cards.map((card, i) => (
-          <li class="stream-card" style={`--tilt:${tilt[i % tilt.length]}deg;--lift:${lift[i % lift.length]}px`} data-glow data-kind={card.kind} data-tone={card.kind === 'word' ? card.tone : undefined}>
+          <li class:list={['stream-card', card.kind === 'photo' && card.wide && 'is-wide']} style={`--tilt:${tilt[i % tilt.length]}deg;--lift:${lift[i % lift.length]}px`} data-glow data-kind={card.kind} data-tone={card.kind === 'word' ? card.tone : undefined}>
             {card.kind === 'photo' ? (
               <figure class="stream-figure">
                 <picture>
-                  <source type="image/avif" srcset={`${photoSrc(card.photo, 480, 'avif')} 480w, ${photoSrc(card.photo, 800, 'avif')} 800w`} sizes="15rem" />
-                  <img src={photoSrc(card.photo, 480, 'webp')} srcset={`${photoSrc(card.photo, 480, 'webp')} 480w, ${photoSrc(card.photo, 800, 'webp')} 800w`} sizes="15rem" alt={copy === 0 ? card.photo.alt : ''} width="480" height="640" loading={i < 4 && copy === 0 ? 'eager' : 'lazy'} decoding="async" style={`background-image:url(${card.photo.blur});background-color:${card.photo.color}`} />
+                  <source type="image/avif" srcset={`${photoSrc(card.photo, 480, 'avif', card.wide)} 480w, ${photoSrc(card.photo, 800, 'avif', card.wide)} 800w`} sizes={card.wide ? '26rem' : '15rem'} />
+                  <img src={photoSrc(card.photo, 480, 'webp', card.wide)} srcset={`${photoSrc(card.photo, 480, 'webp', card.wide)} 480w, ${photoSrc(card.photo, 800, 'webp', card.wide)} 800w`} sizes={card.wide ? '26rem' : '15rem'} alt={copy === 0 ? card.photo.alt : ''} width="480" height={card.wide ? 360 : 640} loading={i < 4 && copy === 0 ? 'eager' : 'lazy'} decoding="async" style={`background-image:url(${card.photo.blur});background-color:${card.photo.color}`} />
                 </picture>
                 <figcaption class="stream-caption">
                   <span class="stream-chip">{card.label}</span>
@@ -106,21 +109,51 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
 </div>
 
 <script>
-  // WCAG 2.2.2: moving content can be paused. Save-Data: start paused.
+  // The drift slows down and stops gently on hover (and on the pause button, WCAG 2.2.2), then picks up
+  // again: the CSS animation's playbackRate is eased instead of a hard pause. Save-Data starts paused.
   const setup = () => {
     for (const wrap of document.querySelectorAll<HTMLElement>('.stream-wrap')) {
+      if (wrap.dataset.js !== undefined) continue
+      wrap.dataset.js = ''
       const button = wrap.querySelector<HTMLButtonElement>('[data-stream-toggle]')
       const label = wrap.querySelector<HTMLElement>('[data-stream-toggle-label]')
-      if (!button || !label || button.dataset.ready) continue
-      button.dataset.ready = ''
-      const set = (paused: boolean) => {
-        wrap.toggleAttribute('data-paused', paused)
-        button.dataset.state = paused ? 'paused' : 'playing'
-        label.textContent = (paused ? button.dataset.play : button.dataset.pause) ?? ''
+      const stream = wrap.querySelector<HTMLElement>('[data-stream]')
+      const anims = () => [...wrap.querySelectorAll<HTMLElement>('.stream-track')].flatMap((el) => el.getAnimations())
+      let rate = 1
+      let frame = 0
+      let paused = false
+      let hovering = false
+      const ease = (target: number, ms: number) => {
+        cancelAnimationFrame(frame)
+        const from = rate
+        const start = performance.now()
+        const step = (now: number) => {
+          const p = Math.min(1, (now - start) / ms)
+          rate = from + (target - from) * (1 - (1 - p) ** 3)
+          for (const a of anims()) a.playbackRate = rate
+          if (p < 1) frame = requestAnimationFrame(step)
+        }
+        frame = requestAnimationFrame(step)
       }
+      const apply = () => ease(paused || hovering ? 0 : 1, paused || hovering ? 900 : 1200)
+      const set = (value: boolean) => {
+        paused = value
+        wrap.toggleAttribute('data-paused', value)
+        if (button) button.dataset.state = value ? 'paused' : 'playing'
+        if (label && button) label.textContent = (value ? button.dataset.play : button.dataset.pause) ?? ''
+        apply()
+      }
+      stream?.addEventListener('pointerenter', () => {
+        hovering = true
+        apply()
+      })
+      stream?.addEventListener('pointerleave', () => {
+        hovering = false
+        apply()
+      })
       const nav = navigator as Navigator & { connection?: { saveData?: boolean } }
       if (nav.connection?.saveData) set(true)
-      button.addEventListener('click', () => set(!wrap.hasAttribute('data-paused')))
+      button?.addEventListener('click', () => set(!paused))
     }
   }
   setup()
@@ -131,9 +164,6 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
   .stream-wrap {
     display: grid;
     justify-items: center;
-  }
-  .stream-wrap[data-paused] .stream-track {
-    animation-play-state: paused;
   }
   .stream-toggle {
     margin-block-start: -1.5rem;
@@ -151,7 +181,7 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
   .stream {
     --card-w: clamp(11.5rem, 16vw, 15rem);
     --gap: clamp(-1.25rem, -1.4vw, -0.5rem);
-    --speed: 70s;
+    --speed: 130s;
     position: relative;
     display: flex;
     width: 100%;
@@ -169,7 +199,9 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
     padding-inline-end: calc(var(--gap) * -1 + 1rem);
     animation: stream-drift var(--speed) linear infinite;
   }
-  .stream:hover .stream-track {
+  /* Without JS, hovering still pauses (the script eases the speed instead). */
+  .stream-wrap:not([data-js]) .stream:hover .stream-track,
+  .stream-wrap:not([data-js])[data-paused] .stream-track {
     animation-play-state: paused;
   }
   @keyframes stream-drift {
@@ -191,9 +223,13 @@ const lift = [0, 18, -6, 12, -14, 6, 20, -8]
       transform var(--duration-nav) var(--ease-spring),
       box-shadow var(--duration-ui) var(--ease-out);
   }
+  .stream-card.is-wide {
+    width: calc(var(--card-w) * 16 / 9);
+    aspect-ratio: 4 / 3;
+  }
   .stream-card:hover {
     z-index: 2;
-    transform: translateY(calc(var(--lift) - 1.25rem)) rotate(0deg) scale(1.06);
+    transform: translateY(calc(var(--lift) - 1.25rem)) rotate(0deg) scale(1.1);
     box-shadow: var(--elevation-3);
   }
   /* Light that follows the pointer (set by the data-glow helper in @eec/ui/primitives). */

@@ -189,22 +189,6 @@ a.bento-card:hover .bento-more svg {
   transform: translateY(-3px);
   background: var(--primary-soft);
 }
-.bento-season {
-  grid-template-columns: 1fr 7.5rem;
-  align-items: center;
-}
-.bento-ring {
-  width: 7.5rem;
-  height: 7.5rem;
-  transition: transform var(--duration-story) var(--ease-spring);
-}
-.bento-season > .bento-ring {
-  grid-column: 2;
-  grid-row: 1;
-}
-.bento-season:hover .bento-ring {
-  transform: rotate(-24deg);
-}
 .bento-verse {
   margin: 0;
   align-content: space-between;

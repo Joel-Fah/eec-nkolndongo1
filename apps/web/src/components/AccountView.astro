@@ -8,11 +8,11 @@ import Button from '@eec/ui/astro/Button.astro'
 import Choice from '@eec/ui/astro/Choice.astro'
 import Field from '@eec/ui/astro/Field.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
 import Tabs from '@eec/ui/astro/Tabs.astro'
 import google from '@eec/ui/brand/google-g.svg?raw'
 import { localeOf, useT } from '../lib/i18n'
 import { href, pages } from '../lib/nav'
-import { peoplePhotos, photoSrc } from '../lib/placeholders'
 import '../styles/patterns.css'
 
 const locale = localeOf(Astro.currentLocale)
@@ -34,7 +34,6 @@ const messages = {
   email: t('member.email_invalid'),
 }
 const steps = [t('member.step1_t'), t('member.step2_t'), t('member.step3_t')]
-const photos = peoplePhotos().slice(0, 3)
 const benefits = [
   ['account', 'pages.account.l1'],
   ['check', 'pages.account.l2'],
@@ -56,15 +55,7 @@ const tiles = [
   </div>
 
   <aside class="acct-side" aria-label={t('member.benefits_label')}>
-    {
-      photos.length > 0 && (
-        <div class="acct-photos" aria-hidden="true">
-          {photos.map((p, i) => (
-            <img src={photoSrc(p, 480, 'webp')} alt="" width="480" height="640" style={`--i:${i};background:${p.color}`} />
-          ))}
-        </div>
-      )
-    }
+    <Illustration name="sign-up" class="acct-art" />
     <ul class="acct-benefits" role="list">
       {benefits.map(([icon, key]) => <li><span class="acct-benefit-icon"><Icon name={icon} size={20} /></span>{t(key)}</li>)}
     </ul>
@@ -347,22 +338,8 @@ const tiles = [
     gap: 1.75rem;
     align-content: start;
   }
-  .acct-photos {
-    display: flex;
-    padding-inline-start: 1rem;
-  }
-  .acct-photos img {
-    width: 7.5rem;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    margin-inline-start: -1.25rem;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 0 0 4px var(--bg), var(--elevation-2);
-    transform: rotate(calc((var(--i) - 1) * 6deg)) translateY(calc(var(--i) * 6px - 6px));
-    transition: transform var(--duration-nav) var(--ease-spring);
-  }
-  .acct-photos:hover img {
-    transform: rotate(calc((var(--i) - 1) * 9deg)) translateX(calc((var(--i) - 1) * 0.75rem));
+  .acct-art {
+    width: min(100%, 22rem);
   }
   .acct-benefits {
     display: grid;

@@ -98,6 +98,37 @@ export const seasonNames = Object.keys(seasons) as Season[]
 /** Illustration skin tones — warm browns, same in both themes. */
 export const skin = ['#C68B5E', '#9C6440', '#6E4129', '#4A2A1A'] as const
 
+/**
+ * Storyset (Cuate) illustrations are recoloured into these, one file per theme (scripts/illos-fetch.ts,
+ * decision 0024): the accent becomes our gold, slate and greys follow the theme, skin tones become ours.
+ */
+export const storysetPalette = {
+  light: {
+    accent: '#E8B931',
+    accentDeep: '#C9971C',
+    slate: '#22302A',
+    slate2: '#3A4A42',
+    slate3: '#5A6A62',
+    paper: '#FFFDF8',
+    mist: '#EFEAE0',
+    mist2: '#DED7C8',
+    mist3: '#B9B1A0',
+    blush: '#E98360',
+  },
+  dark: {
+    accent: '#F0C64B',
+    accentDeep: '#C9A23A',
+    slate: '#3F4F48',
+    slate2: '#56675F',
+    slate3: '#728279',
+    paper: '#EAE3D3',
+    mist: '#1D2A23',
+    mist2: '#2A3830',
+    mist3: '#3E4D45',
+    blush: '#E98360',
+  },
+} as const
+
 /** Soft, warm, layered shadows tinted with ink; in dark: deeper shadow + a faint top highlight. */
 export const elevation = {
   1: {

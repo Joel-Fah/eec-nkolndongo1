@@ -148,8 +148,7 @@
     "moissons": "Harvest Festival (Fête des Moissons)"
   },
   "illo": {
-    "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages.",
-    "sunday_welcome": "A parishioner welcomes a visitor at the church door and hands him a hymn book."
+    "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages."
   },
   "lockup": {
     "short": "EEC NKOLNDONGO 1",
@@ -297,15 +296,9 @@
       "title": "Icons and illustration",
       "lead": "Hugeicons, stroke-rounded only: 1.5 px, text colour, at 16, 20 and 24 px.",
       "illustration": "Sample illustration",
-      "illustration_lead": "“Hands passing a hymn book”: original drawing, token colours, four skin tones, a gentle animation turned off with reduced motion.",
+      "illustration_lead": "Storyset illustrations (“Cuate” style), recoloured into our palette: the accent becomes our gold, slate and greys follow the theme, skin tones become ours. One file per theme, loaded only when shown. The files are not in the repository (licence): `pnpm illos:fetch` downloads them. Credit “Illustrations: Storyset” in the footer. No looping animation.",
       "light": "Light",
-      "dark": "Dark",
-      "size": "{size} gzipped",
-      "scene_title": "Character scenes (“Cuate” style)",
-      "scene_lead": "Whole people with natural proportions, one accent colour (gold, or the colour of the liturgical season), slate and soft greys for the setting. A range of warm skin tones. Colours come from tokens: the scene follows the theme and the season. Under 15 KB compressed.",
-      "scene_light": "light theme",
-      "scene_dark": "dark theme",
-      "scene_avent": "Advent season accent"
+      "dark": "Dark"
     },
     "page": {
       "status": "Living guide — internal",
@@ -543,7 +536,7 @@
       },
       "footer": {
         "name": "Footer",
-        "desc": "Floating footer: lifted off the edges like the header, rounded on every corner. An invitation, the site map, practical links, then the name “Nkolndongo” set very large and cropped by the card’s bottom edge.",
+        "desc": "A separate invitation card, then a sober floating footer (same frame as the header, rounded on every corner): the parish and the site map. Below the card: legal links, language and theme.",
         "use": "<Footer /> through the Site layout.",
         "a11y": "One h2 per column, 44 px links.",
         "demo": "See the footer at the bottom of the site."
@@ -589,7 +582,7 @@
       "lead": "The larger blocks that give the public pages their character. Each page has its own idea; these patterns are the shared vocabulary.",
       "stream": {
         "name": "Card stream (home)",
-        "desc": "A deck of tilted cards drifting from one edge of the screen to the other: the community in photos, mixed with word cards (Sing, Pray…). On hover the stream slows, the card straightens, lifts and shows its caption; a light follows the pointer. CSS animation only, track rendered twice for a seamless loop.",
+        "desc": "A deck of tilted cards, portrait and landscape mixed, drifting slowly across the screen: the community in photos and word cards (Sing, Pray…). On hover the stream eases to a stop (its speed is damped, not cut), the card straightens, grows a little and shows its caption; a light follows the pointer.",
         "use": "<HeroStream />. Pexels photos of people exist only in development; production shows word cards only until real parish photos (with consent) arrive.",
         "a11y": "“Pause” button (WCAG 2.2.2), also pauses on hover. Reduced motion: no drift, a row to swipe with snap points. Save-Data: starts paused. The track copy is aria-hidden."
       },
@@ -606,10 +599,10 @@
         "a11y": "Fine pointers only; off with reduced motion. Changes neither size nor hit area."
       },
       "ring": {
-        "name": "Liturgical year ring",
-        "desc": "The year as a ring: one arc per season at its real length this year (computed from Easter), the current season thicker, a dot for today.",
-        "use": "<SeasonRing label=… />. Season colours from tokens; follows the theme.",
-        "a11y": "role=img with a label naming the current season."
+        "name": "Liturgical year strip",
+        "desc": "The year as a strip: one segment per season at its real length this year (computed from Easter), the current season in full colour, a marker for today and the next season with a countdown.",
+        "use": "<SeasonStrip />. Season colours from tokens; follows the theme.",
+        "a11y": "role=img with a label naming the current season; the next season is written out."
       },
       "figures": {
         "name": "Key figures",
@@ -639,8 +632,8 @@
     "start3_p": "What we believe, what gathers us, and the way to join us.",
     "verse": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
     "verse_cite": "Matthew 11:28",
-    "title_a": "A family that sings, prays and moves forward",
-    "title_b": "together.",
+    "title_a": "A family that sings, prays",
+    "title_b": "and moves forward",
     "cta_visit": "Come on Sunday",
     "start_eyebrow": "First steps",
     "more": "Learn more",
@@ -681,7 +674,11 @@
       "credit": "Photo: {name} · Pexels",
       "pause": "Pause",
       "play": "Resume the slideshow"
-    }
+    },
+    "title_c": "together.",
+    "season_strip_label": "The liturgical year; we are in: {season}",
+    "season_next": "Next: {season}, in {days} days",
+    "season_next_tomorrow": "Next: {season}, from tomorrow"
   },
   "soon": {
     "badge": "Coming soon",
@@ -703,7 +700,7 @@
     "follow": "Follow us",
     "social_pending": "link soon",
     "legal": "Information",
-    "credits": "Original illustrations",
+    "credits": "Illustrations: Storyset",
     "credits_pending": "Photos: credits added with the photos",
     "rights": "© EEC Nkolndongo 1",
     "controls": "Language and theme",
@@ -1023,7 +1020,7 @@
       "s2_t": "Logo and marks",
       "s2_p": "The EEC logo belongs to the Evangelical Church of Cameroon. It is used here by the parish and may not be reused without permission.",
       "s3_t": "Code, fonts and illustrations",
-      "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Erode and text in Switzer (Fontshare fonts, ITF Free Font License). The illustrations are original.",
+      "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Erode and text in Switzer (Fontshare fonts, ITF Free Font License). Illustrations come from Storyset (storyset.com), used with credit.",
       "s4_t": "Hosting",
       "s4_p": "The site will be hosted by Cloudflare. The host’s address and details will be shown here at launch."
     }

@@ -1,30 +1,14 @@
 ---
-import { formatBytes } from '@eec/i18n'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import { icons } from '@eec/ui/icons'
-import illustration from '@eec/ui/illustrations/hymn-book-handover.svg?raw'
+import storyset from '@eec/ui/illustrations/storyset.json'
 import { localeOf, useT } from '../../lib/i18n'
 import Section from './Section.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const names = Object.keys(icons) as (keyof typeof icons)[]
-const gzipped = await new Response(
-  new Blob([illustration]).stream().pipeThrough(new CompressionStream('gzip')),
-).arrayBuffer()
-const gzipKb = formatBytes(gzipped.byteLength, locale)
-const variants = [
-  { theme: 'light', label: t('brand.icons.light'), hands: ['--skin-2', '--skin-4'] },
-  { theme: 'dark', label: t('brand.icons.dark'), hands: ['--skin-1', '--skin-3'] },
-  { theme: 'light', season: 'avent', label: t('season.avent'), hands: ['--skin-3', '--skin-1'] },
-  {
-    theme: 'dark',
-    season: 'pentecote',
-    label: t('season.pentecote'),
-    hands: ['--skin-4', '--skin-2'],
-  },
-] as const
 ---
 
 <Section id="icons" title={t('brand.icons.title')} lead={t('brand.icons.lead')}>
@@ -46,48 +30,27 @@ const variants = [
   <div class="grid gap-5">
     <div>
       <h3 class="text-xl">{t('brand.icons.illustration')}</h3>
-      <p class="mt-1 max-w-[62ch] text-ink-muted">
-        {t('brand.icons.illustration_lead')} {t('brand.icons.size', { size: gzipKb })}
-      </p>
+      <p class="mt-1 max-w-[62ch] text-ink-muted">{t('brand.icons.illustration_lead')}</p>
     </div>
-    <div class="grid gap-4 md:grid-cols-2">
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
       {
-        variants.map((variant, i) => (
-          <figure
-            data-theme={variant.theme}
-            data-season={'season' in variant ? variant.season : undefined}
-            class="grid gap-2 overflow-hidden rounded-xl bg-bg p-3 text-ink ring-1 ring-line"
-            style={`--hand-a:var(${variant.hands[0]});--hand-b:var(${variant.hands[1]})`}
-          >
-            <Illustration
-              name="hymn-book-handover"
-              title={i === 0 ? t('illo.hymn_book') : undefined}
-              class="h-auto w-full"
-              animate
-            />
-            <figcaption class="px-2 pb-1 text-sm text-ink-muted">{variant.label}</figcaption>
-          </figure>
+        storyset.map((item) => (
+          <li class="grid gap-2 rounded-xl bg-surface p-3 ring-1 ring-line">
+            <Illustration name={item.name} />
+            <p class="px-1 text-sm"><code>{item.name}</code> · <span class="text-ink-muted">{item.use}</span></p>
+          </li>
         ))
       }
-    </div>
-    <div>
-      <h3 class="text-xl">{t('brand.icons.scene_title')}</h3>
-      <p class="mt-1 max-w-[62ch] text-ink-muted">{t('brand.icons.scene_lead')}</p>
-    </div>
-    <div class="grid gap-4 md:grid-cols-3">
+    </ul>
+    <div class="grid gap-4 md:grid-cols-2">
       {
-        (['light', 'dark', 'avent'] as const).map((v) => (
-          <figure data-theme={v === 'dark' ? 'dark' : 'light'} data-season={v === 'avent' ? 'avent' : undefined} class="grid gap-2 overflow-hidden rounded-xl bg-surface p-3 text-ink ring-1 ring-line" style={v === 'avent' ? '--gold:var(--season)' : undefined}>
-            <Illustration name="sunday-welcome" title={v === 'light' ? t('illo.sunday_welcome') : undefined} class="h-auto w-full" />
-            <figcaption class="px-2 pb-1 text-sm text-ink-muted"><code>sunday-welcome</code> · {t(`brand.icons.scene_${v}` as 'brand.icons.scene_light')}</figcaption>
+        (['light', 'dark'] as const).map((theme) => (
+          <figure data-theme={theme} class="grid gap-2 rounded-xl bg-bg p-3 text-ink ring-1 ring-line">
+            <Illustration name="together" />
+            <figcaption class="px-1 text-sm text-ink-muted">{t(`brand.icons.${theme}` as 'brand.icons.light')}</figcaption>
           </figure>
         ))
       }
     </div>
   </div>
 </Section>
-
-<script>
-  import { animateIllustrations } from '../../scripts/illustration-idle'
-  animateIllustrations()
-</script>

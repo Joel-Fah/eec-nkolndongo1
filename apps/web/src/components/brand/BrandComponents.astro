@@ -34,7 +34,6 @@ type Id =
   | 'verse'
   | 'ornament'
   | 'docblock'
-  | 'motion_idle'
   | 'button'
   | 'fields'
   | 'choices'
@@ -81,11 +80,7 @@ const doc = (id: Id) => ({
     </DocBlock>
 
     <DocBlock {...doc('illustration')}>
-      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" />
-    </DocBlock>
-
-    <DocBlock {...doc('motion_idle')}>
-      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" animate />
+      <Illustration name="reading-book" class="h-auto w-full max-w-sm" />
     </DocBlock>
 
     <DocBlock {...doc('theme')}>
@@ -173,12 +168,12 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('surfaces')}>
       <div class="grid gap-4 md:grid-cols-2">
         <Card><div class="flex items-center gap-3"><Avatar initials="EE" /><h4 class="text-lg">{t('ui.card_title')}</h4></div><p class="text-ink-muted">{t('ui.card_text')}</p></Card>
-        <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" /></EmptyState>
+        <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="reading-book" class="h-auto w-full" /></EmptyState>
       </div>
     </DocBlock>
 
     <DocBlock {...doc('preloader')}>
-      <div class="preloader-demo text-primary"><Mark variant="lockup-line" class="w-full max-w-md" /></div>
+      <div class="preloader-demo text-primary"><Mark variant="lockup-short-line" class="eec-preloader-lockup w-full max-w-md" /></div>
     </DocBlock>
 
     <DocBlock {...doc('header')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>

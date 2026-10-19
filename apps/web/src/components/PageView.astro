@@ -89,7 +89,7 @@ const colsClass = {
       if (block.t === 'empty') {
         return (
           <EmptyState title={t(block.title)} text={t(block.text)}>
-            <Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" />
+            <Illustration slot="art" name="reading-book" class="h-auto w-full" />
             {block.link && <Button href={href(locale, pagePath(block.link.page))} variant="secondary">{t(block.link.label)}</Button>}
           </EmptyState>
         )

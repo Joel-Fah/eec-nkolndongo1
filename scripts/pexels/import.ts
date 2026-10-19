@@ -6,6 +6,7 @@
  * any placeholder with `people: true` (apps/web/src/lib/placeholders.ts).
  *
  * Usage: node --env-file=../.env.local pexels/import.ts --set people <id> <id> …
+ *        add --landscape to also write 4:3 crops (<id>-l-480/800) for the given ids.
  */
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -15,7 +16,10 @@ import sharp from 'sharp'
 import type { PexelsPhoto } from './search.ts'
 
 const { values, positionals } = parseArgs({
-  options: { set: { type: 'string', default: 'people' } },
+  options: {
+    set: { type: 'string', default: 'people' },
+    landscape: { type: 'boolean', default: false },
+  },
   allowPositionals: true,
 })
 const key = process.env.PEXELS_API_KEY
@@ -38,11 +42,31 @@ type Entry = {
   pexelsUrl: string
   color: string
   blur: string
+  landscape?: boolean
   replaceWith: string | null
 }
 const manifest: Entry[] = existsSync(manifestFile)
   ? JSON.parse(await readFile(manifestFile, 'utf8'))
   : []
+
+/** 4:3 crop of the same photo, for the landscape cards of the hero stream. */
+async function landscape(id: number, original: string) {
+  const cropped = await sharp(original)
+    .rotate()
+    .resize({ width: 1067, height: 800, fit: 'cover', position: 'attention' })
+    .toBuffer()
+  for (const w of [480, 800]) {
+    const sized = sharp(cropped).resize({ width: w })
+    await sized
+      .clone()
+      .avif({ quality: 52, effort: 6 })
+      .toFile(join(outDir, `${id}-l-${w}.avif`))
+    await sized
+      .clone()
+      .webp({ quality: 72 })
+      .toFile(join(outDir, `${id}-l-${w}.webp`))
+  }
+}
 
 /** Pexels/CDN connections drop now and then: retry with a short back-off. */
 async function get(url: string, init?: RequestInit, tries = 4): Promise<Response> {
@@ -56,7 +80,16 @@ async function get(url: string, init?: RequestInit, tries = 4): Promise<Response
 }
 
 for (const id of positionals.map(Number)) {
-  if (manifest.some((m) => m.id === id) && existsSync(join(outDir, `${id}-800.webp`))) continue
+  const known = manifest.find((m) => m.id === id)
+  if (known && existsSync(join(outDir, `${id}-800.webp`))) {
+    if (values.landscape) {
+      await landscape(id, join(cacheDir, `${id}.jpg`))
+      known.landscape = true
+      await writeFile(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`)
+      console.log(`✓ ${id} landscape`)
+    }
+    continue
+  }
   const res = await get(`https://api.pexels.com/v1/photos/${id}`, {
     headers: { Authorization: key },
   })

@@ -12,7 +12,10 @@ page with its own concept. Vertical slice done, **waiting for Joël's review** b
 - Floating footer (invitation, site map, cropped « Nkolndongo »).
 - Home: card stream hero (pause button), key figures (`lib/stats.ts`, null until validated), bento grid,
   season ring. Mon espace: one card, two tabs, three-step sign-up, member dashboard.
-- First Cuate-style illustration `sunday-welcome` (Joël judges it before more are drawn).
+- Round 2 (Joël's feedback): preloader draws the short lockup (mark + « EEC / Nkolndongo 1 »); navbar
+  active tab = soft tint; hero title on two lines, slower stream mixing portrait/landscape, eased pause on
+  hover; footer split (CTA card, sober footer, legal line below); season strip with countdown.
+- Illustrations: Storyset Cuate, recoloured to our palette, never committed (decision 0024, `pnpm illos:fetch`).
 - Pexels photos of people: **dev-only** placeholders (gitignored, removed from builds; credits in
   `apps/web/src/content/placeholders.json`). Real, consented parish photos needed before launch.
 - Next after review: every other page gets its own concept (`docs/product/pages.md`), then Checkpoint B.

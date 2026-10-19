@@ -55,4 +55,14 @@ jobs:
           key: fontshare-${{ hashFiles('scripts/fonts-fetch.ts') }}
       - run: pnpm fonts:fetch
 
+      # Storyset illustrations can't live in the repo either (licence, decision 0024) — same pattern.
+      - name: Storyset illustrations cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            apps/web/public/illustrations
+            apps/admin/public/illustrations
+          key: storyset-${{ hashFiles('packages/ui/illustrations/storyset.json', 'scripts/illos-fetch.ts', 'packages/ui/src/tokens.ts') }}
+      - run: pnpm illos:fetch
+
       - run: pnpm turbo run lint typecheck test build --affected --cache-dir=.turbo/cache

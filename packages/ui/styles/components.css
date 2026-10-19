@@ -25,6 +25,34 @@
     --mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
   }
 
+  /* ── Illustration (Storyset, one file per theme) ─────────────────────────────────────── */
+  .illo {
+    display: block;
+  }
+  /* Only the file for the current theme is displayed (a hidden lazy <img> is never downloaded). */
+  .illo > img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .illo > .illo-dark {
+    display: none;
+  }
+  [data-theme="dark"] .illo > .illo-light {
+    display: none;
+  }
+  [data-theme="dark"] .illo > .illo-dark {
+    display: block;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .illo:not([data-theme="light"] *) > .illo-light {
+      display: none;
+    }
+    :root:not([data-theme="light"]) .illo:not([data-theme="light"] *) > .illo-dark {
+      display: block;
+    }
+  }
+
   /* ── Button ──────────────────────────────────────────────────────────────────────────── */
   .btn {
     position: relative;

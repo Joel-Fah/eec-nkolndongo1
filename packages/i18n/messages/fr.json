@@ -148,8 +148,7 @@
     "moissons": "Fête des Moissons"
   },
   "illo": {
-    "hymn_book": "Une main tend un recueil de cantiques ouvert à une autre main ; des notes de musique s’envolent des pages.",
-    "sunday_welcome": "Une paroissienne accueille un visiteur à la porte du temple et lui tend un recueil de chants."
+    "hymn_book": "Une main tend un recueil de cantiques ouvert à une autre main ; des notes de musique s’envolent des pages."
   },
   "lockup": {
     "short": "EEC NKOLNDONGO 1",
@@ -297,15 +296,9 @@
       "title": "Icônes et illustration",
       "lead": "Hugeicons, trait arrondi uniquement : 1,5 px, couleur du texte, en 16, 20 et 24 px.",
       "illustration": "Illustration d’exemple",
-      "illustration_lead": "« Des mains se passent un recueil de cantiques » : dessin original, couleurs par jetons, quatre teintes de peau, animation douce désactivée en mouvement réduit.",
+      "illustration_lead": "Illustrations Storyset (style « Cuate »), recolorées dans notre palette : l’accent devient notre or, l’ardoise et les gris suivent le thème, les tons de peau deviennent les nôtres. Un fichier par thème, chargé seulement quand il s’affiche. Les fichiers ne sont pas dans le dépôt (licence) : `pnpm illos:fetch` les télécharge. Crédit « Illustrations : Storyset » en pied de page. Pas d’animation en boucle.",
       "light": "Clair",
-      "dark": "Sombre",
-      "size": "{size} gzippé",
-      "scene_title": "Scènes de personnages (style « Cuate »)",
-      "scene_lead": "Des personnes entières aux proportions naturelles, une couleur d’accent (l’or, ou la couleur du temps liturgique), l’ardoise et des gris doux pour le décor. Tons de peau chauds variés. Couleurs par jetons : la scène suit le thème et la saison. Moins de 15 Ko compressé.",
-      "scene_light": "thème clair",
-      "scene_dark": "thème sombre",
-      "scene_avent": "accent du temps de l’Avent"
+      "dark": "Sombre"
     },
     "page": {
       "status": "Guide vivant — interne",
@@ -543,7 +536,7 @@
       },
       "footer": {
         "name": "Pied de page",
-        "desc": "Pied de page flottant : détaché des bords comme l’en-tête, arrondi à chaque coin. Une invitation, le plan du site, les liens pratiques, puis le nom « Nkolndongo » en très grand, coupé par le bas de la carte.",
+        "desc": "Une carte d’invitation, détachée, puis un pied de page flottant et sobre (même cadre que l’en-tête, arrondi à chaque coin) : la paroisse et le plan du site. Sous la carte : mentions, langue et thème.",
         "use": "<Footer /> via le gabarit Site.",
         "a11y": "Titres h2 par colonne, liens de 44 px.",
         "demo": "Voir le pied de page en bas du site."
@@ -589,7 +582,7 @@
       "lead": "Les grands blocs qui donnent leur caractère aux pages publiques. Chaque page a sa propre idée ; ces motifs en sont le vocabulaire commun.",
       "stream": {
         "name": "Défilé de cartes (accueil)",
-        "desc": "Un jeu de cartes inclinées qui traverse l’écran d’un bord à l’autre : la communauté en photos, mêlée à des cartes-mots (Chanter, Prier…). Au survol, le défilé ralentit, la carte se redresse, se soulève et montre sa légende ; une lumière suit le pointeur. Animation CSS seule, piste rendue deux fois pour une boucle sans couture.",
+        "desc": "Un jeu de cartes inclinées, portrait et paysage mêlés, qui traverse lentement l’écran : la communauté en photos et des cartes-mots (Chanter, Prier…). Au survol, le défilé ralentit doucement jusqu’à l’arrêt (sa vitesse est amortie, pas coupée), la carte se redresse, grandit un peu et montre sa légende ; une lumière suit le pointeur.",
         "use": "<HeroStream />. Les photos de personnes Pexels n’existent qu’en développement ; en production, uniquement des cartes-mots jusqu’à l’arrivée de vraies photos de la paroisse (avec consentement).",
         "a11y": "Bouton « Mettre en pause » (WCAG 2.2.2), pause aussi au survol. Mouvement réduit : pas de défilement, rangée à faire glisser avec des points d’arrêt. Save-Data : démarre en pause. La copie de la piste est aria-hidden."
       },
@@ -606,10 +599,10 @@
         "a11y": "Pointeur fin uniquement ; désactivé avec le mouvement réduit. Ne change ni la taille ni la zone cliquable."
       },
       "ring": {
-        "name": "Anneau de l’année liturgique",
-        "desc": "L’année en un anneau : un arc par temps liturgique, à sa vraie longueur cette année (calculée depuis Pâques), le temps actuel plus épais, un point pour aujourd’hui.",
-        "use": "<SeasonRing label=… />. Couleurs des temps par jetons ; suit le thème.",
-        "a11y": "role=img avec une étiquette qui dit le temps actuel."
+        "name": "Bande de l’année liturgique",
+        "desc": "L’année en une bande : un segment par temps liturgique, à sa vraie longueur cette année (calculée depuis Pâques), le temps actuel en couleur pleine, un repère pour aujourd’hui et le prochain temps avec un compte à rebours.",
+        "use": "<SeasonStrip />. Couleurs des temps par jetons ; suit le thème.",
+        "a11y": "role=img avec une étiquette qui dit le temps actuel ; le prochain temps est écrit en clair."
       },
       "figures": {
         "name": "Chiffres clés",
@@ -639,8 +632,8 @@
     "start3_p": "Ce que nous croyons, ce qui nous rassemble, et le chemin pour nous rejoindre.",
     "verse": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
     "verse_cite": "Matthieu 11 : 28",
-    "title_a": "Une famille qui chante, prie et avance",
-    "title_b": "ensemble.",
+    "title_a": "Une famille qui chante, prie",
+    "title_b": "et avance",
     "cta_visit": "Venir dimanche",
     "start_eyebrow": "Premiers pas",
     "more": "En savoir plus",
@@ -681,7 +674,11 @@
       "credit": "Photo : {name} · Pexels",
       "pause": "Mettre en pause",
       "play": "Reprendre le défilement"
-    }
+    },
+    "title_c": "ensemble.",
+    "season_strip_label": "L’année liturgique, nous sommes dans le temps : {season}",
+    "season_next": "Ensuite : {season}, dans {days} jours",
+    "season_next_tomorrow": "Ensuite : {season}, dès demain"
   },
   "soon": {
     "badge": "Bientôt",
@@ -703,7 +700,7 @@
     "follow": "Nous suivre",
     "social_pending": "lien bientôt",
     "legal": "Informations",
-    "credits": "Illustrations originales",
+    "credits": "Illustrations : Storyset",
     "credits_pending": "Photos : crédits ajoutés avec les photos",
     "rights": "© EEC Nkolndongo 1",
     "controls": "Langue et thème",
@@ -1023,7 +1020,7 @@
       "s2_t": "Logo et marques",
       "s2_p": "Le logo de l’EEC appartient à l’Église Évangélique du Cameroun. Il est utilisé ici par la paroisse et ne peut être réutilisé sans autorisation.",
       "s3_t": "Code, polices et illustrations",
-      "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Erode et le texte en Switzer (polices Fontshare, licence ITF Free Font License). Les illustrations sont originales.",
+      "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Erode et le texte en Switzer (polices Fontshare, licence ITF Free Font License). Les illustrations viennent de Storyset (storyset.com), utilisées avec mention.",
       "s4_t": "Hébergement",
       "s4_p": "Le site sera hébergé par Cloudflare. L’adresse et les informations de l’hébergeur seront indiquées ici à la mise en ligne."
     }
