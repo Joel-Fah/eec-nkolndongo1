@@ -391,6 +391,9 @@ importers:
       '@eec/config':
         specifier: workspace:*
         version: link:../config
+      '@eec/core':
+        specifier: workspace:*
+        version: link:../core
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2

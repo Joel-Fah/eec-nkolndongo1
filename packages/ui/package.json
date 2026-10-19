@@ -30,6 +30,7 @@
     "@eec/config": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "@eec/core": "workspace:*"
   }
 }

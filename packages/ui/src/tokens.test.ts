@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
+import { SEASONS } from '@eec/core'
 import { describe, expect, it } from 'vitest'
 import { contrastReport, ratio } from './contrast.ts'
+import { seasonNames } from './tokens.ts'
 import { fluid, renderTokensCss } from './tokens-css.ts'
 
 describe('tokens', () => {
@@ -12,6 +14,10 @@ describe('tokens', () => {
   it('every text/background pair passes WCAG AA in both themes', () => {
     const failing = contrastReport().filter((row) => !row.pass)
     expect(failing).toEqual([])
+  })
+
+  it('has a colour set for every liturgical season, and only those', () => {
+    expect([...seasonNames].sort()).toEqual([...SEASONS].sort())
   })
 
   it('computes WCAG ratios and fluid sizes', () => {
