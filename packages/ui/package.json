@@ -11,7 +11,10 @@
     "./illustrations/*": "./illustrations/*",
     "./astro/*": "./astro/*",
     "./react/*": "./react/*",
-    "./*": "./src/*.ts"
+    "./tokens": "./src/tokens.ts",
+    "./contrast": "./src/contrast.ts",
+    "./icons": "./src/icons.ts",
+    "./motion": "./src/motion.ts"
   },
   "scripts": {
     "build": "node ../../scripts/fonts-fetch.ts",

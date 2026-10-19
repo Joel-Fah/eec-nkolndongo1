@@ -9,7 +9,6 @@ export default {
         overrides: {
           cleanupIds: false,
           convertColors: false,
-          removeViewBox: false,
           collapseGroups: false,
           mergePaths: false,
         },

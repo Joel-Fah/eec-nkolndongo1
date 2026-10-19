@@ -1,0 +1,41 @@
+---
+import mark from '../brand/mark.svg?raw'
+/**
+ * The EEC mark, inlined so mono variants follow `currentColor`. Ids get a per-instance prefix so
+ * several marks can share a page. Never restyle the shapes — see packages/ui/brand/README.md.
+ */
+import full from '../brand/mark-full.svg?raw'
+import fullHalo from '../brand/mark-full-halo.svg?raw'
+import fullMono from '../brand/mark-full-mono.svg?raw'
+import halo from '../brand/mark-halo.svg?raw'
+import mono from '../brand/mark-mono.svg?raw'
+import { nextId } from '../src/uid.ts'
+
+const sources = {
+  full,
+  'full-halo': fullHalo,
+  'full-mono': fullMono,
+  mark,
+  halo,
+  mono,
+} as const
+
+interface Props {
+  variant?: keyof typeof sources
+  /** Accessible name; omit when a visible text label sits next to the mark. */
+  label?: string
+  class?: string
+  style?: string
+}
+
+const { variant = 'mark', label, class: className, style } = Astro.props
+const uid = nextId('m')
+let svg = sources[variant].replace(/(id="|href="#|url\(#)(eec[a-z]*-)/g, `$1${uid}-$2`)
+svg = label
+  ? svg.replace(/<title>[^<]*<\/title>/, `<title>${label}</title>`)
+  : svg.replace(' role="img"', ' aria-hidden="true"').replace(/<title>[^<]*<\/title>/, '')
+if (className) svg = svg.replace('<svg ', `<svg class="${className}" `)
+if (style) svg = svg.replace('<svg ', `<svg style="${style}" `)
+---
+
+<Fragment set:html={svg} />
