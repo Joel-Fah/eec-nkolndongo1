@@ -1,0 +1,27 @@
+{
+  "name": "@eec/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./styles/*": "./styles/*",
+    "./fonts/*": "./fonts/*",
+    "./brand/*": "./brand/*",
+    "./illustrations/*": "./illustrations/*",
+    "./astro/*": "./astro/*",
+    "./react/*": "./react/*",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@hugeicons/core-free-icons": "catalog:"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
