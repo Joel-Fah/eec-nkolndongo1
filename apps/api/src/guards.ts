@@ -30,7 +30,7 @@ export function requirePermission(
 export function requireSelf(): Guarded {
   const mw: Guarded = async (c, next) => {
     const actor = await c.var.deps.actor()
-    if (!actor || actor.principal.status !== 'active') return fail(c, 401, 'unauthenticated')
+    if (actor?.principal.status !== 'active') return fail(c, 401, 'unauthenticated')
     await next()
   }
   mw.__guard = 'self'

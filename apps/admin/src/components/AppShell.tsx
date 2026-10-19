@@ -155,22 +155,24 @@ export function AppShell() {
             <ThemeButton />
             <Menu.Root>
               <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
-                EE
+                {initials}
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">
                   <Menu.Popup className="eec-popover eec-popup">
-                    <p className="px-3 py-2 text-sm font-medium">{t('admin.user.name')}</p>
-                    <Menu.Item className="menu-item" disabled>
-                      {t('admin.user.profile')}
-                    </Menu.Item>
-                    <Menu.Item className="menu-item" disabled>
+                    <div className="grid px-3 py-2">
+                      <p className="text-sm font-medium">{me?.user.name}</p>
+                      <p className="text-xs text-ink-muted">{me?.user.email}</p>
+                    </div>
+                    <Menu.Item
+                      className="menu-item"
+                      onClick={async () => {
+                        await signOut()
+                        navigate({ to: '/login' })
+                      }}
+                    >
                       {t('admin.user.signout')}
                     </Menu.Item>
-                    <p className="px-3 py-2 text-xs text-ink-muted">{t('admin.user.pending')}</p>
-                    <Menu.LinkItem className="menu-item" render={<Link to="/login" />}>
-                      {t('login.title')}
-                    </Menu.LinkItem>
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>

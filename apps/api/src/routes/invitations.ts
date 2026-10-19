@@ -24,7 +24,8 @@ export const invitationRoutes = new Hono<AppEnv>()
     zValidator('json', create),
     async (c) => {
       const { email, roles } = c.req.valid('json')
-      const actor = (await c.var.deps.actor())!
+      const actor = await c.var.deps.actor()
+      if (!actor) return fail(c, 401, 'unauthenticated')
       if (roles.length && !can(actor.principal, 'core:roles-assign'))
         return fail(c, 403, 'forbidden')
       const db = await c.var.deps.db()
@@ -138,7 +139,8 @@ export const invitationRoutes = new Hono<AppEnv>()
   // Staff password reset: an admin generates a single-use link (no email needed).
   .post('/users/:id/reset-link', requirePermission('core:users-reset-link'), async (c) => {
     const db = await c.var.deps.db()
-    const actor = (await c.var.deps.actor())!
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
     const [u] = await db
       .select({ id: schema.user.id, email: schema.user.email })
       .from(schema.user)

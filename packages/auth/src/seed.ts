@@ -64,11 +64,12 @@ export async function seedRbac(db: Db, modules: readonly DefinedModule[]) {
       })
       .onConflictDoNothing({ target: schema.roles.key })
       .returning({ id: schema.roles.id })
-    if (inserted[0]) {
+    const created = inserted[0]
+    if (created) {
       createdRoles++
       const grants = role.grants
         .filter((k) => known.has(k))
-        .map((permissionKey) => ({ roleId: inserted[0]!.id, permissionKey }))
+        .map((permissionKey) => ({ roleId: created.id, permissionKey }))
       if (grants.length)
         await db.insert(schema.rolePermissions).values(grants).onConflictDoNothing()
     } else {

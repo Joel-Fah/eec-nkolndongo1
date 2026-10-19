@@ -37,7 +37,8 @@ describe.skipIf(!run)('platform flow (dev database)', () => {
     )
   const post = (path: string, body: unknown, cookie?: string) =>
     req(path, { method: 'POST', body: JSON.stringify(body) }, cookie)
-  const json = async (res: Response) => (await res.json()) as any // biome-ignore lint/suspicious/noExplicitAny: test helper
+  // biome-ignore lint/suspicious/noExplicitAny: test helper
+  const json = async (res: Response) => (await res.json()) as any
   const cookieOf = (res: Response) =>
     res.headers
       .getSetCookie()

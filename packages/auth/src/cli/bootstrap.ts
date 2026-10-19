@@ -18,8 +18,11 @@ const rl = createInterface({ input: process.stdin, output: process.stdout })
 // Piped input (scripts, tests) can end before the database answers: read those lines up front.
 const piped: string[] = []
 if (!process.stdin.isTTY) for await (const line of rl) piped.push(line)
-const ask = async (question: string) =>
-  process.stdin.isTTY ? rl.question(question) : (console.log(question), piped.shift() ?? '')
+const ask = async (question: string) => {
+  if (process.stdin.isTTY) return rl.question(question)
+  console.log(question)
+  return piped.shift() ?? ''
+}
 const { db, close } = await connectDirect()
 
 try {

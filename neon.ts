@@ -1,4 +1,4 @@
-import { defineConfig } from "@neon/config/v1";
+import { defineConfig } from '@neon/config/v1'
 
 export default defineConfig({
   // Declare your Neon services here
@@ -6,25 +6,25 @@ export default defineConfig({
   buckets: {
     // "private" is the default; use "public_read" for anonymous reads
     // Never public: files are served through our own /media route (decision 0020).
-    "eec-media": { access: "private" },
-    "eec-backups": { access: "private" },
+    'eec-media': { access: 'private' },
+    'eec-backups': { access: 'private' },
   },
   // Branch policy: per-branch tuning
   branch: (branch) => {
     if (branch.isDefault) {
       // Default branch: no overrides, uses project defaults
-      return {};
+      return {}
     }
     // `dev` is our long-lived local/test branch: never auto-expire it.
-    if (branch.name === "dev") {
-      return {};
+    if (branch.name === 'dev') {
+      return {}
     }
     if (!branch.exists) {
       // New non-default branches: auto-expire
       // Run `neon checkout <name>` to create a new branch with these settings
-      return { ttl: "7d" };
+      return { ttl: '7d' }
     }
     // Existing branch: no changes
-    return {};
+    return {}
   },
-});
+})

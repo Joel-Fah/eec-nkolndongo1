@@ -49,7 +49,7 @@ const cookieAttrs = up.setCookie.map((c) =>
   c
     .split(';')
     .map((s) => s.trim())
-    .filter((s, i) => (i === 0 ? false : true))
+    .filter((_, i) => i !== 0)
     .join('; '),
 )
 console.log(
