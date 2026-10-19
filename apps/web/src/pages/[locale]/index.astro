@@ -1,15 +1,54 @@
 ---
-import Base from '../../layouts/Base.astro'
-import { localePaths, useT } from '../../lib/i18n'
+import { getSeason } from '@eec/core'
+import Button from '@eec/ui/astro/Button.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { localeOf, localePaths, useT } from '../../lib/i18n'
+import { href, pages, tabs } from '../../lib/nav'
 
 export const getStaticPaths = localePaths
 
-const t = useT(Astro.currentLocale)
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const season = getSeason()
+const seasonLabel = t(`season.${season}` as 'season.avent')
+const discover = tabs.find((x) => x.id === 'discover')?.slug[locale] ?? ''
+const calendar = tabs.find((x) => x.id === 'calendar')?.slug[locale] ?? ''
+void pages
 ---
 
-<Base title={t('site.name')}>
-  <main>
-    <h1>{t('site.name')}</h1>
-    <p>{t('site.tagline')}</p>
-  </main>
-</Base>
+<Site title={t('site.name')} description={t('site.tagline')}>
+  <section class="hero mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 md:px-8 md:py-24 lg:grid-cols-2">
+    <div class="grid content-center gap-6">
+      <p class="season-chip w-fit rounded-md px-3 py-1.5 text-sm font-semibold">{t('home.season', { season: seasonLabel })}</p>
+      <h1 class="text-5xl md:text-6xl" style="font-size:var(--text-4xl)">{t('home.title')}</h1>
+      <p class="max-w-[46ch] text-lg text-ink-muted">{t('site.tagline')}</p>
+      <p class="text-sm text-ink-muted">{t('home.hero_note')}</p>
+      <div class="flex flex-wrap gap-3">
+        <Button href={href(locale, discover)} size="lg">{t('home.cta_discover')}</Button>
+        <Button href={href(locale, calendar)} size="lg" variant="secondary">{t('home.cta_calendar')}</Button>
+      </div>
+    </div>
+    <div class="hero-art relative">
+      <div class="hero-blob" aria-hidden="true"></div>
+      <Illustration name="hymn-book-handover" class="relative h-auto w-full" animate />
+    </div>
+  </section>
+</Site>
+
+<style is:global>
+  .season-chip {
+    background: color-mix(in oklab, var(--season) 14%, var(--surface));
+    color: var(--season-ink);
+  }
+  .hero-art {
+    isolation: isolate;
+  }
+  .hero-blob {
+    position: absolute;
+    inset: 6% 2% 0;
+    z-index: -1;
+    border-radius: var(--radius-xl);
+    background: color-mix(in oklab, var(--season) 16%, var(--bg));
+  }
+</style>

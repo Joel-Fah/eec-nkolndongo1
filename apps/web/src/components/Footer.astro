@@ -1,0 +1,63 @@
+---
+import Icon from '@eec/ui/astro/Icon.astro'
+import { localeOf, useT } from '../lib/i18n'
+import { alternates, href, labelKey, pages } from '../lib/nav'
+import SiteLockup from './SiteLockup.astro'
+import ThemeToggle from './ThemeToggle.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const other = locale === 'fr' ? 'en' : 'fr'
+const switchHref = alternates(Astro.url.pathname)[other]
+const legal = ['privacy', 'legal'].map((id) => ({
+  id,
+  path: pages.find((p) => p.id === id)?.path[locale] ?? '',
+}))
+const socials = [
+  ['whatsapp', 'WhatsApp'],
+  ['chat', 'Facebook'],
+  ['play', 'YouTube'],
+] as const
+---
+
+<footer class="site-footer mt-24">
+  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:px-8 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+    <div class="grid content-start gap-4">
+      <div class="w-[min(100%,20rem)] text-[1.15rem]"><SiteLockup variant="long" /></div>
+      <p class="max-w-[36ch] text-ink-muted">{t('footer.about')}</p>
+    </div>
+    <div class="grid content-start gap-2">
+      <h2 class="font-display text-lg font-medium">{t('footer.visit')}</h2>
+      <p class="flex gap-2 text-ink-muted"><Icon name="location" class="mt-1 flex-none" />{t('footer.address')}</p>
+      <p class="text-sm font-medium">{t('footer.hours_title')}</p>
+      <p class="flex gap-2 text-ink-muted"><Icon name="clock" class="mt-1 flex-none" />{t('footer.hours')}</p>
+    </div>
+    <div class="grid content-start gap-2">
+      <h2 class="font-display text-lg font-medium">{t('footer.follow')}</h2>
+      <ul class="grid gap-1" role="list">
+        {socials.map(([icon, name]) => <li class="flex min-h-11 items-center gap-2 text-ink-muted"><Icon name={icon} />{name} · {t('footer.social_pending')}</li>)}
+      </ul>
+    </div>
+    <div class="grid content-start gap-2">
+      <h2 class="font-display text-lg font-medium">{t('footer.legal')}</h2>
+      <ul class="grid gap-1" role="list">
+        {legal.map((l) => <li><a class="flex min-h-11 items-center underline-offset-4 hover:underline" href={href(locale, l.path)}>{t(labelKey(l.id))}</a></li>)}
+      </ul>
+      <p class="text-sm text-ink-muted">{t('footer.credits')} · <span>{t('footer.credits_pending')}</span></p>
+    </div>
+  </div>
+  <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 pb-10 md:px-8">
+    <p class="text-sm text-ink-muted">{t('footer.rights')}</p>
+    <div class="flex items-center gap-2" role="group" aria-label={t('footer.controls')}>
+      <a href={switchHref} hreflang={other} lang={other} class="btn btn-ghost btn-sm" aria-label={t('common.language.switch_label')}><Icon name="language" size={16} />{t('common.language.switch_to')}</a>
+      <ThemeToggle />
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    background: var(--surface-2);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+</style>

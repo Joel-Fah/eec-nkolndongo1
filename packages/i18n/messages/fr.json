@@ -29,7 +29,82 @@
     "news": "Actualités",
     "give": "Donner",
     "account": "Mon espace",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "items": {
+      "histoire": {
+        "label": "Notre histoire",
+        "desc": "Le chemin parcouru par notre communauté."
+      },
+      "croyances": {
+        "label": "Ce que nous croyons",
+        "desc": "Ce qui nous rassemble et nous fait avancer."
+      },
+      "pasteurs": {
+        "label": "Pasteurs et Conseil",
+        "desc": "Celles et ceux qui servent et conduisent la paroisse."
+      },
+      "trouver": {
+        "label": "Nous trouver",
+        "desc": "Comment venir nous rejoindre."
+      },
+      "cultes": {
+        "label": "Cultes et horaires",
+        "desc": "Les rendez-vous de la semaine."
+      },
+      "departements": {
+        "label": "Départements",
+        "desc": "Les groupes de la paroisse : trouvez votre place."
+      },
+      "pratique": {
+        "label": "Vie pratique",
+        "desc": "Baptême, mariage, deuil, adhésion : pas à pas."
+      },
+      "evenements": {
+        "label": "Événements",
+        "desc": "Ce qui se passe bientôt."
+      },
+      "liturgie": {
+        "label": "Année liturgique",
+        "desc": "Les saisons de l’année, leurs couleurs et leur sens."
+      },
+      "moissons": {
+        "label": "Fête des Moissons",
+        "desc": "La fête de la générosité et de la gratitude."
+      },
+      "nouvelles": {
+        "label": "Nouvelles",
+        "desc": "Les dernières nouvelles de la paroisse."
+      },
+      "predications": {
+        "label": "Prédications",
+        "desc": "Écouter ou réécouter un message."
+      },
+      "meditations": {
+        "label": "Méditations et bulletin",
+        "desc": "Un mot pour la semaine, et le bulletin à emporter."
+      },
+      "give": {
+        "label": "Donner",
+        "desc": "Soutenir la vie et les projets de la paroisse."
+      },
+      "account": {
+        "label": "Mon espace",
+        "desc": "Votre compte de membre."
+      },
+      "privacy": {
+        "label": "Confidentialité",
+        "desc": "Comment nous protégeons vos données."
+      },
+      "legal": {
+        "label": "Mentions légales",
+        "desc": "Informations légales sur le site."
+      }
+    },
+    "main": "Menu principal",
+    "open_menu": "Ouvrir le menu",
+    "close_menu": "Fermer le menu",
+    "home": "Accueil",
+    "utilities": "Outils"
   },
   "season": {
     "avent": "Avent",
@@ -303,7 +378,7 @@
       "a11y": "Accessibilité",
       "demo": "Démonstration",
       "upcoming_title": "À documenter au fil de la construction",
-      "upcoming": "Bouton · Champ · Zone de texte · Liste déroulante · Case à cocher · Bouton radio · Interrupteur · Menu · Infobulle · Fenêtre · Volet · Onglets · Accordéon · Notification · Carte · Pastille · Avatar · Squelette · État vide · En-tête et navigation · Pied de page · Transitions de page",
+      "upcoming": "Sélecteur de date · Tableau de données · Zone de téléversement · Lecteur audio · Bandeau de saison · Cartes d’actualités et d’événements · Pagination",
       "icon": {
         "name": "Icône",
         "desc": "Hugeicons à trait arrondi, rendues au moment de la construction : aucun JavaScript.",
@@ -359,6 +434,82 @@
         "desc": "Notes qui flottent et étincelles qui respirent, en boucle douce ; en pause hors écran.",
         "use": "<Illustration animate /> + scripts/illustration-idle.ts. GSAP est importé dynamiquement, jamais globalement.",
         "a11y": "Absente en mouvement réduit et en économie de données (GSAP n’est pas téléchargé)."
+      },
+      "button": {
+        "name": "Bouton",
+        "desc": "Cinq variantes (principal, secondaire, discret, danger, lien), trois tailles, état de chargement et version icône seule.",
+        "use": "<Button variant=\"primary\" size=\"lg\">. Un seul bouton principal par écran. Arrondi 14 px, jamais en pilule. Le chargement garde la largeur (aria-busy).",
+        "a11y": "Cible d’au moins 44 px, focus doré visible, un label obligatoire pour l’icône seule, bouton désactivé à 50 % d’opacité."
+      },
+      "fields": {
+        "name": "Champs : texte, zone de texte, liste",
+        "desc": "Étiquette, aide et erreur autour du contrôle. La liste de l’interface publique est un <select> natif habillé ; celle de l’administration est un composant Base UI au même aspect.",
+        "use": "<Field id label hint error>. L’erreur dit quoi faire, sans reproche. Les listes ne montrent jamais l’apparence du navigateur.",
+        "a11y": "label relié au contrôle, aria-invalid et aria-describedby, erreur annoncée (role=alert), bordure d’erreur de 2 px en plus de la couleur."
+      },
+      "choices": {
+        "name": "Case à cocher, radio, interrupteur",
+        "desc": "Contrôles de choix dessinés par nous, sur de vrais <input> : le clavier et les lecteurs d’écran fonctionnent sans effort.",
+        "use": "<Choice kind=\"checkbox|radio|switch\">. La ligne entière est cliquable (44 px). Un interrupteur agit tout de suite ; une case attend l’envoi.",
+        "a11y": "L’interrupteur a role=switch. L’état n’est jamais porté par la seule couleur : forme et position changent aussi."
+      },
+      "overlays": {
+        "name": "Fenêtre, volet, menu, infobulle",
+        "desc": "Fenêtre et volet sur <dialog> natif ; menu sur l’attribut popover ; infobulle en CSS. Entrée en fondu et petite montée, sortie plus rapide.",
+        "use": "<Dialog>, <Dialog side=\"end\">, <Menu>, <Tooltip>. La fenêtre pour décider, le volet pour filtrer ou naviguer, le menu pour des actions. Jamais de fenêtre sur fenêtre.",
+        "a11y": "Piège du focus, Échap ferme, le focus revient au bouton, défilement de la page bloqué. Menu : flèches, Début/Fin. Infobulle : Échap, survol et focus."
+      },
+      "disclosure": {
+        "name": "Onglets et accordéon",
+        "desc": "Les onglets alternent des vues ; l’accordéon, natif sur <details>, déplie des réponses et fonctionne sans JavaScript.",
+        "use": "<Tabs> pour 2 à 5 vues sœurs ; <Accordion> pour des questions. L’attribut name rend l’accordéon exclusif.",
+        "a11y": "Onglets : role=tablist, flèches, Début/Fin. Accordéon : résumé focalisable, chevron décoratif."
+      },
+      "feedback": {
+        "name": "Notification, étiquette, squelette",
+        "desc": "Retours courts : une notification qui disparaît seule, des étiquettes d’état, un squelette pendant le chargement.",
+        "use": "toast(message,  tone ). Un ton par sens : succès, avertissement, danger, information. Cinq secondes ; le survol suspend.",
+        "a11y": "role=status (alert pour le danger), bouton de fermeture étiqueté. Le sens passe aussi par le texte, pas seulement la couleur."
+      },
+      "surfaces": {
+        "name": "Carte, avatar, état vide",
+        "desc": "Surfaces douces (20 px) sur l’ombre 1. L’état vide accueille une illustration, un titre aimable et une action.",
+        "use": "<Card href> devient un lien entier. <EmptyState> : toujours dire quoi faire ensuite.",
+        "a11y": "Une carte-lien a un seul lien (toute la carte). L’avatar est décoratif s’il est près du nom."
+      },
+      "header": {
+        "name": "En-tête et navigation du site",
+        "desc": "Logotype, cinq onglets à panneaux, recherche, langue, thème et Mon espace. Il se cache en descendant, réapparaît en remontant, et devient translucide avec un flou.",
+        "use": "<Header /> via le gabarit Site. Panneaux à l’intention de la souris (120 ms), au clic et au clavier. Page active : trait doré sous l’onglet.",
+        "a11y": "Boutons aria-expanded, flèches pour parcourir, Échap ferme et rend le focus, lien d’évitement vers le contenu.",
+        "demo": "Voir l’en-tête en haut de la page d’accueil du site."
+      },
+      "mobile": {
+        "name": "Menu mobile",
+        "desc": "Un volet plein écran : onglets en accordéon, outils en bas, grand bouton de fermeture à portée du pouce. Il s’ouvre par un révélateur circulaire doux.",
+        "use": "Sous 1024 px, le bouton menu ouvre le <dialog>. En mouvement réduit, simple fondu.",
+        "a11y": "<dialog> modal : focus piégé, Échap, focus rendu. Cibles de 52 px."
+      },
+      "footer": {
+        "name": "Pied de page",
+        "desc": "Adresse, horaires, réseaux, informations légales, crédit photos, langue et thème. Les données de la paroisse sont des [À VALIDER] tant qu’elles ne sont pas confirmées.",
+        "use": "<Footer /> via le gabarit Site.",
+        "a11y": "Titres h2 par colonne, liens de 44 px.",
+        "demo": "Voir le pied de page en bas du site."
+      },
+      "transitions": {
+        "name": "Transitions de page",
+        "desc": "Un effet de page qui tourne : l’ancienne glisse un peu et s’efface, la nouvelle arrive de l’autre côté.",
+        "use": "Astro ClientRouter dans le gabarit Site. 150 ms en sortie, 260 ms en entrée. Les scripts se relancent à astro:page-load.",
+        "a11y": "Mouvement réduit : simple fondu de 120 ms. Le focus et le défilement sont gérés par le routeur.",
+        "demo": "Naviguez entre deux pages du site pour la voir."
+      },
+      "adminshell": {
+        "name": "Coque de l’administration",
+        "desc": "Barre latérale repliable par groupes, barre du haut (recherche rapide, langue, thème, compte), contenu. Mêmes jetons et polices que le site.",
+        "use": "apps/admin. ⌘K ou Ctrl+K ouvre la recherche rapide. Les composants React sont montrés dans /ui de l’administration.",
+        "a11y": "Lien d’évitement, navigation étiquetée, page courante en aria-current, volet mobile avec fond cliquable.",
+        "demo": "Voir l’administration : pnpm dev puis http://localhost:5173."
       }
     },
     "rules": {
@@ -376,5 +527,166 @@
       "upkeep_title": "Entretenir ce guide",
       "upkeep": "Toute nouvelle couleur, composant, animation, transition ou règle s’ajoute à cette page dans la même modification que le code. Les textes sont écrits en français d’abord. Une décision importante reçoit aussi une fiche dans docs/decisions."
     }
+  },
+  "home": {
+    "title": "Bienvenue",
+    "season": "Nous vivons le temps : {season}",
+    "cta_discover": "Nous découvrir",
+    "cta_calendar": "Voir l’agenda",
+    "hero_note": "[À VALIDER : titre d’accueil de la page d’accueil]"
+  },
+  "soon": {
+    "badge": "Bientôt",
+    "title": "Cette page arrive bientôt",
+    "text": "Nous la préparons avec soin. En attendant, revenez à l’accueil ou découvrez le reste du site.",
+    "note": "[À VALIDER : contenu de cette page]",
+    "home": "Retour à l’accueil"
+  },
+  "notfound": {
+    "title": "Cette page s’est égarée",
+    "text": "Comme une brebis, elle a quitté le troupeau. Revenons à l’accueil."
+  },
+  "footer": {
+    "about": "Une paroisse de l’Église Évangélique du Cameroun, à Yaoundé.",
+    "visit": "Nous rendre visite",
+    "address": "[À VALIDER : adresse de la paroisse]",
+    "hours_title": "Horaires",
+    "hours": "[À VALIDER : horaires des cultes]",
+    "follow": "Nous suivre",
+    "social_pending": "[À VALIDER : lien]",
+    "legal": "Informations",
+    "credits": "Photos : Pexels",
+    "credits_pending": "[À VALIDER : crédits photos]",
+    "rights": "© EEC Nkolndongo 1",
+    "controls": "Langue et thème"
+  },
+  "admin": {
+    "title": "Administration",
+    "skip": "Aller au contenu",
+    "sidebar": "Navigation de l’administration",
+    "collapse": "Réduire le menu",
+    "expand": "Déployer le menu",
+    "dashboard": "Tableau de bord",
+    "dashboard_text": "Bienvenue dans l’administration. Les modules s’ajoutent ici au fil de la construction.",
+    "groups": {
+      "content": "Contenu",
+      "parish": "Vie paroissiale",
+      "members": "Membres",
+      "finance": "Finances",
+      "settings": "Paramètres"
+    },
+    "items": {
+      "news": "Actualités",
+      "sermons": "Prédications",
+      "bulletin": "Méditations et bulletin",
+      "media": "Médiathèque",
+      "events": "Événements",
+      "departments": "Départements",
+      "services": "Cultes et horaires",
+      "liturgy": "Année liturgique",
+      "people": "Fidèles",
+      "roles": "Rôles et permissions",
+      "giving": "Dons",
+      "parish": "Paroisse",
+      "modules": "Modules",
+      "audit": "Journal d’audit",
+      "ui": "Composants"
+    },
+    "soon_title": "Ce module arrive bientôt",
+    "soon_text": "Il sera construit dans une prochaine phase. Rien à configurer pour l’instant.",
+    "user": {
+      "menu": "Menu du compte",
+      "name": "Compte (exemple)",
+      "profile": "Mon profil",
+      "signout": "Se déconnecter",
+      "pending": "Disponible avec l’authentification (phase 02)."
+    },
+    "palette": {
+      "open": "Ouvrir la recherche rapide",
+      "title": "Recherche rapide",
+      "placeholder": "Aller à… (module, page)",
+      "empty": "Rien ne correspond.",
+      "hint": "↑ ↓ pour choisir · Entrée pour ouvrir · Échap pour fermer"
+    },
+    "locale": "Langue"
+  },
+  "login": {
+    "title": "Connexion",
+    "lead": "Accédez à l’administration de la paroisse.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "remember": "Rester connecté sur cet appareil",
+    "submit": "Se connecter",
+    "forgot": "Mot de passe oublié ?",
+    "pending": "La connexion sera activée en phase 02. Cet écran est une maquette.",
+    "error_email": "Saisissez une adresse e-mail valide.",
+    "error_password": "Saisissez votre mot de passe.",
+    "back": "Retour au tableau de bord"
+  },
+  "ui": {
+    "title": "Composants (administration)",
+    "lead": "Les éléments React de l’administration, sur Base UI et avec la même feuille de style que le site public. Le guide complet est dans la charte graphique.",
+    "buttons": "Boutons",
+    "fields": "Champs",
+    "field_name": "Nom",
+    "field_hint": "Comme il apparaît sur votre carte.",
+    "field_error": "Ce champ est obligatoire.",
+    "field_notes": "Notes",
+    "select_label": "Département",
+    "select_placeholder": "Choisir un département",
+    "combo_label": "Rechercher un département",
+    "o1": "Chorale",
+    "o2": "Jeunesse",
+    "o3": "Union des Femmes",
+    "o4": "Catéchèse",
+    "choices": "Choix",
+    "check": "Recevoir les nouvelles",
+    "switch": "Mode brouillon",
+    "overlays": "Fenêtres et menus",
+    "dialog_open": "Ouvrir une fenêtre",
+    "dialog_title": "Publier cet article ?",
+    "dialog_text": "Il sera visible par tous les visiteurs.",
+    "sheet_open": "Ouvrir un volet",
+    "sheet_title": "Filtres",
+    "close": "Fermer",
+    "menu": "Actions",
+    "menu_edit": "Modifier",
+    "menu_copy": "Dupliquer",
+    "menu_delete": "Supprimer",
+    "popover": "Plus d’infos",
+    "popover_text": "Un popover regroupe un court contenu lié à un bouton.",
+    "tooltip": "Aide courte",
+    "tooltip_text": "Une infobulle précise une icône ou un bouton.",
+    "disclosure": "Onglets et accordéon",
+    "tab1": "Aperçu",
+    "tab2": "Détails",
+    "tab1_text": "Le contenu de l’onglet Aperçu.",
+    "tab2_text": "Le contenu de l’onglet Détails.",
+    "acc1": "Qui peut publier ?",
+    "acc1_text": "Selon les permissions de chaque rôle.",
+    "acc2": "Où voit-on l’historique ?",
+    "acc2_text": "Dans le journal d’audit.",
+    "feedback": "Retours et surfaces",
+    "toast_btn": "Afficher une notification",
+    "toast_text": "Enregistré. Merci !",
+    "badges": "Étiquettes",
+    "state_success": "Publié",
+    "state_warning": "En attente",
+    "state_danger": "Refusé",
+    "state_info": "Brouillon",
+    "card_title": "Une carte",
+    "card_text": "Les cartes regroupent un contenu sur une surface douce.",
+    "empty_title": "Rien ici pour l’instant",
+    "empty_text": "Quand il y aura des éléments, ils apparaîtront ici.",
+    "btn_primary": "Principal",
+    "btn_secondary": "Secondaire",
+    "btn_ghost": "Discret",
+    "btn_danger": "Supprimer",
+    "btn_link": "Lien",
+    "btn_small": "Petit",
+    "btn_large": "Grand",
+    "btn_loading": "Envoi",
+    "btn_disabled": "Indisponible",
+    "menu_item_demo": "Menu"
   }
 }

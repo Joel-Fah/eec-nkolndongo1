@@ -1,0 +1,23 @@
+---
+import { createT } from '@eec/i18n'
+import Button from '@eec/ui/astro/Button.astro'
+import EmptyState from '@eec/ui/astro/EmptyState.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Base from '../layouts/Base.astro'
+
+// One 404 for the whole site (static hosting serves a single file): French first, then English.
+const fr = createT('fr')
+const en = createT('en')
+---
+
+<Base title={fr('notfound.title')} noindex>
+  <main id="main" class="mx-auto grid max-w-3xl gap-8 px-4 py-14 md:px-8">
+    <EmptyState title={fr('notfound.title')} text={fr('notfound.text')}>
+      <Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" />
+      <Button href="/fr/">{fr('soon.home')}</Button>
+    </EmptyState>
+    <EmptyState title={en('notfound.title')} text={en('notfound.text')}>
+      <Button href="/en/" variant="secondary" lang="en">{en('soon.home')}</Button>
+    </EmptyState>
+  </main>
+</Base>

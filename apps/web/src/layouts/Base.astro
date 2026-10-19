@@ -31,7 +31,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <script is:inline set:html={themeHeadScript} />
+    <script is:inline data-astro-rerun set:html={themeHeadScript} />
     <title>{title === siteName ? title : `${title} · ${siteName}`}</title>
     {description && <meta name="description" content={description} />}
     {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
@@ -51,6 +51,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
   <body>
     <a class="skip-link" href="#main">{t('common.skip_to_content')}</a>
     <slot />
+    <script>
+      import { initPrimitives } from '@eec/ui/primitives'
+      initPrimitives()
+    </script>
   </body>
 </html>
 

@@ -29,7 +29,82 @@
     "news": "News",
     "give": "Give",
     "account": "My space",
-    "search": "Search"
+    "search": "Search",
+    "items": {
+      "histoire": {
+        "label": "Our story",
+        "desc": "The road our community has walked."
+      },
+      "croyances": {
+        "label": "What we believe",
+        "desc": "What gathers us and keeps us moving."
+      },
+      "pasteurs": {
+        "label": "Pastors and Council",
+        "desc": "Those who serve and lead the parish."
+      },
+      "trouver": {
+        "label": "Find us",
+        "desc": "How to come and join us."
+      },
+      "cultes": {
+        "label": "Services and times",
+        "desc": "The gatherings of the week."
+      },
+      "departements": {
+        "label": "Departments",
+        "desc": "The parish groups: find your place."
+      },
+      "pratique": {
+        "label": "Practical life",
+        "desc": "Baptism, marriage, bereavement, joining: step by step."
+      },
+      "evenements": {
+        "label": "Events",
+        "desc": "What is happening soon."
+      },
+      "liturgie": {
+        "label": "Liturgical year",
+        "desc": "The seasons of the year, their colours and meaning."
+      },
+      "moissons": {
+        "label": "Harvest Festival",
+        "desc": "The festival of generosity and gratitude."
+      },
+      "nouvelles": {
+        "label": "News",
+        "desc": "The latest news from the parish."
+      },
+      "predications": {
+        "label": "Sermons",
+        "desc": "Listen or listen again to a message."
+      },
+      "meditations": {
+        "label": "Meditations and bulletin",
+        "desc": "A word for the week, and the bulletin to take away."
+      },
+      "give": {
+        "label": "Give",
+        "desc": "Support the life and projects of the parish."
+      },
+      "account": {
+        "label": "My space",
+        "desc": "Your member account."
+      },
+      "privacy": {
+        "label": "Privacy",
+        "desc": "How we protect your data."
+      },
+      "legal": {
+        "label": "Legal notice",
+        "desc": "Legal information about the site."
+      }
+    },
+    "main": "Main menu",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "home": "Home",
+    "utilities": "Tools"
   },
   "season": {
     "avent": "Advent",
@@ -303,7 +378,7 @@
       "a11y": "Accessibility",
       "demo": "Demo",
       "upcoming_title": "To document as we build",
-      "upcoming": "Button · Input · Textarea · Select · Checkbox · Radio · Switch · Menu · Tooltip · Dialog · Sheet · Tabs · Accordion · Toast · Card · Badge · Avatar · Skeleton · Empty state · Header and navigation · Footer · Page transitions",
+      "upcoming": "Date picker · Data table · File upload · Audio player · Season banner · News and event cards · Pagination",
       "icon": {
         "name": "Icon",
         "desc": "Stroke-rounded Hugeicons, rendered at build time: no JavaScript.",
@@ -359,6 +434,82 @@
         "desc": "Floating notes and breathing sparkles in a gentle loop; paused off-screen.",
         "use": "<Illustration animate /> + scripts/illustration-idle.ts. GSAP is imported dynamically, never globally.",
         "a11y": "Absent under reduced motion and data saver (GSAP isn’t downloaded)."
+      },
+      "button": {
+        "name": "Button",
+        "desc": "Five variants (primary, secondary, ghost, danger, link), three sizes, a loading state and an icon-only version.",
+        "use": "<Button variant=\"primary\" size=\"lg\">. One primary button per screen. 14 px radius, never a pill. Loading keeps the width (aria-busy).",
+        "a11y": "Target at least 44 px, visible gold focus, a label is mandatory for icon-only, disabled at 50 % opacity."
+      },
+      "fields": {
+        "name": "Fields: text, textarea, select",
+        "desc": "Label, hint and error around the control. The public select is a styled native <select>; the admin’s is a Base UI component that looks the same.",
+        "use": "<Field id label hint error>. The error says what to do, without blame. Selects never show the browser’s default look.",
+        "a11y": "Label tied to the control, aria-invalid and aria-describedby, error announced (role=alert), a 2 px error frame in addition to colour."
+      },
+      "choices": {
+        "name": "Checkbox, radio, switch",
+        "desc": "Choice controls drawn by us on real <input>s: keyboard and screen readers work out of the box.",
+        "use": "<Choice kind=\"checkbox|radio|switch\">. The whole row is clickable (44 px). A switch acts at once; a checkbox waits for submit.",
+        "a11y": "The switch has role=switch. State is never carried by colour alone: shape and position change too."
+      },
+      "overlays": {
+        "name": "Dialog, sheet, menu, tooltip",
+        "desc": "Dialog and sheet on native <dialog>; menu on the popover attribute; tooltip in CSS. Fade and small rise in, faster out.",
+        "use": "<Dialog>, <Dialog side=\"end\">, <Menu>, <Tooltip>. Dialog to decide, sheet to filter or navigate, menu for actions. Never a dialog over a dialog.",
+        "a11y": "Focus trap, Esc closes, focus returns to the trigger, page scroll locked. Menu: arrows, Home/End. Tooltip: Esc, hover and focus."
+      },
+      "disclosure": {
+        "name": "Tabs and accordion",
+        "desc": "Tabs switch views; the accordion, native on <details>, unfolds answers and works without JavaScript.",
+        "use": "<Tabs> for 2 to 5 sibling views; <Accordion> for questions. The name attribute makes the accordion exclusive.",
+        "a11y": "Tabs: role=tablist, arrows, Home/End. Accordion: focusable summary, decorative chevron."
+      },
+      "feedback": {
+        "name": "Toast, badge, skeleton",
+        "desc": "Short feedback: a toast that disappears by itself, state badges, a skeleton while loading.",
+        "use": "toast(message,  tone ). One tone per meaning: success, warning, danger, info. Five seconds; hovering pauses.",
+        "a11y": "role=status (alert for danger), labelled close button. Meaning is in the text too, not just colour."
+      },
+      "surfaces": {
+        "name": "Card, avatar, empty state",
+        "desc": "Soft surfaces (20 px) on shadow 1. The empty state hosts an illustration, a kind title and an action.",
+        "use": "<Card href> becomes a whole-card link. <EmptyState>: always say what to do next.",
+        "a11y": "A link card has a single link (the whole card). The avatar is decorative when next to the name."
+      },
+      "header": {
+        "name": "Site header and navigation",
+        "desc": "Lockup, five tabs with panels, search, language, theme and My space. It hides on scroll down, returns on scroll up, and turns translucent with a blur.",
+        "use": "<Header /> through the Site layout. Panels open on mouse intent (120 ms), click and keyboard. Active page: a gold stroke under the tab.",
+        "a11y": "aria-expanded buttons, arrows to move, Esc closes and returns focus, skip link to the content.",
+        "demo": "See the header at the top of the site’s home page."
+      },
+      "mobile": {
+        "name": "Mobile menu",
+        "desc": "A full-screen sheet: tabs as accordions, tools at the bottom, a big close button within thumb reach. It opens with a soft circular reveal.",
+        "use": "Below 1024 px, the menu button opens the <dialog>. Under reduced motion, a plain fade.",
+        "a11y": "Modal <dialog>: trapped focus, Esc, focus returned. 52 px targets."
+      },
+      "footer": {
+        "name": "Footer",
+        "desc": "Address, times, socials, legal information, photo credit, language and theme. Parish data stays [TO CONFIRM] until confirmed.",
+        "use": "<Footer /> through the Site layout.",
+        "a11y": "One h2 per column, 44 px links.",
+        "demo": "See the footer at the bottom of the site."
+      },
+      "transitions": {
+        "name": "Page transitions",
+        "desc": "A page-turn effect: the old page slides a little and fades, the new one arrives from the other side.",
+        "use": "Astro ClientRouter in the Site layout. 150 ms out, 260 ms in. Scripts re-run on astro:page-load.",
+        "a11y": "Reduced motion: a plain 120 ms fade. Focus and scroll are handled by the router.",
+        "demo": "Navigate between two site pages to see it."
+      },
+      "adminshell": {
+        "name": "Admin shell",
+        "desc": "A collapsible sidebar by groups, a top bar (quick search, language, theme, account), content. Same tokens and fonts as the site.",
+        "use": "apps/admin. ⌘K or Ctrl+K opens quick search. The React components are shown at /ui in the admin.",
+        "a11y": "Skip link, labelled navigation, current page via aria-current, mobile drawer with a clickable scrim.",
+        "demo": "See the administration: pnpm dev then http://localhost:5173."
       }
     },
     "rules": {
@@ -376,5 +527,166 @@
       "upkeep_title": "Keeping this guide alive",
       "upkeep": "Every new colour, component, animation, transition or rule is added to this page in the same change as the code. Texts are written in French first. An important decision also gets a record in docs/decisions."
     }
+  },
+  "home": {
+    "title": "Welcome",
+    "season": "We are in the season of {season}",
+    "cta_discover": "Get to know us",
+    "cta_calendar": "See the calendar",
+    "hero_note": "[TO CONFIRM: home page headline]"
+  },
+  "soon": {
+    "badge": "Coming soon",
+    "title": "This page is on its way",
+    "text": "We are preparing it with care. Meanwhile, head back home or explore the rest of the site.",
+    "note": "[TO CONFIRM: content for this page]",
+    "home": "Back to home"
+  },
+  "notfound": {
+    "title": "This page wandered off",
+    "text": "Like a lost sheep, it left the flock. Let’s head back home."
+  },
+  "footer": {
+    "about": "A parish of the Evangelical Church of Cameroon, in Yaoundé.",
+    "visit": "Visit us",
+    "address": "[TO CONFIRM: parish address]",
+    "hours_title": "Times",
+    "hours": "[TO CONFIRM: service times]",
+    "follow": "Follow us",
+    "social_pending": "[TO CONFIRM: link]",
+    "legal": "Information",
+    "credits": "Photos: Pexels",
+    "credits_pending": "[TO CONFIRM: photo credits]",
+    "rights": "© EEC Nkolndongo 1",
+    "controls": "Language and theme"
+  },
+  "admin": {
+    "title": "Administration",
+    "skip": "Skip to content",
+    "sidebar": "Administration navigation",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "dashboard": "Dashboard",
+    "dashboard_text": "Welcome to the administration. Modules are added here as we build.",
+    "groups": {
+      "content": "Content",
+      "parish": "Parish life",
+      "members": "Members",
+      "finance": "Finance",
+      "settings": "Settings"
+    },
+    "items": {
+      "news": "News",
+      "sermons": "Sermons",
+      "bulletin": "Meditations and bulletin",
+      "media": "Media library",
+      "events": "Events",
+      "departments": "Departments",
+      "services": "Services and times",
+      "liturgy": "Liturgical year",
+      "people": "Members",
+      "roles": "Roles and permissions",
+      "giving": "Giving",
+      "parish": "Parish",
+      "modules": "Modules",
+      "audit": "Audit log",
+      "ui": "Components"
+    },
+    "soon_title": "This module is on its way",
+    "soon_text": "It will be built in a later phase. Nothing to set up for now.",
+    "user": {
+      "menu": "Account menu",
+      "name": "Account (sample)",
+      "profile": "My profile",
+      "signout": "Sign out",
+      "pending": "Available with authentication (phase 02)."
+    },
+    "palette": {
+      "open": "Open quick search",
+      "title": "Quick search",
+      "placeholder": "Go to… (module, page)",
+      "empty": "Nothing matches.",
+      "hint": "↑ ↓ to choose · Enter to open · Esc to close"
+    },
+    "locale": "Language"
+  },
+  "login": {
+    "title": "Sign in",
+    "lead": "Access the parish administration.",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Keep me signed in on this device",
+    "submit": "Sign in",
+    "forgot": "Forgot your password?",
+    "pending": "Sign-in will be enabled in phase 02. This screen is a mock-up.",
+    "error_email": "Enter a valid email address.",
+    "error_password": "Enter your password.",
+    "back": "Back to the dashboard"
+  },
+  "ui": {
+    "title": "Components (administration)",
+    "lead": "The administration’s React elements, built on Base UI with the same stylesheet as the public site. The full guide lives in the brand guidelines.",
+    "buttons": "Buttons",
+    "fields": "Fields",
+    "field_name": "Name",
+    "field_hint": "As it appears on your card.",
+    "field_error": "This field is required.",
+    "field_notes": "Notes",
+    "select_label": "Department",
+    "select_placeholder": "Choose a department",
+    "combo_label": "Search a department",
+    "o1": "Choir",
+    "o2": "Youth",
+    "o3": "Women’s Union",
+    "o4": "Catechism",
+    "choices": "Choices",
+    "check": "Receive the news",
+    "switch": "Draft mode",
+    "overlays": "Overlays and menus",
+    "dialog_open": "Open a dialog",
+    "dialog_title": "Publish this article?",
+    "dialog_text": "It will be visible to all visitors.",
+    "sheet_open": "Open a side sheet",
+    "sheet_title": "Filters",
+    "close": "Close",
+    "menu": "Actions",
+    "menu_edit": "Edit",
+    "menu_copy": "Duplicate",
+    "menu_delete": "Delete",
+    "popover": "More info",
+    "popover_text": "A popover holds a short piece of content tied to a button.",
+    "tooltip": "Short help",
+    "tooltip_text": "A tooltip clarifies an icon or a button.",
+    "disclosure": "Tabs and accordion",
+    "tab1": "Overview",
+    "tab2": "Details",
+    "tab1_text": "The Overview tab’s content.",
+    "tab2_text": "The Details tab’s content.",
+    "acc1": "Who can publish?",
+    "acc1_text": "Depending on each role’s permissions.",
+    "acc2": "Where is the history?",
+    "acc2_text": "In the audit log.",
+    "feedback": "Feedback and surfaces",
+    "toast_btn": "Show a notification",
+    "toast_text": "Saved. Thank you!",
+    "badges": "Badges",
+    "state_success": "Published",
+    "state_warning": "Pending",
+    "state_danger": "Rejected",
+    "state_info": "Draft",
+    "card_title": "A card",
+    "card_text": "Cards group content on a soft surface.",
+    "empty_title": "Nothing here yet",
+    "empty_text": "When there are items, they will show up here.",
+    "btn_primary": "Primary",
+    "btn_secondary": "Secondary",
+    "btn_ghost": "Ghost",
+    "btn_danger": "Delete",
+    "btn_link": "Link",
+    "btn_small": "Small",
+    "btn_large": "Large",
+    "btn_loading": "Sending",
+    "btn_disabled": "Unavailable",
+    "menu_item_demo": "Menu"
   }
 }
