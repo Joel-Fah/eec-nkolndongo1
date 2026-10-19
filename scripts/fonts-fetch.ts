@@ -15,8 +15,7 @@ import { inflateRawSync } from 'node:zlib'
 
 const families: Record<string, string[]> = {
   switzer: ['Variable', 'VariableItalic', 'Regular', 'Italic', 'Medium', 'Semibold'],
-  zodiak: ['Variable', 'VariableItalic', 'Regular', 'Bold'],
-  gambetta: ['Variable', 'VariableItalic', 'Regular', 'Semibold'],
+  'general-sans': ['Variable', 'VariableItalic'],
 }
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -55,7 +54,11 @@ function readZip(buffer: Buffer): Map<string, () => Buffer> {
 
 async function fetchFamily(family: string, styles: string[]): Promise<void> {
   const dir = join(outDir, family)
-  const Family = family[0]?.toUpperCase() + family.slice(1)
+  // File prefix: `general-sans` → `GeneralSans`
+  const Family = family
+    .split('-')
+    .map((w) => (w[0]?.toUpperCase() ?? '') + w.slice(1))
+    .join('')
   const wanted = styles.map((style) => `${Family}-${style}.woff2`)
   if (!force && wanted.every((file) => existsSync(join(dir, file)))) {
     console.log(`✓ ${Family} already present`)

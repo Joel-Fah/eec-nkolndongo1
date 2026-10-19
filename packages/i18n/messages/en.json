@@ -1,8 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "site": {
-    "name": "EEC Nkolndongo\u00a01",
-    "parish": "Nkolndongo\u00a01 Parish",
+    "name": "EEC Nkolndongo 1",
+    "parish": "Nkolndongo 1 Parish",
     "church": "Evangelical Church of Cameroon",
     "tagline": "[TO CONFIRM: parish welcome line]"
   },
@@ -46,13 +46,13 @@
     "hymn_book": "One hand passes an open hymn book to another; music notes float up from the pages."
   },
   "lockup": {
-    "short": "EEC NKOLNDONGO\u00a01",
+    "short": "EEC NKOLNDONGO 1",
     "long_church": "Église Évangélique du Cameroun",
-    "long_parish": "Paroisse de Nkolndongo\u00a01"
+    "long_parish": "Paroisse de Nkolndongo 1"
   },
   "brand": {
     "title": "Brand board",
-    "status": "Draft — checkpoint A",
+    "status": "Approved — logo, colours, fonts",
     "intro": "A working board to approve the logo, colours, typography and style before building the site. Nothing here is final.",
     "toc": "On this page",
     "logo": {
@@ -79,14 +79,16 @@
       "minsize": "Minimum size: 24 px tall without text; 200 px with the arched text, which is unreadable below that.",
       "minsize_demo": "The mark without text at 24, 32, 48 and 64 px",
       "lockups": "Horizontal lockups",
-      "lockups_lead": "The mark with the parish name, for the header and documents. One try per display typeface; the chosen one will be outlined as vectors. The name stays in French (proper name).",
+      "lockups_lead": "The mark with the parish name, in live text. The short one is for small spaces, the long one for large ones.",
       "lockup_short": "Short",
       "lockup_long": "Long",
-      "icons": "Favicons and app icons"
+      "icons": "Favicons and app icons",
+      "lockup_auto": "Adaptive",
+      "lockup_auto_lead": "One composition picks short or long from the width it has (from 22 rem)."
     },
     "colour": {
       "title": "Colour",
-      "lead": "Drawn from the logo — green, yellow, black, white — then softened. Every text/background pair is checked (WCAG AA) in both themes.",
+      "lead": "Drawn from the logo — green, yellow, black, white — then softened, with the state colours. Every text/background pair is checked (WCAG AA) in both themes.",
       "light": "Light theme",
       "dark": "Dark theme",
       "seasons": "Liturgical season colours",
@@ -109,13 +111,13 @@
       "change_focus": "Focus ring: gold, plus an outer forest-green ring in the light theme (gold alone doesn't reach 3:1).",
       "change_line": "Field borders: new line-strong token (3:1) so fields can be told apart.",
       "change_seasons": "Seasons: a decorative tint, a text tint and an on-colour for each; lighter tints in the dark theme.",
-      "change_new_seasons": "Epiphany and Holy Week weren't defined: proposed gold (as Christmas) and crimson. To confirm."
+      "change_new_seasons": "Epiphany and Holy Week weren't defined: proposed gold (as Christmas) and crimson. To confirm.",
+      "change_states": "States: success, warning, danger and info, each with a text-safe tint and a soft background tint, passing in both themes."
     },
     "type": {
       "title": "Typography",
-      "lead": "Switzer for text and interface, a display serif for headings. Three pairings to compare.",
-      "pairing": "Switzer + {font}",
-      "recommended": "Recommended",
+      "lead": "Switzer for text and interface, General Sans for headings: two sans-serifs, one calm and one warmer.",
+      "pairing": "Switzer + General Sans",
       "weight": "File weight: {size}",
       "sample_label": "Typographic sample, not information about the parish.",
       "h1": "Welcome home",
@@ -129,7 +131,10 @@
       "quote": "“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”",
       "quote_ref": "Matthew 11:28",
       "punctuation": "Come as you are; there's room for everyone! A question? Write to us.",
-      "numbers": "Dates and amounts"
+      "numbers": "Dates and amounts",
+      "scale": "Type scale",
+      "scale_base": "Body text, 17 to 18 px",
+      "scale_xs": "Labels"
     },
     "shape": {
       "title": "Shape, elevation and motion",

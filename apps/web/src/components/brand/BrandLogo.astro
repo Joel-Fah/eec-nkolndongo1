@@ -2,14 +2,10 @@
 import Mark from '@eec/ui/astro/Mark.astro'
 import official from '../../../../../assets/images/eec-logo-tr.png?url'
 import { useT } from '../../lib/i18n'
+import SiteLockup from '../SiteLockup.astro'
 import Section from './Section.astro'
 
 const t = useT(Astro.currentLocale)
-const displayFonts = [
-  { name: 'Fraunces', stack: 'var(--font-fraunces)' },
-  { name: 'Zodiak', stack: 'var(--font-zodiak)' },
-  { name: 'Gambetta', stack: 'var(--font-gambetta)' },
-]
 const darkOptions = [
   { key: 'brand.logo.dark_plain', variant: 'full', tile: false },
   { key: 'brand.logo.dark_halo', variant: 'full-halo', tile: false },
@@ -112,54 +108,33 @@ const darkOptions = [
       <h3 class="text-xl">{t('brand.logo.lockups')}</h3>
       <p class="mt-2 max-w-[62ch] text-ink-muted">{t('brand.logo.lockups_lead')}</p>
     </div>
-    {
-      displayFonts.map((font) => (
-        <div class="grid gap-3" style={`--lockup-font:${font.stack}`}>
-          <p class="text-sm font-medium text-ink-muted">{font.name}</p>
-          <div class="grid gap-3 lg:grid-cols-3">
-            <div class="lockup-row rounded-lg bg-surface p-5 shadow-1">
-              <div class="lockup">
-                <Mark variant="mark" class="lockup-mark" />
-                <span class="lockup-short">{t('lockup.short')}</span>
-              </div>
-              <div class="lockup">
-                <Mark variant="mark" class="lockup-mark lockup-mark-lg" />
-                <span class="lockup-long">
-                  <span>{t('lockup.long_church')}</span>
-                  <span>{t('lockup.long_parish')}</span>
-                </span>
-              </div>
+    <div class="grid gap-4 lg:grid-cols-3">
+      <div data-theme="light" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
+        <SiteLockup variant="short" class="text-[1.375rem]" />
+        <SiteLockup variant="long" class="text-[1.375rem]" />
+      </div>
+      <div data-theme="dark" class="grid gap-6 rounded-lg bg-surface p-6 text-ink shadow-1">
+        <SiteLockup variant="short" mark="halo" class="text-[1.375rem]" />
+        <SiteLockup variant="long" mark="halo" class="text-[1.375rem]" />
+      </div>
+      <div data-theme="light" class="grid gap-6 rounded-lg bg-surface-2 p-6 text-ink">
+        <SiteLockup variant="short" mark="mono" class="text-[1.375rem]" />
+        <SiteLockup variant="long" mark="mono" class="text-[1.375rem]" />
+      </div>
+    </div>
+    <div class="grid gap-3">
+      <h4 class="text-lg">{t('brand.logo.lockup_auto')}</h4>
+      <p class="max-w-[62ch] text-sm text-ink-muted">{t('brand.logo.lockup_auto_lead')}</p>
+      <div class="grid gap-3">
+        {
+          ['14rem', '20rem', '26rem', '36rem'].map((width) => (
+            <div class="rounded-md bg-surface p-4 text-ink shadow-1" style={`width:min(100%, ${width})`}>
+              <SiteLockup class="text-[1.25rem]" />
             </div>
-            <div data-theme="dark" class="lockup-row rounded-lg bg-surface p-5 text-ink">
-              <div class="lockup">
-                <Mark variant="halo" class="lockup-mark" />
-                <span class="lockup-short">{t('lockup.short')}</span>
-              </div>
-              <div class="lockup">
-                <Mark variant="halo" class="lockup-mark lockup-mark-lg" />
-                <span class="lockup-long">
-                  <span>{t('lockup.long_church')}</span>
-                  <span>{t('lockup.long_parish')}</span>
-                </span>
-              </div>
-            </div>
-            <div class="lockup-row rounded-lg bg-surface-2 p-5 text-ink">
-              <div class="lockup">
-                <Mark variant="mono" class="lockup-mark" />
-                <span class="lockup-short">{t('lockup.short')}</span>
-              </div>
-              <div class="lockup">
-                <Mark variant="mono" class="lockup-mark lockup-mark-lg" />
-                <span class="lockup-long">
-                  <span>{t('lockup.long_church')}</span>
-                  <span>{t('lockup.long_parish')}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))
-    }
+          ))
+        }
+      </div>
+    </div>
   </div>
 
   <div class="grid gap-5">
@@ -191,45 +166,5 @@ const darkOptions = [
     outline-offset: -1px;
     background-image: linear-gradient(var(--surface), var(--surface)), linear-gradient(var(--gold-soft), var(--gold-soft));
     background-clip: content-box, padding-box;
-  }
-  .lockup-row {
-    display: grid;
-    gap: 1.25rem;
-  }
-  .lockup {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .lockup :global(.lockup-mark) {
-    height: 2.75rem;
-    width: auto;
-    flex: none;
-  }
-  .lockup :global(.lockup-mark-lg) {
-    height: 3.5rem;
-  }
-  .lockup-short {
-    font-family: var(--lockup-font);
-    font-weight: 600;
-    font-size: clamp(1.125rem, 4.6vw, 1.375rem);
-    letter-spacing: 0.02em;
-    line-height: 1;
-  }
-  .lockup-long {
-    display: grid;
-    gap: 0.125rem;
-    line-height: 1.1;
-  }
-  .lockup-long > :first-child {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    color: var(--ink-muted);
-  }
-  .lockup-long > :last-child {
-    font-family: var(--lockup-font);
-    font-weight: 600;
-    font-size: clamp(1.125rem, 4.6vw, 1.375rem);
   }
 </style>

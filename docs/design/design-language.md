@@ -2,7 +2,7 @@
 
 Mood: **modern, gentle, subtle, sleek, welcoming, charming, elegant — with a smirk.**
 Reference for *feel only* (do not replicate): maree-lndev.vercel.app.
-Values below are **proposals** until approved on the brand board.
+Palette, logo and fonts approved on the brand board (decision 0015); other values are still provisional.
 
 ## 1. Brand mark
 - Source: `assets/images/eec-logo-tr.png` (EEC universal logo). To be redrawn as clean SVG
@@ -55,8 +55,8 @@ In dark mode, elevation = lighter surface + faint top highlight border rather th
 ## 5. Typography
 - **Text & UI:** **Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
   No Inter, no Geist.
-- **Display:** expressive serif, shortlist for the brand board: **Fraunces** (soft/wonk axes),
-  **Zodiak**, **Gambetta** (Fontshare).
+- **Display:** **General Sans** (Fontshare) — chosen on the brand board over Fraunces / Zodiak /
+  Gambetta (decision 0015). Two sans-serifs: Switzer calm for reading, General Sans warmer for headings.
 - Fluid type scale (clamp), ratio ~1.25 mobile / 1.333 desktop. Body 17–18px, line-height 1.6.
 - French typography: non-breaking space before `: ; ! ?` and inside « guillemets » (handled by an i18n
   helper), proper apostrophe `’`.

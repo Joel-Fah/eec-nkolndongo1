@@ -1,8 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "site": {
-    "name": "EEC Nkolndongo\u00a01",
-    "parish": "Paroisse de Nkolndongo\u00a01",
+    "name": "EEC Nkolndongo 1",
+    "parish": "Paroisse de Nkolndongo 1",
     "church": "Église Évangélique du Cameroun",
     "tagline": "[À VALIDER : phrase d’accueil de la paroisse]"
   },
@@ -46,13 +46,13 @@
     "hymn_book": "Une main tend un recueil de cantiques ouvert à une autre main ; des notes de musique s’envolent des pages."
   },
   "lockup": {
-    "short": "EEC NKOLNDONGO\u00a01",
+    "short": "EEC NKOLNDONGO 1",
     "long_church": "Église Évangélique du Cameroun",
-    "long_parish": "Paroisse de Nkolndongo\u00a01"
+    "long_parish": "Paroisse de Nkolndongo 1"
   },
   "brand": {
     "title": "Charte graphique",
-    "status": "Brouillon — point de contrôle A",
+    "status": "Validé — logo, couleurs, polices",
     "intro": "Planche de travail pour valider le logo, les couleurs, la typographie et le style avant de construire le site. Rien ici n’est définitif.",
     "toc": "Sur cette page",
     "logo": {
@@ -79,14 +79,16 @@
       "minsize": "Taille minimale : 24 px de haut sans texte ; 200 px avec le texte en arc, illisible en dessous.",
       "minsize_demo": "Le logo sans texte à 24, 32, 48 et 64 px",
       "lockups": "Logotypes horizontaux",
-      "lockups_lead": "Le logo et le nom de la paroisse, pour l’en-tête et les documents. Un essai par police d’affichage ; la version retenue sera vectorisée.",
+      "lockups_lead": "Le logo et le nom de la paroisse, en texte vivant. Le court est pour les petits espaces, le long pour les grands.",
       "lockup_short": "Court",
       "lockup_long": "Long",
-      "icons": "Favicons et icônes d’application"
+      "icons": "Favicons et icônes d’application",
+      "lockup_auto": "Adaptatif",
+      "lockup_auto_lead": "Une seule composition choisit court ou long selon la largeur disponible (à partir de 22 rem)."
     },
     "colour": {
       "title": "Couleurs",
-      "lead": "Tirées du logo — vert, jaune, noir, blanc — puis adoucies. Chaque couple texte/fond est vérifié (WCAG AA) dans les deux thèmes.",
+      "lead": "Tirées du logo — vert, jaune, noir, blanc — puis adoucies, avec les couleurs d’état. Chaque couple texte/fond est vérifié (WCAG AA) dans les deux thèmes.",
       "light": "Thème clair",
       "dark": "Thème sombre",
       "seasons": "Couleurs du temps liturgique",
@@ -109,13 +111,13 @@
       "change_focus": "Anneau de focus : or, plus un anneau extérieur vert forêt en thème clair (l’or seul n’atteint pas 3:1).",
       "change_line": "Bordures des champs : nouveau jeton line-strong (3:1) pour qu’on les distingue.",
       "change_seasons": "Saisons : teinte décorative, teinte texte et texte posé dessus pour chacune ; teintes plus claires en thème sombre.",
-      "change_new_seasons": "Épiphanie et Semaine sainte n’étaient pas définies : proposition or (comme Noël) et cramoisi. À confirmer."
+      "change_new_seasons": "Épiphanie et Semaine sainte n’étaient pas définies : proposition or (comme Noël) et cramoisi. À confirmer.",
+      "change_states": "États : succès, avertissement, danger et information, chacun avec une teinte pour le texte et une teinte de fond doux, conformes dans les deux thèmes."
     },
     "type": {
       "title": "Typographie",
-      "lead": "Switzer pour le texte et l’interface, une serif d’affichage pour les titres. Trois accords à comparer.",
-      "pairing": "Switzer + {font}",
-      "recommended": "Recommandé",
+      "lead": "Switzer pour le texte et l’interface, General Sans pour les titres : deux sans-serif, l’une sobre et l’autre plus chaleureuse.",
+      "pairing": "Switzer + General Sans",
       "weight": "Poids des fichiers : {size}",
       "sample_label": "Exemple typographique, pas une information sur la paroisse.",
       "h1": "Bienvenue à la maison",
@@ -129,7 +131,10 @@
       "quote": "« Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos. »",
       "quote_ref": "Matthieu 11 : 28",
       "punctuation": "Venez comme vous êtes ; il y a de la place pour tous ! Une question ? Écrivez-nous.",
-      "numbers": "Dates et montants"
+      "numbers": "Dates et montants",
+      "scale": "Échelle typographique",
+      "scale_base": "Texte courant, 17 à 18 px",
+      "scale_xs": "Étiquettes"
     },
     "shape": {
       "title": "Formes, ombres et mouvement",

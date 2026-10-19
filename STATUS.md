@@ -27,5 +27,5 @@ _Last updated: 2026-10-19_
 - Pexels API key (Joël will provide at build time).
 
 ## Open questions
-- Display serif choice (decided on the brand board).
+- Display font: General Sans (decided, 0015).
 - Is the Délivrance ministry presented publicly? (council decision)

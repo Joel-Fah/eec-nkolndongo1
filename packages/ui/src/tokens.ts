@@ -32,8 +32,15 @@ export const colors = {
   clay: { light: '#D9643A', dark: '#E98360' },
   /** ⚑ Clay is 3.4:1 on cream — large text only. clay-ink for small text. */
   'clay-ink': { light: '#B0461F', dark: '#E98360' },
+  /** States — text/icons (4.5:1 on every surface) and their soft backgrounds (alerts, toasts, badges). */
+  success: { light: '#1B6E3F', dark: '#5FD08A' },
+  'success-soft': { light: '#E1F1E6', dark: '#14301F' },
+  warning: { light: '#8A5200', dark: '#F2B24A' },
+  'warning-soft': { light: '#FCEBCB', dark: '#3A2A0E' },
   danger: { light: '#B3261E', dark: '#F2867B' },
   'danger-soft': { light: '#FBE9E6', dark: '#3B1D1A' },
+  info: { light: '#1F5FA8', dark: '#7DB2EA' },
+  'info-soft': { light: '#E1ECF8', dark: '#12283F' },
   /** Illustrations: paper stays light, shadows stay dark, whatever the theme. */
   'illo-paper': { light: '#FFFDF8', dark: '#EAE3D3' },
   'illo-shadow': { light: '#16201A', dark: '#050906' },
@@ -111,8 +118,9 @@ export const radius = { xs: 6, sm: 10, md: 14, lg: 20, xl: 28 } as const
 
 export const fonts = {
   sans: '"Switzer", "Switzer Fallback", "Switzer Fallback Android", ui-sans-serif, system-ui, sans-serif',
-  /** Provisional until the brand board decides (Fraunces / Zodiak / Gambetta). */
-  display: '"Fraunces", "Fraunces Fallback", "Fraunces Fallback Android", ui-serif, Georgia, serif',
+  /** Headings, lockups, big numbers. General Sans (Fontshare) — chosen on the brand board. */
+  display:
+    '"General Sans", "General Sans Fallback", "General Sans Fallback Android", ui-sans-serif, system-ui, sans-serif',
 } as const
 
 export const motion = {
@@ -142,16 +150,29 @@ export const type = {
 /** Text/background pairs that must pass WCAG AA in both themes. [fg, bg, min ratio] */
 export const contrastPairs: readonly [string, string, number][] = [
   ...(['bg', 'surface', 'surface-2', 'surface-raised'] as const).flatMap((bg) =>
-    (['ink', 'ink-muted', 'primary', 'gold-ink', 'clay-ink', 'danger'] as const).map(
-      (fg) => [fg, bg, 4.5] as [string, string, number],
-    ),
+    (
+      [
+        'ink',
+        'ink-muted',
+        'primary',
+        'gold-ink',
+        'clay-ink',
+        'success',
+        'warning',
+        'danger',
+        'info',
+      ] as const
+    ).map((fg) => [fg, bg, 4.5] as [string, string, number]),
   ),
   ['on-primary', 'primary', 4.5],
   ['ink', 'primary-soft', 4.5],
   ['primary', 'primary-soft', 4.5],
   ['ink', 'gold-soft', 4.5],
   ['on-gold', 'gold', 4.5],
+  ['success', 'success-soft', 4.5],
+  ['warning', 'warning-soft', 4.5],
   ['danger', 'danger-soft', 4.5],
+  ['info', 'info-soft', 4.5],
   ['line-strong', 'bg', 3],
   ['line-strong', 'surface', 3],
   ['gold', 'bg', 1], // decorative only — listed so the board shows why gold is never text

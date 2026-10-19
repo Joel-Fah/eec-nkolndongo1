@@ -8,7 +8,16 @@ import Swatch from './Swatch.astro'
 const t = useT(Astro.currentLocale)
 const report = contrastReport()
 const failing = report.filter((row) => !row.pass).length
-const flagged = new Set(['line-strong', 'gold-ink', 'clay-ink', 'focus-outer', 'on-gold'])
+const flagged = new Set([
+  'line-strong',
+  'gold-ink',
+  'clay-ink',
+  'focus-outer',
+  'on-gold',
+  'success',
+  'warning',
+  'info',
+])
 const changes = [
   'brand.colour.change_gold',
   'brand.colour.change_clay',
@@ -16,6 +25,7 @@ const changes = [
   'brand.colour.change_line',
   'brand.colour.change_seasons',
   'brand.colour.change_new_seasons',
+  'brand.colour.change_states',
 ] as const
 const seasonLabel = (name: Season) => t(`season.${name}`)
 ---

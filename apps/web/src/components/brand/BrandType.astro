@@ -10,11 +10,7 @@ const t = useT(locale)
 const files = import.meta.glob<string>(
   [
     '../../../../../packages/ui/fonts/fontshare/switzer/Switzer-Variable.woff2',
-    '../../../../../packages/ui/fonts/fraunces/Fraunces-Display.woff2',
-    '../../../../../packages/ui/fonts/fontshare/zodiak/Zodiak-Variable.woff2',
-    '../../../../../packages/ui/fonts/fontshare/zodiak/Zodiak-Regular.woff2',
-    '../../../../../packages/ui/fonts/fontshare/gambetta/Gambetta-Variable.woff2',
-    '../../../../../packages/ui/fonts/fontshare/gambetta/Gambetta-Regular.woff2',
+    '../../../../../packages/ui/fonts/fontshare/general-sans/GeneralSans-Variable.woff2',
   ],
   { query: '?inline', import: 'default', eager: true },
 )
@@ -25,88 +21,76 @@ const kb = (file: string) => {
   return formatBytes(Math.floor((base64.length * 3) / 4), locale)
 }
 
-const pairings = [
-  {
-    font: 'Fraunces',
-    stack: 'var(--font-fraunces)',
-    sizes: `Switzer ${kb('Switzer-Variable.woff2')} + Fraunces ${kb('Fraunces-Display.woff2')}`,
-    recommended: true,
-  },
-  {
-    font: 'Zodiak',
-    stack: 'var(--font-zodiak)',
-    sizes: `Switzer ${kb('Switzer-Variable.woff2')} + Zodiak ${kb('Zodiak-Regular.woff2')} (${kb('Zodiak-Variable.woff2')} var.)`,
-    recommended: false,
-  },
-  {
-    font: 'Gambetta',
-    stack: 'var(--font-gambetta)',
-    sizes: `Switzer ${kb('Switzer-Variable.woff2')} + Gambetta ${kb('Gambetta-Regular.woff2')} (${kb('Gambetta-Variable.woff2')} var.)`,
-    recommended: false,
-  },
-]
+const sizes = `Switzer ${kb('Switzer-Variable.woff2')} + General Sans ${kb('GeneralSans-Variable.woff2')}`
 
 // A typographic sample only: Sunday 25 October 2026, 09:00 in Yaoundé.
 const sample = new Date('2026-10-25T08:00:00Z')
 const dateLine = `${formatDate(sample, locale)} · ${formatTime(sample, locale)}`
 const amount = formatXAF(5000, locale)
+const scale = [
+  ['4xl', 'brand.type.h1'],
+  ['3xl', 'brand.type.h2'],
+  ['2xl', 'brand.type.h3'],
+  ['xl', 'brand.type.h4'],
+  ['lg', 'brand.type.lead_text'],
+  ['base', 'brand.type.scale_base'],
+  ['sm', 'brand.type.small'],
+  ['xs', 'brand.type.scale_xs'],
+] as const
 const nav = ['nav.discover', 'nav.live', 'nav.calendar', 'nav.news', 'nav.give'] as const
 ---
 
 <Section id="type" title={t('brand.type.title')} lead={t('brand.type.lead')}>
   <p class="text-sm text-ink-muted">{t('brand.type.sample_label')}</p>
-  <div class="grid gap-6 xl:grid-cols-3">
-    {
-      pairings.map((pairing) => (
-        <article
-          class:list={[
-            'specimen grid min-w-0 content-start gap-5 rounded-xl bg-surface p-6 shadow-1 md:p-8',
-            pairing.recommended && 'ring-2 ring-gold',
-          ]}
-          style={`--font-display:${pairing.stack}`}
-        >
-          <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-4">
-            <h3 class="font-sans text-base font-semibold">{t('brand.type.pairing', { font: pairing.font })}</h3>
-            {pairing.recommended && (
-              <span class="rounded-xs bg-gold px-2 py-0.5 text-xs font-semibold text-on-gold">
-                {t('brand.type.recommended')}
-              </span>
-            )}
-            <p class="w-full text-xs text-ink-muted">{t('brand.type.weight', { size: pairing.sizes })}</p>
-          </header>
-          <p class="specimen-h1">{t('brand.type.h1')}</p>
-          <p class="specimen-h2">{t('brand.type.h2')}</p>
-          <p class="font-display text-2xl">{t('brand.type.h3')}</p>
-          <p class="font-display text-xl">{t('brand.type.h4')}</p>
-          <p class="text-lg text-ink-muted">{t('brand.type.lead_text')}</p>
-          <p>{t('brand.type.body')}</p>
-          <blockquote class="border-s-2 border-gold ps-4">
-            <p class="font-display text-xl italic">{t('brand.type.quote')}</p>
-            <footer class="mt-1 text-sm text-ink-muted">{t('brand.type.quote_ref')}</footer>
-          </blockquote>
-          <p>{t('brand.type.punctuation')}</p>
-          <p class="text-sm text-ink-muted">{t('brand.type.small')}</p>
-          <div class="grid gap-1">
-            <p class="text-xs font-medium uppercase tracking-wide text-ink-muted">{t('brand.type.numbers')}</p>
-            <p class="font-display text-xl tabular-nums">{dateLine}</p>
-            <p class="text-lg font-medium tabular-nums">{amount}</p>
-          </div>
-          <nav class="flex flex-wrap gap-x-5 gap-y-2 text-[0.9375rem] font-medium" aria-label={pairing.font}>
-            {nav.map((key) => <span>{t(key)}</span>)}
-          </nav>
-          <div>
-            <span class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 font-medium text-on-primary">
-              {t('brand.type.button')}
-            </span>
-          </div>
-        </article>
-      ))
-    }
+  <div class="grid gap-6 lg:grid-cols-2">
+    <article class="specimen grid min-w-0 content-start gap-5 rounded-xl bg-surface p-6 shadow-1 md:p-8">
+      <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-4">
+        <h3 class="font-sans text-base font-semibold">{t('brand.type.pairing')}</h3>
+        <p class="w-full text-xs text-ink-muted">{t('brand.type.weight', { size: sizes })}</p>
+      </header>
+      <p class="specimen-h1">{t('brand.type.h1')}</p>
+      <p class="specimen-h2">{t('brand.type.h2')}</p>
+      <p class="font-display text-2xl font-medium">{t('brand.type.h3')}</p>
+      <p class="font-display text-xl font-medium">{t('brand.type.h4')}</p>
+      <p class="text-lg text-ink-muted">{t('brand.type.lead_text')}</p>
+      <p>{t('brand.type.body')}</p>
+      <blockquote class="border-s-2 border-gold ps-4">
+        <p class="font-display text-xl italic">{t('brand.type.quote')}</p>
+        <footer class="mt-1 text-sm text-ink-muted">{t('brand.type.quote_ref')}</footer>
+      </blockquote>
+      <p>{t('brand.type.punctuation')}</p>
+      <p class="text-sm text-ink-muted">{t('brand.type.small')}</p>
+      <div class="grid gap-1">
+        <p class="text-xs font-medium uppercase tracking-wide text-ink-muted">{t('brand.type.numbers')}</p>
+        <p class="font-display text-xl font-medium tabular-nums">{dateLine}</p>
+        <p class="text-lg font-medium tabular-nums">{amount}</p>
+      </div>
+      <nav class="flex flex-wrap gap-x-5 gap-y-2 text-[0.9375rem] font-medium" aria-label={t('brand.type.pairing')}>
+        {nav.map((key) => <span>{t(key)}</span>)}
+      </nav>
+      <div>
+        <span class="inline-flex min-h-11 items-center rounded-md bg-primary px-5 font-medium text-on-primary">
+          {t('brand.type.button')}
+        </span>
+      </div>
+    </article>
+    <div class="grid content-start gap-4 rounded-xl bg-surface-2 p-6 md:p-8">
+      <h3 class="text-xl">{t('brand.type.scale')}</h3>
+      <dl class="grid gap-3">
+        {
+          scale.map(([token, key]) => (
+            <div class="grid grid-cols-[4.5rem_1fr] items-baseline gap-3 border-b border-line pb-2">
+              <dt class="text-xs text-ink-muted tabular-nums">{token}</dt>
+              <dd class="font-display font-medium" style={`font-size:var(--text-${token});line-height:1.15`}>{t(key)}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
   </div>
 </Section>
 
 <style>
-  /* Headings scale with the card so the three specimens can sit side by side. */
   .specimen {
     container-type: inline-size;
     min-width: 0;

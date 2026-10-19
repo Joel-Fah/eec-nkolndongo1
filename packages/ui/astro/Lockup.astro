@@ -1,0 +1,95 @@
+---
+/**
+ * Horizontal lockup: the EEC mark + the parish name, in live text (General Sans), so it stays
+ * crisp, translatable and responsive.
+ *   short  → mark + « EEC NKOLNDONGO 1 »
+ *   long   → mark + « Église Évangélique du Cameroun » / « Paroisse de Nkolndongo 1 » (two lines)
+ *   auto   → short in narrow slots, long when the slot is ≥ 22rem wide (container query)
+ * The slot (parent) sets the width; the font-size sets the scale. Clear space is the caller's job (height of an « E » ≈ 0.28 × mark height). Mark ≥ 24 px tall.
+ */
+import Mark from './Mark.astro'
+
+interface Props {
+  variant?: 'auto' | 'short' | 'long'
+  /** Mark variant: `halo` on dark backgrounds, `mono` for one colour. */
+  mark?: 'mark' | 'halo' | 'mono'
+  /** Localised text (FR/EN), from packages/i18n — the lockup itself has no strings. */
+  short: string
+  church: string
+  parish: string
+  class?: string
+}
+
+const { variant = 'auto', mark = 'mark', short, church, parish, class: className } = Astro.props
+---
+
+<span class:list={['eec-lockup', className]} data-variant={variant}>
+  <Mark variant={mark} class="eec-lockup-mark" />
+  <span class="eec-lockup-short">{short}</span>
+  <span class="eec-lockup-long">
+    <span class="eec-lockup-church">{church}</span>
+    <span class="eec-lockup-parish">{parish}</span>
+  </span>
+</span>
+
+<style is:global>
+  .eec-lockup {
+    container-type: inline-size;
+    /* Size containment: needs a width. Fill the slot the caller gives it. */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    min-width: 0;
+    font-family: var(--font-display);
+    color: inherit;
+    --lockup-mark: 2.75em;
+  }
+  .eec-lockup-mark {
+    flex: none;
+    width: auto;
+    height: var(--lockup-mark);
+  }
+  .eec-lockup-short,
+  .eec-lockup-parish {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .eec-lockup-short {
+    font-size: 1.1em;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+  .eec-lockup-long {
+    display: grid;
+    gap: 0.15em;
+    line-height: 1.1;
+    min-width: 0;
+  }
+  .eec-lockup-church {
+    font-size: 0.62em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  .eec-lockup-parish {
+    font-size: 1.05em;
+  }
+
+  .eec-lockup[data-variant="long"] .eec-lockup-short,
+  .eec-lockup[data-variant="short"] .eec-lockup-long {
+    display: none;
+  }
+  .eec-lockup[data-variant="auto"] .eec-lockup-long {
+    display: none;
+  }
+  @container (min-width: 22rem) {
+    .eec-lockup[data-variant="auto"] .eec-lockup-short {
+      display: none;
+    }
+    .eec-lockup[data-variant="auto"] .eec-lockup-long {
+      display: grid;
+    }
+  }
+</style>

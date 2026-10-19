@@ -83,12 +83,12 @@ const toc = [
 </Base>
 
 <style is:global>
-  :root {
-    --font-fraunces: "Fraunces", "Fraunces Fallback", "Fraunces Fallback Android", Georgia, serif;
-    --font-zodiak: "Zodiak", "Zodiak Fallback", Georgia, serif;
-    --font-gambetta: "Gambetta", "Gambetta Fallback", Georgia, serif;
-  }
   html {
     scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 </style>
