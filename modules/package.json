@@ -18,6 +18,7 @@
     "@eec/api-kit": "workspace:*",
     "@eec/auth": "workspace:*",
     "@eec/db": "workspace:*",
+    "@eec/module-media": "workspace:*",
     "@eec/module-settings": "workspace:*",
     "@eec/modules-kit": "workspace:*",
     "hono": "4.13.13",
