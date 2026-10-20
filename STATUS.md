@@ -1,8 +1,23 @@
 # STATUS
 
-_Last updated: 2026-10-19_
+_Last updated: 2026-10-20_
 
-## Current phase: 02 — Platform Core · Checkpoint B (admin core) ready for review
+## Current phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep) ready for review
+
+## Checkpoint C — built (2026-10-20), waiting for Joël's review
+- **Media library** (`modules/media`, decision 0020): S3-compatible store (Neon Object Storage, bucket `eec-media`), photos
+  resized and stripped of EXIF/GPS in the browser (Web Worker), ThumbHash, audio/PDF streamed through, `/media/<key>`
+  public route (Range, ETag, immutable), admin screen (drop zone, required descriptions, filters, details, archive/delete
+  with usage check, space meter), Astro `<Picture>`.
+- **Members** (`modules/members` + Mon espace): admin list/records/CSV export (audited), headcount dashboard with SVG
+  trend + table, Mon espace panels (profile, consents, copy of my data, deletion with 30-day grace, devices).
+- **Retention**: daily Cloudflare Cron (`apps/api/src/retention.ts`), each run logged in `retention_runs`.
+- **Privacy page** rewritten (FR/EN, `[À VALIDER]`); **security headers**, noindex flag (`SITE_INDEXABLE`), ribbon, robots.txt.
+- **Ops**: `deploy`, `preview`, `backup` workflows; encrypted backups + **tested restore** (decision 0022); runbook, incident doc.
+- **Not done yet**: the first production deploy (needs Joël present, a Cloudflare token + Neon `main` branch + Hyperdrive),
+  Worker CPU measurement on a deployed preview, the Pexels curation into the library (needs Joël's review of thumbnails),
+  a second copy of the media files. See `docs/phases/PHASE_02_REPORT.md`.
+- **Open points**: Bible texts (PDV/ETR) to verify against licensed wording; testimonials empty on purpose; real parish photos.
 
 ## In progress — public UI revamp (asked by Joël, 2026-10-19)
 Joël rejected the Phase 01 page layouts. Direction: SaaS-sleek (Supabase/Neon feel) for a church, each

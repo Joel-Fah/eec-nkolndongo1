@@ -146,3 +146,8 @@ CI/CD rules: `docs/ops/ci-cd.md`. Domain: not chosen yet — `*.workers.dev` / `
 voice and tone, logo, colour, type, shape, motion, icons, illustration, every component and rule. They are
 `noindex`, unlinked and out of the sitemap — **unlisted, not private**; access control comes with auth
 (Phase 02). New components, animations and tokens are documented there in the same change.
+
+## Phase 02 additions
+- `modules/media` (library, `/media/<key>`), `modules/members` (admin list, export, headcount), `apps/api/src/retention.ts`
+  (daily Cron), security headers (`packages/api-kit/src/security-headers.ts`), backups (`scripts/backup/`). See the decisions
+  0020, 0022 and `docs/ops/runbook.md`.
