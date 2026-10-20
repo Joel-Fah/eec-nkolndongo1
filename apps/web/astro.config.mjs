@@ -8,7 +8,7 @@ import { defineConfig } from 'astro/config'
 import { headersFile } from '../../packages/api-kit/src/security-headers.ts'
 
 // Placeholder until the domain is chosen (on hold — see STATUS.md).
-const site = 'https://eec-nkolndongo1.workers.dev'
+const site = 'https://eec-nkolndongo1.joelfah2003.workers.dev'
 // `SITE_INDEXABLE=1` at build time = launched. Until then every page, file and header says « do not index ».
 const indexable = process.env.SITE_INDEXABLE === '1'
 

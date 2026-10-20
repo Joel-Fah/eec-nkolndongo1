@@ -20,7 +20,7 @@
     "crons": ["17 3 * * *"]
   },
   "vars": {
-    "APP_ORIGIN": "http://localhost:8080",
+    "APP_ORIGIN": "https://eec-nkolndongo1.joelfah2003.workers.dev",
     "ADMIN_PATH": "admin",
     "SITE_INDEXABLE": "0"
   },
