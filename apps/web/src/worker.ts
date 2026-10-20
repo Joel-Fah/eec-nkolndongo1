@@ -11,6 +11,7 @@ import { handle } from '@astrojs/cloudflare/handler'
 import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
 import type { Env } from '@eec/api-kit'
+import { adminPrefix } from '@eec/core'
 
 type Bindings = Env
 const GUIDE = /^\/(fr|en)\/_brand\/?$/
@@ -48,9 +49,24 @@ async function guide(request: Request, env: Bindings, ctx: ExecutionContext) {
   return new Response(res.body, { status: allowed ? res.status : 404, headers })
 }
 
+/**
+ * The admin SPA is built into ADMIN_PATH as static assets. A URL under it that is not a real file (a
+ * client-side route such as /gestion/users) gets the SPA shell, so deep links and reloads work.
+ */
+async function adminShell(request: Request, env: Bindings) {
+  const assets = (env as unknown as { ASSETS: { fetch: (r: Request) => Promise<Response> } }).ASSETS
+  return assets.fetch(
+    new Request(new URL(`${adminPrefix(env.ADMIN_PATH)}/index.html`, request.url), request),
+  )
+}
+
 export default {
-  fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
-    if (GUIDE.test(new URL(request.url).pathname)) return guide(request, env, ctx)
+  async fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
+    const path = new URL(request.url).pathname
+    const prefix = adminPrefix(env.ADMIN_PATH)
+    if ((path === prefix || path.startsWith(`${prefix}/`)) && !/\.[a-z0-9]+$/i.test(path))
+      return adminShell(request, env)
+    if (GUIDE.test(path)) return guide(request, env, ctx)
     return handle(request, env as never, ctx)
   },
 }

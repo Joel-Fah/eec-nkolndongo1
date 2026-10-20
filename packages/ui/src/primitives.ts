@@ -325,9 +325,20 @@ export function initPrimitives() {
     }
   }
 
+  // A tablist inside a hidden container has no size at start-up: re-place the indicator whenever its size
+  // changes (it appears, fonts load, the language changes), not only on resize.
+  const watched = new WeakSet<Element>()
+  const resizer = new ResizeObserver((entries) => {
+    for (const entry of entries) placeIndicator(entry.target as HTMLElement)
+  })
   const placeAll = () => {
-    for (const list of document.querySelectorAll<HTMLElement>('[role="tablist"]'))
+    for (const list of document.querySelectorAll<HTMLElement>('[role="tablist"]')) {
       placeIndicator(list)
+      if (!watched.has(list)) {
+        watched.add(list)
+        resizer.observe(list)
+      }
+    }
   }
   placeAll()
   document.fonts?.ready.then(placeAll)

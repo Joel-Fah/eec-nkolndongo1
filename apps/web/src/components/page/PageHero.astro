@@ -359,9 +359,6 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
   }
 
   /* ── Phones: one big shape, wider than the screen (cropped left and right); cards follow ── */
-  .ph-tile:nth-child(n + 2) {
-    display: none;
-  }
   .ph-cards {
     position: relative;
     z-index: 2;
@@ -372,9 +369,6 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
     padding-inline: 0.25rem;
     order: 2;
     width: 100%;
-  }
-  .ph-row {
-    flex-wrap: wrap;
   }
   .ph-card {
     display: block;
@@ -530,20 +524,59 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
     text-align: start;
   }
 
-  /* ── Phones, stage: the shape is 18% wider than the screen, centered, so both sides are cropped ── */
-  @media (max-width: 47.99rem) {
-    [data-layout="stage"] .ph-tile {
-      width: 118vw;
-      max-width: none;
-      margin-inline: -9vw;
+  /*
+   * ── Phones and tablets, stage: a cluster of shapes (3 on phones, 4 on tablets) fills the bottom of the
+   * screen and bleeds past both edges; the cards follow underneath, overlapping it a little.
+   */
+  @media (max-width: 63.99rem) {
+    [data-layout="stage"] .ph-frame {
+      min-height: calc(100svh - 7rem);
+      grid-template-rows: auto 1fr;
+      align-content: stretch;
+    }
+    [data-layout="stage"] .ph-stage {
+      align-self: end;
     }
     [data-layout="stage"] .ph-row {
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-inline: -7vw;
+    }
+    [data-layout="stage"] .ph-tile {
+      width: auto;
+      min-width: 0;
+      max-width: none;
+      margin-block-start: 0;
+    }
+    [data-layout="stage"] .ph-tile:nth-child(2) {
+      margin-block-start: 2.5rem;
+    }
+    [data-layout="stage"] .ph-tile:nth-child(4) {
+      margin-block-start: 2.5rem;
+    }
+    /* The cards sit under the cluster, as a calm list. */
+    [data-layout="stage"] .ph-cards {
+      grid-column: 1 / -1;
+      margin-inline: 7vw;
+      width: auto;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    /* Phones: three shapes; the third is centered under the first two. */
+    [data-layout="stage"] .ph-tile:nth-child(n + 4) {
+      display: none;
+    }
+    [data-layout="stage"] .ph-tile:nth-child(3) {
+      grid-column: 1 / -1;
+      width: 68%;
+      justify-self: center;
+      margin-block-start: -0.5rem;
     }
   }
 
   /* ── From tablets: a row of shapes, scattered cards, text centered above ───────────── */
-  @media (min-width: 48rem) {
+  @media (min-width: 64rem) {
     .ph {
       padding-inline: 1.5rem;
     }
@@ -565,10 +598,7 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
       max-width: 36rem;
       min-width: 0;
     }
-    /* 2 shapes on tablets, 3 on laptops, 4 on large displays. */
-    [data-layout="stage"] .ph-tile:nth-child(2) {
-      display: block;
-    }
+    /* Laptops: 2 shapes (3 and 4 appear on wider screens below). */
     [data-layout="stage"] .ph-tile:nth-child(n + 3) {
       display: none;
     }

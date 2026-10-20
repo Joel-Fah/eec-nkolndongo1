@@ -25,6 +25,7 @@ const errors = [
   'password_too_long',
   'password_too_common',
   'email_taken',
+  'bad_origin',
   'generic',
   'network',
 ] as const
@@ -161,6 +162,12 @@ const tiles = [
       }
     </ul>
     <div><Button variant="secondary" data-signout><Icon name="logout" />{t('member.signout')}</Button></div>
+  </div>
+
+  <div class="acct-leaving" data-leaving hidden role="status" aria-live="polite">
+    <div class="acct-leaving-badge"><Icon name="church" size={24} /></div>
+    <p class="acct-leaving-text">{t('member.leaving')}</p>
+    <span class="acct-leaving-bar" aria-hidden="true"><span></span></span>
   </div>
 
   <dialog class="dialog acct-dialog" data-google-dialog aria-labelledby="gd-title">
@@ -336,7 +343,7 @@ const tiles = [
       say('')
       const r = await call('/members/google', { locale: lang, acceptPrivacy: consent.privacy, acceptNews: consent.news })
       if (r.ok && r.json.url) window.location.assign(r.json.url)
-      else say(r.ok ? (msgs.fail ?? '') : r.code === 'rate_limited' ? (msgs.rate ?? '') : (msgs.fail ?? ''))
+      else say(r.ok ? (msgs.fail ?? '') : msg(r.code))
     }
     const dialog = root.querySelector<HTMLDialogElement>('[data-google-dialog]')
     for (const b of root.querySelectorAll<HTMLButtonElement>('[data-google]'))
@@ -367,8 +374,12 @@ const tiles = [
     }
 
     root.querySelector('[data-signout]')?.addEventListener('click', async () => {
-      await call('/auth/sign-out', {})
+      // Feedback at once (the request can take a few seconds), and never flash back too fast.
+      const screen = root.querySelector<HTMLElement>('[data-leaving]')
+      if (screen) screen.hidden = false
+      await Promise.all([call('/auth/sign-out', {}), new Promise((r) => setTimeout(r, 1600))])
       show('out')
+      if (screen) screen.hidden = true
     })
     refresh()
   }
@@ -439,6 +450,59 @@ const tiles = [
   }
   .acct-photos:hover img {
     transform: rotate(calc((var(--i) - 1) * 9deg)) translateX(calc((var(--i) - 1) * 0.75rem));
+  }
+  .acct-leaving {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.25rem;
+    background: var(--bg);
+    animation: acct-leaving-in 0.35s var(--ease-soft) both;
+  }
+  .acct-leaving[hidden] {
+    display: none;
+  }
+  @keyframes acct-leaving-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .acct-leaving-badge {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--elevation-2);
+  }
+  .acct-leaving-text {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    text-align: center;
+  }
+  .acct-leaving-bar {
+    width: 5rem;
+    height: 0.25rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+  }
+  .acct-leaving-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--primary);
+    transform-origin: left;
+    animation: acct-leaving-fill 1.6s var(--ease-in-out) both;
+  }
+  @keyframes acct-leaving-fill {
+    from {
+      transform: scaleX(0);
+    }
   }
   .acct-banner {
     padding: 0.75rem 1rem;

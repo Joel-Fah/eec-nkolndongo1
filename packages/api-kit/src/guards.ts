@@ -52,7 +52,11 @@ export const sameOrigin: MiddlewareHandler<AppEnv> = async (c, next) => {
   const ok = origin
     ? origin === c.env.APP_ORIGIN
     : site === undefined || site === 'same-origin' || site === 'none'
-  if (!ok) return fail(c, 403, 'bad_origin')
+  if (!ok) {
+    // Not a secret: tells you which address to use when the site is opened from the wrong one.
+    console.warn(`bad_origin: request from "${origin ?? site}", expected "${c.env.APP_ORIGIN}"`)
+    return fail(c, 403, 'bad_origin')
+  }
   return next()
 }
 

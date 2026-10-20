@@ -5,6 +5,8 @@ export type Env = {
   /** Local/dev and CLI: the direct (non-pooled) Neon URL. */
   DATABASE_URL_UNPOOLED?: string
   AUTH_SECRET: string
+  /** Where the admin lives (default « admin »); « admin », « admin/ » and « /admin/ » are all accepted. */
+  ADMIN_PATH?: string
   /** Google sign-in for members (OAuth client created by Joël). Both absent = Google stays inactive. */
   GOOGLE_CLIENT_ID?: string
   GOOGLE_CLIENT_SECRET?: string
