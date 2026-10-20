@@ -230,7 +230,7 @@ const doc = (id: Id) => ({
     </DocBlock>
 
     <DocBlock {...doc('imagery')}>
-      <div class="grid gap-4 md:grid-cols-3">
+      <div class="grid items-start gap-4 md:grid-cols-3">
         <Figure src={demoPhotos[0] ? photoSrc(demoPhotos[0], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="4/3" caption={t('ui.imagery_caption')} credit={t('ui.imagery_credit')} zoom />
         <Figure src={demoPhotos[1] ? photoSrc(demoPhotos[1], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="1/1" zoom />
         <Figure src={demoPhotos[2] ? photoSrc(demoPhotos[2], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="3/4" caption={t('ui.imagery_caption')} />
@@ -348,12 +348,15 @@ const doc = (id: Id) => ({
   }
   .shape-gallery li {
     display: grid;
+    min-width: 0;
+    overflow: clip;
     justify-items: center;
     gap: 0.375rem;
   }
   .shape-demo {
     display: block;
     width: 100%;
+    max-width: 100%;
     background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--season) 70%, var(--gold)));
   }
   .shape-demo[style*="--hue:1"] {

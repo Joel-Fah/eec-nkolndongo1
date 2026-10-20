@@ -574,7 +574,7 @@
       "picture": {
         "name": "Photo de la médiathèque",
         "desc": "<Picture> affiche une photo de la médiathèque : plusieurs tailles (480, 960, 1600 px), la description dans la langue de la page, un flou de chargement (ThumbHash) en arrière-plan, chargement différé. Les personnes qui demandent à économiser les données reçoivent la plus petite taille.",
-        "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> avec les champs renvoyés par /api/media. Dans l’administration : Médiathèque (envoi par glisser-déposer, description obligatoire, crédit, archivage).",
+        "use": "<Picture media sizes=\"(min-width: 64rem) 50vw, 100vw\" /> avec les champs renvoyés par /api/media. Dans l’administration : Médiathèque (envoi par glisser-déposer, description obligatoire, crédit, archivage).",
         "a11y": "Description obligatoire pour toute photo (alt), vide seulement si l’image est décorative. Les dimensions sont données pour éviter les décalages de mise en page.",
         "demo": "Voir l’administration, Médiathèque. Aucune photo n’est encore utilisée sur le site."
       },
@@ -588,14 +588,14 @@
       "pagination": {
         "name": "Pagination",
         "desc": "Des liens vers les pages d’une longue liste : précédent, numéros autour de la page courante (« … » pour le reste), suivant. De simples liens : ça marche sans JavaScript et chaque page a son adresse.",
-        "use": "<Pagination page pages href=\"/fr/nouvelles/?page={n}\" … />.",
+        "use": "<Pagination page pages href=\"/fr/nouvelles/?page=N\" … /> : N est remplacé par le numéro de page.",
         "a11y": "<nav> étiquetée, page courante en aria-current, « précédent/suivant » désactivés aux extrémités, cibles de 44 px, texte « Précédent/Suivant » remplacé par la flèche seule sur téléphone.",
         "demo": "Cinq sur douze, et un petit nombre de pages."
       },
       "insetfields": {
         "name": "Champs avec icône intégrée",
         "desc": "Un champ avec une icône au début (e-mail, téléphone, recherche) et, pour un mot de passe, un œil à la fin qui montre ou cache la saisie. L’icône prend la couleur du focus quand on tape.",
-        "use": "Astro : <Field icon=\"mail\" /> et <Field type=\"password\" toggle={{ show, hide }} />. React : <TextField icon=\"mail\" /> et <PasswordField /> dans l’administration.",
+        "use": "Astro : <Field icon=\"mail\" /> et <Field type=\"password\" toggle (libellés afficher / masquer) />. React : <TextField icon=\"mail\" /> et <PasswordField /> dans l’administration.",
         "a11y": "L’icône est décorative (aria-hidden). Le bouton œil est un vrai bouton, nommé (« Afficher le mot de passe » / « Masquer… »), avec aria-pressed, et reste atteignable au clavier.",
         "demo": "Essayez l’œil du champ mot de passe."
       },
@@ -630,7 +630,7 @@
       "shapes": {
         "name": "Formes d’art",
         "desc": "Les formes qui découpent les photos et les illustrations (blob, fenêtres, blocs, fleur, feuille, goutte, arche, voile…), définies en unités relatives pour s’adapter à n’importe quel cadre. Chaque page a sa propre composition.",
-        "use": "lib/shapes.ts : { ar, defs } par forme ; clip-path: url(#id) avec clipPathUnits=\"objectBoundingBox\".",
+        "use": "lib/shapes.ts : un rapport (ar) et un tracé (defs) par forme ; clip-path: url(#id) avec clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Décoratives : le contenu et le texte alternatif sont ceux de l’image découpée ; aucune information n’est portée par la forme.",
         "demo": "Toutes les formes disponibles."
       }

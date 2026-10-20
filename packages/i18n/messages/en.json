@@ -574,7 +574,7 @@
       "picture": {
         "name": "Media library photo",
         "desc": "<Picture> shows a photo from the media library: several sizes (480, 960, 1600 px), the description in the page’s language, a blurred loading placeholder (ThumbHash) behind it, lazy loading. People who ask to save data get the smallest size.",
-        "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> with the fields /api/media returns. In the admin: Media library (drag-and-drop upload, required description, credit, archive).",
+        "use": "<Picture media sizes=\"(min-width: 64rem) 50vw, 100vw\" /> with the fields /api/media returns. In the admin: Media library (drag-and-drop upload, required description, credit, archive).",
         "a11y": "A description (alt) is required for every photo, empty only when the image is decorative. Dimensions are given to avoid layout shifts.",
         "demo": "See the admin, Media library. No photo is used on the site yet."
       },
@@ -588,14 +588,14 @@
       "pagination": {
         "name": "Pagination",
         "desc": "Links to the pages of a long list: previous, numbers around the current page (“…” for the rest), next. Plain links: it works without JavaScript and every page has its own address.",
-        "use": "<Pagination page pages href=\"/en/news/?page={n}\" … />.",
+        "use": "<Pagination page pages href=\"/en/news/?page=N\" … />: N is replaced by the page number.",
         "a11y": "Labelled <nav>, current page in aria-current, previous/next disabled at the ends, 44 px targets, the “Previous/Next” text replaced by the arrow alone on a phone.",
         "demo": "Five of twelve, and a small number of pages."
       },
       "insetfields": {
         "name": "Fields with inset icons",
         "desc": "A field with an icon at the start (email, phone, search) and, for a password, an eye at the end that shows or hides the entry. The icon takes the focus colour while typing.",
-        "use": "Astro: <Field icon=\"mail\" /> and <Field type=\"password\" toggle={{ show, hide }} />. React: <TextField icon=\"mail\" /> and <PasswordField /> in the admin.",
+        "use": "Astro: <Field icon=\"mail\" /> and <Field type=\"password\" toggle (show / hide labels) />. React: <TextField icon=\"mail\" /> and <PasswordField /> in the admin.",
         "a11y": "The icon is decorative (aria-hidden). The eye is a real, named button (“Show password” / “Hide…”) with aria-pressed, reachable by keyboard.",
         "demo": "Try the eye of the password field."
       },
@@ -630,7 +630,7 @@
       "shapes": {
         "name": "Art shapes",
         "desc": "The shapes that cut photos and illustrations (blob, windows, blocks, flower, leaf, drop, arch, sail…), defined in relative units so they fit any frame. Each page has its own composition.",
-        "use": "lib/shapes.ts: { ar, defs } per shape; clip-path: url(#id) with clipPathUnits=\"objectBoundingBox\".",
+        "use": "lib/shapes.ts: a ratio (ar) and a path (defs) per shape; clip-path: url(#id) with clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Decorative: the content and alternative text are those of the cut image; no information is carried by the shape.",
         "demo": "Every available shape."
       }
