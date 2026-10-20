@@ -36,7 +36,14 @@ const procs = [
     // Own process group: stopping kills the whole tree (pnpm → sh → node), not just pnpm.
     detached: true,
     stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, FORCE_COLOR: '1' },
+    env: {
+      ...process.env,
+      FORCE_COLOR: '1',
+      // The wrangler config binds Hyperdrive (production); locally that binding connects straight to the dev
+      // database. The value comes from .env.local and is never written to a file.
+      CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE:
+        envLocal('DATABASE_URL_UNPOOLED') ?? '',
+    },
   })
   const out = (stream: NodeJS.WriteStream) => (chunk: Buffer) => {
     for (const line of chunk.toString().split('\n'))
