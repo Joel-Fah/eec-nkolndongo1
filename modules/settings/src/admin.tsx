@@ -32,7 +32,7 @@ export default function SettingsPage() {
   const canValidate = hasPermission(me, 'settings:validate')
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-8">
+    <div className="grid max-w-4xl gap-8">
       <header className="grid gap-2">
         <h1 className="text-4xl">{t(k('title'))}</h1>
         <p className="max-w-[60ch] text-ink-muted">{t(k('lead'))}</p>

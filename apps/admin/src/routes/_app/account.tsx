@@ -51,7 +51,7 @@ function Account() {
   )
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-8">
+    <div className="grid max-w-4xl gap-8">
       <PageHeader title={t('admin.account.title')} lead={t('admin.account.lead')} />
       <form className="admin-panel" onSubmit={submit}>
         <h2 className="text-xl">{t('admin.account.profile')}</h2>

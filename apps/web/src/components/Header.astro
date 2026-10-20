@@ -100,6 +100,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     <div class="mobile-menu-inner">
       <div class="mobile-menu-top">
         <a href={home} class="mobile-menu-brand"><SiteLockup variant="three" class="text-[0.95rem]" /></a>
+        <button type="button" class="btn btn-secondary btn-icon mobile-menu-x" data-dialog-close aria-label={t('nav.close_menu')}><Icon name="close" size={24} /></button>
       </div>
       <nav aria-label={t('nav.main')} class="mobile-menu-nav">
         {
@@ -356,12 +357,16 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       translate var(--duration-nav) var(--ease-soft);
     pointer-events: none;
   }
-  /* Shown: the hovered/focused item's scene; before any hover, the first one. */
-  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))) .mega-illustration[data-art="0"],
+  /* Shown: the hovered/focused item's scene; otherwise the current page's; otherwise the first. */
   .mega-grid:has(.mega-item[data-i="0"]:is(:hover, :focus-visible)) .mega-illustration[data-art="0"],
   .mega-grid:has(.mega-item[data-i="1"]:is(:hover, :focus-visible)) .mega-illustration[data-art="1"],
   .mega-grid:has(.mega-item[data-i="2"]:is(:hover, :focus-visible)) .mega-illustration[data-art="2"],
-  .mega-grid:has(.mega-item[data-i="3"]:is(:hover, :focus-visible)) .mega-illustration[data-art="3"] {
+  .mega-grid:has(.mega-item[data-i="3"]:is(:hover, :focus-visible)) .mega-illustration[data-art="3"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="0"][aria-current="page"]) .mega-illustration[data-art="0"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="1"][aria-current="page"]) .mega-illustration[data-art="1"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="2"][aria-current="page"]) .mega-illustration[data-art="2"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="3"][aria-current="page"]) .mega-illustration[data-art="3"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible), .mega-item[aria-current="page"])) .mega-illustration[data-art="0"] {
     opacity: 1;
     translate: -50% 0;
   }
@@ -410,6 +415,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   /* Mobile menu: full screen, floating cards, a soft circular reveal. */
   .mobile-menu {
     background: var(--bg);
+    /* The header (its parent) ignores the pointer so its margins never block the page: undo it here. */
+    pointer-events: auto;
     clip-path: circle(0% at calc(100% - 2.25rem) 2.25rem);
     opacity: 1;
     transform: none;
@@ -438,8 +445,14 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
   }
   .mobile-menu-top {
-    width: 12rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 0.5rem 0.25rem;
+  }
+  .mobile-menu-brand {
+    width: 12rem;
   }
   .mobile-menu-brand {
     display: block;

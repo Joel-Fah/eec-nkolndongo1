@@ -3,22 +3,13 @@ import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { labelOf, navFor } from '../lib/nav'
+import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
-import { Mark } from './Mark'
-
-const COLLAPSE_KEY = 'eec-admin-sidebar'
 
 export function AppShell() {
   const { t, locale } = useLocale()
-  const [collapsed, setCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem(COLLAPSE_KEY) === '1'
-    } catch {
-      return false
-    }
-  })
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   useEffect(() => {
@@ -35,28 +26,18 @@ export function AppShell() {
     .slice(0, 2)
     .toUpperCase()
   const path = useRouterState({ select: (s) => s.location.pathname })
-  const toggle = () =>
-    setCollapsed((c) => {
-      try {
-        localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1')
-      } catch {
-        // ignore
-      }
-      return !c
-    })
   const groups = navFor(me)
 
   return (
-    <div
-      className="admin-shell"
-      data-collapsed={collapsed ? '' : undefined}
-      data-mobile-open={mobileOpen ? '' : undefined}
-    >
+    <div className="admin-shell" data-mobile-open={mobileOpen ? '' : undefined}>
       <a className="skip-link" href="#main">
         {t('admin.skip')}
       </a>
       <aside className="admin-sidebar" aria-label={t('admin.sidebar')}>
         <div className="admin-brand">
+          <Link to="/" aria-label={t('admin.dashboard')} className="admin-brand-link">
+            <Brand />
+          </Link>
           <button
             type="button"
             className="btn btn-ghost btn-icon admin-close"
@@ -65,10 +46,6 @@ export function AppShell() {
           >
             <Icon name="close" size={24} />
           </button>
-          <Link to="/" aria-label={t('admin.dashboard')} className="admin-brand-link">
-            <Mark className="admin-mark" />
-            <span className="admin-brand-text">{t('site.name')}</span>
-          </Link>
         </div>
         <nav className="admin-nav">
           <Link
@@ -77,7 +54,6 @@ export function AppShell() {
             activeOptions={{ exact: true }}
             activeProps={{ 'aria-current': 'page' }}
             onClick={() => setMobileOpen(false)}
-            title={collapsed ? t('admin.dashboard') : undefined}
           >
             <Icon name="home" />
             <span>{t('admin.dashboard')}</span>
@@ -92,7 +68,6 @@ export function AppShell() {
                   className="admin-link"
                   activeProps={{ 'aria-current': 'page' }}
                   onClick={() => setMobileOpen(false)}
-                  title={collapsed ? labelOf(i, t, locale) : undefined}
                 >
                   <Icon name={i.icon} />
                   <span>{labelOf(i, t, locale)}</span>
@@ -101,24 +76,6 @@ export function AppShell() {
             </div>
           ))}
         </nav>
-        <button
-          type="button"
-          className="btn btn-ghost admin-collapse"
-          onClick={toggle}
-          aria-expanded={!collapsed}
-          aria-label={collapsed ? t('admin.expand') : t('admin.collapse')}
-          title={collapsed ? t('admin.expand') : t('admin.collapse')}
-        >
-          <span
-            style={{
-              display: 'inline-flex',
-              transform: collapsed ? 'rotate(0)' : 'rotate(180deg)',
-            }}
-          >
-            <Icon name="arrowRight" />
-          </span>
-          <span className="admin-collapse-text">{t('admin.collapse')}</span>
-        </button>
       </aside>
       {mobileOpen && (
         <button

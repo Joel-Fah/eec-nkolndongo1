@@ -2,8 +2,7 @@ import { api, errorKey, useT } from '@eec/admin-kit'
 import { Button, TextField } from '@eec/ui/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { LocaleSwitch, ThemeButton } from '../components/Controls'
-import { Mark } from '../components/Mark'
+import { AuthShell } from '../components/AuthShell'
 
 export const Route = createFileRoute('/reset/$token')({ component: Reset })
 
@@ -14,13 +13,9 @@ function Reset() {
   const [done, setDone] = useState(false)
   const [busy, setBusy] = useState(false)
   return (
-    <div className="login">
-      <div className="login-tools">
-        <LocaleSwitch />
-        <ThemeButton />
-      </div>
+    <AuthShell>
       <form
-        className="login-card"
+        className="auth-form"
         onSubmit={async (e) => {
           e.preventDefault()
           const data = new FormData(e.currentTarget)
@@ -36,8 +31,7 @@ function Reset() {
           }
         }}
       >
-        <Mark variant="mark" className="login-mark" label={t('site.church')} />
-        <div className="grid gap-1 text-center">
+        <div className="grid gap-1">
           <h1 className="text-3xl">{t('auth.reset.title')}</h1>
           <p className="text-ink-muted">{done ? t('auth.reset.done') : t('auth.reset.lead')}</p>
         </div>
@@ -67,6 +61,6 @@ function Reset() {
           </>
         )}
       </form>
-    </div>
+    </AuthShell>
   )
 }

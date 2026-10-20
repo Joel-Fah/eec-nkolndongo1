@@ -619,7 +619,7 @@
       },
       "pagehero": {
         "name": "Page hero (PageHero)",
-        "desc": "Every page has its own hero: the photo is cut into a playful shape (Replit-style blocks, windows, drop, flower, leaf, sail…) with a tinted echo behind it, and cards are placed over it at chosen spots: some overflow to the left, right or below, never above. Three pages open on a full-screen photo that shrinks into a rounded shape as you scroll. No illustrations in heroes.",
+        "desc": "Every page has its own hero: the title centered, then a row of shapes (blocks, windows, drop, flower, leaf, sail…) that runs partly past the first screen — 1 shape on phones (wider than the screen, cropped left and right), 2 on tablets, 3 on laptops, 4 on large displays. Cards are placed over them at chosen spots (some overflow sideways or below, never above) and drift gently with the pointer, each at its own depth. Three pages open on a full-screen photo behind the navbar that settles into a framed rectangle on scroll. No illustrations in heroes.",
         "use": "lib/heroes.ts: layout (split-right, split-left, centered, morph, plain), shape (lib/shapes.ts), photos and cards with their position in % of the picture. Figures are facts: null until validated (example shown in development, hidden in production). Without a photo, the shape keeps its form on a tinted panel.",
         "a11y": "One h1 per page. Cards on solid surfaces (contrast guaranteed). On phones the shape sits above and the cards below, overlapping slightly. The scroll effect (CSS scroll-driven) is absent with reduced motion and in browsers without support: the final shape is shown directly."
       },

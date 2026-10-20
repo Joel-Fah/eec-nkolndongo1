@@ -80,14 +80,14 @@ export const tabs: NavTab[] = [
   {
     id: 'calendar',
     icon: 'calendar',
-    art: 'events',
+    art: 'a-whole-year',
     slug: { fr: 'agenda', en: 'calendar' },
     children: [
       {
         id: 'evenements',
         slug: { fr: 'evenements', en: 'events' },
         icon: 'calendar',
-        art: 'events',
+        art: 'a-whole-year',
       },
       {
         id: 'liturgie',
@@ -106,21 +106,26 @@ export const tabs: NavTab[] = [
   {
     id: 'news',
     icon: 'newspaper',
-    art: 'news',
+    art: 'messaging-fun',
     slug: { fr: 'actualites', en: 'news' },
     children: [
-      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper', art: 'news' },
+      {
+        id: 'nouvelles',
+        slug: { fr: 'nouvelles', en: 'latest' },
+        icon: 'newspaper',
+        art: 'messaging-fun',
+      },
       {
         id: 'predications',
         slug: { fr: 'predications', en: 'sermons' },
         icon: 'headphones',
-        art: 'chatting',
+        art: 'group-discussion',
       },
       {
         id: 'meditations',
         slug: { fr: 'meditations-et-bulletin', en: 'meditations-and-bulletin' },
         icon: 'book',
-        art: 'book-lover',
+        art: 'stay-at-home',
       },
     ],
   },

@@ -1,35 +1,38 @@
-/* Admin shell layout. Tokens only; no one-sided borders. */
+/*
+ * Admin shell, Google-Cloud style: the sidebar and the top bar are fixed "chrome" on the same surface; the
+ * work area is a panel with its own scroll whose top-left corner is rounded where the two chrome pieces
+ * meet. Tokens only; no one-sided borders (the panel's frame is a complete inset ring).
+ */
 .admin-shell {
+  --chrome-h: 3.5rem;
   display: grid;
-  grid-template-columns: 16.5rem minmax(0, 1fr);
-  gap: 0.75rem;
-  min-height: 100dvh;
-  padding: 0.75rem;
-  background: var(--bg);
+  grid-template-columns: 15.5rem minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--surface);
   transition: grid-template-columns var(--duration-nav) var(--ease-soft);
 }
 .admin-shell[data-collapsed] {
-  grid-template-columns: 4.75rem minmax(0, 1fr);
+  grid-template-columns: 4.25rem minmax(0, 1fr);
 }
 .admin-sidebar {
-  position: sticky;
-  inset-block-start: 0.75rem;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 0.5rem;
-  height: calc(100dvh - 1.5rem);
-  padding: 0.75rem;
-  border-radius: var(--radius-xl);
-  background: var(--surface);
-  box-shadow: var(--elevation-2);
+  min-height: 0;
+  padding: 0 0.625rem 0.625rem;
   overflow: hidden;
   z-index: 30;
+}
+.admin-brand {
+  display: flex;
+  align-items: center;
+  height: var(--chrome-h);
 }
 .admin-brand-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 3rem;
+  min-height: 2.5rem;
   padding-inline: 0.5rem;
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -37,7 +40,7 @@
   font-weight: 600;
 }
 .admin-mark {
-  height: 2.25rem;
+  height: 2rem;
   flex: none;
 }
 .admin-nav {
@@ -65,7 +68,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 2.75rem;
+  min-height: 2.5rem;
   padding-inline: 0.75rem;
   border-radius: var(--radius-md);
   color: var(--ink);
@@ -99,21 +102,17 @@
   padding-inline: 0;
 }
 .admin-main {
+  display: grid;
+  grid-template-rows: var(--chrome-h) minmax(0, 1fr);
   min-width: 0;
+  min-height: 0;
 }
 .admin-topbar {
-  position: sticky;
-  inset-block-start: 0.75rem;
-  z-index: 20;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 0.625rem 0.5rem 0.75rem;
-  border-radius: var(--radius-xl);
-  background: color-mix(in oklab, var(--surface) 82%, transparent);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  box-shadow: var(--elevation-2);
+  padding-inline: 0.5rem 1rem;
+  z-index: 20;
 }
 .admin-topbar-tools {
   display: flex;
@@ -140,8 +139,8 @@
   font-weight: 600;
 }
 .admin-avatar {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
   cursor: pointer;
   transition: box-shadow var(--duration-ui) var(--ease-soft);
 }
@@ -154,8 +153,16 @@
   margin-inline-start: auto;
 }
 .admin-content {
-  padding: 1.75rem 0.75rem 4rem;
-  max-width: 80rem;
+  min-height: 0;
+  padding: 1.75rem 2rem 4rem;
+  overflow: auto;
+  background: var(--bg);
+  /* The rounded join with the chrome (top-left); the frame is a complete ring. */
+  border-start-start-radius: var(--radius-xl);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.admin-content:focus {
+  outline: none;
 }
 .admin-burger,
 .admin-scrim {
@@ -171,37 +178,14 @@
   overflow-y: auto;
   gap: 0.125rem;
 }
-.login {
-  display: grid;
-  place-items: center;
-  min-height: 100dvh;
-  padding: 1rem;
-  background: var(--bg);
-}
-.login-tools {
-  position: fixed;
-  inset-block-start: 0.75rem;
-  inset-inline-end: 0.75rem;
-  display: flex;
-  gap: 0.25rem;
-}
-.login-card {
-  display: grid;
-  gap: 1.25rem;
-  width: min(100%, 26rem);
-  padding: 2rem 1.5rem;
-  border-radius: var(--radius-xl);
-  background: var(--surface);
-  box-shadow: var(--elevation-2);
-}
-.login-mark {
-  height: 4rem;
-  justify-self: center;
-}
 @media (max-width: 63.99rem) {
   .admin-shell,
   .admin-shell[data-collapsed] {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-content {
+    padding: 1.25rem 1rem 4rem;
+    border-start-start-radius: 0;
   }
   /* Opens full screen, floating over the page, with its own soft reveal; the page behind can't scroll. */
   .admin-sidebar {
@@ -211,7 +195,8 @@
     width: 100%;
     height: 100dvh;
     border-radius: 0;
-    padding: 1rem;
+    padding: 0 1rem 1rem;
+    background: var(--surface);
     clip-path: circle(0% at 2.5rem 2.5rem);
     visibility: hidden;
     transition:
@@ -465,4 +450,140 @@ html[data-nav-open] {
 }
 .eec-sheet[data-wide] {
   width: min(100vw - 1.5rem, 52rem);
+}
+
+/* ── Logomark + name, always together ───────────────────────────────────────────────── */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+.brand-lockup-mark {
+  height: 2rem;
+  flex: none;
+}
+.brand-lockup-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.1;
+}
+.brand-lockup-church {
+  font-size: 0.6875rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--ink-muted);
+}
+.brand-lockup-name {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Sign-in, invitation, reset: the whole viewport ─────────────────────────────────── */
+.auth {
+  display: grid;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+.auth-art {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(color-mix(in oklab, var(--ink) 16%, transparent) 1px, transparent 1.5px) 0 0 /
+    22px 22px,
+    radial-gradient(
+      70% 60% at 80% 15%,
+      color-mix(in oklab, var(--season) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      60% 60% at 10% 90%,
+      color-mix(in oklab, var(--gold) 40%, transparent),
+      transparent 70%
+    ),
+    var(--surface-2);
+}
+.auth-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: auth-settle 1.6s var(--ease-soft) both;
+}
+@keyframes auth-settle {
+  from {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+}
+.auth-art-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    color-mix(in oklab, var(--scrim) 78%, transparent)
+  );
+}
+.auth-verse {
+  position: absolute;
+  inset-inline: clamp(1.5rem, 4vw, 3.5rem);
+  inset-block-end: clamp(1.5rem, 4vw, 3.5rem);
+  margin: 0;
+  color: var(--on-photo);
+}
+.auth-verse blockquote {
+  max-width: 28rem;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-style: italic;
+  line-height: 1.2;
+}
+.auth-verse figcaption {
+  margin-block-start: 0.75rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  opacity: 0.85;
+}
+.auth-side {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  padding: 1.25rem clamp(1.25rem, 4vw, 3.5rem);
+}
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.auth-main {
+  display: grid;
+  place-items: center;
+  padding-block: 2rem;
+}
+.auth-form {
+  display: grid;
+  gap: 1.125rem;
+  width: min(100%, 24rem);
+}
+.auth-form h1 {
+  font-size: var(--text-3xl);
+}
+.auth-foot {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+@media (min-width: 64rem) {
+  .auth {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+  .auth-art {
+    display: block;
+    order: -1;
+  }
 }

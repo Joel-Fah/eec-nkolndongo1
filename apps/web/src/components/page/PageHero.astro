@@ -1,11 +1,14 @@
 ---
 /**
- * Page hero (lib/heroes.ts). The photo is clipped to a playful shape (lib/shapes.ts) with a tinted echo
- * behind it; cards are scattered over it at placed positions and may overflow the picture sideways or
- * below, never above. `morph` heroes start as a full-screen photo that shrinks into a rounded shape as the
- * page scrolls (CSS scroll-driven animation; browsers without it, and reduced motion, get the final state).
- * No illustrations. Without photos (production, until the media library) the shape keeps its form on a
- * tinted, textured panel.
+ * Page hero (lib/heroes.ts).
+ * - stage: the title centered on top; below, a row of photo shapes (lib/shapes.ts, 1 on phones → 4 on large
+ *   screens) that runs partly past the first screen. Cards are scattered over the row — some overflow the
+ *   pictures sideways or below, never above — and drift gently with the pointer.
+ * - morph: a full-screen photo behind the navbar that settles into a framed rectangle as you scroll
+ *   (CSS scroll-driven animation; reduced motion / older browsers get the final state), cards revealed on it.
+ * - plain: no photo.
+ * No illustrations. Without photos (production, until the media library) shapes keep their form on a tinted,
+ * textured panel.
  */
 import { getSeason } from '@eec/core'
 import Icon from '@eec/ui/astro/Icon.astro'
@@ -27,9 +30,16 @@ const hero = heroes[id]
 if (!hero) throw new Error(`No hero for page: ${id}`)
 const page = content[id]
 const tab = pages.find((p) => p.id === id)?.tab
-const [main] = photosById(hero.photos)
-const shape = shapes[hero.shape]
 const morph = hero.layout === 'morph'
+// One tile per shape; a tile without its own photo reuses the first.
+const photos = photosById(hero.photos)
+const tileCount = morph ? 1 : Math.max(1, Math.min(4, hero.shapes.length))
+const tiles = Array.from({ length: tileCount }, (_, i) => ({
+  shape: hero.shapes[i] ?? 'blob',
+  photo: photos[i] ?? photos[0],
+}))
+const usedShapes = [...new Set(tiles.map((x) => x.shape))]
+const credits = [...new Set(tiles.map((x) => x.photo?.photographer).filter(Boolean))]
 
 // Facts (stat, progress) show their example only in dev, tagged; unvalidated ones are hidden in production.
 const cards = hero.cards
@@ -48,20 +58,24 @@ const title = t(labelKey(id))
 const lead = page ? t(page.lead) : ''
 const eyebrow = tab ? t(tabKey(tab)) : ''
 const season = getSeason()
-const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
+const sizes = morph
+  ? '100vw'
+  : '(min-width: 100rem) 26vw, (min-width: 80rem) 32vw, (min-width: 48rem) 46vw, 120vw'
+const stagger = ['0', '3.5rem', '1rem', '4.5rem']
 ---
 
-<section class="ph" data-layout={hero.layout} data-shape={hero.shape} aria-labelledby="ph-title">
+
+<section class="ph" data-layout={hero.layout} data-tiles={tiles.length} aria-labelledby="ph-title">
   {
     hero.layout !== 'plain' && (
       <svg class="ph-defs" width="0" height="0" aria-hidden="true" focusable="false">
         <defs>
-          <clipPath id={`ph-${hero.shape}`} clipPathUnits="objectBoundingBox" set:html={shape.defs} />
+          {usedShapes.map((sid) => <clipPath id={`ph-${sid}`} clipPathUnits="objectBoundingBox" set:html={shapes[sid].defs} />)}
         </defs>
       </svg>
     )
   }
-  <div class="ph-frame" style={`--ar:${shape.ar}`}>
+  <div class="ph-frame">
     <div class="ph-text">
       {eyebrow && <p class="ph-eyebrow"><span class="ph-dot" aria-hidden="true"></span>{eyebrow}</p>}
       {hero.giant === 'season' && <p class="ph-giant" aria-hidden="true">{t(`season.${season}` as 'season.avent')}</p>}
@@ -77,87 +91,144 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
 
     {
       hero.layout !== 'plain' && (
-        <div class="ph-stage">
-          <div class="ph-shape-wrap">
-            <div class="ph-echo" style={`clip-path:url(#ph-${hero.shape})`} aria-hidden="true" />
-            <div class="ph-shape" style={morph ? undefined : `clip-path:url(#ph-${hero.shape})`}>
-              {main ? (
-                <picture>
-                  <source type="image/avif" srcset={`${heroSrc(main, 1280, 'avif')} 1280w, ${heroSrc(main, 1920, 'avif')} 1920w`} sizes={sizes} />
-                  <img src={heroSrc(main, 1280, 'webp')} srcset={`${heroSrc(main, 1280, 'webp')} 1280w, ${heroSrc(main, 1920, 'webp')} 1920w`} sizes={sizes} alt={main.alt} width={main.width ?? 1920} height={main.height ?? 1280} fetchpriority="high" decoding="async" style={`background-image:url(${main.blur});background-color:${main.color}`} />
-                </picture>
-              ) : (
-                <div class="ph-empty" aria-hidden="true" />
-              )}
-            </div>
-          </div>
-
-          <ul class="ph-cards">
+        <div class="ph-stage" data-hero-stage>
+          <div class="ph-row">
             {
-              cards.map((c, i) => (
-                <li
-                  class:list={['ph-card', `ph-card-${c.kind}`]}
-                  style={`--x:${c.at.x};--y:${Math.max(0, c.at.y)};--r:${c.at.r ?? 0};--i:${i}`}
-                >
-                  {c.kind === 'season' ? (
-                    <SeasonStrip />
-                  ) : c.kind === 'progress' ? (
-                    <div class="ph-progress">
-                      <svg viewBox="0 0 60 60" aria-hidden="true">
-                        <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-track" />
-                        <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-bar" style={`stroke-dasharray:${((c.shown ?? 0) / 100) * ring} ${ring}`} />
-                      </svg>
-                      <div>
-                        <p class="ph-card-value">{c.shown}%{c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}</p>
-                        <p class="ph-card-label">{t(c.label)}</p>
-                      </div>
-                    </div>
-                  ) : c.kind === 'player' ? (
-                    <div class="ph-player">
-                      <button type="button" class="ph-play" disabled aria-label={`${t('hero.listen')} — ${t('hero.soon')}`}><Icon name="play" size={24} /></button>
-                      <div class="grid min-w-0 gap-1">
-                        <p class="ph-card-title">{t(c.title)}</p>
-                        <p class="ph-card-text">{t(c.text)}</p>
-                        <span class="ph-wave" aria-hidden="true">{Array.from({ length: 30 }, (_, w) => <i style={`--h:${Math.round((Math.sin(w * 1.7) * 0.5 + 0.5) * 70 + 20)}%`} />)}</span>
-                      </div>
-                    </div>
-                  ) : c.kind === 'step' ? (
-                    <>
-                      <span class="ph-step">{c.n}</span>
-                      <p class="ph-card-title">{t(c.title)}</p>
-                      <p class="ph-card-text">{t(c.text)}</p>
-                    </>
-                  ) : c.kind === 'stat' ? (
-                    <>
-                      <p class="ph-card-value">
-                        {c.shown}
-                        {c.suffix}
-                        {c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}
-                      </p>
-                      <p class="ph-card-label">{t(c.label)}</p>
-                    </>
-                  ) : (
-                    <>
-                      <span class="ph-card-icon"><Icon name={c.icon} size={20} /></span>
-                      <p class="ph-card-title">{t(c.title)}</p>
-                      <p class="ph-card-text">{t(c.text)}</p>
-                    </>
-                  )}
-                </li>
+              tiles.map((tile, i) => (
+                <div class="ph-tile" style={`--ar:${shapes[tile.shape].ar};--off:${stagger[i % 4]};--d:${(0.25 + i * 0.12).toFixed(2)}`}>
+                  <div class="ph-echo" style={`clip-path:url(#ph-${tile.shape})`} aria-hidden="true" />
+                  <div class="ph-shape" style={morph ? undefined : `clip-path:url(#ph-${tile.shape})`}>
+                    {tile.photo ? (
+                      <picture>
+                        <source type="image/avif" srcset={`${heroSrc(tile.photo, 1280, 'avif')} 1280w, ${heroSrc(tile.photo, 1920, 'avif')} 1920w`} sizes={sizes} />
+                        <img src={heroSrc(tile.photo, 1280, 'webp')} srcset={`${heroSrc(tile.photo, 1280, 'webp')} 1280w, ${heroSrc(tile.photo, 1920, 'webp')} 1920w`} sizes={sizes} alt={i === 0 ? tile.photo.alt : ''} width={tile.photo.width ?? 1920} height={tile.photo.height ?? 1280} fetchpriority={i === 0 ? 'high' : 'low'} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" style={`background-image:url(${tile.photo.blur});background-color:${tile.photo.color}`} />
+                      </picture>
+                    ) : (
+                      <div class="ph-empty" aria-hidden="true" />
+                    )}
+                  </div>
+                </div>
               ))
             }
-          </ul>
-          {main && <p class="ph-credit">{t('home.stream.credit', { name: main.photographer })}</p>}
+
+            <ul class="ph-cards">
+              {
+                cards.map((c, i) => (
+                  <li
+                    class:list={['ph-card', `ph-card-${c.kind}`]}
+                    style={`--x:${c.at.x};--y:${Math.max(0, c.at.y)};--r:${c.at.r ?? 0};--i:${i};--d:${(0.9 + (i % 3) * 0.35).toFixed(2)}`}
+                  >
+                    <div class="ph-card-body">
+                      {c.kind === 'season' ? (
+                        <SeasonStrip />
+                      ) : c.kind === 'progress' ? (
+                        <div class="ph-progress">
+                          <svg viewBox="0 0 60 60" aria-hidden="true">
+                            <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-track" />
+                            <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-bar" style={`stroke-dasharray:${((c.shown ?? 0) / 100) * ring} ${ring}`} />
+                          </svg>
+                          <div>
+                            <p class="ph-card-value">{c.shown}%{c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}</p>
+                            <p class="ph-card-label">{t(c.label)}</p>
+                          </div>
+                        </div>
+                      ) : c.kind === 'player' ? (
+                        <div class="ph-player">
+                          <button type="button" class="ph-play" disabled aria-label={`${t('hero.listen')} — ${t('hero.soon')}`}><Icon name="play" size={24} /></button>
+                          <div class="grid min-w-0 gap-1">
+                            <p class="ph-card-title">{t(c.title)}</p>
+                            <p class="ph-card-text">{t(c.text)}</p>
+                            <span class="ph-wave" aria-hidden="true">{Array.from({ length: 30 }, (_, w) => <i style={`--h:${Math.round((Math.sin(w * 1.7) * 0.5 + 0.5) * 70 + 20)}%`} />)}</span>
+                          </div>
+                        </div>
+                      ) : c.kind === 'step' ? (
+                        <>
+                          <span class="ph-step">{c.n}</span>
+                          <p class="ph-card-title">{t(c.title)}</p>
+                          <p class="ph-card-text">{t(c.text)}</p>
+                        </>
+                      ) : c.kind === 'stat' ? (
+                        <>
+                          <p class="ph-card-value">
+                            {c.shown}
+                            {c.suffix}
+                            {c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}
+                          </p>
+                          <p class="ph-card-label">{t(c.label)}</p>
+                        </>
+                      ) : (
+                        <>
+                          <span class="ph-card-icon"><Icon name={c.icon} size={20} /></span>
+                          <p class="ph-card-title">{t(c.title)}</p>
+                          <p class="ph-card-text">{t(c.text)}</p>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          {credits.length > 0 && <p class="ph-credit">{t('home.stream.credit', { name: credits.join(', ') })}</p>}
         </div>
       )
     }
   </div>
 </section>
 
+<script>
+  // Cards drift gently with the pointer (each at its own depth), eased every frame. Fine pointers, no
+  // reduced motion; touch and keyboard users get the static composition.
+  const setup = () => {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    for (const stage of document.querySelectorAll<HTMLElement>('[data-hero-stage]')) {
+      if (stage.dataset.live) continue
+      stage.dataset.live = ''
+      const host = stage.closest<HTMLElement>('.ph')
+      if (!host) continue
+      let tx = 0
+      let ty = 0
+      let x = 0
+      let y = 0
+      let frame = 0
+      const tick = () => {
+        x += (tx - x) * 0.07
+        y += (ty - y) * 0.07
+        host.style.setProperty('--px', x.toFixed(3))
+        host.style.setProperty('--py', y.toFixed(3))
+        frame = Math.abs(tx - x) + Math.abs(ty - y) > 0.002 ? requestAnimationFrame(tick) : 0
+      }
+      const kick = () => {
+        if (!frame) frame = requestAnimationFrame(tick)
+      }
+      host.addEventListener(
+        'pointermove',
+        (e) => {
+          const r = host.getBoundingClientRect()
+          tx = ((e.clientX - r.left) / r.width - 0.5) * 2
+          ty = ((e.clientY - r.top) / Math.max(r.height, 1) - 0.5) * 2
+          kick()
+        },
+        { passive: true },
+      )
+      host.addEventListener('pointerleave', () => {
+        tx = 0
+        ty = 0
+        kick()
+      })
+    }
+  }
+  setup()
+  document.addEventListener('astro:page-load', setup)
+</script>
+
 <style is:global>
   .ph {
+    --px: 0;
+    --py: 0;
     padding: 0.5rem 1rem 0;
-    /* The echo and overflowing cards never add a horizontal scrollbar (clip, not hidden: sticky still works). */
+    /* Shapes and cards that overflow never add a horizontal scrollbar (clip, not hidden: sticky still works). */
     overflow-x: clip;
   }
   .ph-defs {
@@ -165,18 +236,20 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
   }
   .ph-frame {
     display: grid;
-    gap: 2rem;
-    max-width: 80rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    max-width: 100rem;
     margin-inline: auto;
-    padding-block: 1.5rem 1rem;
+    padding-block: 1.5rem 0.5rem;
   }
 
   /* ── Text ─────────────────────────────────────────────────────────────────────────── */
   .ph-text {
     display: grid;
+    justify-items: center;
     align-content: center;
-    justify-items: start;
     gap: 1rem;
+    text-align: center;
   }
   .ph-eyebrow {
     display: inline-flex;
@@ -196,13 +269,14 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
     background: var(--season);
   }
   .ph-title {
-    font-size: clamp(2.25rem, 1.2rem + 3.6vw, 4.5rem);
+    max-width: 22ch;
+    font-size: clamp(2.25rem, 1.2rem + 4vw, 5rem);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.02em;
   }
   .ph-lead {
-    max-width: 34rem;
+    max-width: 38rem;
     font-size: var(--text-lg);
     color: var(--ink-muted);
   }
@@ -214,20 +288,26 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
     letter-spacing: -0.02em;
     color: var(--season-ink);
   }
-  [data-layout="split-right"] .ph-giant,
-  [data-layout="split-left"] .ph-giant {
-    margin-block-end: -0.25rem;
-  }
 
-  /* ── The picture: a shape, with an echo of itself behind ──────────────────────────── */
+  /* ── The row of shapes ────────────────────────────────────────────────────────────── */
   .ph-stage {
     position: relative;
-    width: min(100%, 30rem);
-    justify-self: center;
   }
-  .ph-shape-wrap {
+  .ph-row {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .ph-tile {
+    position: relative;
+    flex: 0 0 auto;
+    width: min(118%, 36rem);
     aspect-ratio: var(--ar);
+    margin-block-start: var(--off, 0);
+    /* The tile itself eases a few pixels with the pointer, less than the cards (depth). */
+    transform: translate(calc(var(--px) * var(--d) * -8px), calc(var(--py) * var(--d) * -6px));
     filter: drop-shadow(0 1.25rem 1.5rem color-mix(in oklab, var(--ink) 16%, transparent));
   }
   .ph-echo,
@@ -272,42 +352,50 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
       var(--surface-2);
   }
   .ph-credit {
-    margin-block-start: 0.5rem;
+    margin-block-start: 0.75rem;
     font-size: var(--text-xs);
-    text-align: end;
+    text-align: center;
     color: var(--ink-muted);
   }
 
-  /* ── Cards: scattered over the picture ────────────────────────────────────────────── */
+  /* ── Phones: one big shape, wider than the screen (cropped left and right); cards follow ── */
+  .ph-tile:nth-child(n + 2) {
+    display: none;
+  }
   .ph-cards {
+    position: relative;
+    z-index: 2;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.625rem;
     margin-block-start: -1.5rem;
     padding-inline: 0.25rem;
-    position: relative;
-    z-index: 2;
+    order: 2;
+    width: 100%;
+  }
+  .ph-row {
+    flex-wrap: wrap;
   }
   .ph-card {
+    display: block;
+    min-width: 0;
+  }
+  .ph-card-body {
     display: grid;
     align-content: start;
     gap: 0.25rem;
-    min-width: 9.5rem;
+    height: 100%;
     padding: 0.875rem 1rem;
     border-radius: var(--radius-lg);
     background: var(--surface);
     box-shadow: var(--elevation-2), inset 0 0 0 1px var(--line);
     animation: ph-rise var(--duration-nav) var(--ease-soft) calc(0.35s + var(--i) * 90ms) both;
-    transition: transform var(--duration-nav) var(--ease-spring), box-shadow var(--duration-ui) var(--ease-out);
   }
   @keyframes ph-rise {
     from {
       opacity: 0;
       translate: 0 1rem;
     }
-  }
-  .ph-card:hover {
-    box-shadow: var(--elevation-3), inset 0 0 0 1px var(--line);
   }
   .ph-card-value {
     display: flex;
@@ -358,8 +446,9 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
     font-size: var(--text-lg);
     font-weight: 600;
   }
-  .ph-card:has(.season-strip) {
-    min-width: min(100%, 22rem);
+  .ph-card-season,
+  .ph-card-player {
+    grid-column: 1 / -1;
   }
   .ph-progress {
     display: flex;
@@ -393,7 +482,6 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
     display: flex;
     align-items: center;
     gap: 1rem;
-    min-width: min(100%, 20rem);
   }
   .ph-play {
     display: grid;
@@ -432,56 +520,59 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
   .ph-plain-cards {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.75rem;
   }
+  .ph-plain-cards .ph-card {
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    text-align: start;
+  }
 
-  /* ── Desktop ─────────────────────────────────────────────────────────────────────── */
-  @media (min-width: 64rem) {
+  /* ── Phones, stage: the shape is 18% wider than the screen, centered, so both sides are cropped ── */
+  @media (max-width: 47.99rem) {
+    [data-layout="stage"] .ph-tile {
+      width: 118vw;
+      max-width: none;
+      margin-inline: -9vw;
+    }
+    [data-layout="stage"] .ph-row {
+      justify-content: center;
+    }
+  }
+
+  /* ── From tablets: a row of shapes, scattered cards, text centered above ───────────── */
+  @media (min-width: 48rem) {
     .ph {
       padding-inline: 1.5rem;
     }
-    .ph-frame {
-      min-height: calc(100svh - 7rem);
-      align-items: center;
-      padding-block: 2rem 4rem;
+    [data-layout="stage"] .ph-frame {
+      gap: 3rem;
+      padding-block: 3rem 0;
     }
-    [data-layout="split-right"] .ph-frame {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 34rem);
-      gap: 5rem;
+    [data-layout="stage"] .ph-text {
+      min-height: 30svh;
     }
-    [data-layout="split-left"] .ph-frame {
-      grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
-      grid-template-areas: "stage text";
-      gap: 5rem;
+    [data-layout="stage"] .ph-row {
+      flex-wrap: nowrap;
+      /* 20–30 % of the row runs past the first screen: the row's height is below the fold on purpose. */
+      margin-block-end: -3rem;
     }
-    [data-layout="split-left"] .ph-text {
-      grid-area: text;
+    [data-layout="stage"] .ph-tile {
+      flex: 1 1 0;
+      width: auto;
+      max-width: 36rem;
+      min-width: 0;
     }
-    [data-layout="split-left"] .ph-stage {
-      grid-area: stage;
+    /* 2 shapes on tablets, 3 on laptops, 4 on large displays. */
+    [data-layout="stage"] .ph-tile:nth-child(2) {
+      display: block;
     }
-    .ph-stage {
-      width: 100%;
+    [data-layout="stage"] .ph-tile:nth-child(n + 3) {
+      display: none;
     }
-    [data-layout="centered"] .ph-frame {
-      justify-items: center;
-      gap: 2.5rem;
-      text-align: center;
-    }
-    [data-layout="centered"] .ph-text {
-      justify-items: center;
-    }
-    [data-layout="centered"] .ph-stage {
-      width: min(100%, 36rem);
-    }
-    [data-shape="stadium"] .ph-stage {
-      width: min(100%, 44rem);
-    }
-    [data-layout="centered"][data-shape="circle"] .ph-stage {
-      width: min(100%, 24rem);
-    }
-    /* Scattered: positioned in % of the picture (see lib/heroes.ts), overflow allowed, never above. */
-    .ph-cards {
+    [data-layout="stage"] .ph-cards {
       position: absolute;
       inset: 0;
       display: block;
@@ -489,39 +580,54 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
       padding: 0;
       pointer-events: none;
     }
-    .ph-card {
+    [data-layout="stage"] .ph-card {
       position: absolute;
       inset-inline-start: calc(var(--x) * 1%);
       inset-block-start: calc(var(--y) * 1%);
-      width: max-content;
-      max-width: 15rem;
-      rotate: calc(var(--r) * 1deg);
-      pointer-events: auto;
-    }
-    .ph-card:hover {
-      rotate: 0deg;
-      translate: 0 -4px;
-    }
-    .ph-card-info,
-    .ph-card-step {
       width: 13.5rem;
+      rotate: calc(var(--r) * 1deg);
+      /* Each card drifts at its own depth, following the pointer. */
+      transform: translate(calc(var(--px) * var(--d) * 16px), calc(var(--py) * var(--d) * 11px));
+      pointer-events: auto;
+      transition: rotate 0.9s var(--ease-soft), scale 0.7s var(--ease-soft);
     }
-    .ph-card-progress {
+    [data-layout="stage"] .ph-card:hover {
+      rotate: calc(var(--r) * 0.35deg);
+      scale: 1.025;
+    }
+    [data-layout="stage"] .ph-card-body {
+      transition: box-shadow 0.7s var(--ease-soft);
+    }
+    [data-layout="stage"] .ph-card:hover .ph-card-body {
+      box-shadow: var(--elevation-3), inset 0 0 0 1px var(--line);
+    }
+    [data-layout="stage"] .ph-card-progress {
       width: 15rem;
     }
-    .ph-card-player {
+    [data-layout="stage"] .ph-card-player {
       width: 22rem;
-      max-width: none;
     }
-    .ph-credit {
-      position: absolute;
-      inset-inline-end: 0;
-      inset-block-end: -1.75rem;
-      margin: 0;
+    [data-layout="stage"] .ph-card-season {
+      width: 22rem;
+    }
+    [data-layout="stage"] .ph-credit {
+      position: relative;
+      margin-block-start: 4.5rem;
+    }
+  }
+  @media (min-width: 80rem) {
+    [data-layout="stage"][data-tiles="3"] .ph-tile:nth-child(3),
+    [data-layout="stage"][data-tiles="4"] .ph-tile:nth-child(3) {
+      display: block;
+    }
+  }
+  @media (min-width: 100rem) {
+    [data-layout="stage"][data-tiles="4"] .ph-tile:nth-child(4) {
+      display: block;
     }
   }
 
-  /* ── Morph: a full-screen photo that shrinks into a rounded shape as you scroll ──── */
+  /* ── Morph: full screen behind the navbar, settling into a framed rectangle on scroll ── */
   [data-layout="morph"] .ph-text {
     color: var(--on-photo);
   }
@@ -540,16 +646,12 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, color-mix(in oklab, var(--scrim) 25%, transparent), color-mix(in oklab, var(--scrim) 70%, transparent));
+    background: linear-gradient(180deg, color-mix(in oklab, var(--scrim) 30%, transparent), color-mix(in oklab, var(--scrim) 66%, transparent));
   }
   [data-layout="morph"] .ph-echo {
     display: none;
   }
   @media (max-width: 63.99rem) {
-    [data-layout="morph"] .ph-stage {
-      width: min(100%, 30rem);
-      --ar: 0.8;
-    }
     [data-layout="morph"] .ph-text {
       color: var(--ink);
     }
@@ -560,8 +662,22 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
       color: var(--ink);
       background: var(--surface);
     }
+    [data-layout="morph"] .ph-tile {
+      width: 118vw;
+      max-width: none;
+      margin-inline: -9vw;
+      --ar: 0.9;
+    }
+    [data-layout="morph"] .ph-row {
+      justify-content: center;
+    }
   }
   @media (min-width: 64rem) {
+    [data-layout="morph"].ph {
+      /* Up behind the navbar: the photo starts at the very top of the screen. */
+      margin-block-start: -4.25rem;
+      padding: 0;
+    }
     [data-layout="morph"] .ph-frame {
       display: block;
       max-width: none;
@@ -573,35 +689,66 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
       z-index: 3;
       display: grid;
       place-content: center;
-      justify-items: center;
       height: 100svh;
-      padding-inline: 22%;
-      text-align: center;
+      padding-inline: 20%;
       pointer-events: none;
     }
     [data-layout="morph"] .ph-title {
-      font-size: clamp(2.75rem, 1rem + 5vw, 6rem);
+      max-width: 18ch;
+      font-size: clamp(2.75rem, 1rem + 5vw, 6.25rem);
     }
     [data-layout="morph"] .ph-stage {
       position: absolute;
       inset: 0;
-      width: 100%;
-      justify-self: stretch;
       z-index: 1;
     }
-    [data-layout="morph"] .ph-shape-wrap {
+    [data-layout="morph"] .ph-row {
       position: absolute;
       inset: 0;
+      display: block;
+    }
+    [data-layout="morph"] .ph-tile {
+      position: absolute;
+      inset: 0;
+      width: auto;
+      max-width: none;
+      margin: 0;
       aspect-ratio: auto;
+      transform: none;
       filter: none;
     }
-    /* Final state: a rounded "pebble" with the cards around it. */
+    /* Final state: a framed rectangle with soft corners, clear of the navbar. */
     [data-layout="morph"] .ph-shape {
-      clip-path: inset(10% 15% 6% 15% round 46% / 38%);
+      clip-path: inset(6.5rem 2rem 2.5rem 2rem round var(--radius-xl));
+    }
+    [data-layout="morph"] .ph-cards {
+      position: absolute;
+      inset: 0;
+      display: block;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+    [data-layout="morph"] .ph-card {
+      position: absolute;
+      inset-inline-start: calc(var(--x) * 1%);
+      inset-block-start: calc(var(--y) * 1%);
+      width: 14rem;
+      rotate: calc(var(--r) * 1deg);
+      transform: translate(calc(var(--px) * var(--d) * 16px), calc(var(--py) * var(--d) * 11px));
+      pointer-events: auto;
+      transition: rotate 0.9s var(--ease-soft), scale 0.7s var(--ease-soft);
+    }
+    [data-layout="morph"] .ph-card:hover {
+      rotate: calc(var(--r) * 0.35deg);
+      scale: 1.025;
     }
     [data-layout="morph"] .ph-credit {
-      inset-inline-end: 1.5rem;
-      inset-block-end: 0.5rem;
+      position: absolute;
+      inset-inline-end: 2.5rem;
+      inset-block-end: 0.75rem;
+      margin: 0;
+      color: var(--on-photo);
     }
     @supports (animation-timeline: scroll()) {
       @media (prefers-reduced-motion: no-preference) {
@@ -620,19 +767,19 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
           margin-block-start: -100svh;
         }
         [data-layout="morph"] .ph-shape {
-          animation: ph-morph linear both;
+          animation: ph-morph cubic-bezier(0.45, 0, 0.2, 1) both;
           animation-timeline: scroll(root);
-          animation-range: 0 85svh;
+          animation-range: 0 90svh;
         }
         [data-layout="morph"] .ph-shape img {
           animation: ph-zoom linear both;
           animation-timeline: scroll(root);
-          animation-range: 0 85svh;
+          animation-range: 0 90svh;
         }
-        [data-layout="morph"] .ph-card {
+        [data-layout="morph"] .ph-card-body {
           animation: ph-appear linear both;
           animation-timeline: scroll(root);
-          animation-range: calc(30svh + var(--i) * 8svh) calc(80svh + var(--i) * 8svh);
+          animation-range: calc(35svh + var(--i) * 9svh) calc(85svh + var(--i) * 9svh);
         }
       }
     }
@@ -642,12 +789,12 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
       clip-path: inset(0 0 0 0 round 0);
     }
     to {
-      clip-path: inset(10% 15% 6% 15% round 46% / 38%);
+      clip-path: inset(6.5rem 2rem 2.5rem 2rem round var(--radius-xl));
     }
   }
   @keyframes ph-zoom {
     from {
-      transform: scale(1.12);
+      transform: scale(1.1);
     }
     to {
       transform: scale(1);
@@ -665,9 +812,13 @@ const sizes = morph ? '100vw' : '(min-width: 64rem) 34rem, 90vw'
   }
   @media (prefers-reduced-motion: reduce) {
     .ph-shape img,
-    .ph-card,
+    .ph-card-body,
     .ph-progress-bar {
       animation: none;
+    }
+    .ph-card,
+    .ph-tile {
+      transform: none !important;
     }
   }
 </style>

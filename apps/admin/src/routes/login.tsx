@@ -2,8 +2,7 @@ import { errorKey, meQuery, useSessionActions, useT } from '@eec/admin-kit'
 import { Button, TextField } from '@eec/ui/react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { LocaleSwitch, ThemeButton } from '../components/Controls'
-import { Mark } from '../components/Mark'
+import { AuthShell } from '../components/AuthShell'
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context }) => {
@@ -19,13 +18,9 @@ function Login() {
   const [error, setError] = useState<string>()
   const [busy, setBusy] = useState(false)
   return (
-    <div className="login">
-      <div className="login-tools">
-        <LocaleSwitch />
-        <ThemeButton />
-      </div>
+    <AuthShell>
       <form
-        className="login-card"
+        className="auth-form"
         onSubmit={async (e) => {
           e.preventDefault()
           const data = new FormData(e.currentTarget)
@@ -41,8 +36,7 @@ function Login() {
           }
         }}
       >
-        <Mark variant="mark" className="login-mark" label={t('site.church')} />
-        <div className="grid gap-1 text-center">
+        <div className="grid gap-1">
           <h1 className="text-3xl">{t('auth.login.title')}</h1>
           <p className="text-ink-muted">{t('auth.login.lead')}</p>
         </div>
@@ -70,8 +64,8 @@ function Login() {
         <Button type="submit" size="lg" loading={busy}>
           {t('login.submit')}
         </Button>
-        <p className="text-center text-sm text-ink-muted">{t('auth.login.hint')}</p>
+        <p className="text-sm text-ink-muted">{t('auth.login.hint')}</p>
       </form>
-    </div>
+    </AuthShell>
   )
 }

@@ -25,6 +25,14 @@ page with its own concept. Vertical slice done, **waiting for Joël's review** b
   `apps/web/src/content/placeholders.json`). Real, consented parish photos needed before launch.
 - Next after review: every other page gets its own concept (`docs/product/pages.md`), then Checkpoint B.
 
+## Round 4 UI (2026-10-20, Joël's feedback)
+Mobile menu fixed (it inherited pointer-events:none from the header) + a visible × ; hero redone (centered
+title, row of 1–4 shapes partly below the fold, pointer-following cards, full-screen-behind-navbar morph);
+admin shell is Google-Cloud style (fixed sidebar + top bar, rounded join, left-aligned content); full-screen
+admin login with a random photo and the logo always with the parish name; menu shows the current page's
+illustration by default; new Storyset illustrations for news, sermons, meditations, events, home.
+Google sign-in: members can link Google to an existing password account; staff are still refused.
+
 ## Checkpoint B — done, waiting for Joël's review (2026-10-20)
 - Module system: `modules/` workspace, registry (+ API mounts, admin menu, permission seed, i18n merge),
   feature flags (switched-off module → API 404, menu hidden), boundary test. Shared kits: `@eec/api-kit`,

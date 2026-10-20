@@ -3,7 +3,7 @@
     "name": "church",
     "url": "https://stories.freepiklabs.com/storage/78212/Church_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Spare (menu tabs used these before sub-menu art)"
+    "use": "Spare (superseded)"
   },
   {
     "name": "community",
@@ -15,19 +15,19 @@
     "name": "events",
     "url": "https://stories.freepiklabs.com/storage/51828/Events_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Menu → Événements"
+    "use": "Spare (superseded)"
   },
   {
     "name": "news",
     "url": "https://stories.freepiklabs.com/storage/39809/News_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Menu → Nouvelles"
+    "use": "Spare (superseded)"
   },
   {
     "name": "together",
     "url": "https://stories.freepiklabs.com/storage/42807/Together_Mesa-de-trabajo-1.svg",
     "background": true,
-    "use": "Home → Venir un dimanche"
+    "use": "Spare (superseded by group)"
   },
   {
     "name": "reading-book",
@@ -93,12 +93,42 @@
     "name": "chatting",
     "url": "https://stories.freepiklabs.com/storage/38768/Chatting_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Menu → Prédications"
+    "use": "Spare (superseded)"
   },
   {
     "name": "book-lover",
     "url": "https://stories.freepiklabs.com/storage/15167/Book-lover_Mesa-de-trabajo-1.svg",
     "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "messaging-fun",
+    "url": "https://stories.freepiklabs.com/storage/30217/Messaging-fun_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Nouvelles"
+  },
+  {
+    "name": "group-discussion",
+    "url": "https://stories.freepiklabs.com/storage/57410/Group-discussion_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Prédications"
+  },
+  {
+    "name": "stay-at-home",
+    "url": "https://stories.freepiklabs.com/storage/15121/Stay-at-home_Mesa-de-trabajo-1.svg",
+    "background": false,
     "use": "Menu → Méditations et bulletin"
+  },
+  {
+    "name": "group",
+    "url": "https://stories.freepiklabs.com/storage/57389/Group-(1)_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Home → Venir un dimanche"
+  },
+  {
+    "name": "a-whole-year",
+    "url": "https://stories.freepiklabs.com/storage/41714/A-Whole-Year_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Événements"
   }
 ]

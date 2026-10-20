@@ -80,9 +80,9 @@ export function createAuth({
         locale: { type: 'string', required: false, input: false },
       },
     },
-    // Google is for members only: an address that already has an account (staff included) is never merged
-    // into a Google identity — it must sign in with its own method.
-    account: { accountLinking: { enabled: false } },
+    // Google is for members. A member who first signed up with a password may add Google (Google verifies
+    // the address). Staff never sign in this way: the after-hook below undoes it and removes the link.
+    account: { accountLinking: { enabled: true, trustedProviders: ['google'] } },
     socialProviders: google
       ? {
           google: {
@@ -156,6 +156,12 @@ export function createAuth({
         const undo = async (deleteUser: boolean) => {
           await db.delete(schema.session).where(eq(schema.session.userId, created.id))
           if (deleteUser) await db.delete(schema.user).where(eq(schema.user.id, created.id))
+          else
+            await db
+              .delete(schema.account)
+              .where(
+                and(eq(schema.account.userId, created.id), eq(schema.account.providerId, 'google')),
+              )
         }
         ctx.setCookie(GOOGLE_INTENT_COOKIE, '', { maxAge: 0, path: '/api/auth' })
 

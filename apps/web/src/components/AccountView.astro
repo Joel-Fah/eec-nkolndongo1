@@ -358,9 +358,11 @@ const tiles = [
       startGoogle({ privacy: true, news: (form.elements.namedItem('acceptNews') as HTMLInputElement).checked })
     })
     // Coming back from Google with a problem.
-    const back = new URLSearchParams(location.search).get('google')
+    const params = new URLSearchParams(location.search)
+    const back = params.get('google')
     if (back) {
-      say(msgs[back] ?? msgs.error ?? '')
+      const code = params.get('error')
+      say(`${msgs[back] ?? msgs.error ?? ''}${code ? ` (${code})` : ''}`)
       history.replaceState(null, '', location.pathname)
     }
 
