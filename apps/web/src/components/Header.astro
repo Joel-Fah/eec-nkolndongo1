@@ -18,12 +18,19 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 
 <header class="site-header" data-header>
   <div class="site-header-bar">
-    <a href={home} class="site-brand" aria-label={`${t('site.name')} — ${t('nav.home')}`}>
+    <svg class="site-goo-defs" width="0" height="0" focusable="false" role="presentation" aria-hidden="true">
+      <filter id="eec-goo" x="-20%" y="-60%" width="140%" height="220%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
+      </filter>
+    </svg>
+    <div class="site-goo" data-goo aria-hidden="true"></div>
+    <a href={home} class="site-brand site-pod" data-pod="l" aria-label={`${t('site.name')} — ${t('nav.home')}`}>
       <SiteLockup variant="three" class="site-lockup-narrow text-[0.95rem]" />
       <SiteLockup variant="two" class="site-lockup-wide text-[0.95rem]" />
     </a>
 
-    <nav class="site-nav" aria-label={t('nav.main')}>
+    <nav class="site-nav site-pod" data-pod="c" aria-label={t('nav.main')}>
       <ul class="site-nav-list" role="list">
         {
           tabs.map((tab) => {
@@ -79,7 +86,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       </ul>
     </nav>
 
-    <div class="site-tools">
+    <div class="site-tools site-pod" data-pod="r">
       <button type="button" class="btn btn-ghost btn-icon site-tool-desktop" aria-label={t('nav.search')} disabled title={t('nav.search')}>
         <Icon name="search" />
       </button>
@@ -149,8 +156,15 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 </script>
 
 <style is:global>
-  /* The bar floats: inset from the edges, rounded on every corner, blurred. */
+  /*
+   * The bar is three separate pods on one line (logo, tabs, tools; on phones: logo and the menu button).
+   * At the top of the page they sit apart; scrolling down brings them together like water droplets (a "goo"
+   * layer behind them draws the joined shape), and then the merged bar tucks away, leaving a glimpse.
+   * --merge (0 → 1) is set from the scroll position by scripts/header.ts; --dl / --dr are the distances the
+   * outer pods travel. Without the script every pod keeps its own plain background.
+   */
   .site-header {
+    --merge: 0;
     position: sticky;
     inset-block-start: 0.75rem;
     z-index: 40;
@@ -158,8 +172,15 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     pointer-events: none;
     transition: transform var(--duration-nav) var(--ease-soft);
   }
+  /* Tucked away: a glimpse of its lower edge stays; hovering (mouse), scrolling up or tapping it brings it back. */
   .site-header[data-hidden] {
-    transform: translateY(calc(-100% - 1.5rem));
+    transform: translateY(calc(-100% - 0.25rem));
+  }
+  .site-header[data-hidden] .site-header-bar::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 -1rem;
+    pointer-events: auto;
   }
   .site-header-bar {
     position: relative;
@@ -168,23 +189,57 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     gap: 0.75rem;
     max-width: 80rem;
     margin-inline: auto;
-    padding: 0.5rem 0.625rem 0.5rem 1rem;
-    border-radius: var(--radius-xl);
-    background: color-mix(in oklab, var(--surface) 78%, transparent);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  }
+  .site-pod {
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
     box-shadow: var(--elevation-2);
     pointer-events: auto;
-    transition: background-color var(--duration-nav) var(--ease-soft);
   }
-  .site-header[data-scrolled] .site-header-bar {
-    background: color-mix(in oklab, var(--surface) 92%, transparent);
+  .site-header[data-goo] .site-pod {
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header[data-goo] [data-pod="l"] {
+    translate: calc(var(--dl, 0px) * var(--merge)) 0;
+  }
+  .site-header[data-goo] [data-pod="r"] {
+    translate: calc(var(--dr, 0px) * var(--merge) * -1) 0;
+  }
+  .site-goo-defs {
+    position: absolute;
+  }
+  .site-goo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: none;
+    pointer-events: none;
+    opacity: 0.94;
+    filter: url(#eec-goo) drop-shadow(0 0.25rem 0.75rem color-mix(in oklab, var(--ink) 14%, transparent));
+  }
+  .site-header[data-goo] .site-goo {
+    display: block;
+  }
+  .site-goo-blob {
+    position: absolute;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .site-goo-blob[data-pod="l"] {
+    translate: calc(var(--dl, 0px) * var(--merge)) 0;
+  }
+  .site-goo-blob[data-pod="r"] {
+    translate: calc(var(--dr, 0px) * var(--merge) * -1) 0;
   }
   .site-brand {
-    display: block;
+    display: flex;
     flex: none;
-    width: 11.5rem;
-    border-radius: var(--radius-md);
+    width: 13.5rem;
+    padding-inline: 1rem;
     text-decoration: none;
   }
   .site-brand .site-lockup-wide {
@@ -199,6 +254,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     align-items: center;
     gap: 0.125rem;
     margin-inline-start: auto;
+    padding: 0.375rem;
   }
   .site-lang {
     min-width: 2.75rem;
@@ -389,7 +445,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       gap: 1.25rem;
     }
     .site-brand {
-      width: 19.5rem;
+      width: 21.5rem;
     }
     .site-brand .site-lockup-narrow {
       display: none;
@@ -398,8 +454,9 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       display: flex;
     }
     .site-nav {
-      display: block;
+      display: flex;
       margin-inline: auto;
+      padding: 0.375rem;
     }
     .site-tool-desktop {
       display: inline-flex;

@@ -523,9 +523,9 @@
       },
       "header": {
         "name": "Site header and navigation",
-        "desc": "A floating bar: lockup, five tabs with icons, and discreet tools (search, language, theme, account). Each tab opens a mega menu: the pages with their icon and description, and an illustration specific to the theme.",
-        "use": "<Header /> through the Site layout. Panels open on mouse intent (120 ms), click and keyboard. The active page has a gold stroke. Every entry, even nested, carries an icon.",
-        "a11y": "aria-expanded buttons, arrows to move, Esc closes and returns focus, skip link to the content.",
+        "desc": "A floating bar: lockup, five tabs with icons, and discreet tools (search, language, theme, account). Each tab opens a mega menu: the pages with their icon and description, and an illustration specific to the theme. Three pods in a line at the top of the page: the lockup, the tabs and the tools (search, language, theme, account). Scrolling down, they join like water droplets (driven by the scroll) into a single bar; scrolling back to the top, they part the same way. The bar then tucks away leaving a glimpse of its edge; scrolling up, hovering it (mouse) or tapping it (mobile) brings it back. On phones: two pods, the lockup and the menu button (square).",
+        "use": "<Header /> through the Site layout. Panels open on mouse intent (120 ms), click and keyboard. The active page has a gold stroke. Every entry, even nested, carries an icon. The effect exists only at the top of the page. --merge (0 → 1) comes from the scroll (140 px); a “goo” layer (SVG filter) draws the joined shape. Reduced motion: the join is immediate, no animation.",
+        "a11y": "aria-expanded buttons, arrows to move, Esc closes and returns focus, skip link to the content. The first tap on the tucked-away bar only brings it back (nothing underneath is activated). Keyboard focus brings it back too.",
         "demo": "See the header at the top of the site’s home page."
       },
       "mobile": {

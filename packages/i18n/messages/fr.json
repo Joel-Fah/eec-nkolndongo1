@@ -523,9 +523,9 @@
       },
       "header": {
         "name": "En-tête et navigation du site",
-        "desc": "Une barre flottante : logotype, cinq onglets avec icône, et des outils discrets (recherche, langue, thème, compte). Chaque onglet ouvre un méga-menu : les pages avec leur icône et leur description, et une illustration propre au thème.",
-        "use": "<Header /> via le gabarit Site. Les panneaux s’ouvrent à l’intention de la souris (120 ms), au clic et au clavier. La page active a un trait doré. Chaque entrée, même imbriquée, porte une icône.",
-        "a11y": "Boutons aria-expanded, flèches pour parcourir, Échap ferme et rend le focus, lien d’évitement vers le contenu.",
+        "desc": "Une barre flottante : logotype, cinq onglets avec icône, et des outils discrets (recherche, langue, thème, compte). Chaque onglet ouvre un méga-menu : les pages avec leur icône et leur description, et une illustration propre au thème. Trois pastilles sur une ligne en haut de page : le logotype, les onglets et les outils (recherche, langue, thème, compte). En descendant, elles se rejoignent comme des gouttes d’eau (suivant le défilement) pour ne former qu’une barre ; en remontant vers le haut, elles se séparent de la même façon. Ensuite la barre se range en laissant un aperçu de son bord ; défiler vers le haut, la survoler (souris) ou la toucher (mobile) la ramène. Sur mobile : deux pastilles, le logotype et le bouton menu (carré).",
+        "use": "<Header /> via le gabarit Site. Les panneaux s’ouvrent à l’intention de la souris (120 ms), au clic et au clavier. La page active a un trait doré. Chaque entrée, même imbriquée, porte une icône. L’effet n’existe qu’en haut de page. --merge (0 → 1) vient du défilement (140 px), un calque « goo » (filtre SVG) dessine la forme jointe. Mouvement réduit : la jonction est immédiate, sans animation.",
+        "a11y": "Boutons aria-expanded, flèches pour parcourir, Échap ferme et rend le focus, lien d’évitement vers le contenu. Le premier toucher sur la barre rangée ne fait que la ramener (rien dessous n’est activé). Le focus clavier la ramène aussi.",
         "demo": "Voir l’en-tête en haut de la page d’accueil du site."
       },
       "mobile": {
