@@ -1,0 +1,49 @@
+---
+/**
+ * Page numbers for a long list: previous, a few numbers around the current one (with « … » for the rest), next.
+ * Plain links (works without JavaScript, shareable, indexable). `href` is a template with `{n}` for the page.
+ */
+import Icon from './Icon.astro'
+
+interface Props {
+  page: number
+  pages: number
+  /** e.g. `/fr/nouvelles/?page={n}` */
+  href: string
+  label: string
+  prevLabel: string
+  nextLabel: string
+  /** « Page {n} » for the links' accessible names. */
+  pageLabel: string
+}
+const { page, pages, href, label, prevLabel, nextLabel, pageLabel } = Astro.props
+const to = (n: number) => href.replace('{n}', String(n))
+// 1 … (page-1) page (page+1) … last
+const shown = new Set([1, pages, page - 1, page, page + 1].filter((n) => n >= 1 && n <= pages))
+const list: (number | '…')[] = []
+for (const n of [...shown].sort((a, b) => a - b)) {
+  const last = list.at(-1)
+  if (typeof last === 'number' && n - last > 1) list.push('…')
+  list.push(n)
+}
+---
+
+<nav class="pagination" aria-label={label}>
+  <a class="page-link page-step" href={page > 1 ? to(page - 1) : undefined} aria-disabled={page <= 1 ? 'true' : undefined} rel="prev">
+    <Icon name="arrowLeft" size={20} /><span class="page-step-text">{prevLabel}</span>
+  </a>
+  <ol class="page-list">
+    {
+      list.map((n) =>
+        n === '…' ? (
+          <li class="page-gap" aria-hidden="true">…</li>
+        ) : (
+          <li><a class="page-link" href={to(n)} aria-current={n === page ? 'page' : undefined} aria-label={pageLabel.replace('{n}', String(n))}>{n}</a></li>
+        ),
+      )
+    }
+  </ol>
+  <a class="page-link page-step" href={page < pages ? to(page + 1) : undefined} aria-disabled={page >= pages ? 'true' : undefined} rel="next">
+    <span class="page-step-text">{nextLabel}</span><Icon name="arrowRight" size={20} />
+  </a>
+</nav>

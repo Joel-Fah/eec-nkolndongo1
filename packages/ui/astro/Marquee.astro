@@ -1,0 +1,48 @@
+---
+/**
+ * A marquee banner for announcements: one line of short messages gliding across, looped without a seam.
+ * Moving text must be stoppable (WCAG 2.2.2): there is a pause button, hovering or focusing pauses it, and with
+ * reduced motion it does not move at all (the messages wrap, all readable). The second copy is hidden from
+ * assistive technology so nothing is read twice.
+ */
+import Icon from './Icon.astro'
+
+interface Props {
+  /** The messages, already localised. */
+  items: string[]
+  /** Accessible name of the region (« Annonces »). */
+  label: string
+  pauseLabel: string
+  playLabel: string
+  /** Seconds for one pass; longer = calmer. */
+  duration?: number
+  class?: string
+}
+const { items, label, pauseLabel, playLabel, duration = 40, class: className } = Astro.props
+---
+
+<section class:list={['marquee', className]} aria-label={label} data-marquee style={`--marquee-duration:${duration}s`}>
+  <div class="marquee-viewport">
+    <ul class="marquee-track" role="list">
+      {items.map((text) => <li class="marquee-item">{text}</li>)}
+    </ul>
+    <ul class="marquee-track" role="list" aria-hidden="true">
+      {items.map((text) => <li class="marquee-item">{text}</li>)}
+    </ul>
+  </div>
+  <button type="button" class="btn btn-ghost btn-icon marquee-toggle" data-marquee-toggle aria-pressed="false" aria-label={pauseLabel} data-pause={pauseLabel} data-play={playLabel}>
+    <span class="marquee-icon-pause"><Icon name="pause" size={20} /></span>
+    <span class="marquee-icon-play"><Icon name="play" size={20} /></span>
+  </button>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-marquee]')) {
+    const toggle = root.querySelector<HTMLButtonElement>('[data-marquee-toggle]')
+    toggle?.addEventListener('click', () => {
+      const paused = root.toggleAttribute('data-paused')
+      toggle.setAttribute('aria-pressed', String(paused))
+      toggle.setAttribute('aria-label', (paused ? toggle.dataset.play : toggle.dataset.pause) ?? '')
+    })
+  }
+</script>

@@ -50,6 +50,7 @@ export function ErrorScreen({
   return (
     <div
       className="err"
+      data-kind={kind}
       ref={root}
       onPointerMove={light}
       onPointerDown={light}

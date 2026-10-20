@@ -1,8 +1,9 @@
 import { api, errorKey, useT } from '@eec/admin-kit'
-import { Button, TextField } from '@eec/ui/react'
+import { Button } from '@eec/ui/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthShell } from '../components/AuthShell'
+import { PasswordField } from '../components/PasswordField'
 
 export const Route = createFileRoute('/reset/$token')({ component: Reset })
 
@@ -41,11 +42,10 @@ function Reset() {
           </Link>
         ) : (
           <>
-            <TextField
+            <PasswordField
               label={t('login.password')}
               placeholder={t('common.ph.new_password')}
               name="password"
-              type="password"
               autoComplete="new-password"
               hint={t('auth.password.hint')}
               required

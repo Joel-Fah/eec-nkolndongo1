@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthShell } from '../components/AuthShell'
+import { PasswordField } from '../components/PasswordField'
 
 export const Route = createFileRoute('/invite/$token')({ component: Invite })
 
@@ -67,11 +68,10 @@ function Invite() {
               autoComplete="name"
               required
             />
-            <TextField
+            <PasswordField
               label={t('login.password')}
               placeholder={t('common.ph.new_password')}
               name="password"
-              type="password"
               autoComplete="new-password"
               hint={t('auth.password.hint')}
               required

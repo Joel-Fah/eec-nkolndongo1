@@ -121,6 +121,32 @@ export const membersApi = new Hono<AppEnv>()
       .select({ n: sql<number>`count(distinct ${consents.userId})::int` })
       .from(consents)
       .where(and(eq(consents.kind, 'news'), sql`${consents.withdrawnAt} is null`))
+    // The same numbers one month earlier, so the dashboard can show where things are heading.
+    const prevMonthStart = new Date(
+      Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() - 1, 1),
+    )
+    const [totalBefore] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(user)
+      .innerJoin(profiles, eq(profiles.userId, user.id))
+      .where(and(isMember, sql`${user.createdAt} < ${monthStart}`))
+    const [freshBefore] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(user)
+      .innerJoin(profiles, eq(profiles.userId, user.id))
+      .where(
+        and(isMember, gte(user.createdAt, prevMonthStart), sql`${user.createdAt} < ${monthStart}`),
+      )
+    const [newsBefore] = await db
+      .select({ n: sql<number>`count(distinct ${consents.userId})::int` })
+      .from(consents)
+      .where(
+        and(
+          eq(consents.kind, 'news'),
+          sql`${consents.grantedAt} < ${monthStart}`,
+          sql`(${consents.withdrawnAt} is null or ${consents.withdrawnAt} >= ${monthStart})`,
+        ),
+      )
     const byGroup = await db
       .select({
         key: groups.key,
@@ -144,6 +170,11 @@ export const membersApi = new Hono<AppEnv>()
       total: total?.n ?? 0,
       newThisMonth: fresh?.n ?? 0,
       newsSubscribers: news?.n ?? 0,
+      previous: {
+        total: totalBefore?.n ?? 0,
+        newThisMonth: freshBefore?.n ?? 0,
+        newsSubscribers: newsBefore?.n ?? 0,
+      },
       byGroup,
       trend: trendRows.rows.map((r) => ({ month: r.month, n: Number(r.n) })),
     })

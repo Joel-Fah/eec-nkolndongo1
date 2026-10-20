@@ -32,7 +32,9 @@
       "phone": "+237 6XX XX XX XX",
       "notes": "Write here…",
       "search": "Search…"
-    }
+    },
+    "password_show": "Show password",
+    "password_hide": "Hide password"
   },
   "nav": {
     "discover": "Discover",
@@ -575,6 +577,62 @@
         "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> with the fields /api/media returns. In the admin: Media library (drag-and-drop upload, required description, credit, archive).",
         "a11y": "A description (alt) is required for every photo, empty only when the image is decorative. Dimensions are given to avoid layout shifts.",
         "demo": "See the admin, Media library. No photo is used on the site yet."
+      },
+      "marquee": {
+        "name": "Announcement marquee",
+        "desc": "A line of short messages gliding gently, looped without a seam: for an announcement not to be missed (an event, a schedule change). One subject per message.",
+        "use": "<Marquee items label pauseLabel playLabel />. Place it under the header, never more than one per page. One pass lasts 40 s by default.",
+        "a11y": "Automatic motion must be stoppable (WCAG 2.2.2): pause button, pause on hover and focus, and no motion with “reduce motion” (the messages wrap). The second copy is hidden from screen readers.",
+        "demo": "See above: hover or pause it."
+      },
+      "pagination": {
+        "name": "Pagination",
+        "desc": "Links to the pages of a long list: previous, numbers around the current page (“…” for the rest), next. Plain links: it works without JavaScript and every page has its own address.",
+        "use": "<Pagination page pages href=\"/en/news/?page={n}\" … />.",
+        "a11y": "Labelled <nav>, current page in aria-current, previous/next disabled at the ends, 44 px targets, the “Previous/Next” text replaced by the arrow alone on a phone.",
+        "demo": "Five of twelve, and a small number of pages."
+      },
+      "insetfields": {
+        "name": "Fields with inset icons",
+        "desc": "A field with an icon at the start (email, phone, search) and, for a password, an eye at the end that shows or hides the entry. The icon takes the focus colour while typing.",
+        "use": "Astro: <Field icon=\"mail\" /> and <Field type=\"password\" toggle={{ show, hide }} />. React: <TextField icon=\"mail\" /> and <PasswordField /> in the admin.",
+        "a11y": "The icon is decorative (aria-hidden). The eye is a real, named button (“Show password” / “Hide…”) with aria-pressed, reachable by keyboard.",
+        "demo": "Try the eye of the password field."
+      },
+      "search": {
+        "name": "Search",
+        "desc": "A search field with the magnifier inside and a button. The form carries role=\"search\".",
+        "use": "<Field type=\"search\" icon=\"search\" /> inside a <form role=\"search\">.",
+        "a11y": "Visible label, example text that does not repeat the label, 44 px button, Enter runs the search.",
+        "demo": "The search engine arrives with the content."
+      },
+      "imagery": {
+        "name": "Imagery",
+        "desc": "A photo in a frame: rounded corners, a fixed ratio (nothing jumps while loading), a tinted background if the photo is missing, a caption below, a credit on the photo, a gentle zoom on hover. For real photos from the media library, use <Picture>.",
+        "use": "<Figure src alt ratio=\"4/3\" caption credit zoom />. Ratios: 1/1, 4/3, 3/2, 16/9, 3/4.",
+        "a11y": "Alternative text required (empty only when the image is decorative), visible credit, zoom off with “reduce motion”.",
+        "demo": "Stand-in photos (development)."
+      },
+      "tables": {
+        "name": "Tables",
+        "desc": "A calm table: every other row tinted, never rules, a very pale green on hover, numbers right-aligned in tabular figures, horizontal scrolling on a phone (never the page).",
+        "use": "<div class=\"table-wrap\"><table class=\"table\"> with <caption>, <th scope>. Class .num for numbers.",
+        "a11y": "Caption, headers with scope, the first cell of a row as <th scope=\"row\">, AA contrast in light and dark.",
+        "demo": "A four-row example."
+      },
+      "charts": {
+        "name": "Charts",
+        "desc": "Chart.js charts (line, bar, doughnut) in the system’s colours, light and dark, loaded only when they scroll into view (the library weighs nothing on any other page). Always accompanied by the numbers in a table.",
+        "use": "Chart.js 4 loaded on demand; colours read from the tokens (--primary, --gold…). In the admin, the headcount curve stays SVG (lighter).",
+        "a11y": "Every chart has a description (aria-label) and an equivalent table. Animation off with “reduce motion”. Colour is never the only signal.",
+        "demo": "The data are examples."
+      },
+      "shapes": {
+        "name": "Art shapes",
+        "desc": "The shapes that cut photos and illustrations (blob, windows, blocks, flower, leaf, drop, arch, sail…), defined in relative units so they fit any frame. Each page has its own composition.",
+        "use": "lib/shapes.ts: { ar, defs } per shape; clip-path: url(#id) with clipPathUnits=\"objectBoundingBox\".",
+        "a11y": "Decorative: the content and alternative text are those of the cut image; no information is carried by the shape.",
+        "demo": "Every available shape."
       }
     },
     "rules": {
@@ -1103,7 +1161,37 @@
     "btn_large": "Large",
     "btn_loading": "Sending",
     "btn_disabled": "Unavailable",
-    "menu_item_demo": "Menu"
+    "menu_item_demo": "Menu",
+    "marquee_label": "Announcements",
+    "marquee1": "Example: a short announcement, a single idea",
+    "marquee2": "Example: an upcoming event",
+    "marquee3": "Example: a message from the parish",
+    "marquee_pause": "Pause the scrolling",
+    "marquee_play": "Resume the scrolling",
+    "pagination_label": "Pagination",
+    "pagination_prev": "Previous",
+    "pagination_next": "Next",
+    "pagination_page": "Page {n}",
+    "inset_hint": "Click the eye to see what you are typing.",
+    "search_label": "Search",
+    "search_placeholder": "A word, a name, a topic…",
+    "search_go": "Search",
+    "imagery_alt": "Example image",
+    "imagery_caption": "A caption explains the photo in one sentence.",
+    "imagery_credit": "Photo: example",
+    "table_caption": "Example table",
+    "table_name": "Name",
+    "table_group": "Group",
+    "table_count": "People",
+    "table_example": "Example {x}",
+    "table_group_example": "Group {x}",
+    "chart_series": "New members (example)",
+    "chart_line": "Example line over twelve months",
+    "chart_doughnut": "Example breakdown",
+    "chart_bar": "Example bar chart over twelve months",
+    "chart_table": "See the charts’ numbers",
+    "chart_month": "Month",
+    "chart_value": "Value"
   },
   "page": {
     "cta_title": "A question, a memory, a wish to come?",
@@ -1478,5 +1566,34 @@
   "bible": {
     "pdv": "Parole de Vie",
     "etr": "Easy-to-Read Version"
+  },
+  "dash": {
+    "trend_up": "Up by",
+    "trend_down": "Down by",
+    "trend_flat": "Steady:",
+    "vs_last_month": "vs last month",
+    "insights": "To do or good to know",
+    "card_members": "Active members",
+    "card_new": "New this month",
+    "card_media": "Files in the media library",
+    "recent": "Recent activity",
+    "tab_all": "All",
+    "tab_people": "Team",
+    "tab_members": "Members",
+    "tab_media": "Media",
+    "tab_settings": "Settings",
+    "no_activity": "Nothing to report here yet.",
+    "insight_outbox": "{n} message(s) are waiting to be relayed.",
+    "insight_outbox_do": "Open the outbox",
+    "insight_validate": "{n} detail(s) to approve before they are published.",
+    "insight_validate_do": "Review and approve",
+    "insight_alt": "{n} photo(s) without an English description.",
+    "insight_alt_do": "Complete the descriptions",
+    "insight_space": "Storage space is {n}% used.",
+    "insight_space_do": "Tidy up",
+    "insight_groups": "No group exists yet: create them to sort members.",
+    "insight_groups_do": "Create the groups",
+    "insight_ok": "All up to date: nothing needs your attention.",
+    "insight_ok_do": "See the dashboard"
   }
 }

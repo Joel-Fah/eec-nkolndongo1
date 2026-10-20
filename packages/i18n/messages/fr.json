@@ -32,7 +32,9 @@
       "phone": "+237 6XX XX XX XX",
       "notes": "Écrivez ici…",
       "search": "Rechercher…"
-    }
+    },
+    "password_show": "Afficher le mot de passe",
+    "password_hide": "Masquer le mot de passe"
   },
   "nav": {
     "discover": "Découvrir",
@@ -575,6 +577,62 @@
         "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> avec les champs renvoyés par /api/media. Dans l’administration : Médiathèque (envoi par glisser-déposer, description obligatoire, crédit, archivage).",
         "a11y": "Description obligatoire pour toute photo (alt), vide seulement si l’image est décorative. Les dimensions sont données pour éviter les décalages de mise en page.",
         "demo": "Voir l’administration, Médiathèque. Aucune photo n’est encore utilisée sur le site."
+      },
+      "marquee": {
+        "name": "Bandeau d’annonces",
+        "desc": "Une ligne de messages courts qui défile doucement, en boucle sans coupure : pour une annonce à ne pas manquer (un événement, un changement d’horaire). Un seul sujet par message.",
+        "use": "<Marquee items label pauseLabel playLabel />. À placer sous l’en-tête, jamais plus d’un par page. Durée d’un passage : 40 s par défaut.",
+        "a11y": "Un mouvement automatique doit pouvoir s’arrêter (WCAG 2.2.2) : bouton pause, pause au survol et au focus, et aucun mouvement avec « réduire les animations » (les messages passent à la ligne). La seconde copie est cachée aux lecteurs d’écran.",
+        "demo": "Voir ci-dessus : survolez ou mettez en pause."
+      },
+      "pagination": {
+        "name": "Pagination",
+        "desc": "Des liens vers les pages d’une longue liste : précédent, numéros autour de la page courante (« … » pour le reste), suivant. De simples liens : ça marche sans JavaScript et chaque page a son adresse.",
+        "use": "<Pagination page pages href=\"/fr/nouvelles/?page={n}\" … />.",
+        "a11y": "<nav> étiquetée, page courante en aria-current, « précédent/suivant » désactivés aux extrémités, cibles de 44 px, texte « Précédent/Suivant » remplacé par la flèche seule sur téléphone.",
+        "demo": "Cinq sur douze, et un petit nombre de pages."
+      },
+      "insetfields": {
+        "name": "Champs avec icône intégrée",
+        "desc": "Un champ avec une icône au début (e-mail, téléphone, recherche) et, pour un mot de passe, un œil à la fin qui montre ou cache la saisie. L’icône prend la couleur du focus quand on tape.",
+        "use": "Astro : <Field icon=\"mail\" /> et <Field type=\"password\" toggle={{ show, hide }} />. React : <TextField icon=\"mail\" /> et <PasswordField /> dans l’administration.",
+        "a11y": "L’icône est décorative (aria-hidden). Le bouton œil est un vrai bouton, nommé (« Afficher le mot de passe » / « Masquer… »), avec aria-pressed, et reste atteignable au clavier.",
+        "demo": "Essayez l’œil du champ mot de passe."
+      },
+      "search": {
+        "name": "Recherche",
+        "desc": "Un champ de recherche avec la loupe intégrée et un bouton. Le formulaire porte role=\"search\".",
+        "use": "<Field type=\"search\" icon=\"search\" /> dans un <form role=\"search\">.",
+        "a11y": "Libellé visible, texte d’exemple qui ne répète pas le libellé, bouton de 44 px, la touche Entrée lance la recherche.",
+        "demo": "Le moteur de recherche arrive avec les contenus."
+      },
+      "imagery": {
+        "name": "Imagerie",
+        "desc": "Une photo dans un cadre : coins arrondis, ratio fixe (rien ne saute au chargement), fond teinté si la photo manque, légende en dessous, crédit sur la photo, léger zoom au survol. Pour les vraies photos de la médiathèque, utiliser <Picture>.",
+        "use": "<Figure src alt ratio=\"4/3\" caption credit zoom />. Ratios : 1/1, 4/3, 3/2, 16/9, 3/4.",
+        "a11y": "Texte alternatif obligatoire (vide seulement si l’image est décorative), crédit visible, zoom désactivé avec « réduire les animations ».",
+        "demo": "Photos de remplacement (développement)."
+      },
+      "tables": {
+        "name": "Tableaux",
+        "desc": "Un tableau sobre : lignes teintées une sur deux, jamais de traits, survol en vert très pâle, nombres alignés à droite en chiffres tabulaires, défilement horizontal sur téléphone (jamais la page).",
+        "use": "<div class=\"table-wrap\"><table class=\"table\"> avec <caption>, <th scope>. Classe .num pour les nombres.",
+        "a11y": "Légende (caption), en-têtes avec scope, première cellule de ligne en <th scope=\"row\">, contraste AA en clair et en sombre.",
+        "demo": "Un exemple de quatre lignes."
+      },
+      "charts": {
+        "name": "Graphiques",
+        "desc": "Des graphiques Chart.js (courbe, histogramme, anneau) aux couleurs du système, clair et sombre, chargés seulement quand ils entrent à l’écran (la bibliothèque n’alourdit aucune autre page). Toujours accompagnés des chiffres en tableau.",
+        "use": "Chart.js 4 chargé à la demande ; couleurs lues dans les jetons (--primary, --gold…). Dans l’administration, la courbe des effectifs reste en SVG (plus léger).",
+        "a11y": "Chaque graphique a une description (aria-label) et un tableau équivalent. Animation coupée avec « réduire les animations ». La couleur n’est jamais le seul signal.",
+        "demo": "Les données sont des exemples."
+      },
+      "shapes": {
+        "name": "Formes d’art",
+        "desc": "Les formes qui découpent les photos et les illustrations (blob, fenêtres, blocs, fleur, feuille, goutte, arche, voile…), définies en unités relatives pour s’adapter à n’importe quel cadre. Chaque page a sa propre composition.",
+        "use": "lib/shapes.ts : { ar, defs } par forme ; clip-path: url(#id) avec clipPathUnits=\"objectBoundingBox\".",
+        "a11y": "Décoratives : le contenu et le texte alternatif sont ceux de l’image découpée ; aucune information n’est portée par la forme.",
+        "demo": "Toutes les formes disponibles."
       }
     },
     "rules": {
@@ -1103,7 +1161,37 @@
     "btn_large": "Grand",
     "btn_loading": "Envoi",
     "btn_disabled": "Indisponible",
-    "menu_item_demo": "Menu"
+    "menu_item_demo": "Menu",
+    "marquee_label": "Annonces",
+    "marquee1": "Exemple : une annonce courte, une seule idée",
+    "marquee2": "Exemple : un événement à venir",
+    "marquee3": "Exemple : un message de la paroisse",
+    "marquee_pause": "Mettre en pause le défilement",
+    "marquee_play": "Reprendre le défilement",
+    "pagination_label": "Pagination",
+    "pagination_prev": "Précédent",
+    "pagination_next": "Suivant",
+    "pagination_page": "Page {n}",
+    "inset_hint": "Cliquez sur l’œil pour voir ce que vous tapez.",
+    "search_label": "Rechercher",
+    "search_placeholder": "Un mot, un nom, un sujet…",
+    "search_go": "Rechercher",
+    "imagery_alt": "Exemple d’image",
+    "imagery_caption": "Une légende explique la photo en une phrase.",
+    "imagery_credit": "Photo : exemple",
+    "table_caption": "Exemple de tableau",
+    "table_name": "Nom",
+    "table_group": "Groupe",
+    "table_count": "Personnes",
+    "table_example": "Exemple {x}",
+    "table_group_example": "Groupe {x}",
+    "chart_series": "Nouveaux membres (exemple)",
+    "chart_line": "Courbe d’exemple sur douze mois",
+    "chart_doughnut": "Répartition d’exemple",
+    "chart_bar": "Histogramme d’exemple sur douze mois",
+    "chart_table": "Voir les chiffres des graphiques",
+    "chart_month": "Mois",
+    "chart_value": "Valeur"
   },
   "page": {
     "cta_title": "Une question, un souvenir, une envie de venir ?",
@@ -1478,5 +1566,34 @@
   "bible": {
     "pdv": "Parole de Vie",
     "etr": "Easy-to-Read Version"
+  },
+  "dash": {
+    "trend_up": "En hausse de",
+    "trend_down": "En baisse de",
+    "trend_flat": "Stable :",
+    "vs_last_month": "vs mois dernier",
+    "insights": "À faire ou à savoir",
+    "card_members": "Membres actifs",
+    "card_new": "Nouveaux ce mois-ci",
+    "card_media": "Fichiers dans la médiathèque",
+    "recent": "Activité récente",
+    "tab_all": "Tout",
+    "tab_people": "Équipe",
+    "tab_members": "Membres",
+    "tab_media": "Médiathèque",
+    "tab_settings": "Paramètres",
+    "no_activity": "Rien à signaler ici pour l’instant.",
+    "insight_outbox": "{n} message(s) attendent d’être relayés.",
+    "insight_outbox_do": "Ouvrir la boîte d’envoi",
+    "insight_validate": "{n} information(s) à valider avant d’être publiées.",
+    "insight_validate_do": "Relire et valider",
+    "insight_alt": "{n} photo(s) sans description en anglais.",
+    "insight_alt_do": "Compléter les descriptions",
+    "insight_space": "L’espace de stockage est utilisé à {n} %.",
+    "insight_space_do": "Faire le ménage",
+    "insight_groups": "Aucun groupe n’existe encore : créez-les pour classer les membres.",
+    "insight_groups_do": "Créer les groupes",
+    "insight_ok": "Tout est à jour : rien n’attend votre attention.",
+    "insight_ok_do": "Voir le tableau de bord"
   }
 }

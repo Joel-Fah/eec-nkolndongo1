@@ -155,6 +155,19 @@ export function initPrimitives() {
       if (dialog instanceof HTMLDialogElement) dialog.showModal()
       return
     }
+    // The eye of a password field: show or hide what is typed.
+    const eye = target.closest<HTMLElement>('[data-pw-toggle]')
+    if (eye) {
+      const input = document.getElementById(eye.dataset.pwToggle ?? '')
+      if (input instanceof HTMLInputElement) {
+        const show = input.type === 'password'
+        input.type = show ? 'text' : 'password'
+        eye.setAttribute('aria-pressed', String(show))
+        eye.setAttribute('aria-label', (show ? eye.dataset.hide : eye.dataset.show) ?? '')
+        eye.toggleAttribute('data-on', show)
+      }
+      return
+    }
     const close = target.closest<HTMLElement>('[data-dialog-close]')
     if (close) {
       close.closest('dialog')?.close()

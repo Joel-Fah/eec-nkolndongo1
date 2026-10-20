@@ -146,5 +146,19 @@
     "recolour": false,
     "precision": 1,
     "use": "500 page, bottom, cropped (original colours)"
+  },
+  {
+    "name": "magic-tree",
+    "url": "https://stories.freepiklabs.com/storage/62547/Magic-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "use": "Admin dashboard welcome, light mode (original colours)"
+  },
+  {
+    "name": "sauce-tree",
+    "url": "https://stories.freepiklabs.com/storage/62596/Sauce-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "use": "Admin dashboard welcome, dark mode (original colours)"
   }
 ]

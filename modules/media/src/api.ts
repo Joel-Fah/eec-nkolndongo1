@@ -132,7 +132,27 @@ export const mediaApi = new Hono<AppEnv>()
       .from(mediaFiles)
       .groupBy(mediaFiles.kind)
     const used = rows.reduce((n, r) => n + Number(r.bytes), 0)
+    const start = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1))
+    const before = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - 1, 1))
+    const [month] = await db
+      .select({
+        now: sql<number>`count(*) filter (where ${mediaFiles.createdAt} >= ${start})::int`,
+        last: sql<number>`count(*) filter (where ${mediaFiles.createdAt} >= ${before} and ${mediaFiles.createdAt} < ${start})::int`,
+      })
+      .from(mediaFiles)
+    const [todo] = await db
+      .select({
+        noAltEn: sql<number>`count(*) filter (where ${mediaFiles.kind} = 'image' and coalesce(${mediaFiles.altEn}, '') = '')::int`,
+        unused: sql<number>`count(*) filter (where not exists (select 1 from ${mediaUsages} u where u.media_id = ${mediaFiles.id}))::int`,
+      })
+      .from(mediaFiles)
+      .where(eq(mediaFiles.status, 'ready'))
     return c.json({
+      withoutAltEn: todo?.noAltEn ?? 0,
+      unused: todo?.unused ?? 0,
+      files: rows.reduce((n, r) => n + r.count, 0),
+      filesThisMonth: month?.now ?? 0,
+      filesLastMonth: month?.last ?? 0,
       usedBytes: used,
       quotaBytes: QUOTA,
       byKind: rows.map((r) => ({ kind: r.kind, bytes: Number(r.bytes), count: r.count })),

@@ -1,46 +1,25 @@
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { useLocale } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
-import { formatDate } from '@eec/i18n'
-import { useQuery } from '@tanstack/react-query'
-
-type Stats = {
-  total: number
-  newThisMonth: number
-  newsSubscribers: number
-  byGroup: { key: string; nameFr: string; nameEn: string | null; n: number }[]
-  trend: { month: string; n: number }[]
-}
-type Audit = {
-  entries: {
-    id: string
-    createdAt: string
-    summaryFr: string
-    summaryEn: string | null
-    actorName: string | null
-  }[]
-}
+import { useDashboardData } from '../lib/dashboard'
+import { TrendBadge } from './TrendBadge'
 
 const k = (key: string) => `members.dash.${key}` as MessageKey
 
-/** The headcount for the dashboard: three numbers, a bar per group, a 12-month trend (SVG + a table for everyone). */
+/** The headcount for the dashboard: three numbers with their trend, a bar per group, a 12-month chart (SVG + a table). */
 export function Headcount() {
   const { t, locale } = useLocale()
-  const me = useMe().data
-  const allowed = hasPermission(me, 'members:read')
-  const stats = useQuery({
-    queryKey: ['members-stats'],
-    queryFn: () => api<Stats>('/members/stats'),
-    enabled: allowed,
-  })
-  const recent = useQuery({
-    queryKey: ['audit-recent'],
-    queryFn: () => api<Audit>('/audit'),
-    enabled: !!me?.isSuperAdmin,
-  })
-  if (!allowed) return null
-  const s = stats.data
+  const { members } = useDashboardData()
+  if (members.fetchStatus === 'idle' && !members.data) return null
+  const s = members.data
   const gname = (g: { nameFr: string; nameEn: string | null }) =>
     locale === 'en' ? (g.nameEn ?? g.nameFr) : g.nameFr
+  const cards = s
+    ? ([
+        ['total', s.total, s.previous.total],
+        ['new_month', s.newThisMonth, s.previous.newThisMonth],
+        ['news', s.newsSubscribers, s.previous.newsSubscribers],
+      ] as const)
+    : []
   return (
     <section className="grid gap-4" aria-labelledby="headcount-title">
       <h2 id="headcount-title" className="text-2xl">
@@ -53,16 +32,11 @@ export function Headcount() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            {(
-              [
-                ['total', s.total],
-                ['new_month', s.newThisMonth],
-                ['news', s.newsSubscribers],
-              ] as const
-            ).map(([key, n]) => (
+            {cards.map(([key, n, before]) => (
               <div key={key} className="stat-card">
                 <p className="stat-number">{n}</p>
                 <p className="text-sm text-ink-muted">{t(k(key))}</p>
+                <TrendBadge current={n} previous={before} />
               </div>
             ))}
           </div>
@@ -111,21 +85,6 @@ export function Headcount() {
             </div>
           </div>
         </>
-      )}
-      {me?.isSuperAdmin && recent.data && recent.data.entries.length > 0 && (
-        <div className="stat-card">
-          <h3 className="text-lg">{t(k('recent'))}</h3>
-          <ul className="grid gap-1 text-sm">
-            {recent.data.entries.slice(0, 6).map((e) => (
-              <li key={e.id}>
-                <span className="text-ink-muted">
-                  {formatDate(new Date(e.createdAt), locale)} · {e.actorName ?? '—'} ·{' '}
-                </span>
-                {locale === 'en' ? (e.summaryEn ?? e.summaryFr) : e.summaryFr}
-              </li>
-            ))}
-          </ul>
-        </div>
       )}
     </section>
   )

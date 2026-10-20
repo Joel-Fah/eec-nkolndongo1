@@ -1,4 +1,6 @@
 ---
+import type { IconName } from '../src/icons.ts'
+import Icon from './Icon.astro'
 import Select from './Select.astro'
 
 /**
@@ -22,6 +24,10 @@ interface Props {
   autocomplete?: string
   /** For kind="select". */
   options?: { value: string; label: string }[]
+  /** An icon inside the field, at the start. */
+  icon?: IconName
+  /** For type="password": labels of the show/hide eye button. */
+  toggle?: { show: string; hide: string }
 }
 const {
   id,
@@ -38,7 +44,11 @@ const {
   rows,
   autocomplete,
   options = [],
+  icon,
+  toggle,
 } = Astro.props
+const eye = type === 'password' && !!toggle
+const inset = !!icon || eye
 const describedby =
   [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(' ') || undefined
 const common = {
@@ -59,7 +69,20 @@ const common = {
     ) : kind === 'select' ? (
       <Select id={id} name={name} options={options} value={value} placeholder={placeholder} disabled={disabled} invalid={!!error} describedby={describedby} />
     ) : (
-      <input class="input" type={type} placeholder={placeholder} value={value} autocomplete={autocomplete} {...common} />
+      inset ? (
+        <div class="input-wrap">
+          {icon && <span class="input-icon" aria-hidden="true"><Icon name={icon} size={20} /></span>}
+          <input class="input" type={type} placeholder={placeholder} value={value} autocomplete={autocomplete} data-icon={icon ? '' : undefined} data-end={eye ? '' : undefined} {...common} />
+          {eye && toggle && (
+            <button type="button" class="input-end input-toggle" data-pw-toggle={id} data-show={toggle.show} data-hide={toggle.hide} aria-label={toggle.show} aria-pressed="false">
+              <span class="pw-eye"><Icon name="eye" size={20} /></span>
+              <span class="pw-eye-off"><Icon name="eyeOff" size={20} /></span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <input class="input" type={type} placeholder={placeholder} value={value} autocomplete={autocomplete} {...common} />
+      )
     )
   }
   {hint && <p class="field-hint" id={`${id}-hint`}>{hint}</p>}

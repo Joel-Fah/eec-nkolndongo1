@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { type FormEvent, useEffect, useState } from 'react'
 import { deviceName, fmt, notify, PageHeader } from '../../components/kit'
+import { PasswordField } from '../../components/PasswordField'
 import { type ThemeChoice, useTheme } from '../../lib/theme'
 
 export const Route = createFileRoute('/_app/account')({ component: Account })
@@ -140,20 +141,18 @@ function Password() {
     <form className="admin-panel" onSubmit={submit}>
       <h2 className="text-xl">{t('admin.account.password')}</h2>
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextField
+        <PasswordField
           label={t('admin.account.current')}
           placeholder={t('admin.account.current_ph')}
-          type="password"
           autoComplete="current-password"
           required
           value={current}
           onChange={(e: { target: { value: string } }) => setCurrent(e.target.value)}
         />
-        <TextField
+        <PasswordField
           label={t('admin.account.new')}
           placeholder={t('common.ph.new_password')}
           hint={t('auth.password.hint')}
-          type="password"
           autoComplete="new-password"
           required
           value={next}

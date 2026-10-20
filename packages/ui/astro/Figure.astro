@@ -1,0 +1,26 @@
+---
+/**
+ * Imagery: a photo in a frame. Rounded, a fixed ratio so nothing jumps while it loads, a soft tint behind
+ * it, an optional caption below and a credit chip on the photo. `src` can be absent (production before the
+ * media library has photos): the tinted frame stays. Use <Picture> (media library) for real, responsive files.
+ */
+interface Props {
+  src?: string
+  alt: string
+  ratio?: '1/1' | '4/3' | '3/2' | '16/9' | '3/4'
+  caption?: string
+  credit?: string
+  /** A gentle zoom on hover. */
+  zoom?: boolean
+  class?: string
+}
+const { src, alt, ratio = '4/3', caption, credit, zoom = false, class: className } = Astro.props
+---
+
+<figure class:list={['figure', zoom && 'figure-zoom', className]} style={`--ratio:${ratio}`}>
+  <div class="figure-frame">
+    {src && <img src={src} alt={alt} loading="lazy" decoding="async" />}
+    {credit && <span class="figure-credit">{credit}</span>}
+  </div>
+  {caption && <figcaption class="figure-caption">{caption}</figcaption>}
+</figure>

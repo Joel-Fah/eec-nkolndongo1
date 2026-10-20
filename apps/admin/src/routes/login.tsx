@@ -3,6 +3,7 @@ import { Button, TextField } from '@eec/ui/react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AuthShell } from '../components/AuthShell'
+import { PasswordField } from '../components/PasswordField'
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context }) => {
@@ -48,11 +49,10 @@ function Login() {
           autoComplete="username"
           required
         />
-        <TextField
+        <PasswordField
           label={t('login.password')}
           placeholder={t('common.ph.password')}
           name="password"
-          type="password"
           autoComplete="current-password"
           required
         />
