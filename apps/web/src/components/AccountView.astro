@@ -8,11 +8,11 @@ import Button from '@eec/ui/astro/Button.astro'
 import Choice from '@eec/ui/astro/Choice.astro'
 import Field from '@eec/ui/astro/Field.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
-import Illustration from '@eec/ui/astro/Illustration.astro'
 import Tabs from '@eec/ui/astro/Tabs.astro'
 import google from '@eec/ui/brand/google-g.svg?raw'
 import { localeOf, useT } from '../lib/i18n'
 import { href, pages } from '../lib/nav'
+import { peoplePhotos, photoSrc } from '../lib/placeholders'
 import '../styles/patterns.css'
 
 const locale = localeOf(Astro.currentLocale)
@@ -33,6 +33,7 @@ const messages = {
   required: t('member.field_required'),
   email: t('member.email_invalid'),
 }
+const photos = peoplePhotos().slice(0, 3)
 const steps = [t('member.step1_t'), t('member.step2_t'), t('member.step3_t')]
 const benefits = [
   ['account', 'pages.account.l1'],
@@ -47,7 +48,7 @@ const tiles = [
 ] as const
 ---
 
-<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })}>
+<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale}>
   <div class="acct-intro">
     <p class="acct-eyebrow"><Icon name="lock" size={16} />{t('member.eyebrow')}</p>
     <h1 class="acct-title">{t('member.h1')}</h1>
@@ -55,7 +56,15 @@ const tiles = [
   </div>
 
   <aside class="acct-side" aria-label={t('member.benefits_label')}>
-    <Illustration name="sign-up" class="acct-art" />
+    {
+      photos.length > 0 && (
+        <div class="acct-photos" aria-hidden="true">
+          {photos.map((p, i) => (
+            <img src={photoSrc(p, 480, 'webp')} alt="" width="480" height="640" style={`--i:${i};background:${p.color}`} />
+          ))}
+        </div>
+      )
+    }
     <ul class="acct-benefits" role="list">
       {benefits.map(([icon, key]) => <li><span class="acct-benefit-icon"><Icon name={icon} size={20} /></span>{t(key)}</li>)}
     </ul>
@@ -63,10 +72,11 @@ const tiles = [
   </aside>
 
   <div class="acct-card" data-when="out" hidden>
+    <p class="field-error acct-banner" data-google-banner hidden role="alert"></p>
     <Tabs id="acct" label={t('member.title')} tabs={[{ id: 'signup', label: t('member.tab_signup') }, { id: 'signin', label: t('member.tab_signin') }]}>
       <div slot="signup" class="acct-panel">
-        <button type="button" class="btn btn-secondary btn-lg acct-google" disabled aria-describedby="g-soon">
-          <span class="acct-google-g" set:html={google} />{t('member.google')}<span id="g-soon" class="acct-soon">{t('member.soon')}</span>
+        <button type="button" class="btn btn-secondary btn-lg acct-google" data-google="signup">
+          <span class="acct-google-g" set:html={google} />{t('member.google')}
         </button>
         <p class="acct-or"><span>{t('member.or_email')}</span></p>
 
@@ -112,6 +122,10 @@ const tiles = [
 
       <div slot="signin" class="acct-panel">
         <p class="acct-panel-lead">{t('member.signin_lead')}</p>
+        <button type="button" class="btn btn-secondary btn-lg acct-google" data-google="signin">
+          <span class="acct-google-g" set:html={google} />{t('member.google')}
+        </button>
+        <p class="acct-or"><span>{t('member.or_email')}</span></p>
         <form data-form="signin" class="acct-fields" novalidate>
           <Field id="si-email" name="email" type="email" label={t('member.email')} placeholder={t('common.ph.email')} autocomplete="username" required />
           <Field id="si-pass" name="password" type="password" label={t('member.password')} placeholder={t('common.ph.password')} autocomplete="current-password" required />
@@ -125,7 +139,10 @@ const tiles = [
 
   <div class="acct-card acct-home" data-when="in" hidden>
     <div class="acct-hello">
-      <span class="acct-avatar" data-initials aria-hidden="true"></span>
+      <span class="acct-avatar" aria-hidden="true">
+        <img data-photo alt="" hidden width="56" height="56" referrerpolicy="no-referrer" />
+        <span data-initials></span>
+      </span>
       <div>
         <h2 class="text-3xl" data-hello-target></h2>
         <p class="text-ink-muted">{t('member.welcome')}</p>
@@ -145,6 +162,25 @@ const tiles = [
     </ul>
     <div><Button variant="secondary" data-signout><Icon name="logout" />{t('member.signout')}</Button></div>
   </div>
+
+  <dialog class="dialog acct-dialog" data-google-dialog aria-labelledby="gd-title">
+    <form method="dialog" class="dialog-body" data-google-form>
+      <h2 id="gd-title" class="dialog-title">{t('member.google_title')}</h2>
+      <p class="text-ink-muted">{t('member.google_text')}</p>
+      <div class="acct-consent">
+        <Choice id="gd-privacy" name="acceptPrivacy" label={t('member.consent_privacy')} />
+        <a class="acct-link" href={href(locale, privacyPath)}>{t('member.consent_privacy_link')}<Icon name="external" size={16} /></a>
+        <p class="field-error" data-gd-error hidden role="alert">{t('member.consent_required')}</p>
+      </div>
+      <div class="acct-consent">
+        <Choice id="gd-news" name="acceptNews" label={t('member.consent_news')} />
+      </div>
+      <div class="dialog-actions">
+        <Button variant="secondary" data-gd-cancel>{t('admin.common.cancel')}</Button>
+        <Button type="submit" data-gd-go><span class="acct-google-g" set:html={google} />{t('member.google')}</Button>
+      </div>
+    </form>
+  </dialog>
 
   <div class="acct-card acct-loading" data-when="loading" aria-hidden="true">
     <span class="skeleton" style="height:2.75rem"></span>
@@ -178,6 +214,12 @@ const tiles = [
       const me = await call('/me')
       if (me.ok) {
         const name: string = me.json.user.firstName || me.json.user.name || ''
+        const photo = root.querySelector<HTMLImageElement>('[data-photo]')
+        if (photo && me.json.user.image) {
+          photo.src = me.json.user.image
+          photo.hidden = false
+          root.querySelector<HTMLElement>('[data-initials]')?.setAttribute('hidden', '')
+        }
         const target = root.querySelector('[data-hello-target]')
         if (target) target.textContent = (root.dataset.hello ?? '').replace('{name}', name)
         const initials = root.querySelector('[data-initials]')
@@ -281,6 +323,47 @@ const tiles = [
       }
     })
 
+    // Google: sign-up asks for the (unticked) consent first; sign-in goes straight through for existing members.
+    const msgs = JSON.parse(root.dataset.googleMsgs ?? '{}') as Record<string, string>
+    const lang = root.dataset.lang === 'en' ? 'en' : 'fr'
+    const banner = root.querySelector<HTMLElement>('[data-google-banner]')
+    const say = (text: string) => {
+      if (!banner) return
+      banner.textContent = text
+      banner.hidden = !text
+    }
+    const startGoogle = async (consent: { privacy: boolean; news: boolean }) => {
+      say('')
+      const r = await call('/members/google', { locale: lang, acceptPrivacy: consent.privacy, acceptNews: consent.news })
+      if (r.ok && r.json.url) window.location.assign(r.json.url)
+      else say(r.ok ? (msgs.fail ?? '') : r.code === 'rate_limited' ? (msgs.rate ?? '') : (msgs.fail ?? ''))
+    }
+    const dialog = root.querySelector<HTMLDialogElement>('[data-google-dialog]')
+    for (const b of root.querySelectorAll<HTMLButtonElement>('[data-google]'))
+      b.addEventListener('click', () => {
+        if (b.dataset.google === 'signup') dialog?.showModal()
+        else startGoogle({ privacy: false, news: false })
+      })
+    dialog?.querySelector('[data-gd-cancel]')?.addEventListener('click', (e) => {
+      e.preventDefault()
+      dialog.close()
+    })
+    dialog?.querySelector<HTMLFormElement>('[data-google-form]')?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const form = e.currentTarget as HTMLFormElement
+      const privacy = (form.elements.namedItem('acceptPrivacy') as HTMLInputElement).checked
+      const err = form.querySelector<HTMLElement>('[data-gd-error]')
+      if (err) err.hidden = privacy
+      if (!privacy) return
+      startGoogle({ privacy: true, news: (form.elements.namedItem('acceptNews') as HTMLInputElement).checked })
+    })
+    // Coming back from Google with a problem.
+    const back = new URLSearchParams(location.search).get('google')
+    if (back) {
+      say(msgs[back] ?? msgs.error ?? '')
+      history.replaceState(null, '', location.pathname)
+    }
+
     root.querySelector('[data-signout]')?.addEventListener('click', async () => {
       await call('/auth/sign-out', {})
       show('out')
@@ -325,7 +408,7 @@ const tiles = [
   .acct-title {
     font-size: clamp(2.5rem, 1.6rem + 3.4vw, 4.5rem);
     line-height: 1;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
   }
   .acct-lead {
     max-width: 34rem;
@@ -338,8 +421,38 @@ const tiles = [
     gap: 1.75rem;
     align-content: start;
   }
-  .acct-art {
-    width: min(100%, 22rem);
+  .acct-photos {
+    display: flex;
+    padding-inline-start: 1rem;
+  }
+  .acct-photos img {
+    width: 7.5rem;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    margin-inline-start: -1.25rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 4px var(--bg), var(--elevation-2);
+    transform: rotate(calc((var(--i) - 1) * 6deg)) translateY(calc(var(--i) * 6px - 6px));
+    transition: transform var(--duration-nav) var(--ease-spring);
+  }
+  .acct-photos:hover img {
+    transform: rotate(calc((var(--i) - 1) * 9deg)) translateX(calc((var(--i) - 1) * 0.75rem));
+  }
+  .acct-banner {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--danger-soft);
+  }
+  .acct-dialog {
+    width: min(100% - 2rem, 30rem);
+  }
+  .acct-avatar {
+    overflow: hidden;
+  }
+  .acct-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .acct-benefits {
     display: grid;

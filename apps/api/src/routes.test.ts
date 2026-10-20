@@ -37,6 +37,7 @@ describe('route table', () => {
     expect(publics).toEqual([
       'POST /api/auth/*',
       'POST /api/invitations/:token/accept',
+      'POST /api/members/google',
       'POST /api/members/signup',
       'POST /api/reset/:token',
     ])

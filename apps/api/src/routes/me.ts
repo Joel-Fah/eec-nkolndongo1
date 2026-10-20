@@ -42,6 +42,7 @@ export const meRoutes = new Hono<AppEnv>()
         id: user.id,
         email: user.email,
         name: user.name,
+        image: user.image,
         firstName: profiles.firstName,
         lastName: profiles.lastName,
         phone: profiles.phone,

@@ -5,6 +5,9 @@ export type Env = {
   /** Local/dev and CLI: the direct (non-pooled) Neon URL. */
   DATABASE_URL_UNPOOLED?: string
   AUTH_SECRET: string
+  /** Google sign-in for members (OAuth client created by Joël). Both absent = Google stays inactive. */
+  GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_SECRET?: string
   /** The single origin (decision 0017), e.g. https://eec-nkolndongo1.workers.dev */
   APP_ORIGIN: string
 }

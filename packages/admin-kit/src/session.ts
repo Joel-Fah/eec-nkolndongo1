@@ -6,6 +6,8 @@ export type Me = {
     id: string
     email: string
     name: string
+    /** Profile picture URL (Google members). */
+    image: string | null
     firstName: string
     lastName: string
     phone: string | null

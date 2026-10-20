@@ -6,6 +6,27 @@ import { and, eq } from 'drizzle-orm'
 import { checkPassword, PASSWORD_MAX, PASSWORD_MIN } from './passwords.ts'
 import { MEMBER_MS, sessionExpiry } from './sessions.ts'
 
+export type GoogleConfig = { clientId: string; clientSecret: string }
+
+/** Cookie set by POST /api/members/google before the redirect: the consent the person gave, and their language. */
+export const GOOGLE_INTENT_COOKIE = 'eec_gc'
+export type GoogleIntent = { l: 'fr' | 'en'; privacy: boolean; news: boolean; v: string }
+
+export function readIntent(cookieHeader: string | null | undefined): GoogleIntent | null {
+  const raw = cookieHeader
+    ?.split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${GOOGLE_INTENT_COOKIE}=`))
+    ?.slice(GOOGLE_INTENT_COOKIE.length + 1)
+  if (!raw) return null
+  try {
+    const v = JSON.parse(decodeURIComponent(raw)) as GoogleIntent
+    return v && (v.l === 'fr' || v.l === 'en') ? v : null
+  } catch {
+    return null
+  }
+}
+
 export type AuthDeps = {
   db: Db
   /** Run one SQL statement on the same connection (used for Postgres-side bcrypt). */
@@ -15,6 +36,10 @@ export type AuthDeps = {
   origin: string
   /** Send a password-reset link somewhere: the outbox until a domain exists (decision 0019). */
   sendResetPassword?: (data: { email: string; url: string; userId: string }) => Promise<void>
+  /** Members only (never staff). Absent = the Google button stays inactive. */
+  google?: GoogleConfig
+  /** Policy version recorded with a Google sign-up's consent. */
+  policyVersion?: string
 }
 
 const PASSWORD_PATHS = new Set([
@@ -24,7 +49,15 @@ const PASSWORD_PATHS = new Set([
   '/set-password',
 ])
 
-export function createAuth({ db, query, secret, origin, sendResetPassword }: AuthDeps) {
+export function createAuth({
+  db,
+  query,
+  secret,
+  origin,
+  sendResetPassword,
+  google,
+  policyVersion = 'unversioned',
+}: AuthDeps) {
   const secure = origin.startsWith('https://')
   return betterAuth({
     appName: 'EEC Nkolndongo 1',
@@ -40,6 +73,31 @@ export function createAuth({ db, query, secret, origin, sendResetPassword }: Aut
       defaultCookieAttributes: { httpOnly: true, secure, sameSite: 'lax', path: '/' },
       database: { generateId: 'uuid' },
     },
+    user: {
+      additionalFields: {
+        givenName: { type: 'string', required: false, input: false },
+        familyName: { type: 'string', required: false, input: false },
+        locale: { type: 'string', required: false, input: false },
+      },
+    },
+    // Google is for members only: an address that already has an account (staff included) is never merged
+    // into a Google identity — it must sign in with its own method.
+    account: { accountLinking: { enabled: false } },
+    socialProviders: google
+      ? {
+          google: {
+            clientId: google.clientId,
+            clientSecret: google.clientSecret,
+            // Default scopes only (openid, email, profile): name, email (verified by Google) and picture are
+            // stored by Better Auth; we also keep the given/family name and language to prefill the profile.
+            mapProfileToUser: (profile) => ({
+              givenName: profile.given_name ?? null,
+              familyName: profile.family_name ?? null,
+              locale: profile.locale ?? null,
+            }),
+          },
+        }
+      : {},
     emailAndPassword: {
       enabled: true,
       minPasswordLength: PASSWORD_MIN,
@@ -86,6 +144,67 @@ export function createAuth({ db, query, secret, origin, sendResetPassword }: Aut
       },
     },
     hooks: {
+      // After the Google callback: record the consent given before the redirect, or undo the sign-in.
+      after: createAuthMiddleware(async (ctx) => {
+        if (ctx.path !== '/callback/:id') return
+        const created = ctx.context.newSession?.user
+        if (!created) return
+        const intent = readIntent(ctx.request?.headers.get('cookie'))
+        const back = (code: string): never => {
+          throw ctx.redirect(`${origin}/${intent?.l ?? 'fr'}/mon-espace/?google=${code}`)
+        }
+        const undo = async (deleteUser: boolean) => {
+          await db.delete(schema.session).where(eq(schema.session.userId, created.id))
+          if (deleteUser) await db.delete(schema.user).where(eq(schema.user.id, created.id))
+        }
+        ctx.setCookie(GOOGLE_INTENT_COOKIE, '', { maxAge: 0, path: '/api/auth' })
+
+        // Staff never use Google: their sessions are short and tightly controlled.
+        const grants = await db
+          .select({ k: schema.roles.key })
+          .from(schema.userRoles)
+          .innerJoin(schema.roles, eq(schema.roles.id, schema.userRoles.roleId))
+          .where(eq(schema.userRoles.userId, created.id))
+        if (grants.some((g) => g.k !== 'membre')) {
+          await undo(false)
+          return back('staff')
+        }
+        const [known] = await db
+          .select({ id: schema.consents.id })
+          .from(schema.consents)
+          .where(and(eq(schema.consents.userId, created.id), eq(schema.consents.kind, 'privacy')))
+        if (known) return
+        // First time: only valid if the person ticked the privacy consent before leaving for Google.
+        if (!intent?.privacy) {
+          await undo(true)
+          return back('consent')
+        }
+        await db.insert(schema.consents).values([
+          { userId: created.id, kind: 'privacy', policyVersion: intent.v || policyVersion },
+          ...(intent.news
+            ? [
+                {
+                  userId: created.id,
+                  kind: 'news' as const,
+                  policyVersion: intent.v || policyVersion,
+                },
+              ]
+            : []),
+        ])
+        await db.insert(schema.auditLog).values({
+          actorId: created.id,
+          action: 'member.signup',
+          entityType: 'user',
+          entityId: created.id,
+          summaryFr: 'Nouvelle inscription de membre (Google)',
+          summaryEn: 'New member sign-up (Google)',
+          diff: {
+            method: 'google',
+            consents: ['privacy', ...(intent.news ? ['news'] : [])],
+            policyVersion,
+          },
+        })
+      }),
       before: createAuthMiddleware(async (ctx) => {
         if (!PASSWORD_PATHS.has(ctx.path)) return
         const body = (ctx.body ?? {}) as { password?: string; newPassword?: string }
@@ -104,9 +223,20 @@ export function createAuth({ db, query, secret, origin, sendResetPassword }: Aut
         create: {
           // Every account starts as a member with a profile; staff roles are granted separately.
           after: async (user) => {
+            const u = user as typeof user & {
+              givenName?: string | null
+              familyName?: string | null
+              locale?: string | null
+            }
             await db
               .insert(schema.profiles)
-              .values({ userId: user.id, status: 'active' })
+              .values({
+                userId: user.id,
+                status: 'active',
+                firstName: u.givenName ?? '',
+                lastName: u.familyName ?? '',
+                locale: u.locale?.toLowerCase().startsWith('en') ? 'en' : 'fr',
+              })
               .onConflictDoNothing()
             const [member] = await db
               .select({ id: schema.roles.id })
