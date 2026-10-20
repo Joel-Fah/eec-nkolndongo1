@@ -19,10 +19,10 @@ const to = (id: string) => ({
     title={{ fr: fr('notfound.title'), en: en('notfound.title') }}
     text={{ fr: fr('notfound.text'), en: en('notfound.text') }}
     actions={[
-      { label: { fr: fr('soon.home'), en: en('soon.home') }, href: { fr: '/fr/', en: '/en/' }, primary: true },
-      { label: { fr: fr('nav.items.cultes.label'), en: en('nav.items.cultes.label') }, href: to('cultes') },
-      { label: { fr: fr('nav.items.trouver.label'), en: en('nav.items.trouver.label') }, href: to('trouver') },
-      { label: { fr: fr('nav.items.evenements.label'), en: en('nav.items.evenements.label') }, href: to('evenements') },
+      { icon: 'home', label: { fr: fr('soon.home'), en: en('soon.home') }, href: { fr: '/fr/', en: '/en/' }, primary: true },
+      { icon: 'church', label: { fr: fr('nav.items.cultes.label'), en: en('nav.items.cultes.label') }, href: to('cultes') },
+      { icon: 'location', label: { fr: fr('nav.items.trouver.label'), en: en('nav.items.trouver.label') }, href: to('trouver') },
+      { icon: 'calendar', label: { fr: fr('nav.items.evenements.label'), en: en('nav.items.evenements.label') }, href: to('evenements') },
     ]}
   />
 </Base>

@@ -43,6 +43,7 @@ import {
   PlantIcon,
   PlayIcon,
   PlusSignIcon,
+  Refresh01Icon,
   Search01Icon,
   SecurityCheckIcon,
   Settings02Icon,
@@ -107,6 +108,7 @@ export const icons = {
   headphones: HeadphonesIcon,
   plant: PlantIcon,
   hourglass: HourglassIcon,
+  refresh: Refresh01Icon,
   checklist: CheckListIcon,
 } satisfies Record<string, IconData>
 

@@ -15,7 +15,14 @@ import { gzipSync } from 'node:zlib'
 import { optimize } from 'svgo'
 import { skin, storysetPalette } from '../packages/ui/src/tokens.ts'
 
-type Entry = { name: string; url: string; background: boolean; use: string; precision?: number }
+type Entry = {
+  name: string
+  url: string
+  background: boolean
+  use: string
+  precision?: number
+  recolour?: boolean
+}
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const manifest: Entry[] = JSON.parse(
   await readFile(join(root, 'packages/ui/illustrations/storyset.json'), 'utf8'),
@@ -136,7 +143,8 @@ try {
     }).data
     const unknown = new Set<string>()
     for (const theme of ['light', 'dark'] as const) {
-      const svg = recolour(small, theme, unknown)
+      // `recolour: false` keeps the artist's own colours (error pages), the same file for both themes.
+      const svg = entry.recolour === false ? small : recolour(small, theme, unknown)
       for (const dir of outs) await writeFile(join(dir, `${entry.name}-${theme}.svg`), svg)
     }
     console.log(

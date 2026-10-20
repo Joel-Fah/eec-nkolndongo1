@@ -135,7 +135,16 @@
     "name": "cherry-tree",
     "url": "https://stories.freepiklabs.com/storage/65870/Cherry-tree_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Error pages (404, 403…), bottom, cropped",
-    "precision": 0
+    "use": "404 page, bottom, cropped (original colours)",
+    "precision": 0,
+    "recolour": false
+  },
+  {
+    "name": "working-from-anywhere",
+    "url": "https://stories.freepiklabs.com/storage/45971/Working-from-anywhere_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "precision": 1,
+    "use": "500 page, bottom, cropped (original colours)"
   }
 ]

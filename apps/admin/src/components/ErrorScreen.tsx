@@ -3,6 +3,7 @@ import { Link, useRouter } from '@tanstack/react-router'
 import { type PointerEvent, useRef } from 'react'
 import { Brand } from './Brand'
 import { LocaleSwitch, ThemeButton } from './Controls'
+import { Icon } from './Icon'
 import { Illustration } from './Illustration'
 
 /**
@@ -74,24 +75,29 @@ export function ErrorScreen({
               className="btn btn-primary btn-lg"
               onClick={reset ?? (() => router.invalidate())}
             >
+              <Icon name="refresh" />
               {t('admin.error.retry')}
             </button>
           ) : staff ? (
             <Link to="/" className="btn btn-primary btn-lg">
+              <Icon name="compass" />
               {t('admin.error.dashboard')}
             </Link>
           ) : (
             <a href={site} className="btn btn-primary btn-lg">
+              <Icon name="home" />
               {t('admin.error.site')}
             </a>
           )}
           {!broke && !staff && (
             <a href={space} className="btn btn-secondary btn-lg">
+              <Icon name="account" />
               {t('admin.error.my_space')}
             </a>
           )}
           {!broke && !me && (
             <Link to="/login" className="btn btn-secondary btn-lg">
+              <Icon name="lock" />
               {t('admin.error.login')}
             </Link>
           )}
@@ -100,12 +106,13 @@ export function ErrorScreen({
             className="btn btn-secondary btn-lg"
             onClick={() => router.history.back()}
           >
+            <Icon name="arrowLeft" />
             {t('admin.error.back')}
           </button>
         </div>
       </main>
       <div className="err-tree">
-        <Illustration name="cherry-tree" />
+        <Illustration name={broke ? 'working-from-anywhere' : 'cherry-tree'} />
       </div>
     </div>
   )
