@@ -229,6 +229,13 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     border-radius: var(--radius-lg);
     background: var(--surface);
   }
+  /* Joins between neighbouring pods: a flat full-height strip that grows as they meet, so the merged bar has no crease. */
+  .site-goo-bridge {
+    position: absolute;
+    border-radius: 0;
+    background: var(--surface);
+    scale: 1 clamp(0, calc((var(--merge) - 0.7) / 0.3), 1);
+  }
   .site-goo-blob[data-pod="l"] {
     translate: calc(var(--dl, 0px) * var(--merge)) 0;
   }
@@ -238,7 +245,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .site-brand {
     display: flex;
     flex: none;
-    width: 13.5rem;
+    /* The lockup needs a width (container query): this is its content plus the pod's padding. */
+    width: 11.5rem;
     padding-inline: 1rem;
     text-decoration: none;
   }
@@ -445,7 +453,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       gap: 1.25rem;
     }
     .site-brand {
-      width: 21.5rem;
+      width: 17.75rem;
     }
     .site-brand .site-lockup-narrow {
       display: none;
