@@ -12,6 +12,10 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
+  /** From Google sign-in (given_name, family_name, locale); copied to `profiles` on creation. */
+  givenName: text('given_name'),
+  familyName: text('family_name'),
+  locale: text('locale'),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 })
