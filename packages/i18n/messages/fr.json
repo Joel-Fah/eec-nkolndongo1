@@ -567,6 +567,13 @@
         "use": "apps/web : <ErrorScreen /> (404, les deux langues, la bonne est choisie par l’adresse ou le navigateur). apps/admin : ErrorScreen.tsx (404 et 500). Un membre connecté qui ouvre l’administration voit ce même 404 : elle ne s’annonce pas.",
         "a11y": "Un seul h1, boutons de 44 px, l’illustration est décorative. Mouvement réduit : les points ne suivent plus le pointeur.",
         "demo": "Ouvrez une adresse qui n’existe pas, par exemple /fr/oups."
+      },
+      "picture": {
+        "name": "Photo de la médiathèque",
+        "desc": "<Picture> affiche une photo de la médiathèque : plusieurs tailles (480, 960, 1600 px), la description dans la langue de la page, un flou de chargement (ThumbHash) en arrière-plan, chargement différé. Les personnes qui demandent à économiser les données reçoivent la plus petite taille.",
+        "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> avec les champs renvoyés par /api/media. Dans l’administration : Médiathèque (envoi par glisser-déposer, description obligatoire, crédit, archivage).",
+        "a11y": "Description obligatoire pour toute photo (alt), vide seulement si l’image est décorative. Les dimensions sont données pour éviter les décalages de mise en page.",
+        "demo": "Voir l’administration, Médiathèque. Aucune photo n’est encore utilisée sur le site."
       }
     },
     "rules": {

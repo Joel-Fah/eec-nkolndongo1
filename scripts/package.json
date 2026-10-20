@@ -16,5 +16,8 @@
     "@types/node": "catalog:",
     "sharp": "0.35.5",
     "svgo": "4.1.0"
+  },
+  "dependencies": {
+    "aws4fetch": "1.0.20"
   }
 }

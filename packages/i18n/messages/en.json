@@ -567,6 +567,13 @@
         "use": "apps/web: <ErrorScreen /> (404, both languages, the right one picked from the address or the browser). apps/admin: ErrorScreen.tsx (404 and 500). A signed-in member opening the admin sees this same 404: it does not announce itself.",
         "a11y": "One h1, 44 px buttons, the illustration is decorative. Reduced motion: the dots no longer follow the pointer.",
         "demo": "Open an address that does not exist, for example /en/oops."
+      },
+      "picture": {
+        "name": "Media library photo",
+        "desc": "<Picture> shows a photo from the media library: several sizes (480, 960, 1600 px), the description in the page’s language, a blurred loading placeholder (ThumbHash) behind it, lazy loading. People who ask to save data get the smallest size.",
+        "use": "<Picture media={…} sizes=\"(min-width: 64rem) 50vw, 100vw\" /> with the fields /api/media returns. In the admin: Media library (drag-and-drop upload, required description, credit, archive).",
+        "a11y": "A description (alt) is required for every photo, empty only when the image is decorative. Dimensions are given to avoid layout shifts.",
+        "demo": "See the admin, Media library. No photo is used on the site yet."
       }
     },
     "rules": {

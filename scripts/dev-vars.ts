@@ -34,6 +34,7 @@ const wanted = [
   'AWS_REGION',
   'AWS_ACCESS_KEY_ID',
   'AWS_SECRET_ACCESS_KEY',
+  'MEDIA_BUCKET',
   'NEON_BRANCH',
 ]
 const lines = wanted.filter((k) => env[k]).map((k) => `${k}="${env[k]}"`)

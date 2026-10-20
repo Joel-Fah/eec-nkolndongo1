@@ -5,9 +5,10 @@
  * Data only — no server or browser code here, so both the API and the admin can import it.
  */
 import { coreModule } from '@eec/auth/core-module'
+import { mediaModule } from '@eec/module-media'
 import { settingsModule } from '@eec/module-settings'
 import type { DefinedModule } from '@eec/modules-kit'
 
-export const modules: readonly DefinedModule[] = [coreModule, settingsModule]
+export const modules: readonly DefinedModule[] = [coreModule, settingsModule, mediaModule]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

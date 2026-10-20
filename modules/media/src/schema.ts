@@ -36,7 +36,10 @@ export const mediaFiles = pgTable(
     createdBy: uuid('created_by').references(() => user.id, { onDelete: 'set null' }),
     ...timestamps(),
   },
-  (t) => [index('media_files_created_idx').on(t.createdAt), index('media_files_kind_idx').on(t.kind, t.status)],
+  (t) => [
+    index('media_files_created_idx').on(t.createdAt),
+    index('media_files_kind_idx').on(t.kind, t.status),
+  ],
 )
 
 /** Lets future modules say where a file is used, so deleting something in use is refused. */

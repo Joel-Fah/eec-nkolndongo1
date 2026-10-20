@@ -360,6 +360,9 @@ importers:
       '@eec/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@eec/module-media':
+        specifier: workspace:*
+        version: link:../../modules/media
       '@eec/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -375,6 +378,9 @@ importers:
       hono:
         specifier: 4.13.13
         version: 4.13.13
+      thumbhash:
+        specifier: 0.1.1
+        version: 0.1.1
     devDependencies:
       '@astrojs/check':
         specifier: 0.9.10

@@ -15,11 +15,13 @@
     "@eec/api-kit": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/i18n": "workspace:*",
+    "@eec/module-media": "workspace:*",
     "@eec/ui": "workspace:*",
     "@hugeicons/core-free-icons": "catalog:",
     "astro": "7.4.0",
     "gsap": "3.15.0",
-    "hono": "4.13.13"
+    "hono": "4.13.13",
+    "thumbhash": "0.1.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

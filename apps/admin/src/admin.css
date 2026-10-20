@@ -820,3 +820,107 @@ html[data-nav-open] {
     display: none;
   }
 }
+
+/* ── Media library (modules/media) ─────────────────────────────────────────────────────────────── */
+.media-meter {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: var(--radius-xs);
+  accent-color: var(--primary);
+}
+.media-meter[data-warn] {
+  accent-color: var(--warning);
+}
+.media-drop {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--primary) 6%, var(--surface));
+  box-shadow: inset 0 0 0 0.125rem color-mix(in oklab, var(--primary) 25%, transparent);
+  text-align: center;
+  transition: background-color var(--duration-ui) var(--ease-soft);
+}
+.media-drop[data-over] {
+  background: var(--primary-soft);
+}
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 1rem;
+}
+.media-card {
+  display: grid;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  text-align: start;
+  cursor: pointer;
+}
+.media-card:hover {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.media-thumb {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-2) center / cover;
+}
+.media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-kind {
+  font-size: var(--text-2xl);
+  color: var(--ink-muted);
+}
+.media-name {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.media-meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.media-queue-row {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: start;
+}
+.media-queue-row > :last-child {
+  grid-column: 2;
+}
+.media-queue-thumb {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.media-queue-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-preview {
+  width: 100%;
+  max-height: 18rem;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}

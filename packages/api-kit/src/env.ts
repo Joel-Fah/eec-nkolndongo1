@@ -10,6 +10,13 @@ export type Env = {
   /** Google sign-in for members (OAuth client created by Joël). Both absent = Google stays inactive. */
   GOOGLE_CLIENT_ID?: string
   GOOGLE_CLIENT_SECRET?: string
+  /** Object storage for the media library (S3-compatible: Neon today, R2 later; decision 0020). */
+  AWS_ENDPOINT_URL_S3?: string
+  AWS_ACCESS_KEY_ID?: string
+  AWS_SECRET_ACCESS_KEY?: string
+  AWS_REGION?: string
+  /** Defaults to « eec-media ». */
+  MEDIA_BUCKET?: string
   /** The single origin (decision 0017), e.g. https://eec-nkolndongo1.workers.dev */
   APP_ORIGIN: string
 }
