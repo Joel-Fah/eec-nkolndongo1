@@ -50,7 +50,10 @@ function star(n: number, inner: number): Path2D {
     const a = (Math.PI * i) / n - Math.PI / 2
     pts.push([50 + Math.cos(a) * r, 50 + Math.sin(a) * r])
   }
-  pts.forEach(([x, y], i) => (i ? p.lineTo(x, y) : p.moveTo(x, y)))
+  for (const [i, [x, y]] of pts.entries()) {
+    if (i) p.lineTo(x, y)
+    else p.moveTo(x, y)
+  }
   p.closePath()
   return p
 }

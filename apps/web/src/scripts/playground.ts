@@ -39,6 +39,7 @@ export function initPlayground(root: HTMLElement): () => void {
   const canvas = root.querySelector('canvas')
   const ctx = canvas?.getContext('2d')
   if (!canvas || !ctx) return () => {}
+  const canvasEl = canvas
   const still =
     matchMedia('(prefers-reduced-motion: reduce)').matches ||
     (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
@@ -298,8 +299,8 @@ export function initPlayground(root: HTMLElement): () => void {
     dpr = Math.min(2, window.devicePixelRatio || 1)
     W = r.width
     H = r.height
-    canvas!.width = Math.round(W * dpr)
-    canvas!.height = Math.round(H * dpr)
+    canvasEl.width = Math.round(W * dpr)
+    canvasEl.height = Math.round(H * dpr)
     heights = new Array(cols()).fill(0)
     for (const p of particles) {
       if (oldW) p.x *= W / oldW
