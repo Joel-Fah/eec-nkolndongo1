@@ -11,7 +11,7 @@ import { handle } from '@astrojs/cloudflare/handler'
 import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
 import { runRetention } from '@eec/api/retention'
-import type { Env } from '@eec/api-kit'
+import { type Env, securityHeaders } from '@eec/api-kit'
 import { adminPrefix } from '@eec/core'
 
 type Bindings = Env
@@ -73,11 +73,28 @@ export default {
     )
   },
   async fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
-    const path = new URL(request.url).pathname
-    const prefix = adminPrefix(env.ADMIN_PATH)
-    if ((path === prefix || path.startsWith(`${prefix}/`)) && !/\.[a-z0-9]+$/i.test(path))
-      return adminShell(request, env)
-    if (GUIDE.test(path)) return guide(request, env, ctx)
-    return handle(request, env as never, ctx)
+    return withSecurityHeaders(await route(request, env, ctx), env, request)
   },
+}
+
+/** Every response the Worker produces carries the security headers (static files get them from `_headers`). */
+function withSecurityHeaders(res: Response, env: Bindings, request: Request) {
+  const isAdmin = new URL(request.url).pathname.startsWith(adminPrefix(env.ADMIN_PATH))
+  const headers = new Headers(res.headers)
+  const https = env.APP_ORIGIN.startsWith('https://')
+  // The admin is never indexed, launched or not.
+  for (const [k, v] of Object.entries(
+    securityHeaders({ https, noindex: isAdmin || env.SITE_INDEXABLE !== '1' }),
+  ))
+    if (!headers.has(k)) headers.set(k, v)
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers })
+}
+
+async function route(request: Request, env: Bindings, ctx: ExecutionContext) {
+  const path = new URL(request.url).pathname
+  const prefix = adminPrefix(env.ADMIN_PATH)
+  if ((path === prefix || path.startsWith(`${prefix}/`)) && !/\.[a-z0-9]+$/i.test(path))
+    return adminShell(request, env)
+  if (GUIDE.test(path)) return guide(request, env, ctx)
+  return handle(request, env as never, ctx)
 }

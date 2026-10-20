@@ -21,7 +21,10 @@
     "fonts:fetch": "pnpm --filter @eec/scripts fonts:fetch",
     "illos:fetch": "pnpm --filter @eec/scripts illos:fetch",
     "contrast": "pnpm --filter @eec/scripts contrast",
-    "dev:turbo": "turbo run dev"
+    "dev:turbo": "turbo run dev",
+    "backup": "pnpm --filter @eec/scripts backup",
+    "restore": "pnpm --filter @eec/scripts restore",
+    "build:site": "turbo run build && node scripts/assemble-site.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

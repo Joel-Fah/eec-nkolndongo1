@@ -30,3 +30,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0025 | The admin's address is configurable (ADMIN_PATH) | Accepted |
 | 0026 | Seasonal playground under the footer | Accepted |
 | 0020 | Media storage: S3-compatible, Neon Object Storage first | Accepted |
+| 0022 | Backups: encrypted logical dumps, a tested restore | Accepted |

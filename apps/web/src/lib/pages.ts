@@ -202,6 +202,20 @@ export const content: Record<string, PageContent> = {
         ],
       },
       { t: 'text', title: p('privacy.s4_t'), paras: [p('privacy.s4_p')] },
+      {
+        t: 'list',
+        title: p('privacy.s5_t'),
+        items: [p('privacy.l6'), p('privacy.l7'), p('privacy.l8')],
+      },
+      {
+        t: 'list',
+        title: p('privacy.s6_t'),
+        items: [p('privacy.l9'), p('privacy.l10'), p('privacy.l11')],
+      },
+      { t: 'text', title: p('privacy.s7_t'), paras: [p('privacy.s7_p')] },
+      { t: 'text', title: p('privacy.s8_t'), paras: [p('privacy.s8_p')] },
+      { t: 'text', title: p('privacy.s9_t'), paras: [p('privacy.s9_p')] },
+      { t: 'text', title: p('privacy.s10_t'), paras: [p('privacy.s10_p')] },
     ],
   },
   legal: {

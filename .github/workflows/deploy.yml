@@ -1,0 +1,71 @@
+# Deploys the single Worker (site + admin + API + media) to Cloudflare. See docs/ops/ci-cd.md and runbook.md.
+# Only on a merge to main that touches code, or by hand. The very first production deploy is done with Joël present.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'assets/images/illustration_references/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+  TURBO_TELEMETRY_DISABLED: 1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Fontshare fonts cache
+        uses: actions/cache@v6
+        with:
+          path: packages/ui/fonts/fontshare
+          key: fontshare-${{ hashFiles('scripts/fonts-fetch.ts') }}
+      - run: pnpm fonts:fetch
+      - name: Storyset illustrations cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            apps/web/public/illustrations
+            apps/admin/public/illustrations
+          key: storyset-${{ hashFiles('packages/ui/illustrations/storyset.json', 'scripts/illos-fetch.ts', 'packages/ui/src/tokens.ts') }}
+      - run: pnpm illos:fetch
+
+      - run: pnpm turbo run lint typecheck test
+      # SITE_INDEXABLE=1 (repository variable) only when the site is launched: until then everything says noindex.
+      - run: pnpm build:site
+        env:
+          SITE_INDEXABLE: ${{ vars.SITE_INDEXABLE }}
+          ADMIN_PATH: ${{ vars.ADMIN_PATH }}
+
+      # Migrations run before the new code goes live. Additive ones are safe; a destructive one needs Joël's OK first.
+      - run: pnpm db:migrate
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          NEON_BRANCH: main
+
+      - name: Deploy
+        run: pnpm --filter @eec/web exec wrangler deploy --config dist/server/wrangler.json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

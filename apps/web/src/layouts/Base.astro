@@ -17,7 +17,10 @@ interface Props {
   season?: string
 }
 
-const { title, description, noindex = false, alternates = {}, season } = Astro.props
+const { title, description, noindex: asked = false, alternates = {}, season } = Astro.props
+// Until launch (SITE_INDEXABLE=1 at build time) nothing is indexable, and a small ribbon says so.
+const launched = import.meta.env.PUBLIC_SITE_INDEXABLE === '1'
+const noindex = asked || !launched
 // Computed when the page is built; `moissons` will come from an admin-set range (Phase 02).
 const currentSeason = season ?? getSeason()
 const locale = localeOf(Astro.currentLocale)
@@ -52,6 +55,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
     <Preloader />
     <a class="skip-link" href="#main">{t('common.skip_to_content')}</a>
     <slot />
+    {!launched && <p class="site-ribbon" role="note">{t('site.noindex_ribbon')}</p>}
     <script>
       import { initPrimitives } from '@eec/ui/primitives'
       initPrimitives()
@@ -60,6 +64,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 </html>
 
 <style>
+  .site-ribbon {
+    position: fixed;
+    inset-block-end: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 30;
+    margin: 0;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--warning-soft);
+    color: var(--warning);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    pointer-events: none;
+  }
   .skip-link {
     position: absolute;
     inset-inline-start: 1rem;

@@ -8,7 +8,8 @@
     "build": "vite build && tsc",
     "preview": "vite preview",
     "lint": "biome check .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
@@ -29,11 +30,13 @@
     "@eec/config": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "1.168.47",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "6.1.2",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

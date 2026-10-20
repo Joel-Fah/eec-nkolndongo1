@@ -13,5 +13,5 @@
   // `wrangler secret put` or the dashboard — never here, never in git.
   // One daily Cron Trigger (the Free plan allows 5): retention at 03:17 UTC, a quiet hour in Yaoundé.
   "triggers": { "crons": ["17 3 * * *"] },
-  "vars": { "APP_ORIGIN": "http://localhost:8080", "ADMIN_PATH": "admin" }
+  "vars": { "APP_ORIGIN": "http://localhost:8080", "ADMIN_PATH": "admin", "SITE_INDEXABLE": "0" }
 }

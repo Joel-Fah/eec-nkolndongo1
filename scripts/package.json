@@ -10,14 +10,20 @@
     "lint": "biome check . && node check-design-rules.ts",
     "dev:vars": "node dev-vars.ts",
     "dev:gateway": "node dev-gateway.ts",
-    "illos:fetch": "node illos-fetch.ts"
+    "illos:fetch": "node illos-fetch.ts",
+    "backup": "node backup/backup.ts",
+    "restore": "node backup/restore.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/pg": "8.15.5",
     "sharp": "0.35.5",
     "svgo": "4.1.0"
   },
   "dependencies": {
-    "aws4fetch": "1.0.20"
+    "age-encryption": "0.3.1",
+    "aws4fetch": "1.0.20",
+    "pg": "8.23.1",
+    "drizzle-orm": "0.45.4"
   }
 }
