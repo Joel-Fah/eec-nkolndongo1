@@ -108,3 +108,13 @@ export const consents = pgTable(
   },
   (t) => [index('consents_user_idx').on(t.userId, t.kind)],
 )
+
+/**
+ * One counter per content area, bumped on every publish/save (decision 0021). It is part of the edge
+ * cache key of public reads, so a change is visible within seconds without a global cache purge.
+ */
+export const contentVersions = pgTable('content_versions', {
+  area: text('area').primaryKey(),
+  version: integer('version').notNull().default(1),
+  updatedAt: updatedAt(),
+})
