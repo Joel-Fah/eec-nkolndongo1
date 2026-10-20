@@ -49,7 +49,7 @@ const tiles = [
 ] as const
 ---
 
-<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale}>
+<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale}>
   <div class="acct-intro">
     <p class="acct-eyebrow"><Icon name="lock" size={16} />{t('member.eyebrow')}</p>
     <h1 class="acct-title">{t('member.h1')}</h1>
@@ -369,7 +369,9 @@ const tiles = [
     const back = params.get('google')
     if (back) {
       const code = params.get('error')
-      say(`${msgs[back] ?? msgs.error ?? ''}${code ? ` (${code})` : ''}`)
+      // Google refusing the exchange is not the visitor's doing (and not an account clash): say so.
+      const refused = back === 'error' && ['invalid_code', 'server_error', 'internal_server_error'].includes(code ?? '')
+      say(`${refused ? msgs.unavailable : (msgs[back] ?? msgs.error ?? '')}${code ? ` (${code})` : ''}`)
       history.replaceState(null, '', location.pathname)
     }
 

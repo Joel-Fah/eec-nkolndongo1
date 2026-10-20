@@ -1298,16 +1298,14 @@
       "text": "Your account doesn’t have access to this page. If this is a mistake, talk to the secretariat."
     },
     "quotes": {
-      "v1": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
+      "v1": "Come to me, all of you who are tired and have heavy loads. I will give you rest.",
       "v1_cite": "Matthew 11:28",
-      "v2": "Behold, how good and how pleasant it is for brethren to dwell together in unity!",
-      "v2_cite": "Psalm 133:1",
-      "v3": "I was glad when they said unto me, Let us go into the house of the LORD.",
-      "v3_cite": "Psalm 122:1",
-      "v4": "Serve the LORD with gladness: come before his presence with singing.",
-      "v4_cite": "Psalm 100:2",
-      "v5": "Wherefore receive ye one another, as Christ also received us to the glory of God.",
-      "v5_cite": "Romans 15:7"
+      "v2": "The Lord is my shepherd. I have everything I need.",
+      "v2_cite": "Psalm 23:1",
+      "v3": "God loved the world so much that he gave his only Son. God gave his Son so that every person who believes in him may have eternal life and never be lost.",
+      "v3_cite": "John 3:16",
+      "v4": "Be strong and brave! Don’t be afraid, because the Lord your God will be with you everywhere you go.",
+      "v4_cite": "Joshua 1:9"
     }
   },
   "member": {
@@ -1356,6 +1354,7 @@
     "google_text": "To create your account, the parish keeps your Google name, email address and profile picture. Nothing else. First, tell us you agree:",
     "google_err": "Google sign-in didn’t work. If this address already has an account, sign in with its password.",
     "google_err_consent": "No account with this Google address yet. Choose “Create an account”: we need your agreement before keeping your details.",
+    "google_unavailable": "Google isn’t responding as expected right now. Sign in with your password or try again later.",
     "google_err_staff": "Team accounts sign in with their email and password, not with Google.",
     "soon": "Soon",
     "leaving": "See you soon! Closing the door gently…"
@@ -1400,5 +1399,9 @@
     "thanks": "Thank you",
     "listen": "Listen",
     "soon": "Soon"
+  },
+  "bible": {
+    "pdv": "Parole de Vie",
+    "etr": "Easy-to-Read Version"
   }
 }

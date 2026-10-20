@@ -1298,16 +1298,14 @@
       "text": "Votre compte n’a pas le droit d’accès à cette page. Si c’est une erreur, parlez-en au secrétariat."
     },
     "quotes": {
-      "v1": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
-      "v1_cite": "Matthieu 11 : 28",
-      "v2": "Voici, oh ! qu’il est agréable, qu’il est doux pour des frères de demeurer ensemble !",
-      "v2_cite": "Psaume 133 : 1",
-      "v3": "Je suis dans la joie quand on me dit : Allons à la maison de l’Éternel !",
-      "v3_cite": "Psaume 122 : 1",
-      "v4": "Servez l’Éternel avec joie, venez avec allégresse en sa présence !",
-      "v4_cite": "Psaume 100 : 2",
-      "v5": "Accueillez-vous donc les uns les autres, comme Christ vous a accueillis, pour la gloire de Dieu.",
-      "v5_cite": "Romains 15 : 7"
+      "v1": "Venez à moi, vous tous qui êtes fatigués et qui portez un lourd fardeau. Je vous donnerai du repos.",
+      "v1_cite": "Matthieu 11 : 28",
+      "v2": "Le Seigneur est mon berger, je ne manque de rien.",
+      "v2_cite": "Psaume 23 : 1",
+      "v3": "Dieu a tellement aimé le monde qu’il a donné son Fils unique. Ainsi, tous ceux qui croient en lui ne seront pas perdus, mais ils auront la vie éternelle.",
+      "v3_cite": "Jean 3 : 16",
+      "v4": "Sois courageux et fort ! N’aie pas peur, car le Seigneur ton Dieu est avec toi partout où tu iras.",
+      "v4_cite": "Josué 1 : 9"
     }
   },
   "member": {
@@ -1356,6 +1354,7 @@
     "google_text": "Pour créer votre compte, la paroisse garde votre nom, votre adresse e-mail et votre photo de profil Google. Rien d’autre. Dites-nous d’abord que vous êtes d’accord :",
     "google_err": "La connexion avec Google n’a pas abouti. Si cette adresse a déjà un compte, connectez-vous avec son mot de passe.",
     "google_err_consent": "Pas encore de compte avec cette adresse Google. Choisissez « Créer un compte » : nous avons besoin de votre accord avant de garder vos informations.",
+    "google_unavailable": "Google ne répond pas comme prévu pour le moment. Connectez-vous avec votre mot de passe ou réessayez plus tard.",
     "google_err_staff": "Les comptes de l’équipe se connectent avec leur e-mail et leur mot de passe, pas avec Google.",
     "soon": "Bientôt",
     "leaving": "À bientôt ! On referme la porte doucement…"
@@ -1400,5 +1399,9 @@
     "thanks": "Merci",
     "listen": "Écouter",
     "soon": "Bientôt"
+  },
+  "bible": {
+    "pdv": "Parole de Vie",
+    "etr": "Easy-to-Read Version"
   }
 }

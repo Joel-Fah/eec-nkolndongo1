@@ -81,3 +81,10 @@ modules (news, events), access control for `/_brand`, deploy workflows. See the 
 - Épiphanie / Pentecôte season end dates and the Épiphanie + Semaine sainte colours (proposed, to confirm).
 - Is the Délivrance ministry presented publicly? (council decision)
 - Signature line for the parish (candidates in `/_brand` → Identité).
+
+## Open points (2026-10-20)
+- Bible verses on the admin login use Parole de Vie (FR) and Easy-to-Read Version (EN), version shown next to the
+  reference. **To do:** check the wording against the licensed text and the publishers' quotation terms; later,
+  let members choose their version in Mon espace. Testimonials stay empty until real, consented, validated ones exist.
+- Google sign-in: `invalid_client` means `GOOGLE_CLIENT_SECRET` in `.env.local` does not match the client (re-copy it,
+  no quotes or spaces, then restart `pnpm dev`).

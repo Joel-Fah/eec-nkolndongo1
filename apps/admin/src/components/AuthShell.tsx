@@ -13,11 +13,43 @@ const PHOTOS = [
   17290989, 31326469, 36937754, 18487803, 10438600, 9056625, 37088368, 8270597, 19783489,
 ]
 
+/** Clip shapes for the small-screen cluster (objectBoundingBox units, so each stretches to its tile). */
+const CLUSTER = [
+  { id: 'arch', d: 'M0 1V0.5C0 0.22 0.22 0 0.5 0 0.78 0 1 0.22 1 0.5V1Z' },
+  {
+    id: 'blob',
+    d: 'M0.52 0.02C0.74 0 0.96 0.14 0.98 0.38 1 0.6 0.9 0.8 0.7 0.92 0.52 1.02 0.28 0.98 0.14 0.84 0 0.7-0.02 0.46 0.08 0.28 0.18 0.1 0.34 0.04 0.52 0.02Z',
+  },
+  { id: 'leaf', d: 'M0 1C0 0.45 0.42 0 1 0 1 0.55 0.58 1 0 1Z' },
+  { id: 'drop', d: 'M0 0H0.5A0.5 0.5 0 0 1 1 0.5 0.5 0.5 0 0 1 0.5 1 0.5 0.5 0 0 1 0 0.5Z' },
+] as const
+
+function Photo({ id, size = 1920 }: { id: number; size?: number }) {
+  const [gone, setGone] = useState(false)
+  if (gone) return null
+  return (
+    <img
+      src={`/placeholders/place/${id}-h-${size}.webp`}
+      alt=""
+      loading="lazy"
+      onError={(e) => {
+        const img = e.currentTarget
+        // The photo may be a "people" one: try that folder before giving up (production has none).
+        if (img.dataset.tried) setGone(true)
+        else {
+          img.dataset.tried = '1'
+          img.src = `/placeholders/people/${id}-h-${size}.webp`
+        }
+      }}
+    />
+  )
+}
+
 export function AuthShell({ children }: { children: ReactNode }) {
   const { t, locale } = useLocale()
   const photo = useMemo(() => PHOTOS[Math.floor(Math.random() * PHOTOS.length)], [])
   const quote = useMemo(() => pickQuote(), [])
-  const [missing, setMissing] = useState(false)
+  const others = useMemo(() => PHOTOS.filter((x) => x !== photo).slice(0, 4), [photo])
   const stage = useRef<HTMLDivElement>(null)
 
   // Gentle tilt: the pointer's position, eased every frame (fine pointers, no reduced motion).
@@ -65,27 +97,15 @@ export function AuthShell({ children }: { children: ReactNode }) {
     <div className="auth">
       <div className="auth-stage" ref={stage} aria-hidden="true">
         <div className="auth-art">
-          {!missing && (
-            <img
-              src={`/placeholders/place/${photo}-h-1920.webp`}
-              alt=""
-              onError={(e) => {
-                const img = e.currentTarget
-                // The photo may be a "people" one: try that folder before giving up (production has none).
-                if (img.dataset.tried) setMissing(true)
-                else {
-                  img.dataset.tried = '1'
-                  img.src = `/placeholders/people/${photo}-h-1920.webp`
-                }
-              }}
-            />
-          )}
+          <Photo id={photo} />
           <div className="auth-art-scrim" />
           <figure className="auth-verse">
             {quote.kind === 'verse' ? (
               <>
                 <blockquote>{t(quote.text)}</blockquote>
-                <figcaption>{t(quote.cite)}</figcaption>
+                <figcaption>
+                  {t(quote.cite)} · {t(locale === 'fr' ? 'bible.pdv' : 'bible.etr')}
+                </figcaption>
               </>
             ) : (
               <>
@@ -108,6 +128,20 @@ export function AuthShell({ children }: { children: ReactNode }) {
         </div>
         <div className="auth-main">{children}</div>
         <p className="auth-foot">{t('footer.rights')}</p>
+        <div className="auth-cluster" aria-hidden="true">
+          <svg width="0" height="0" focusable="false" role="presentation">
+            {CLUSTER.map((c) => (
+              <clipPath key={c.id} id={`auth-${c.id}`} clipPathUnits="objectBoundingBox">
+                <path d={c.d} />
+              </clipPath>
+            ))}
+          </svg>
+          {CLUSTER.map((c, i) => (
+            <div key={c.id} className="auth-shape" style={{ clipPath: `url(#auth-${c.id})` }}>
+              <Photo id={others[i] ?? photo} size={1280} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

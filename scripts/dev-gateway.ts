@@ -26,6 +26,7 @@ const server = createServer((req, res) => {
         ...req.headers,
         host: `localhost:${PORT}`,
         'x-forwarded-host': `localhost:${PORT}`,
+        'x-forwarded-for': req.socket.remoteAddress ?? '127.0.0.1',
       },
     },
     (r) => {

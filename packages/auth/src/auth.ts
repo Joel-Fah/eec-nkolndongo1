@@ -72,6 +72,8 @@ export function createAuth({
       useSecureCookies: secure,
       defaultCookieAttributes: { httpOnly: true, secure, sameSite: 'lax', path: '/' },
       database: { generateId: 'uuid' },
+      // Rate limiting needs the visitor's address: Cloudflare sets the first header, the local gateway the second.
+      ipAddress: { ipAddressHeaders: ['cf-connecting-ip', 'x-forwarded-for'] },
     },
     user: {
       additionalFields: {
