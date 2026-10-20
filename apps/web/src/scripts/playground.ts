@@ -13,7 +13,10 @@ import { type ColourToken, gardens, type Motif } from '../lib/seasonal-art'
 const GRAVITY = 900
 const CELL = 20
 const SPRITE = 64
-const POINTER_R = 120
+const POINTER_R = 140
+/** How far above the footer's lower strip the canvas reaches: room for things thrown up to fall back onto it. */
+const REACH = 200
+const LEDGE_CAP = 34
 
 type Particle = {
   motif: Motif
@@ -33,6 +36,8 @@ type Particle = {
   at: number
   cell: number
   add: number
+  /** 0 = the floor, 1 = the ledge (the footer's lower strip). */
+  on: 0 | 1
 }
 
 export function initPlayground(root: HTMLElement): () => void {
@@ -55,6 +60,11 @@ export function initPlayground(root: HTMLElement): () => void {
   let spriteOf: { motif: Motif; colour: number; index: number }[] = []
   let particles: Particle[] = []
   let heights: number[] = []
+  let ledge: number[] = []
+  let ledgeY = 0
+  let ledgeFrom = 0
+  let ledgeTo = 0
+  let playTop = 0
   let raf = 0
   let last = 0
   let visible = true
@@ -133,7 +143,7 @@ export function initPlayground(root: HTMLElement): () => void {
       sprite: index,
       size,
       x: Math.random() * W,
-      y: -size,
+      y: playTop - size,
       vx: 0,
       vy: 0,
       angle: Math.random() * Math.PI * 2,
@@ -146,42 +156,45 @@ export function initPlayground(root: HTMLElement): () => void {
       at: (i / count) * delay + Math.random() * 0.6,
       cell: 0,
       add: 0,
+      on: 0,
     }
   }
 
   // ── The floor ────────────────────────────────────────────────────────────────────────────────
   const cols = () => Math.ceil(W / CELL) + 1
-  const pileMax = () => H * 0.34
-  const floorAt = (x: number) =>
-    H - (heights[Math.min(heights.length - 1, Math.max(0, Math.floor(x / CELL)))] ?? 0)
+  const pileMax = () => Math.min(H * 0.3, 230)
+  const cellOf = (x: number) => Math.min(heights.length - 1, Math.max(0, Math.floor(x / CELL)))
+  const floorAt = (x: number) => H - (heights[cellOf(x)] ?? 0)
+  const onLedge = (x: number) => x > ledgeFrom && x < ledgeTo
+  const ledgeAt = (x: number) => ledgeY - (ledge[cellOf(x)] ?? 0)
 
-  function land(p: Particle) {
-    const c = Math.min(heights.length - 1, Math.max(0, Math.floor(p.x / CELL)))
-    p.state = 'rest'
-    p.vx = p.vy = p.spin = 0
-    p.y = Math.min(H - p.size * 0.12, floorAt(p.x) - p.size * 0.1)
-    p.cell = c
-    p.add = Math.max(0, Math.min(p.size * 0.12, pileMax() - (heights[c] ?? 0)))
+  const bump = (arr: number[], c: number, add: number) => {
     for (const [d, k] of [
       [0, 1],
       [-1, 0.55],
       [1, 0.55],
     ] as const) {
       const i = c + d
-      if (heights[i] !== undefined) heights[i] = (heights[i] as number) + p.add * k
+      if (arr[i] !== undefined) arr[i] = Math.max(0, (arr[i] as number) + add * k)
     }
+  }
+
+  function land(p: Particle, surface: 0 | 1) {
+    const c = cellOf(p.x)
+    const arr = surface ? ledge : heights
+    const cap = surface ? LEDGE_CAP : pileMax()
+    p.state = 'rest'
+    p.on = surface
+    p.vx = p.vy = p.spin = 0
+    p.y = (surface ? ledgeAt(p.x) : Math.min(H - p.size * 0.12, floorAt(p.x))) - p.size * 0.1
+    p.cell = c
+    p.add = Math.max(0, Math.min(p.size * 0.11, cap - (arr[c] ?? 0)))
+    bump(arr, c, p.add)
   }
 
   function wake(p: Particle) {
     if (p.state !== 'rest') return
-    for (const [d, k] of [
-      [0, 1],
-      [-1, 0.55],
-      [1, 0.55],
-    ] as const) {
-      const i = p.cell + d
-      if (heights[i] !== undefined) heights[i] = Math.max(0, (heights[i] as number) - p.add * k)
-    }
+    bump(p.on ? ledge : heights, p.cell, -p.add)
     p.state = 'fall'
     p.tilt = Math.random() * 6
   }
@@ -202,7 +215,8 @@ export function initPlayground(root: HTMLElement): () => void {
       }
       if (p.state === 'rest') {
         // Something that rested on a pile that has been disturbed drops again.
-        if (floorAt(p.x) - p.size * 0.1 - p.y > 6) wake(p)
+        const base = p.on ? ledgeAt(p.x) : floorAt(p.x)
+        if (base - p.size * 0.1 - p.y > 6) wake(p)
         else if (moving < 30 && !burst) continue
       }
       const dx = p.x - pointer.x
@@ -235,6 +249,7 @@ export function initPlayground(root: HTMLElement): () => void {
       p.vx +=
         ((wind - p.vx) * 0.9 + Math.sin(t * p.freq + p.phase) * 150 * p.motif.flutter * falling) *
         dt
+      const before = p.y
       p.x += p.vx * dt
       p.y += p.vy * dt
       p.tilt += (2.2 + Math.abs(p.vx) * 0.02 + Math.abs(p.spin)) * dt
@@ -246,7 +261,10 @@ export function initPlayground(root: HTMLElement): () => void {
         p.x = Math.min(W, Math.max(0, p.x))
         p.vx *= -0.4
       }
-      if (p.y > floorAt(p.x) - p.size * 0.1 && p.vy > 0) land(p)
+      // Falling back onto the footer's lower strip, if it was thrown up that high; otherwise to the floor.
+      if (p.vy > 0 && onLedge(p.x) && before < ledgeAt(p.x) && p.y >= ledgeAt(p.x) - p.size * 0.1)
+        land(p, 1)
+      else if (p.y > floorAt(p.x) - p.size * 0.1 && p.vy > 0) land(p, 0)
     }
     burst = null
     pointer.vx *= 0.86
@@ -297,11 +315,22 @@ export function initPlayground(root: HTMLElement): () => void {
     if (!r.width || !r.height) return
     const oldW = W
     dpr = Math.min(2, window.devicePixelRatio || 1)
+    // The canvas reaches above the playground to the footer's lower strip (and a little more), so what is
+    // thrown up can fall back onto that strip.
+    const strip = document.querySelector<HTMLElement>('.footer-meta')?.getBoundingClientRect()
+    const above = strip ? Math.max(0, r.top - strip.top) : 0
+    playTop = above + REACH
+    ledgeY = REACH
+    ledgeFrom = strip ? strip.left - r.left + 16 : 0
+    ledgeTo = strip ? strip.right - r.left - 16 : 0
     W = r.width
-    H = r.height
+    H = r.height + playTop
+    canvasEl.style.top = `${-playTop}px`
+    canvasEl.style.height = `${H}px`
     canvasEl.width = Math.round(W * dpr)
     canvasEl.height = Math.round(H * dpr)
     heights = new Array(cols()).fill(0)
+    ledge = new Array(cols()).fill(0)
     for (const p of particles) {
       if (oldW) p.x *= W / oldW
       if (p.state === 'rest') p.state = 'fall'
@@ -316,16 +345,16 @@ export function initPlayground(root: HTMLElement): () => void {
     for (const p of particles) {
       p.state = 'wait'
       p.at = 0
-      p.y = -p.size
+      p.y = playTop - p.size
     }
     for (let i = 0; i < 1500 && particles.some((p) => p.state !== 'rest'); i++) step(1 / 30)
     draw()
   }
 
   buildSprites()
-  const count = Math.round(Math.min(110, Math.max(34, innerWidth / 11)) * (lowEnd ? 0.6 : 1))
+  const count = Math.round(Math.min(300, Math.max(90, innerWidth / 4.6)) * (lowEnd ? 0.55 : 1))
   resize()
-  particles = Array.from({ length: count }, (_, i) => make(i, count, 6))
+  particles = Array.from({ length: count }, (_, i) => make(i, count, 9))
   particles.sort((a, b) => a.size - b.size)
   if (still) settleNow()
   else wakeLoop()
@@ -351,9 +380,17 @@ export function initPlayground(root: HTMLElement): () => void {
   })
   mo.observe(rootEl, { attributes: true, attributeFilter: ['data-season', 'data-theme'] })
 
+  const fan = root.querySelector<HTMLElement>('.playground-fan')
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches
+  if (fine && !still) root.classList.add('has-fan')
+  const moveFan = (x: number, y: number, vx: number) => {
+    if (!fan) return
+    fan.style.transform = `translate(${x - 32}px, ${y - 34}px) rotate(${Math.max(-42, Math.min(42, vx / 32))}deg)`
+    fan.dataset.on = ''
+  }
   const local = (e: PointerEvent) => {
     const r = root.getBoundingClientRect()
-    return { x: e.clientX - r.left, y: e.clientY - r.top }
+    return { x: e.clientX - r.left, y: e.clientY - r.top + playTop }
   }
   const onMove = (e: PointerEvent) => {
     if (still) return
@@ -368,10 +405,12 @@ export function initPlayground(root: HTMLElement): () => void {
     pointer.y = y
     pointer.at = now
     pointer.seen = true
+    if (e.pointerType === 'mouse') moveFan(x, y - playTop, pointer.vx)
     root.classList.add('is-played')
     wakeLoop()
   }
   const onLeave = () => {
+    fan?.removeAttribute('data-on')
     pointer.x = pointer.y = -999
     pointer.seen = false
   }

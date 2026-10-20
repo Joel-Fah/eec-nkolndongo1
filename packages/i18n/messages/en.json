@@ -1365,6 +1365,7 @@
     "google_text": "To create your account, the parish keeps your Google name, email address and profile picture. Nothing else. First, tell us you agree:",
     "google_err": "Google sign-in didn’t work. If this address already has an account, sign in with its password.",
     "google_err_consent": "No account with this Google address yet. Choose “Create an account”: we need your agreement before keeping your details.",
+    "google_wait": "Opening Google…",
     "google_unavailable": "Google isn’t responding as expected right now. Sign in with your password or try again later.",
     "google_err_staff": "Team accounts sign in with their email and password, not with Google.",
     "soon": "Soon",

@@ -1365,6 +1365,7 @@
     "google_text": "Pour créer votre compte, la paroisse garde votre nom, votre adresse e-mail et votre photo de profil Google. Rien d’autre. Dites-nous d’abord que vous êtes d’accord :",
     "google_err": "La connexion avec Google n’a pas abouti. Si cette adresse a déjà un compte, connectez-vous avec son mot de passe.",
     "google_err_consent": "Pas encore de compte avec cette adresse Google. Choisissez « Créer un compte » : nous avons besoin de votre accord avant de garder vos informations.",
+    "google_wait": "Ouverture de Google…",
     "google_unavailable": "Google ne répond pas comme prévu pour le moment. Connectez-vous avec votre mot de passe ou réessayez plus tard.",
     "google_err_staff": "Les comptes de l’équipe se connectent avec leur e-mail et leur mot de passe, pas avec Google.",
     "soon": "Bientôt",
