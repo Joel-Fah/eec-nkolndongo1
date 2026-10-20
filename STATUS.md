@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-19_
 
-## Current phase: 02 — Platform Core (Checkpoint A done) + public UI revamp in review
+## Current phase: 02 — Platform Core · Checkpoint B (admin core) ready for review
 
 ## In progress — public UI revamp (asked by Joël, 2026-10-19)
 Joël rejected the Phase 01 page layouts. Direction: SaaS-sleek (Supabase/Neon feel) for a church, each
@@ -24,6 +24,22 @@ page with its own concept. Vertical slice done, **waiting for Joël's review** b
 - Pexels photos of people: **dev-only** placeholders (gitignored, removed from builds; credits in
   `apps/web/src/content/placeholders.json`). Real, consented parish photos needed before launch.
 - Next after review: every other page gets its own concept (`docs/product/pages.md`), then Checkpoint B.
+
+## Checkpoint B — done, waiting for Joël's review (2026-10-20)
+- Module system: `modules/` workspace, registry (+ API mounts, admin menu, permission seed, i18n merge),
+  feature flags (switched-off module → API 404, menu hidden), boundary test. Shared kits: `@eec/api-kit`,
+  `@eec/admin-kit`. `new-module` skill updated with the real APIs.
+- Admin core: Utilisateurs (search/filters, invitation links, profile, roles with group scope, groups,
+  sessions, activity, reset links, deactivate with undo), Rôles (permission matrix, duplicate, delete with
+  typed confirmation), Groupes, Journal d’activité (filters, readable details, CSV for super admin), Boîte
+  d’envoi, Mon compte (profile, language/theme, password, devices). Every mutation guarded + audited.
+- Settings module: parish details + season (approval per field; only approved values public), flags,
+  system info. Public site reads `/api/settings/public` (edge-cached, content version — decision 0021).
+- `/fr/_brand` and `/en/_brand` gated by `core:system-design` via our Worker entry (`apps/web/src/worker.ts`).
+- Decisions 0019 (outbox) and 0021 (settings freshness).
+- Next (Checkpoint C): media module (Neon object storage), members module (Mon espace, export, deletion,
+  retention Cron, headcount), privacy page rewrite, deploy workflows, first production deploy (with Joël),
+  backup + tested restore.
 
 ## Phase 02 so far
 Neon + Drizzle schema and migrations, self-hosted Better Auth (0018), RBAC + audit, invitations and reset
