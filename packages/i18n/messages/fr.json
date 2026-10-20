@@ -536,9 +536,9 @@
       },
       "footer": {
         "name": "Pied de page",
-        "desc": "Une carte d’invitation, détachée, puis un pied de page flottant et sobre (même cadre que l’en-tête, arrondi à chaque coin) : la paroisse et le plan du site. Sous la carte : mentions, langue et thème.",
-        "use": "<Footer /> via le gabarit Site.",
-        "a11y": "Titres h2 par colonne, liens de 44 px.",
+        "desc": "Une carte d’invitation, détachée, puis un pied de page flottant et sobre (même cadre que l’en-tête, arrondi à chaque coin) : la paroisse et le plan du site. Sous la carte : mentions, langue et thème. Sous le pied de page, un terrain de jeu saisonnier : selon le temps liturgique, des feuilles, étoiles, brindilles, palmes, fleurs, flammes ou épis tombent doucement à l’approche du pied de page et s’amassent au sol. Le pointeur les agite, les lance vers le haut (elles retombent avec du poids et un peu de vent) ; un toucher les disperse.",
+        "use": "<Footer /> via le gabarit Site. Dessins dans lib/seasonal-art.ts, physique dans scripts/playground.ts (chargé seulement à l’approche du pied de page, canvas sans dépendance).",
+        "a11y": "Titres h2 par colonne, liens de 44 px. Le terrain de jeu est décoratif (aria-hidden), jamais nécessaire. Mouvement réduit ou économie de données : une image fixe du tas, sans animation.",
         "demo": "Voir le pied de page en bas du site."
       },
       "transitions": {
@@ -720,7 +720,18 @@
     "invite_title": "Venez nous voir dimanche",
     "invite_text": "Personne ne vous demandera d’où vous venez. Asseyez-vous, écoutez, chantez si vous en avez envie : vous êtes attendu.",
     "invite_find": "Nous trouver",
-    "invite_account": "Créer mon espace"
+    "invite_account": "Créer mon espace",
+    "play": {
+      "avent": "Effleurez les étoiles et les rameaux",
+      "noel": "Effleurez les étoiles et les flocons",
+      "epiphanie": "Effleurez les étoiles",
+      "careme": "Effleurez les brindilles",
+      "semaine-sainte": "Effleurez les palmes et les pétales",
+      "paques": "Effleurez les fleurs",
+      "pentecote": "Effleurez les flammes",
+      "ordinaire": "Effleurez les feuilles",
+      "moissons": "Effleurez les épis"
+    }
   },
   "admin": {
     "title": "Administration",

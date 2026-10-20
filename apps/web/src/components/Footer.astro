@@ -3,8 +3,10 @@
  * An invitation card, then a minimalist floating footer (same 80rem frame as the header, every corner
  * rounded): the parish and the site map. The legal line, language and theme sit below the card.
  */
+import { getSeason } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
+import { seasonNames } from '@eec/ui/tokens'
 import { localeOf, useT } from '../lib/i18n'
 import { alternates, href, labelKey, pages, tabKey, tabs } from '../lib/nav'
 import SiteLockup from './SiteLockup.astro'
@@ -21,6 +23,10 @@ const socials = [
   ['chat', 'Facebook', 'facebook'],
   ['play', 'YouTube', 'youtube'],
 ] as const
+const season = getSeason()
+const hints = Object.fromEntries(
+  seasonNames.map((n) => [n, t(`footer.play.${n}` as 'footer.play.ordinaire')]),
+)
 const mapTabs = tabs.filter((tab) => tab.children.length)
 ---
 
@@ -86,10 +92,42 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
   </div>
 </footer>
 
+{/* Seasonal playground: things fall as the footer comes into view; brush the pointer through them. */}
+<div class="site-playground" data-playground data-hints={JSON.stringify(hints)} aria-hidden="true">
+  <canvas></canvas>
+  <p class="playground-hint">{hints[season]}</p>
+</div>
+
 <script>
   import { applyPublicSettings } from '../lib/settings-client'
   applyPublicSettings()
   document.addEventListener('astro:page-load', applyPublicSettings)
+
+  // The playground loads (and starts) only when the footer is about to be seen.
+  let stop: (() => void) | undefined
+  document.addEventListener('astro:before-swap', () => stop?.())
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-playground]')
+    if (!root) return
+    const hint = root.querySelector('.playground-hint')
+    const hints = JSON.parse(root.dataset.hints ?? '{}') as Record<string, string>
+    const sync = () => {
+      const text = hints[document.documentElement.dataset.season ?? '']
+      if (hint && text) hint.textContent = text
+    }
+    sync()
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) return
+        io.disconnect()
+        import('../scripts/playground').then((m) => {
+          stop = m.initPlayground(root)
+        })
+      },
+      { rootMargin: '0px 0px 240px 0px' },
+    )
+    io.observe(root)
+  })
 </script>
 
 <style is:global>
@@ -184,6 +222,34 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
     background: var(--surface);
     color: var(--ink-muted);
     box-shadow: inset 0 0 0 1px var(--line);
+  }
+  /* The playground: seasonal things fall here and pile up; the pointer stirs them (scripts/playground.ts). */
+  .site-playground {
+    position: relative;
+    height: clamp(16rem, 30vw + 5rem, 26rem);
+    margin-block-start: 0.5rem;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .site-playground canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .playground-hint {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-start: 1.25rem;
+    margin: 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    pointer-events: none;
+    transition: opacity var(--duration-story) var(--ease-soft);
+  }
+  .site-playground.is-played .playground-hint {
+    opacity: 0;
   }
   /* Below the card: the legal line, language and theme. */
   .footer-meta {

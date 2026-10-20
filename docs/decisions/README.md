@@ -28,3 +28,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0023 | Erode replaces Fraunces for headings | Accepted |
 | 0024 | Storyset (Cuate) illustrations, recoloured, never committed | Accepted |
 | 0025 | The admin's address is configurable (ADMIN_PATH) | Accepted |
+| 0026 | Seasonal playground under the footer | Accepted |

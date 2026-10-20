@@ -536,9 +536,9 @@
       },
       "footer": {
         "name": "Footer",
-        "desc": "A separate invitation card, then a sober floating footer (same frame as the header, rounded on every corner): the parish and the site map. Below the card: legal links, language and theme.",
-        "use": "<Footer /> through the Site layout.",
-        "a11y": "One h2 per column, 44 px links.",
+        "desc": "A separate invitation card, then a sober floating footer (same frame as the header, rounded on every corner): the parish and the site map. Below the card: legal links, language and theme. Below the footer, a seasonal playground: depending on the liturgical season, leaves, stars, twigs, palms, flowers, flames or ears of wheat drift down as the footer nears and pile up. The pointer stirs them and throws them upwards (they fall back with weight and a little wind); a tap scatters them.",
+        "use": "<Footer /> through the Site layout. Drawings in lib/seasonal-art.ts, physics in scripts/playground.ts (loaded only when the footer is near, dependency-free canvas).",
+        "a11y": "One h2 per column, 44 px links. The playground is decorative (aria-hidden) and never required. Reduced motion or Save-Data: a still picture of the pile, no animation.",
         "demo": "See the footer at the bottom of the site."
       },
       "transitions": {
@@ -720,7 +720,18 @@
     "invite_title": "Come and see us on Sunday",
     "invite_text": "No one will ask where you come from. Sit down, listen, sing if you feel like it: you are expected.",
     "invite_find": "Find us",
-    "invite_account": "Create my space"
+    "invite_account": "Create my space",
+    "play": {
+      "avent": "Brush the stars and twigs",
+      "noel": "Brush the stars and snowflakes",
+      "epiphanie": "Brush the stars",
+      "careme": "Brush the twigs",
+      "semaine-sainte": "Brush the palms and petals",
+      "paques": "Brush the flowers",
+      "pentecote": "Brush the flames",
+      "ordinaire": "Brush the leaves",
+      "moissons": "Brush the ears of wheat"
+    }
   },
   "admin": {
     "title": "Administration",
