@@ -33,7 +33,7 @@ function Invite() {
                 password: String(data.get('password') ?? ''),
               },
             })
-            window.location.assign('/admin/')
+            window.location.assign(import.meta.env.BASE_URL)
           } catch (err) {
             setError(t(errorKey(err)))
             setBusy(false)

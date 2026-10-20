@@ -122,7 +122,7 @@ function Users() {
                   <td>
                     <a
                       className="admin-person"
-                      href={`/admin/users/${u.id}`}
+                      href={`${import.meta.env.BASE_URL}users/${u.id}`}
                       onClick={(e) => {
                         e.preventDefault()
                         navigate({ to: '/users/$id', params: { id: u.id } })

@@ -7,11 +7,13 @@ import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
+import { LeavingScreen } from './LeavingScreen'
 
 export function AppShell() {
   const { t, locale } = useLocale()
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   useEffect(() => {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
@@ -126,7 +128,12 @@ export function AppShell() {
                     <Menu.Item
                       className="menu-item"
                       onClick={async () => {
-                        await signOut()
+                        // Feedback at once (the request can take a few seconds), and never flash back too fast.
+                        setLeaving(true)
+                        await Promise.all([
+                          signOut().catch(() => {}),
+                          new Promise((r) => setTimeout(r, 1600)),
+                        ])
                         navigate({ to: '/login' })
                       }}
                     >
@@ -143,6 +150,7 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      {leaving && <LeavingScreen />}
     </div>
   )
 }

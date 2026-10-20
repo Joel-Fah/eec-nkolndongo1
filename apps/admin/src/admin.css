@@ -487,10 +487,19 @@ html[data-nav-open] {
   min-height: 100dvh;
   background: var(--bg);
 }
-.auth-art {
+.auth-stage {
+  --tx: 0;
+  --ty: 0;
   display: none;
+  padding: 1rem;
+  perspective: 1400px;
+}
+.auth-art {
   position: relative;
+  height: calc(100dvh - 2rem);
   overflow: hidden;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-3);
   background:
     radial-gradient(color-mix(in oklab, var(--ink) 16%, transparent) 1px, transparent 1.5px) 0 0 /
     22px 22px,
@@ -505,18 +514,24 @@ html[data-nav-open] {
       transparent 70%
     ),
     var(--surface-2);
+  /* It floats above the page: a gentle tilt towards the pointer. */
+  transform: rotateY(calc(var(--tx) * 2.2deg)) rotateX(calc(var(--ty) * -1.8deg));
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 .auth-art img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -7%;
+  width: 114%;
+  height: 114%;
   object-fit: cover;
+  /* The photo drifts a little against the frame: depth. */
+  translate: calc(var(--tx) * -10px) calc(var(--ty) * -8px);
   animation: auth-settle 1.6s var(--ease-soft) both;
 }
 @keyframes auth-settle {
   from {
-    transform: scale(1.06);
+    scale: 1.06;
     opacity: 0;
   }
 }
@@ -525,7 +540,7 @@ html[data-nav-open] {
   inset: 0;
   background: linear-gradient(
     180deg,
-    transparent 40%,
+    transparent 45%,
     color-mix(in oklab, var(--scrim) 78%, transparent)
   );
 }
@@ -580,10 +595,73 @@ html[data-nav-open] {
 }
 @media (min-width: 64rem) {
   .auth {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
   }
-  .auth-art {
+  .auth-stage {
     display: block;
     order: -1;
+  }
+}
+
+/* ── Signing out: a calm full-screen goodbye ────────────────────────────────────────── */
+.leaving {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.25rem;
+  background: var(--bg);
+  animation: leaving-in 0.35s var(--ease-soft) both;
+}
+@keyframes leaving-in {
+  from {
+    opacity: 0;
+  }
+}
+.leaving-badge {
+  padding: 1.25rem 1.75rem;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-2);
+  animation: leaving-breathe 1.8s var(--ease-in-out) infinite;
+}
+@keyframes leaving-breathe {
+  50% {
+    transform: scale(1.03);
+  }
+}
+.leaving-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  text-align: center;
+}
+.leaving-bar {
+  width: 5rem;
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: var(--radius-xs);
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.leaving-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transform-origin: left;
+  animation: leaving-fill 1.6s var(--ease-in-out) both;
+}
+@keyframes leaving-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-art {
+    transform: none;
+  }
+  .leaving-badge,
+  .leaving-bar > span {
+    animation: none;
   }
 }
