@@ -7,7 +7,8 @@ import type { IconName } from '@eec/ui/icons'
 
 type Slugs = Record<Locale, string>
 
-export type NavChild = { id: string; slug: Slugs; icon: IconName }
+/** `art`: the Storyset illustration shown when this sub-menu item is hovered (packages/ui/illustrations/storyset.json). */
+export type NavChild = { id: string; slug: Slugs; icon: IconName; art: string }
 export type NavTab = {
   id: 'discover' | 'live' | 'calendar' | 'news' | 'give'
   slug: Slugs
@@ -24,18 +25,30 @@ export const tabs: NavTab[] = [
     art: 'church',
     slug: { fr: 'decouvrir', en: 'discover' },
     children: [
-      { id: 'histoire', slug: { fr: 'notre-histoire', en: 'our-story' }, icon: 'hourglass' },
+      {
+        id: 'histoire',
+        slug: { fr: 'notre-histoire', en: 'our-story' },
+        icon: 'hourglass',
+        art: 'adventure',
+      },
       {
         id: 'croyances',
         slug: { fr: 'ce-que-nous-croyons', en: 'what-we-believe' },
         icon: 'bible',
+        art: 'pray',
       },
       {
         id: 'pasteurs',
         slug: { fr: 'pasteurs-et-conseil', en: 'pastors-and-council' },
         icon: 'account',
+        art: 'conversation',
       },
-      { id: 'trouver', slug: { fr: 'nous-trouver', en: 'find-us' }, icon: 'location' },
+      {
+        id: 'trouver',
+        slug: { fr: 'nous-trouver', en: 'find-us' },
+        icon: 'location',
+        art: 'destination',
+      },
     ],
   },
   {
@@ -48,9 +61,20 @@ export const tabs: NavTab[] = [
         id: 'cultes',
         slug: { fr: 'cultes-et-horaires', en: 'services-and-times' },
         icon: 'church',
+        art: 'music',
       },
-      { id: 'departements', slug: { fr: 'departements', en: 'departments' }, icon: 'users' },
-      { id: 'pratique', slug: { fr: 'vie-pratique', en: 'practical-life' }, icon: 'checklist' },
+      {
+        id: 'departements',
+        slug: { fr: 'departements', en: 'departments' },
+        icon: 'users',
+        art: 'community',
+      },
+      {
+        id: 'pratique',
+        slug: { fr: 'vie-pratique', en: 'practical-life' },
+        icon: 'checklist',
+        art: 'family',
+      },
     ],
   },
   {
@@ -59,9 +83,24 @@ export const tabs: NavTab[] = [
     art: 'events',
     slug: { fr: 'agenda', en: 'calendar' },
     children: [
-      { id: 'evenements', slug: { fr: 'evenements', en: 'events' }, icon: 'calendar' },
-      { id: 'liturgie', slug: { fr: 'annee-liturgique', en: 'liturgical-year' }, icon: 'sun' },
-      { id: 'moissons', slug: { fr: 'fete-des-moissons', en: 'harvest-festival' }, icon: 'plant' },
+      {
+        id: 'evenements',
+        slug: { fr: 'evenements', en: 'events' },
+        icon: 'calendar',
+        art: 'events',
+      },
+      {
+        id: 'liturgie',
+        slug: { fr: 'annee-liturgique', en: 'liturgical-year' },
+        icon: 'sun',
+        art: 'calendar',
+      },
+      {
+        id: 'moissons',
+        slug: { fr: 'fete-des-moissons', en: 'harvest-festival' },
+        icon: 'plant',
+        art: 'gardening',
+      },
     ],
   },
   {
@@ -70,12 +109,18 @@ export const tabs: NavTab[] = [
     art: 'news',
     slug: { fr: 'actualites', en: 'news' },
     children: [
-      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper' },
-      { id: 'predications', slug: { fr: 'predications', en: 'sermons' }, icon: 'headphones' },
+      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper', art: 'news' },
+      {
+        id: 'predications',
+        slug: { fr: 'predications', en: 'sermons' },
+        icon: 'headphones',
+        art: 'chatting',
+      },
       {
         id: 'meditations',
         slug: { fr: 'meditations-et-bulletin', en: 'meditations-and-bulletin' },
         icon: 'book',
+        art: 'book-lover',
       },
     ],
   },

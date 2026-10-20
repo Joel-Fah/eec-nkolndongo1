@@ -62,7 +62,7 @@ In dark mode, elevation = lighter surface + faint top highlight border rather th
 - **Headings: Erode** (Fontshare, ITF FFL, variable 300–700 — decision 0023, replaces Fraunces). **Text & UI: Switzer** (Fontshare, free commercial licence) — self-hosted, subset Latin + French.
   No Inter, no Geist.
 - **Display:** **Erode** for headings — chosen by Joël (decision 0023), replacing Fraunces.
-- Fluid type scale (clamp), ratio ~1.25 mobile / 1.333 desktop. Body 17–18px, line-height 1.6.
+- Fluid type scale (clamp), ratio ~1.25 mobile / 1.333 desktop. **Body 15–16px** (was 17–18 until 2026-10-20: too large next to SaaS products), line-height 1.6. Buttons 40 px high with a mouse (44 px on touch), headline tracking −0.01 to −0.03em.
 - French typography: non-breaking space before `: ; ! ?` and inside « guillemets » (handled by an i18n
   helper), proper apostrophe `’`.
 

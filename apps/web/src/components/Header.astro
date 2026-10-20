@@ -40,11 +40,11 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                     <div id={`panel-${tab.id}`} class="mega" data-menu-panel hidden>
                       <div class="mega-grid">
                         <ul class="mega-list" role="list">
-                          {tab.children.map((child) => {
+                          {tab.children.map((child, i) => {
                             const to = href(locale, `${slug}/${child.slug[locale]}`)
                             return (
                               <li>
-                                <a class="mega-item" href={to} aria-current={current.startsWith(to) ? 'page' : undefined}>
+                                <a class="mega-item" data-i={i} href={to} aria-current={current.startsWith(to) ? 'page' : undefined}>
                                   <span class="mega-icon"><Icon name={child.icon} size={20} /></span>
                                   <span class="mega-text">
                                     <span class="mega-label">{t(labelKey(child.id))}</span>
@@ -55,10 +55,13 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                             )
                           })}
                         </ul>
+                        {/* One illustration per item, cropped by the panel; the hovered/focused item's one shows. */}
                         <aside class="mega-art" aria-hidden="true">
-                          {tab.art && <Illustration name={tab.art} class="mega-illustration" />}
-                          <p class="mega-art-title">{t(`nav.panel.${tab.id}.title` as 'nav.panel.discover.title')}</p>
-                          <p class="mega-art-text">{t(`nav.panel.${tab.id}.text` as 'nav.panel.discover.text')}</p>
+                          <div class="mega-art-text-wrap">
+                            <p class="mega-art-title">{t(`nav.panel.${tab.id}.title` as 'nav.panel.discover.title')}</p>
+                            <p class="mega-art-text">{t(`nav.panel.${tab.id}.text` as 'nav.panel.discover.text')}</p>
+                          </div>
+                          {tab.children.map((child, i) => <Illustration name={child.art} class="mega-illustration" data-art={i} />)}
                         </aside>
                       </div>
                     </div>
@@ -255,10 +258,9 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .mega {
     position: absolute;
     inset-block-start: calc(100% + 0.5rem);
+    /* The whole width of the navbar, not just its content. */
     inset-inline: 0;
     z-index: 5;
-    width: min(100%, 52rem);
-    margin-inline: auto;
     padding: 0.75rem;
     border-radius: var(--radius-xl);
     background: var(--surface-raised);
@@ -275,7 +277,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   }
   .mega-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     gap: 0.75rem;
   }
   .mega-list {
@@ -326,22 +328,46 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     line-height: 1.35;
     color: var(--ink-muted);
   }
+  /* Illustration panel, cropped style: text on top, the scene big and cut by the panel's bottom edge. */
   .mega-art {
-    display: grid;
-    align-content: start;
-    gap: 0.25rem;
-    padding: 0.75rem;
+    position: relative;
+    min-height: 19rem;
+    overflow: hidden;
     border-radius: var(--radius-lg);
-    background: var(--surface-2);
+    background: color-mix(in oklab, var(--season) 9%, var(--surface-2));
+  }
+  .mega-art-text-wrap {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.25rem;
+    max-width: 22rem;
+    padding: 1.25rem 1.5rem;
   }
   .mega-illustration {
-    width: 100%;
-    height: auto;
-    margin-bottom: 0.25rem;
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-end: -42%;
+    width: min(30rem, 100%);
+    translate: -50% 0.75rem;
+    opacity: 0;
+    transition:
+      opacity var(--duration-nav) var(--ease-soft),
+      translate var(--duration-nav) var(--ease-soft);
+    pointer-events: none;
+  }
+  /* Shown: the hovered/focused item's scene; before any hover, the first one. */
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))) .mega-illustration[data-art="0"],
+  .mega-grid:has(.mega-item[data-i="0"]:is(:hover, :focus-visible)) .mega-illustration[data-art="0"],
+  .mega-grid:has(.mega-item[data-i="1"]:is(:hover, :focus-visible)) .mega-illustration[data-art="1"],
+  .mega-grid:has(.mega-item[data-i="2"]:is(:hover, :focus-visible)) .mega-illustration[data-art="2"],
+  .mega-grid:has(.mega-item[data-i="3"]:is(:hover, :focus-visible)) .mega-illustration[data-art="3"] {
+    opacity: 1;
+    translate: -50% 0;
   }
   .mega-art-title {
     font-family: var(--font-display);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
     font-weight: 500;
     line-height: 1.2;
   }

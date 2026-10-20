@@ -71,10 +71,10 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
         <div class="grid gap-3">
           <span class="bento-icon"><Icon name="church" /></span>
           <h3 class="text-2xl">{t('home.start1_t')}</h3>
-          <p class="text-ink-muted">{t('home.start1_p')}</p>
+          <p class="max-w-[34ch] text-ink-muted">{t('home.start1_p')}</p>
+          <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
         </div>
         <Illustration name="together" class="bento-art" />
-        <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
       </a>
 
       <a class="bento-card bento-groups" href={pathOf('departements')} data-glow>
@@ -220,10 +220,10 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     }
   }
   .home-title {
-    font-size: clamp(2.5rem, 1.3rem + 4.3vw, 5.25rem);
+    font-size: clamp(2.25rem, 1.2rem + 3.9vw, 4.5rem);
     font-weight: 500;
     line-height: 0.98;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
   }
   /* Two lines on tablet and desktop; on phones each line may wrap. */
   .home-title-line {

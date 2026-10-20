@@ -298,8 +298,10 @@ const colsClass = {
     color: var(--gold-ink);
   }
   .pv-empty {
+    position: relative;
     display: grid;
     gap: 2rem;
+    overflow: hidden;
     padding: 2rem;
     border-radius: var(--radius-xl);
     background: var(--surface);
@@ -307,9 +309,17 @@ const colsClass = {
   }
   @media (min-width: 48rem) {
     .pv-empty {
-      grid-template-columns: minmax(0, 20rem) 1fr;
+      grid-template-columns: minmax(0, 22rem) 1fr;
       padding: 2.5rem 3rem;
+      min-height: 22rem;
     }
+  }
+  /* Cropped style: the scene is larger than its column and cut by the card's bottom edge. */
+  .pv-empty-art {
+    align-self: end;
+    width: 120%;
+    margin-block-end: -7rem;
+    margin-inline-start: -10%;
   }
   .pv-note {
     display: flex;

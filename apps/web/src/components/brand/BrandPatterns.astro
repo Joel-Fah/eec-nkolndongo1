@@ -78,7 +78,7 @@ const doc = (id: Id) => ({
           <li>
             <a class="flex items-center justify-between gap-3 rounded-md bg-surface px-4 py-3 text-sm ring-1 ring-line hover:ring-primary" href={href(locale, pages.find((p) => p.id === id)?.path[locale] ?? '')}>
               <span>{t(labelKey(id))}</span>
-              <code class="text-ink-muted">{h.layout}</code>
+              <code class="text-ink-muted">{h.layout} · {h.shape}</code>
             </a>
           </li>
         ))

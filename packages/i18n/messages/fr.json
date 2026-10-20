@@ -619,9 +619,9 @@
       },
       "pagehero": {
         "name": "Héros de page (PageHero)",
-        "desc": "Chaque page a son propre héros, jamais le même : photo presque plein écran dans un cadre flottant arrondi, et des cartes posées dessus (chiffres, informations, étapes, lecteur audio, bande de l’année, anneau d’objectif). 15 mises en page : fullbleed, arch, stack, panorama, split, mosaic, path, ticket, duotone, goal, cover, listen, reading, gratitude, plain.",
-        "use": "lib/heroes.ts : une entrée par page (mise en page, photos, cartes). Les chiffres sont des faits : valeur nulle tant qu’elle n’est pas validée (exemple affiché en développement, masqué en production). Sans photo, chaque mise en page garde sa forme sur un panneau teinté.",
-        "a11y": "Un seul h1 par page. Texte sur photo sur un voile sombre (contraste garanti), cartes « verre » avec texte clair. Mouvement (zoom qui se pose, dérive au défilement, cartes qui montent) supprimé avec le mouvement réduit."
+        "desc": "Chaque page a son propre héros : la photo est découpée en une forme ludique (blocs façon Replit, vitraux, goutte, fleur, feuille, voile…) avec son écho teinté derrière, et des cartes sont posées dessus à des endroits choisis : certaines débordent à gauche, à droite ou en dessous, jamais au-dessus. Trois pages s’ouvrent sur une photo plein écran qui rétrécit en forme arrondie au défilement. Pas d’illustrations dans les héros.",
+        "use": "lib/heroes.ts : mise en page (split-right, split-left, centered, morph, plain), forme (lib/shapes.ts), photos et cartes avec leur position en % de l’image. Les chiffres sont des faits : valeur nulle tant qu’elle n’est pas validée (exemple affiché en développement, masqué en production). Sans photo, la forme garde son dessin sur un panneau teinté.",
+        "a11y": "Un seul h1 par page. Cartes sur fond plein (contraste garanti). Sur téléphone, la forme passe au-dessus et les cartes en dessous, se chevauchant un peu. L’effet de défilement (CSS scroll-driven) est absent avec le mouvement réduit et dans les navigateurs sans support : on voit alors directement la forme finale."
       },
       "pagebody": {
         "name": "Corps de page",
@@ -1319,7 +1319,6 @@
     "tab_signup": "Créer un compte",
     "tab_signin": "Se connecter",
     "google": "Continuer avec Google",
-    "soon": "Bientôt",
     "or_email": "ou avec votre adresse e-mail",
     "step": "Étape {n} sur {total}",
     "step1_t": "Faisons connaissance",
@@ -1338,7 +1337,13 @@
     "tile_groups_t": "Mes groupes",
     "tile_groups_p": "Les groupes et activités que vous suivez.",
     "tile_card_t": "Carte de Sainte-Cène",
-    "tile_card_p": "Votre carte, toujours avec vous."
+    "tile_card_p": "Votre carte, toujours avec vous.",
+    "google_title": "Continuer avec Google",
+    "google_text": "Pour créer votre compte, la paroisse garde votre nom, votre adresse e-mail et votre photo de profil Google. Rien d’autre. Dites-nous d’abord que vous êtes d’accord :",
+    "google_err": "La connexion avec Google n’a pas abouti. Si cette adresse a déjà un compte, connectez-vous avec son mot de passe.",
+    "google_err_consent": "Pas encore de compte avec cette adresse Google. Choisissez « Créer un compte » : nous avons besoin de votre accord avant de garder vos informations.",
+    "google_err_staff": "Les comptes de l’équipe se connectent avec leur e-mail et leur mot de passe, pas avec Google.",
+    "soon": "Bientôt"
   },
   "hero": {
     "stats": {

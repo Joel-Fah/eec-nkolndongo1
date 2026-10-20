@@ -13,15 +13,16 @@ interface Props {
   class?: string
   /** Above the fold: load at once. */
   eager?: boolean
+  [attr: `data-${string}`]: string | number | undefined
 }
-const { name, title, class: className, eager = false } = Astro.props
+const { name, title, class: className, eager = false, ...rest } = Astro.props
 if (!manifest.some((m) => m.name === name))
   throw new Error(`Unknown illustration: ${name} (packages/ui/illustrations/storyset.json)`)
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 const loading = eager ? 'eager' : 'lazy'
 ---
 
-<span class:list={['illo', className]} role={title ? 'img' : undefined} aria-label={title} aria-hidden={title ? undefined : 'true'}>
+<span class:list={['illo', className]} {...rest} role={title ? 'img' : undefined} aria-label={title} aria-hidden={title ? undefined : 'true'}>
   <img class="illo-light" src={`${base}/illustrations/${name}-light.svg`} alt="" width="500" height="500" loading={loading} decoding="async" />
   <img class="illo-dark" src={`${base}/illustrations/${name}-dark.svg`} alt="" width="500" height="500" loading={loading} decoding="async" />
 </span>

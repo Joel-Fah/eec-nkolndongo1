@@ -9,6 +9,8 @@ import data from '../content/placeholders.json'
 export type Placeholder = (typeof data)[number] & {
   landscape?: boolean
   hero?: boolean
+  /** false = imported for wide heroes only (no 480/800 portrait files). */
+  portrait?: boolean
   width?: number
   height?: number
 }
@@ -20,7 +22,9 @@ export const photoSrc = (p: Placeholder, w: 480 | 800, ext: 'avif' | 'webp', lan
 /** Photos of people, only in `astro dev`. */
 export function peoplePhotos(): Placeholder[] {
   if (!import.meta.env.DEV) return []
-  return (data as Placeholder[]).filter((p) => p.people && p.replaceWith === null)
+  return (data as Placeholder[]).filter(
+    (p) => p.people && p.portrait !== false && p.replaceWith === null,
+  )
 }
 
 /** Wide hero files (imported with --hero): the photo's own proportions, 1280 and 1920 px wide. */

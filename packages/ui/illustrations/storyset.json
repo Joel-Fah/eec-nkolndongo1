@@ -3,25 +3,25 @@
     "name": "church",
     "url": "https://stories.freepiklabs.com/storage/78212/Church_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Header → Découvrir"
+    "use": "Spare (menu tabs used these before sub-menu art)"
   },
   {
     "name": "community",
     "url": "https://stories.freepiklabs.com/storage/31823/Community_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Header → Vivre"
+    "use": "Menu → Départements"
   },
   {
     "name": "events",
     "url": "https://stories.freepiklabs.com/storage/51828/Events_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Header → Agenda"
+    "use": "Menu → Événements"
   },
   {
     "name": "news",
     "url": "https://stories.freepiklabs.com/storage/39809/News_Mesa-de-trabajo-1.svg",
     "background": false,
-    "use": "Header → Actualités"
+    "use": "Menu → Nouvelles"
   },
   {
     "name": "together",
@@ -45,6 +45,60 @@
     "name": "destination",
     "url": "https://stories.freepiklabs.com/storage/38520/Destination_Mesa-de-trabajo-1.svg",
     "background": true,
-    "use": "404"
+    "use": "404 · Menu → Nous trouver"
+  },
+  {
+    "name": "adventure",
+    "url": "https://stories.freepiklabs.com/storage/46855/Adventure_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Notre histoire"
+  },
+  {
+    "name": "pray",
+    "url": "https://stories.freepiklabs.com/storage/26411/Pray-(1)_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Ce que nous croyons"
+  },
+  {
+    "name": "conversation",
+    "url": "https://stories.freepiklabs.com/storage/15178/Conversation_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Pasteurs et Conseil"
+  },
+  {
+    "name": "music",
+    "url": "https://stories.freepiklabs.com/storage/49302/Music_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Cultes et horaires"
+  },
+  {
+    "name": "family",
+    "url": "https://stories.freepiklabs.com/storage/29335/Family_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Vie pratique"
+  },
+  {
+    "name": "calendar",
+    "url": "https://stories.freepiklabs.com/storage/34434/4761599_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Année liturgique"
+  },
+  {
+    "name": "gardening",
+    "url": "https://stories.freepiklabs.com/storage/48661/Gardening_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Fête des Moissons"
+  },
+  {
+    "name": "chatting",
+    "url": "https://stories.freepiklabs.com/storage/38768/Chatting_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Prédications"
+  },
+  {
+    "name": "book-lover",
+    "url": "https://stories.freepiklabs.com/storage/15167/Book-lover_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Méditations et bulletin"
   }
 ]

@@ -129,6 +129,7 @@ for (const id of positionals.map(Number)) {
       }),
       blur: known?.blur ?? `data:image/webp;base64,${tiny.toString('base64')}`,
       hero: true,
+      ...(known ? {} : { portrait: false }),
       width: meta.width,
       height: meta.height,
     } as Entry

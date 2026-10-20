@@ -19,6 +19,10 @@ Guide: `docs/design/illustration-guide.md`. Decision 0024. We do **not** draw ou
 6. Use `<Illustration name="…" />` (Astro, `@eec/ui/astro/Illustration.astro`; pass `eager` above the fold,
    `title` when meaningful) or the admin's `<Illustration name="…" />`.
 
+## Placement
+Cropped style: large, cut by the container's bottom edge, text above. Sparingly: menus, empty states, 404,
+a few story cards. Never in page heroes, never on Mon espace. See `docs/design/illustration-guide.md`.
+
 ## Never
 Commit the SVG files (licence) · inline them in the shell (13–30 KB each) · loop-animate them ·
 remove the « Illustrations : Storyset » credit.

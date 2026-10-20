@@ -180,16 +180,16 @@ export const motion = {
   rise: { normal: 12, reduced: 0 },
 } as const
 
-/** Fluid type scale (px at 360 → 1280 px viewport); body 17 → 18 px, ratio ~1.25 → 1.333. */
+/** Fluid type scale (px at 360 → 1280 px viewport); body 15 → 16 px (SaaS-sized, 2026-10-20), ratio ~1.25 → 1.333. */
 export const type = {
-  xs: [13, 13, 1.45],
-  sm: [14.5, 15, 1.5],
-  base: [17, 18, 1.6],
-  lg: [19.5, 22, 1.5],
-  xl: [23, 28, 1.3],
-  '2xl': [28, 37, 1.2],
-  '3xl': [33, 50, 1.12],
-  '4xl': [40, 67, 1.05],
+  xs: [12, 12.5, 1.45],
+  sm: [13.5, 14, 1.5],
+  base: [15, 16, 1.6],
+  lg: [17, 18.5, 1.5],
+  xl: [19.5, 23, 1.35],
+  '2xl': [23, 29, 1.25],
+  '3xl': [27, 38, 1.15],
+  '4xl': [32, 54, 1.08],
 } as const satisfies Record<string, readonly [number, number, number]>
 
 /** Text/background pairs that must pass WCAG AA in both themes. [fg, bg, min ratio] */

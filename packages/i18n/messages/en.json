@@ -619,9 +619,9 @@
       },
       "pagehero": {
         "name": "Page hero (PageHero)",
-        "desc": "Every page has its own hero, never the same: a near full-screen photo in a floating rounded frame, with cards laid over it (figures, information, steps, audio player, year strip, goal ring). 15 layouts: fullbleed, arch, stack, panorama, split, mosaic, path, ticket, duotone, goal, cover, listen, reading, gratitude, plain.",
-        "use": "lib/heroes.ts: one entry per page (layout, photos, cards). Figures are facts: null until validated (example shown in development, hidden in production). Without a photo, every layout keeps its shape on a tinted panel.",
-        "a11y": "One h1 per page. Text on photos sits on a dark scrim (contrast guaranteed); “glass” cards use light text. Motion (settling zoom, scroll drift, rising cards) is removed with reduced motion."
+        "desc": "Every page has its own hero: the photo is cut into a playful shape (Replit-style blocks, windows, drop, flower, leaf, sail…) with a tinted echo behind it, and cards are placed over it at chosen spots: some overflow to the left, right or below, never above. Three pages open on a full-screen photo that shrinks into a rounded shape as you scroll. No illustrations in heroes.",
+        "use": "lib/heroes.ts: layout (split-right, split-left, centered, morph, plain), shape (lib/shapes.ts), photos and cards with their position in % of the picture. Figures are facts: null until validated (example shown in development, hidden in production). Without a photo, the shape keeps its form on a tinted panel.",
+        "a11y": "One h1 per page. Cards on solid surfaces (contrast guaranteed). On phones the shape sits above and the cards below, overlapping slightly. The scroll effect (CSS scroll-driven) is absent with reduced motion and in browsers without support: the final shape is shown directly."
       },
       "pagebody": {
         "name": "Page body",
@@ -1319,7 +1319,6 @@
     "tab_signup": "Create an account",
     "tab_signin": "Sign in",
     "google": "Continue with Google",
-    "soon": "Soon",
     "or_email": "or with your email address",
     "step": "Step {n} of {total}",
     "step1_t": "Let’s get acquainted",
@@ -1338,7 +1337,13 @@
     "tile_groups_t": "My groups",
     "tile_groups_p": "The groups and activities you follow.",
     "tile_card_t": "Communion card",
-    "tile_card_p": "Your card, always with you."
+    "tile_card_p": "Your card, always with you.",
+    "google_title": "Continue with Google",
+    "google_text": "To create your account, the parish keeps your Google name, email address and profile picture. Nothing else. First, tell us you agree:",
+    "google_err": "Google sign-in didn’t work. If this address already has an account, sign in with its password.",
+    "google_err_consent": "No account with this Google address yet. Choose “Create an account”: we need your agreement before keeping your details.",
+    "google_err_staff": "Team accounts sign in with their email and password, not with Google.",
+    "soon": "Soon"
   },
   "hero": {
     "stats": {

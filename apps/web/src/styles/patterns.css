@@ -37,7 +37,7 @@
   font-size: var(--text-4xl);
   font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
 }
 .home-stat-example {
@@ -156,19 +156,20 @@ a.bento-card:hover .bento-more svg {
   transform: translateX(4px);
 }
 .bento-visit {
-  align-content: stretch;
-  grid-template-rows: auto 1fr auto;
+  min-height: 30rem;
   background: color-mix(in oklab, var(--primary-soft) 55%, var(--surface));
 }
+/* Cropped style: the scene is bigger than its card and cut by the bottom edge. */
 .bento-art {
-  width: min(100%, 30rem);
+  position: absolute;
+  inset-inline: 8%;
+  inset-block-end: -30%;
+  width: 84%;
   height: auto;
-  justify-self: center;
-  align-self: center;
   transition: transform var(--duration-nav) var(--ease-spring);
 }
 .bento-visit:hover .bento-art {
-  transform: scale(1.03) rotate(-1deg);
+  transform: translateY(-0.5rem) scale(1.02);
 }
 .bento-chips {
   display: flex;

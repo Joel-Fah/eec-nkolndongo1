@@ -17,6 +17,14 @@ palette. We no longer draw our own scenes. References in `assets/images/illustra
 4. Use it: `<Illustration name="…" />` (Astro) or `<Illustration name="…" />` (admin). Decorative unless
    you pass `title` (then a localised one).
 
+## How they are used (Joël, 2026-10-20)
+- **Cropped style:** the scene is larger than its container and cut by the bottom edge (usually); any text
+  sits in the space above. Never a small illustration floating in a box. Examples: the menu panel, the home
+  « Venir un dimanche » card, empty states (`.empty-art`), the page-body empty block.
+- **Use sparingly.** Illustrations are for menus, empty states, 404 and a few story cards. Never in page
+  heroes (photos and shapes there) and not on Mon espace (pictures).
+- Menus: one scene per sub-item, switched on hover/focus (`NavChild.art`).
+
 ## Rules
 - Never commit the SVG files (licence): they live in gitignored `public/illustrations/`.
 - Credit stays in the footer (« Illustrations : Storyset ») and on the legal page.

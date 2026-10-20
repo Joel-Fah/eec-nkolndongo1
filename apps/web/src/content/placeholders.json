@@ -282,7 +282,8 @@
     "blur": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAAAQAgCdASoQAAsAA4BaJbACdAYtBGTpb9mAAP5b/A0YsoCeq+UOmWJmXMdI/w17iR/RyY+fKIx60poMFUIqxpq95BVrwIA27XJ4jDSGx8nEcLPLyC3RNeHmjOVzxkQT/jXd6m8owFkrQNNs8vElAAAA",
     "hero": true,
     "width": 2400,
-    "height": 1602
+    "height": 1602,
+    "portrait": false
   },
   {
     "id": 8270597,
@@ -297,7 +298,8 @@
     "blur": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAABQAgCdASoQAAsAA4BaJagCdAYvDwRrM208RfAA/gGPYUWabRWFh8JzHJehK2F1Cyg8ZJCEMCv8l+6ullKPCiOPlaLkBEUJXBCmw/1UJyDMQsBJMBDFBXj6QYyN3wzFLKAN3C0X0louD7PHUbKwsgAA",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   },
   {
     "id": 32037766,
@@ -312,7 +314,8 @@
     "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAADwAQCdASoQAAsAA4BaJZgCdAEOdpedxAgA/kEuVF86oS1Ap4LsqKdTwqHgUOItBuJBRjAzYbmN/tK1RyLJrpgaCZWczxm/BhPAlejMfRQE/IpVo9qGiHEkgo6LJf7Jf4GxDwAA",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   },
   {
     "id": 32632180,
@@ -327,7 +330,8 @@
     "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAQAgCdASoQAAsAA4BaJQBOgMW+1fmbUvNgAP717+SPqErU6/EPv2IZUVrhrXMABDNOBcQhli0wRr2g3EWQDPdOM6iI5zEDbxq59oiFnxMAAA==",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   },
   {
     "id": 30356540,
@@ -342,7 +346,8 @@
     "blur": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAABwAgCdASoQAAsAA4BaJYgCdH8AgrSxLMUY2fHgAP7CmQgg+HF+bVyO8Mv2R0JPtwggXj1tmFeer/82cx79zu0BVrhaEx9cwG/VBseg2nfWjng+RqJH6nlQXjt6NghNZfBuVMRAAAA=",
     "hero": true,
     "width": 2400,
-    "height": 1602
+    "height": 1602,
+    "portrait": false
   },
   {
     "id": 35388499,
@@ -357,7 +362,8 @@
     "blur": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACwAQCdASoQAAsAA4BaJbACdABtZEvwAP6+aYbAysXPv442efqmjr1dtAreq2YLiZx3mYZanS5vf529RQMQjR1JPT5gYvZOsXfjD6E1u4u4jrXEPnEeYWZqcVRCTDLfb/ZCnsguYAAAAA==",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   },
   {
     "id": 7520351,
@@ -372,7 +378,8 @@
     "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADQAQCdASoQAAsAA4BaJZQAAsQfSEGaAAD+9MP1hyYtEK9bwOxH3OeGaIKg915VBwBmqrFzJJhmD9sxixvgCswt46iu+O05iE4QST+9SsHiijkAAAA=",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   },
   {
     "id": 18487803,
@@ -447,6 +454,7 @@
     "blur": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAADwAQCdASoQAAsAA4BaJaACdAEPRNsYyAAA+p/Wl+FK3EYPIWl3N0ujIjfv+exuMbbqgTOgjlJXEOFi+A0HnNfOFp9+jxQ7+5lu4P2aw5JwoIksgN83hYJ1LJf8N3sAAAA=",
     "hero": true,
     "width": 2400,
-    "height": 1600
+    "height": 1600,
+    "portrait": false
   }
 ]
