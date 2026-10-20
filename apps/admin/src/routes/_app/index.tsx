@@ -3,6 +3,7 @@ import { Card } from '@eec/ui/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Headcount } from '../../components/Headcount'
 import { Icon } from '../../components/Icon'
+import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
 import { WelcomeBanner } from '../../components/WelcomeBanner'
 import { labelOf, navFor } from '../../lib/nav'
@@ -17,6 +18,7 @@ function Dashboard() {
   return (
     <div className="grid gap-8">
       <WelcomeBanner />
+      <QuickActions />
       <Headcount />
       <RecentActivity />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

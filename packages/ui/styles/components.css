@@ -1033,6 +1033,13 @@
       0 0 0 4px var(--gold),
       0 0 0 6px var(--focus-outer);
   }
+  /* A destructive choice (sign out, delete): the danger colour as soon as it is pointed at. */
+  .menu-item.menu-item-danger:hover,
+  .menu-item.menu-item-danger:focus-visible,
+  .menu-item.menu-item-danger[data-highlighted] {
+    background: color-mix(in oklab, var(--danger) 10%, var(--surface-raised, var(--surface)));
+    color: var(--danger);
+  }
   .menu-item[aria-current="page"] {
     background: var(--primary-soft);
     color: var(--primary);

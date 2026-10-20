@@ -131,7 +131,12 @@ try {
             node: { attributes: Record<string, string> },
             parent: { children: unknown[] },
           ) => {
-            if (!entry.background && node.attributes.id === 'background-complete')
+            const id = node.attributes.id
+            // `noBackdrop` also drops the grey halftone patch behind the subject (« background-simple »).
+            if (
+              (!entry.background && id === 'background-complete') ||
+              (entry.noBackdrop && id === 'background-simple')
+            )
               parent.children = parent.children.filter((child) => child !== node)
           },
         },

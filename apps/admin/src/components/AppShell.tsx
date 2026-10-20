@@ -126,7 +126,7 @@ export function AppShell() {
                       {t('admin.items.account')}
                     </Menu.LinkItem>
                     <Menu.Item
-                      className="menu-item"
+                      className="menu-item menu-item-danger"
                       onClick={async () => {
                         // Feedback at once (the request can take a few seconds), and never flash back too fast.
                         setLeaving(true)

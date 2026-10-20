@@ -1594,6 +1594,13 @@
     "insight_groups": "No group exists yet: create them to sort members.",
     "insight_groups_do": "Create the groups",
     "insight_ok": "All up to date: nothing needs your attention.",
-    "insight_ok_do": "See the dashboard"
+    "insight_ok_do": "See the dashboard",
+    "quick": "Quick actions",
+    "qa_upload": "Add a photo",
+    "qa_invite": "Invite someone",
+    "qa_members": "View members",
+    "qa_settings": "Settings",
+    "qa_outbox": "Outbox",
+    "qa_activity": "Recent activity"
   }
 }

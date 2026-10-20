@@ -152,13 +152,15 @@
     "url": "https://stories.freepiklabs.com/storage/62547/Magic-tree_Mesa-de-trabajo-1.svg",
     "background": false,
     "recolour": false,
-    "use": "Admin dashboard welcome, light mode (original colours)"
+    "use": "Admin dashboard welcome, light mode (original colours)",
+    "noBackdrop": true
   },
   {
     "name": "sauce-tree",
     "url": "https://stories.freepiklabs.com/storage/62596/Sauce-tree_Mesa-de-trabajo-1.svg",
     "background": false,
     "recolour": false,
-    "use": "Admin dashboard welcome, dark mode (original colours)"
+    "use": "Admin dashboard welcome, dark mode (original colours)",
+    "noBackdrop": true
   }
 ]

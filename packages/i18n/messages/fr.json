@@ -1594,6 +1594,13 @@
     "insight_groups": "Aucun groupe n’existe encore : créez-les pour classer les membres.",
     "insight_groups_do": "Créer les groupes",
     "insight_ok": "Tout est à jour : rien n’attend votre attention.",
-    "insight_ok_do": "Voir le tableau de bord"
+    "insight_ok_do": "Voir le tableau de bord",
+    "quick": "Actions rapides",
+    "qa_upload": "Ajouter une photo",
+    "qa_invite": "Inviter quelqu’un",
+    "qa_members": "Voir les membres",
+    "qa_settings": "Paramètres",
+    "qa_outbox": "Boîte d’envoi",
+    "qa_activity": "Activité récente"
   }
 }
