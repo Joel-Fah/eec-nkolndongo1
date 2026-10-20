@@ -137,8 +137,7 @@
     "background": false,
     "use": "404 page, bottom, cropped (original colours)",
     "precision": 0,
-    "recolour": false,
-    "local": "assets/images/cherry tree-cuate.svg"
+    "recolour": false
   },
   {
     "name": "working-from-anywhere",

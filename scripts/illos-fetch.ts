@@ -137,13 +137,18 @@ try {
         },
       }),
     }
+    // `precision` rounds the path coordinates only: a global rounding would also round opacities (0.6 → 1).
     const small = optimize(raw, {
       multipass: true,
-      // Very detailed drawings (thousands of tiny shapes) can ask for fewer decimals to stay light.
-      floatPrecision: entry.precision ?? 1,
+      floatPrecision: entry.precision === undefined ? 1 : 2,
       plugins: [
         dropBackground,
-        'preset-default',
+        entry.precision === undefined
+          ? 'preset-default'
+          : {
+              name: 'preset-default',
+              params: { overrides: { convertPathData: { floatPrecision: entry.precision } } },
+            },
         'convertStyleToAttrs',
         { name: 'removeAttrs', params: { attrs: ['id', 'class', 'data-name'] } },
       ],
