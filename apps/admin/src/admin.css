@@ -1019,15 +1019,21 @@ html[data-nav-open] {
 .welcome-art::before {
   content: "";
   position: absolute;
-  inset: 10% 4% 6%;
+  inset: -22% -34% -10%;
   z-index: -1;
   border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in oklab, var(--gold) 42%, transparent),
-    transparent 78%
-  );
-  filter: blur(1.25rem);
+  background:
+    radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--gold) 70%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--season) 24%, transparent),
+      transparent 100%
+    );
+  filter: blur(1.5rem);
 }
 .welcome-art img {
   width: 100%;

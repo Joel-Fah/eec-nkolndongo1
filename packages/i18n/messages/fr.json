@@ -703,6 +703,12 @@
         "a11y": "Hiérarchie h1 → h2 → h3, numéros décoratifs (aria-hidden), allumage au défilement absent avec le mouvement réduit.",
         "demo": "Voir n’importe quelle page publique, par exemple Notre histoire ou Ce que nous croyons."
       }
+    },
+    "search": {
+      "open": "Rechercher dans le guide",
+      "placeholder": "Un composant, une couleur, une règle…",
+      "empty": "Rien ne correspond à cette recherche.",
+      "hint": "↑ ↓ pour choisir · Entrée pour y aller · Échap pour fermer"
     }
   },
   "home": {

@@ -703,6 +703,12 @@
         "a11y": "h1 → h2 → h3 hierarchy, decorative numbers (aria-hidden), no scroll lighting with reduced motion.",
         "demo": "See any public page, for example Our story or What we believe."
       }
+    },
+    "search": {
+      "open": "Search the guide",
+      "placeholder": "A component, a colour, a rule…",
+      "empty": "Nothing matches this search.",
+      "hint": "↑ ↓ to choose · Enter to go · Esc to close"
     }
   },
   "home": {
