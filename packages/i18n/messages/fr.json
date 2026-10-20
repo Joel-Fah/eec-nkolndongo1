@@ -560,6 +560,13 @@
         "desc": "À la première visite : un petit badge centré où le logo EEC se dessine trait par trait, puis ses couleurs apparaissent ; une fine barre suit le dessin. La page attend la fin du dessin (≈ 2 s), puis se lève sous le badge.",
         "use": "<Preloader /> dans le gabarit de base, avec la variante line de <Mark>. Le dessin dure environ 1,2 s ; il n’est jamais rejoué pendant la navigation.",
         "a11y": "Décoratif (aria-hidden), ne retient pas le contenu plus que nécessaire. Mouvement réduit : le trait est déjà tracé, simple fondu."
+      },
+      "errorscreen": {
+        "name": "Page d’erreur",
+        "desc": "Un seul écran, sans défilement : des points sur tout l’écran qui s’illuminent autour du pointeur (là où il se trouve et un peu autour), un grand code, un texte chaleureux, une action principale (retour à l’accueil) et quelques actions utiles. Le cerisier Storyset se tient tout en bas, coupé par le bord de l’écran. Sans cartes.",
+        "use": "apps/web : <ErrorScreen /> (404, les deux langues, la bonne est choisie par l’adresse ou le navigateur). apps/admin : ErrorScreen.tsx (404 et 500). Un membre connecté qui ouvre l’administration voit ce même 404 : elle ne s’annonce pas.",
+        "a11y": "Un seul h1, boutons de 44 px, l’illustration est décorative. Mouvement réduit : les points ne suivent plus le pointeur.",
+        "demo": "Ouvrez une adresse qui n’existe pas, par exemple /fr/oups."
       }
     },
     "rules": {
@@ -999,7 +1006,17 @@
       "unknown_device": "Appareil inconnu",
       "err_current": "Le mot de passe actuel n’est pas le bon."
     },
-    "leaving": "À bientôt ! On referme la porte doucement…"
+    "leaving": "À bientôt ! On referme la porte doucement…",
+    "error": {
+      "site": "Retour au site",
+      "my_space": "Mon espace",
+      "dashboard": "Tableau de bord",
+      "back": "Page précédente",
+      "login": "Se connecter",
+      "broke_title": "Un souci de notre côté",
+      "broke_text": "Quelque chose s’est mal passé. Réessayez dans un instant.",
+      "retry": "Réessayer"
+    }
   },
   "login": {
     "title": "Connexion",

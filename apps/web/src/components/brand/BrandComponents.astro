@@ -47,6 +47,7 @@ type Id =
   | 'transitions'
   | 'adminshell'
   | 'preloader'
+  | 'errorscreen'
 const doc = (id: Id) => ({
   id: id.replace('_', '-'),
   name: t(`brand.components.${id}.name` as 'brand.components.icon.name'),
@@ -175,6 +176,8 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('preloader')}>
       <div class="preloader-demo text-primary"><Mark variant="lockup-short-line" class="eec-preloader-lockup w-full max-w-md" /></div>
     </DocBlock>
+
+    <DocBlock {...doc('errorscreen')}><p class="text-sm text-ink-muted">{t('brand.components.errorscreen.demo')}</p></DocBlock>
 
     <DocBlock {...doc('header')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>
     <DocBlock {...doc('mobile')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>

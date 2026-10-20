@@ -1,0 +1,206 @@
+---
+/**
+ * An error page (404 …): one screen, no scroll. A dotted background over the whole viewport that lights up
+ * around the pointer, a big code, a short friendly text, a primary action and a few helpful ones, and the
+ * Storyset cherry tree at the very bottom, cropped by the edge of the screen. Both languages are in the
+ * page (a static host serves one 404 file); a tiny script picks one from the address or the browser.
+ * The admin has the same screen in React (apps/admin/src/components/ErrorScreen.tsx): keep them alike.
+ */
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import SiteLockup from './SiteLockup.astro'
+import ThemeToggle from './ThemeToggle.astro'
+
+type Text = { fr: string; en: string }
+interface Props {
+  code: string
+  title: Text
+  text: Text
+  actions: { label: Text; href: Text; primary?: boolean }[]
+}
+const { code, title, text, actions } = Astro.props
+const locales = ['fr', 'en'] as const
+---
+
+<div class="err" data-error-screen>
+  <header class="err-top">
+    {locales.map((l) => <a class={`err-brand l-${l}`} href={`/${l}/`} lang={l} aria-label={l === 'fr' ? 'Accueil' : 'Home'}><SiteLockup variant="two" class="text-[0.95rem]" /></a>)}
+    <ThemeToggle />
+  </header>
+
+  <main id="main" class="err-main">
+    <p class="err-code" aria-hidden="true">{code}</p>
+    {
+      locales.map((l) => (
+        <div class={`err-copy l-${l}`} lang={l}>
+          <h1 class="err-title">{title[l]}</h1>
+          <p class="err-text">{text[l]}</p>
+          <div class="err-actions">
+            {actions.map((a) => <a class:list={['btn btn-lg', a.primary ? 'btn-primary' : 'btn-secondary']} href={a.href[l]}>{a.label[l]}</a>)}
+          </div>
+        </div>
+      ))
+    }
+  </main>
+
+  <Illustration name="cherry-tree" class="err-tree" eager />
+</div>
+
+<script is:inline data-astro-rerun>
+  {
+    const p = location.pathname
+    const en = p.startsWith('/en') || (!p.startsWith('/fr') && (navigator.language || '').startsWith('en'))
+    document.documentElement.dataset.ui = en ? 'en' : 'fr'
+    document.documentElement.lang = en ? 'en' : 'fr'
+  }
+</script>
+<script>
+  // The dots light up around the pointer, easing after it; they fade when it leaves.
+  const root = document.querySelector<HTMLElement>('[data-error-screen]')
+  if (root && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    let tx = 0
+    let ty = 0
+    let x = 0
+    let y = 0
+    let frame = 0
+    const tick = () => {
+      x += (tx - x) * 0.14
+      y += (ty - y) * 0.14
+      root.style.setProperty('--mx', `${x.toFixed(1)}px`)
+      root.style.setProperty('--my', `${y.toFixed(1)}px`)
+      frame = Math.hypot(tx - x, ty - y) > 0.5 ? requestAnimationFrame(tick) : 0
+    }
+    const move = (e: PointerEvent) => {
+      tx = e.clientX
+      ty = e.clientY
+      root.style.setProperty('--lit', '1')
+      if (!frame) frame = requestAnimationFrame(tick)
+    }
+    root.addEventListener('pointermove', move)
+    root.addEventListener('pointerdown', move)
+    root.addEventListener('pointerleave', () => root.style.setProperty('--lit', '0'))
+  }
+</script>
+
+<style is:global>
+  html:has([data-error-screen]),
+  html:has([data-error-screen]) body {
+    height: 100%;
+    overflow: hidden;
+  }
+  .err {
+    --lit: 0;
+    --mx: 50%;
+    --my: 35%;
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--bg);
+  }
+  /* Dots everywhere; the same dots, brighter and larger, show only around the pointer. */
+  .err::before,
+  .err::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-size: 1.75rem 1.75rem;
+  }
+  .err::before {
+    background-image: radial-gradient(circle, color-mix(in oklab, var(--ink) 16%, transparent) 0.09rem, transparent 0.12rem);
+  }
+  .err::after {
+    z-index: -1;
+    background-image: radial-gradient(circle, var(--primary) 0.17rem, transparent 0.21rem);
+    opacity: var(--lit);
+    transition: opacity 0.5s var(--ease-soft);
+    -webkit-mask-image: radial-gradient(circle 11rem at var(--mx) var(--my), var(--ink), transparent);
+    mask-image: radial-gradient(circle 11rem at var(--mx) var(--my), var(--ink), transparent);
+  }
+  .err-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+  }
+  .err-brand {
+    display: block;
+    width: 17.5rem;
+    max-width: 70vw;
+  }
+  .err-main {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    align-content: start;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: clamp(0.5rem, 5dvh, 3rem) 1.25rem 0;
+    text-align: center;
+  }
+  .err-code {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 22dvh, 11rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--primary);
+  }
+  .err-copy {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+  }
+  .err-title {
+    font-size: var(--text-3xl);
+  }
+  .err-text {
+    max-width: 40ch;
+    color: var(--ink-muted);
+  }
+  .err-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+  /* The tree stands at the very bottom, 16 % of it below the screen, wider than a phone (cropped at the sides). */
+  .err-tree {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .err-tree img {
+    width: auto;
+    height: min(58dvh, 44rem);
+    max-width: none;
+    translate: 0 16%;
+  }
+  /* One language at a time. */
+  .l-en {
+    display: none;
+  }
+  html[data-ui="en"] .l-en {
+    display: grid;
+  }
+  html[data-ui="en"] .l-fr {
+    display: none;
+  }
+  html[data-ui="en"] a.l-en {
+    display: block;
+  }
+  @media (max-height: 34rem) {
+    .err-tree {
+      display: none;
+    }
+  }
+</style>

@@ -130,5 +130,12 @@
     "url": "https://stories.freepiklabs.com/storage/41714/A-Whole-Year_Mesa-de-trabajo-1.svg",
     "background": false,
     "use": "Menu → Événements"
+  },
+  {
+    "name": "cherry-tree",
+    "url": "https://stories.freepiklabs.com/storage/65870/Cherry-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Error pages (404, 403…), bottom, cropped",
+    "precision": 0
   }
 ]

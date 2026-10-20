@@ -1,5 +1,5 @@
 import { meQuery } from '@eec/admin-kit'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router'
 import { AppShell } from '../components/AppShell'
 
 export const Route = createFileRoute('/_app')({
@@ -7,6 +7,8 @@ export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context }) => {
     const me = await context.queryClient.ensureQueryData(meQuery)
     if (!me) throw redirect({ to: '/login' })
+    // A signed-in member (no permission at all) gets the plain 404: the admin does not announce itself.
+    if (!me.isSuperAdmin && me.permissions.length === 0) throw notFound()
   },
   component: AppShell,
 })

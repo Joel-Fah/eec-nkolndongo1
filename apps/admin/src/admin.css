@@ -706,3 +706,105 @@ html[data-nav-open] {
     animation: none;
   }
 }
+
+/* ── Error screens: one screen, dots that light up around the pointer, the cherry tree at the bottom ─ */
+.err {
+  --lit: 0;
+  --mx: 50%;
+  --my: 35%;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+}
+.err::before,
+.err::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-size: 1.75rem 1.75rem;
+}
+.err::before {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--ink) 16%, transparent) 0.09rem,
+    transparent 0.12rem
+  );
+}
+.err::after {
+  z-index: -1;
+  background-image: radial-gradient(circle, var(--primary) 0.17rem, transparent 0.21rem);
+  opacity: var(--lit);
+  transition: opacity 0.5s var(--ease-soft);
+  -webkit-mask-image: radial-gradient(circle 11rem at var(--mx) var(--my), var(--ink), transparent);
+  mask-image: radial-gradient(circle 11rem at var(--mx) var(--my), var(--ink), transparent);
+}
+.err-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+.err-main {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: clamp(0.5rem, 5dvh, 3rem) 1.25rem 0;
+  text-align: center;
+}
+.err-code {
+  margin: 0 0 -0.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 22dvh, 11rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+}
+.err-title {
+  font-size: var(--text-3xl);
+}
+.err-text {
+  max-width: 40ch;
+  color: var(--ink-muted);
+}
+.err-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-block-start: 0.5rem;
+}
+.err-tree {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.err-tree .illo {
+  display: block;
+  height: min(58dvh, 44rem);
+  translate: 0 16%;
+}
+.err-tree img {
+  width: auto;
+  height: 100%;
+  max-width: none;
+}
+@media (max-height: 34rem) {
+  .err-tree {
+    display: none;
+  }
+}

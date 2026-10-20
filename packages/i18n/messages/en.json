@@ -560,6 +560,13 @@
         "desc": "On the first visit: a small centred badge where the EEC mark draws itself stroke by stroke, then its colours fill in; a thin bar follows the drawing. The page waits for the drawing to finish (≈2 s), then rises in under the badge.",
         "use": "<Preloader /> in the base layout, with the line variant of <Mark>. The drawing lasts about 1.2 s; it never replays during navigation.",
         "a11y": "Decorative (aria-hidden), holds the content no longer than needed. Reduced motion: the line is already drawn, a plain fade."
+      },
+      "errorscreen": {
+        "name": "Error page",
+        "desc": "A single screen, no scroll: dots over the whole screen that light up around the pointer (where it is and a little around), a big code, a warm text, a primary action (back home) and a few helpful ones. The Storyset cherry tree stands at the very bottom, cropped by the screen edge. No cards.",
+        "use": "apps/web: <ErrorScreen /> (404, both languages, the right one picked from the address or the browser). apps/admin: ErrorScreen.tsx (404 and 500). A signed-in member opening the admin sees this same 404: it does not announce itself.",
+        "a11y": "One h1, 44 px buttons, the illustration is decorative. Reduced motion: the dots no longer follow the pointer.",
+        "demo": "Open an address that does not exist, for example /en/oops."
       }
     },
     "rules": {
@@ -999,7 +1006,17 @@
       "unknown_device": "Unknown device",
       "err_current": "The current password isn’t right."
     },
-    "leaving": "See you soon! Closing the door gently…"
+    "leaving": "See you soon! Closing the door gently…",
+    "error": {
+      "site": "Back to the site",
+      "my_space": "My space",
+      "dashboard": "Dashboard",
+      "back": "Previous page",
+      "login": "Sign in",
+      "broke_title": "A hiccup on our side",
+      "broke_text": "Something went wrong. Please try again in a moment.",
+      "retry": "Try again"
+    }
   },
   "login": {
     "title": "Sign in",

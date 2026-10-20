@@ -15,7 +15,7 @@ import { gzipSync } from 'node:zlib'
 import { optimize } from 'svgo'
 import { skin, storysetPalette } from '../packages/ui/src/tokens.ts'
 
-type Entry = { name: string; url: string; background: boolean; use: string }
+type Entry = { name: string; url: string; background: boolean; use: string; precision?: number }
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const manifest: Entry[] = JSON.parse(
   await readFile(join(root, 'packages/ui/illustrations/storyset.json'), 'utf8'),
@@ -125,7 +125,8 @@ try {
     }
     const small = optimize(raw, {
       multipass: true,
-      floatPrecision: 1,
+      // Very detailed drawings (thousands of tiny shapes) can ask for fewer decimals to stay light.
+      floatPrecision: entry.precision ?? 1,
       plugins: [
         dropBackground,
         'preset-default',

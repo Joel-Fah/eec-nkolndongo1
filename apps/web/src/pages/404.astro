@@ -1,23 +1,28 @@
 ---
 import { createT } from '@eec/i18n'
-import Button from '@eec/ui/astro/Button.astro'
-import EmptyState from '@eec/ui/astro/EmptyState.astro'
-import Illustration from '@eec/ui/astro/Illustration.astro'
+import ErrorScreen from '../components/ErrorScreen.astro'
 import Base from '../layouts/Base.astro'
+import { href, pages } from '../lib/nav'
 
-// One 404 for the whole site (static hosting serves a single file): French first, then English.
+// One 404 for the whole site (static hosting serves a single file): both languages, the script picks one.
 const fr = createT('fr')
 const en = createT('en')
+const to = (id: string) => ({
+  fr: href('fr', pages.find((p) => p.id === id)?.path.fr ?? ''),
+  en: href('en', pages.find((p) => p.id === id)?.path.en ?? ''),
+})
 ---
 
 <Base title={fr('notfound.title')} noindex>
-  <main id="main" class="mx-auto grid max-w-3xl gap-8 px-4 py-14 md:px-8">
-    <EmptyState title={fr('notfound.title')} text={fr('notfound.text')}>
-      <Illustration slot="art" name="destination" class="h-auto w-full" eager />
-      <Button href="/fr/">{fr('soon.home')}</Button>
-    </EmptyState>
-    <EmptyState title={en('notfound.title')} text={en('notfound.text')}>
-      <Button href="/en/" variant="secondary" lang="en">{en('soon.home')}</Button>
-    </EmptyState>
-  </main>
+  <ErrorScreen
+    code="404"
+    title={{ fr: fr('notfound.title'), en: en('notfound.title') }}
+    text={{ fr: fr('notfound.text'), en: en('notfound.text') }}
+    actions={[
+      { label: { fr: fr('soon.home'), en: en('soon.home') }, href: { fr: '/fr/', en: '/en/' }, primary: true },
+      { label: { fr: fr('nav.items.cultes.label'), en: en('nav.items.cultes.label') }, href: to('cultes') },
+      { label: { fr: fr('nav.items.trouver.label'), en: en('nav.items.trouver.label') }, href: to('trouver') },
+      { label: { fr: fr('nav.items.evenements.label'), en: en('nav.items.evenements.label') }, href: to('evenements') },
+    ]}
+  />
 </Base>
