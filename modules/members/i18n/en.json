@@ -1,0 +1,60 @@
+{
+  "title": "Members",
+  "lead": "People who created an account on the site. Records are read-only: everyone edits their own details in “My space”.",
+  "search": "Search (name, email, phone)",
+  "search_ph": "Marie, marie@example.cm, 6…",
+  "group": "Group",
+  "all_groups": "All groups",
+  "status": "Status",
+  "all_status": "All",
+  "status_active": "Active",
+  "status_deactivated": "Deactivated",
+  "since": "Joined since",
+  "export": "Export as CSV",
+  "export_confirm": "This file contains names, email addresses and phone numbers. Every export is logged. Continue?",
+  "exported": "File ready. The export was recorded in the activity log.",
+  "count": "{n} person(s) shown",
+  "more": "Show more",
+  "empty_title": "No members yet",
+  "empty_text": "As soon as someone creates an account in “My space”, they appear here.",
+  "col": {
+    "name": "Name",
+    "email": "Email address",
+    "phone": "Phone",
+    "joined": "Joined",
+    "groups": "Groups",
+    "news": "News"
+  },
+  "news_yes": "Yes",
+  "news_no": "No",
+  "deletion": "Deletion requested on {date}",
+  "detail": {
+    "title": "Member record",
+    "last_seen": "Last visit",
+    "consents": "Consents",
+    "kind_privacy": "Privacy policy",
+    "kind_news": "Receive the news",
+    "granted": "given on {date}",
+    "withdrawn": "withdrawn on {date}",
+    "version": "version {v}",
+    "no_groups": "No groups."
+  },
+  "err": {
+    "generic": "Something went wrong.",
+    "forbidden": "You don’t have access to this action."
+  },
+  "dash": {
+    "title": "Members in numbers",
+    "total": "Active members",
+    "new_month": "New this month",
+    "news": "News subscribers",
+    "by_group": "By group",
+    "trend": "New members per month",
+    "trend_table": "See the chart’s numbers",
+    "month": "Month",
+    "new": "New",
+    "empty": "No members yet: the numbers will appear with the first sign-ups.",
+    "recent": "Recent activity",
+    "no_groups": "No groups yet: create them under “Groups”."
+  }
+}

@@ -7,7 +7,8 @@
     "lint": "biome check .",
     "typecheck": "tsc",
     "test": "vitest run",
-    "test:integration": "node --env-file=../../.env.local node_modules/vitest/vitest.mjs run flow.integration"
+    "test:integration": "node --env-file=../../.env.local node_modules/vitest/vitest.mjs run flow.integration",
+    "retention": "node --env-file=../../.env.local --dns-result-order=ipv4first src/cli-retention.ts"
   },
   "dependencies": {
     "@eec/api-kit": "workspace:*",
@@ -31,6 +32,7 @@
     "@types/node": "catalog:"
   },
   "exports": {
-    ".": "./src/app.ts"
+    ".": "./src/app.ts",
+    "./retention": "./src/retention.ts"
   }
 }

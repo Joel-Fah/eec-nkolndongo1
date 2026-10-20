@@ -924,3 +924,58 @@ html[data-nav-open] {
   border-radius: var(--radius-md);
   background: var(--surface-2);
 }
+
+/* ── Dashboard: headcount (components/Headcount.tsx) ───────────────────────────────────────────── */
+.stat-card {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.stat-number {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  line-height: 1;
+  color: var(--primary);
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 2rem;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: var(--text-sm);
+}
+.bar {
+  height: 0.5rem;
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-xs);
+  background: var(--primary);
+}
+.trend {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.trend-area {
+  fill: color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.trend-line {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.trend-dot {
+  fill: var(--surface);
+  stroke: var(--primary);
+  stroke-width: 2;
+}

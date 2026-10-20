@@ -1,6 +1,7 @@
 import { useLocale, useMe } from '@eec/admin-kit'
 import { Card } from '@eec/ui/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { Headcount } from '../../components/Headcount'
 import { Icon } from '../../components/Icon'
 import { labelOf, navFor } from '../../lib/nav'
 
@@ -21,6 +22,7 @@ function Dashboard() {
         </h1>
         <p className="max-w-[62ch] text-lg text-ink-muted">{t('admin.dashboard_text')}</p>
       </header>
+      <Headcount />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {groups.map((g) => (
           <Card key={g.id}>

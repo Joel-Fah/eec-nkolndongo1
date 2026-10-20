@@ -42,14 +42,12 @@ const benefits = [
   ['calendar', 'pages.account.l3'],
 ] as const
 const tiles = [
-  ['account', 'profile'],
-  ['heart', 'choices'],
   ['users', 'groups'],
   ['bible', 'card'],
 ] as const
 ---
 
-<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), wait: t('member.google_wait'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale}>
+<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), wait: t('member.google_wait'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale} data-me-msgs={JSON.stringify({ privacy: t('member.privacy_line', { date: '{date}', v: '{v}' }), newsSince: t('member.news_since', { date: '{date}' }), newsOff: t('member.news_off'), pending: t('member.delete_pending', { date: '{date}' }), staff: t('member.delete_staff'), current: t('member.devices_current'), device: t('member.devices_unknown') })}>
   <div class="acct-intro">
     <p class="acct-eyebrow"><Icon name="lock" size={16} />{t('member.eyebrow')}</p>
     <h1 class="acct-title">{t('member.h1')}</h1>
@@ -161,6 +159,44 @@ const tiles = [
         ))
       }
     </ul>
+    <div class="acct-panels">
+      <details class="acct-panel" data-panel="profile">
+        <summary>{t('member.panel_profile')}</summary>
+        <form data-form="profile" class="acct-fields" novalidate>
+          <Field id="pf-first" name="firstName" label={t('member.first_name')} placeholder={t('common.ph.first_name')} autocomplete="given-name" />
+          <Field id="pf-last" name="lastName" label={t('member.last_name')} placeholder={t('common.ph.last_name')} autocomplete="family-name" />
+          <Field id="pf-phone" name="phone" type="tel" label={t('member.phone')} placeholder={t('common.ph.phone')} autocomplete="tel" />
+          <p class="acct-ok" data-profile-ok hidden role="status">{t('member.profile_saved')}</p>
+          <Button type="submit" variant="secondary">{t('member.profile_save')}</Button>
+        </form>
+      </details>
+      <details class="acct-panel" data-panel="data">
+        <summary>{t('member.panel_data')}</summary>
+        <div class="acct-fields">
+          <p class="text-sm text-ink-muted" data-privacy-line></p>
+          <Choice id="pf-news" name="news" label={t('member.news_label')} />
+          <p class="text-sm text-ink-muted" data-news-line></p>
+          <div class="acct-row">
+            <Button variant="secondary" data-export><Icon name="download" />{t('member.export')}</Button>
+            <p class="text-sm text-ink-muted">{t('member.export_help')}</p>
+          </div>
+          <div class="acct-danger" data-delete-zone>
+            <p class="font-semibold">{t('member.delete')}</p>
+            <p class="text-sm text-ink-muted" data-delete-help>{t('member.delete_help')}</p>
+            <p class="text-sm" data-delete-pending hidden role="status"></p>
+            <Button variant="secondary" data-delete-open>{t('member.delete')}</Button>
+            <Button variant="secondary" data-delete-cancel hidden>{t('member.delete_cancel')}</Button>
+          </div>
+        </div>
+      </details>
+      <details class="acct-panel" data-panel="devices">
+        <summary>{t('member.panel_devices')}</summary>
+        <div class="acct-fields">
+          <ul class="grid gap-2 text-sm" data-devices role="list"></ul>
+          <Button variant="secondary" data-signout-others>{t('member.devices_others')}</Button>
+        </div>
+      </details>
+    </div>
     <div><Button variant="secondary" data-signout><Icon name="logout" />{t('member.signout')}</Button></div>
   </div>
 
@@ -169,6 +205,17 @@ const tiles = [
     <p class="acct-leaving-text">{t('member.leaving')}</p>
     <span class="acct-leaving-bar" aria-hidden="true"><span></span></span>
   </div>
+
+  <dialog class="dialog acct-dialog" data-delete-dialog aria-labelledby="dd-title">
+    <form method="dialog" class="dialog-body">
+      <h2 id="dd-title" class="dialog-title">{t('member.delete_title')}</h2>
+      <p class="text-ink-muted">{t('member.delete_text')}</p>
+      <div class="dialog-actions">
+        <Button variant="secondary" data-dd-cancel>{t('admin.common.cancel')}</Button>
+        <Button type="submit" data-dd-go>{t('member.delete_go')}</Button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog class="dialog acct-dialog" data-google-dialog aria-labelledby="gd-title">
     <form method="dialog" class="dialog-body" data-google-form>
@@ -206,9 +253,9 @@ const tiles = [
       for (const el of root.querySelectorAll<HTMLElement>('[data-when]')) el.hidden = el.dataset.when !== state
     }
     const msg = (code: string) => errors[code] ?? errors.generic ?? ''
-    async function call(path: string, body?: unknown) {
+    async function call(path: string, body?: unknown, method?: string) {
       try {
-        const res = await fetch(`/api${path}`, { method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', headers: body === undefined ? undefined : { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
+        const res = await fetch(`/api${path}`, { method: method ?? (body === undefined ? 'GET' : 'POST'), credentials: 'same-origin', headers: body === undefined ? undefined : { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
         const json = await res.json().catch(() => ({}))
         if (res.ok) return { ok: true as const, json }
         const code = res.status === 429 ? 'rate_limited' : (json.error?.code ?? (json.code ? String(json.code).toLowerCase() : 'generic'))
@@ -232,6 +279,7 @@ const tiles = [
         const initials = root.querySelector('[data-initials]')
         if (initials) initials.textContent = name.slice(0, 1).toUpperCase()
         show('in')
+        loadPanels(me.json.user)
       } else show('out')
     }
     const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement | null
@@ -264,6 +312,86 @@ const tiles = [
       first?.focus()
       return !first
     }
+
+
+    // ── Mon compte: profile, privacy choices, copy of my data, deletion, devices ──────────────────
+    const me = JSON.parse(root.dataset.meMsgs ?? '{}') as Record<string, string>
+    const day = (d: string) => new Date(d).toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })
+    const fill = (tpl: string, vars: Record<string, string>) => Object.entries(vars).reduce((o, [k, v]) => o.replace(`{${k}}`, v), tpl)
+    async function loadPanels(profile?: { firstName?: string; lastName?: string; phone?: string | null }) {
+      const pf = root.querySelector<HTMLFormElement>('[data-form="profile"]')
+      if (pf && profile) {
+        const set = (n: string, v?: string | null) => { const el = input(pf, n); if (el) el.value = v ?? '' }
+        set('firstName', profile.firstName)
+        set('lastName', profile.lastName)
+        set('phone', profile.phone)
+      }
+      const pr = await call('/me/privacy')
+      if (pr.ok) {
+        const privacy = pr.json.consents.find((c: { kind: string; withdrawnAt: string | null }) => c.kind === 'privacy')
+        const news = pr.json.consents.find((c: { kind: string; withdrawnAt: string | null }) => c.kind === 'news' && !c.withdrawnAt)
+        const line = root.querySelector('[data-privacy-line]')
+        if (line && privacy) line.textContent = fill(me.privacy ?? '', { date: day(privacy.grantedAt), v: privacy.policyVersion })
+        const box = root.querySelector<HTMLInputElement>('input[name="news"]')
+        if (box) box.checked = !!news
+        const nl = root.querySelector('[data-news-line]')
+        if (nl) nl.textContent = news ? fill(me.newsSince ?? '', { date: day(news.grantedAt) }) : (me.newsOff ?? '')
+        const pending = root.querySelector<HTMLElement>('[data-delete-pending]')
+        const open = root.querySelector<HTMLElement>('[data-delete-open]')
+        const cancel = root.querySelector<HTMLElement>('[data-delete-cancel]')
+        const help = root.querySelector<HTMLElement>('[data-delete-help]')
+        const asked = !!pr.json.deletionRequestedAt
+        if (pending) { pending.hidden = !asked; if (asked) pending.textContent = fill(me.pending ?? '', { date: day(pr.json.purgeOn) }) }
+        if (open) open.hidden = asked || !pr.json.canDelete
+        if (cancel) cancel.hidden = !asked
+        if (help && !pr.json.canDelete) help.textContent = me.staff ?? ''
+      }
+      const ss = await call('/me/sessions')
+      const list = root.querySelector('[data-devices]')
+      if (ss.ok && list) {
+        list.replaceChildren(...ss.json.sessions.map((s: { userAgent: string | null; createdAt: string; current: boolean }) => {
+          const li = document.createElement('li')
+          li.textContent = `${s.userAgent ? (/Android|iPhone|iPad/.test(s.userAgent) ? 'Mobile' : 'Ordinateur') : (me.device ?? '')} · ${day(s.createdAt)}${s.current ? ` · ${me.current ?? ''}` : ''}`
+          return li
+        }))
+      }
+    }
+    root.querySelector<HTMLFormElement>('[data-form="profile"]')?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const f = e.currentTarget as HTMLFormElement
+      const r = await call('/me', { firstName: input(f, 'firstName')?.value.trim(), lastName: input(f, 'lastName')?.value.trim(), phone: input(f, 'phone')?.value.trim() || null }, 'PATCH')
+      const ok = f.querySelector<HTMLElement>('[data-profile-ok]')
+      if (ok) ok.hidden = !r.ok
+    })
+    root.querySelector<HTMLInputElement>('input[name="news"]')?.addEventListener('change', async (e) => {
+      await call('/me/consents/news', { granted: (e.currentTarget as HTMLInputElement).checked })
+      loadPanels()
+    })
+    root.querySelector('[data-export]')?.addEventListener('click', async () => {
+      const res = await fetch('/api/me/export', { credentials: 'same-origin' })
+      if (!res.ok) return
+      const url = URL.createObjectURL(await res.blob())
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'mes-donnees-eec-nkolndongo1.json' })
+      a.click()
+      URL.revokeObjectURL(url)
+    })
+    const dd = root.querySelector<HTMLDialogElement>('[data-delete-dialog]')
+    root.querySelector('[data-delete-open]')?.addEventListener('click', () => dd?.showModal())
+    dd?.querySelector('[data-dd-cancel]')?.addEventListener('click', (e) => { e.preventDefault(); dd.close() })
+    dd?.querySelector('form')?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await call('/me/delete', {})
+      dd.close()
+      loadPanels()
+    })
+    root.querySelector('[data-delete-cancel]')?.addEventListener('click', async () => {
+      await call('/me/delete', undefined, 'DELETE')
+      loadPanels()
+    })
+    root.querySelector('[data-signout-others]')?.addEventListener('click', async () => {
+      await call('/me/sessions', undefined, 'DELETE')
+      loadPanels()
+    })
 
     // Sign-up in three steps.
     const signup = root.querySelector<HTMLFormElement>('[data-form="signup"]')
@@ -728,6 +856,45 @@ const tiles = [
     [data-gd-go][data-busy]::before {
       animation: none;
     }
+  }
+  .acct-panels {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .acct-panel {
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .acct-panel > summary {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .acct-panel[open] > summary {
+    margin-block-end: 0.5rem;
+  }
+  .acct-panel .acct-fields {
+    padding-block-end: 1rem;
+  }
+  .acct-row {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  .acct-danger {
+    display: grid;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--danger) 7%, var(--surface));
+  }
+  .acct-ok {
+    color: var(--success);
+    font-size: var(--text-sm);
   }
   .acct-loading {
     gap: 1rem;

@@ -6,9 +6,15 @@
  */
 import { coreModule } from '@eec/auth/core-module'
 import { mediaModule } from '@eec/module-media'
+import { membersModule } from '@eec/module-members'
 import { settingsModule } from '@eec/module-settings'
 import type { DefinedModule } from '@eec/modules-kit'
 
-export const modules: readonly DefinedModule[] = [coreModule, settingsModule, mediaModule]
+export const modules: readonly DefinedModule[] = [
+  coreModule,
+  settingsModule,
+  mediaModule,
+  membersModule,
+]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

@@ -10,6 +10,7 @@
 import { handle } from '@astrojs/cloudflare/handler'
 import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
+import { runRetention } from '@eec/api/retention'
 import type { Env } from '@eec/api-kit'
 import { adminPrefix } from '@eec/core'
 
@@ -61,6 +62,16 @@ async function adminShell(request: Request, env: Bindings) {
 }
 
 export default {
+  /** The daily Cron Trigger (wrangler.jsonc): retention (docs/legal/data-protection.md). */
+  async scheduled(_event: unknown, env: Bindings, ctx: ExecutionContext) {
+    ctx.waitUntil(
+      runRetention(env).then(
+        (result) => console.log('retention', JSON.stringify(result)),
+        (error) =>
+          console.error('retention failed', error instanceof Error ? error.message : error),
+      ),
+    )
+  },
   async fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
     const path = new URL(request.url).pathname
     const prefix = adminPrefix(env.ADMIN_PATH)

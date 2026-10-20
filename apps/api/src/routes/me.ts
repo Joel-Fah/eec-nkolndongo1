@@ -3,7 +3,7 @@
  * from this), and Mon compte — profile, language and theme, password, sessions ("sign out everywhere").
  */
 import { type AppEnv, audit, fail, requireSelf } from '@eec/api-kit'
-import { checkPassword } from '@eec/auth'
+import { checkPassword, isStaff } from '@eec/auth'
 import { schema } from '@eec/db'
 import { modules } from '@eec/modules'
 import { isModuleEnabled } from '@eec/modules-kit'
@@ -12,8 +12,13 @@ import { and, desc, eq, ne, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
 import { readFlags } from './flags.ts'
+import { POLICY_VERSION } from './members.ts'
 
-const { user, profiles, session, account } = schema
+const { user, profiles, session, account, consents, groupMembers, groups, auditLog } = schema
+
+/** How long a deletion request can still be cancelled (data-protection.md). */
+export const DELETION_GRACE_DAYS = 30
+const DAY = 86_400_000
 
 const patch = z.object({
   firstName: z.string().trim().max(80).optional(),
@@ -114,6 +119,203 @@ export const meRoutes = new Hono<AppEnv>()
       entityId: actor.userId,
       summaryFr: 'Mot de passe changé (autres sessions fermées)',
       summaryEn: 'Password changed (other sessions closed)',
+    })
+    return c.json({ ok: true })
+  })
+
+  // ── My data (Loi n°2024/017): what we keep, my choices, a copy, and deletion with a grace period ──
+  .get('/privacy', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const db = await c.var.deps.db()
+    const rows = await db
+      .select({
+        kind: consents.kind,
+        policyVersion: consents.policyVersion,
+        grantedAt: consents.grantedAt,
+        withdrawnAt: consents.withdrawnAt,
+      })
+      .from(consents)
+      .where(eq(consents.userId, actor.userId))
+      .orderBy(desc(consents.grantedAt))
+    const [p] = await db
+      .select({ at: profiles.deletionRequestedAt })
+      .from(profiles)
+      .where(eq(profiles.userId, actor.userId))
+    return c.json({
+      consents: rows,
+      currentPolicy: POLICY_VERSION,
+      deletionRequestedAt: p?.at ?? null,
+      purgeOn: p?.at ? new Date(p.at.getTime() + DELETION_GRACE_DAYS * DAY) : null,
+      graceDays: DELETION_GRACE_DAYS,
+      canDelete: !isStaff(actor.principal),
+    })
+  })
+
+  // The optional consent (parish news later) can be given and withdrawn at any time; the history is kept.
+  .post(
+    '/consents/news',
+    requireSelf(),
+    zValidator('json', z.object({ granted: z.boolean() })),
+    async (c) => {
+      const actor = await c.var.deps.actor()
+      if (!actor) return fail(c, 401, 'unauthenticated')
+      const { granted } = c.req.valid('json')
+      const db = await c.var.deps.db()
+      const active = and(
+        eq(consents.userId, actor.userId),
+        eq(consents.kind, 'news'),
+        sql`${consents.withdrawnAt} is null`,
+      )
+      if (granted) {
+        const [already] = await db.select({ id: consents.id }).from(consents).where(active).limit(1)
+        if (!already)
+          await db
+            .insert(consents)
+            .values({ userId: actor.userId, kind: 'news', policyVersion: POLICY_VERSION })
+      } else await db.update(consents).set({ withdrawnAt: new Date() }).where(active)
+      await audit(c, {
+        action: granted ? 'consent.grant' : 'consent.withdraw',
+        entityType: 'account',
+        entityId: actor.userId,
+        summaryFr: granted
+          ? 'Consentement aux nouvelles accordé'
+          : 'Consentement aux nouvelles retiré',
+        summaryEn: granted ? 'News consent given' : 'News consent withdrawn',
+      })
+      return c.json({ ok: true })
+    },
+  )
+
+  // A copy of everything we hold about the person, as JSON (the right of access).
+  .get('/export', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const db = await c.var.deps.db()
+    const [account_] = await db
+      .select({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+      })
+      .from(user)
+      .where(eq(user.id, actor.userId))
+    const [profile] = await db
+      .select({
+        firstName: profiles.firstName,
+        lastName: profiles.lastName,
+        phone: profiles.phone,
+        locale: profiles.locale,
+        theme: profiles.theme,
+        status: profiles.status,
+        deletionRequestedAt: profiles.deletionRequestedAt,
+      })
+      .from(profiles)
+      .where(eq(profiles.userId, actor.userId))
+    const myConsents = await db
+      .select({
+        kind: consents.kind,
+        policyVersion: consents.policyVersion,
+        grantedAt: consents.grantedAt,
+        withdrawnAt: consents.withdrawnAt,
+      })
+      .from(consents)
+      .where(eq(consents.userId, actor.userId))
+    const myGroups = await db
+      .select({
+        key: groups.key,
+        nameFr: groups.nameFr,
+        nameEn: groups.nameEn,
+        joinedAt: groupMembers.createdAt,
+      })
+      .from(groupMembers)
+      .innerJoin(groups, eq(groups.id, groupMembers.groupId))
+      .where(eq(groupMembers.userId, actor.userId))
+    const sessions = await db
+      .select({
+        startedAt: session.createdAt,
+        expiresAt: session.expiresAt,
+        device: session.userAgent,
+      })
+      .from(session)
+      .where(eq(session.userId, actor.userId))
+    const activity = await db
+      .select({ at: auditLog.createdAt, action: auditLog.action, summary: auditLog.summaryFr })
+      .from(auditLog)
+      .where(eq(auditLog.actorId, actor.userId))
+      .orderBy(desc(auditLog.createdAt))
+      .limit(500)
+    await audit(c, {
+      action: 'data.export',
+      entityType: 'account',
+      entityId: actor.userId,
+      summaryFr: 'Copie des données personnelles téléchargée par la personne',
+      summaryEn: 'Personal data copy downloaded by its owner',
+    })
+    const body = JSON.stringify(
+      {
+        generatedAt: new Date(),
+        policyVersion: POLICY_VERSION,
+        account: account_,
+        profile,
+        consents: myConsents,
+        groups: myGroups,
+        sessions,
+        activity,
+      },
+      null,
+      2,
+    )
+    return new Response(body, {
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'content-disposition': 'attachment; filename="mes-donnees-eec-nkolndongo1.json"',
+        'cache-control': 'private, no-store',
+      },
+    })
+  })
+
+  // Deletion: asked here, cancellable for 30 days, then purged by the daily retention job.
+  .post('/delete', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    // Team accounts are closed by a super admin (roles, audit trail and the last-super-admin rule).
+    if (isStaff(actor.principal)) return fail(c, 403, 'staff_account')
+    const db = await c.var.deps.db()
+    const at = new Date()
+    await db
+      .update(profiles)
+      .set({ deletionRequestedAt: at })
+      .where(eq(profiles.userId, actor.userId))
+    await audit(c, {
+      action: 'account.deletion-requested',
+      entityType: 'account',
+      entityId: actor.userId,
+      summaryFr: `Suppression du compte demandée (effective après ${DELETION_GRACE_DAYS} jours)`,
+      summaryEn: `Account deletion requested (effective after ${DELETION_GRACE_DAYS} days)`,
+    })
+    return c.json({
+      deletionRequestedAt: at,
+      purgeOn: new Date(at.getTime() + DELETION_GRACE_DAYS * DAY),
+    })
+  })
+
+  .delete('/delete', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const db = await c.var.deps.db()
+    await db
+      .update(profiles)
+      .set({ deletionRequestedAt: null })
+      .where(eq(profiles.userId, actor.userId))
+    await audit(c, {
+      action: 'account.deletion-cancelled',
+      entityType: 'account',
+      entityId: actor.userId,
+      summaryFr: 'Demande de suppression annulée',
+      summaryEn: 'Deletion request cancelled',
     })
     return c.json({ ok: true })
   })
