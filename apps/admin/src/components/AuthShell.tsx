@@ -47,7 +47,10 @@ function Photo({ id, size = 1920 }: { id: number; size?: number }) {
 
 export function AuthShell({ children }: { children: ReactNode }) {
   const { t, locale } = useLocale()
-  const photo = useMemo(() => PHOTOS[Math.floor(Math.random() * PHOTOS.length)], [])
+  const photo = useMemo(
+    () => PHOTOS[Math.floor(Math.random() * PHOTOS.length)] ?? PHOTOS[0] ?? 0,
+    [],
+  )
   const quote = useMemo(() => pickQuote(), [])
   const others = useMemo(() => PHOTOS.filter((x) => x !== photo).slice(0, 4), [photo])
   const stage = useRef<HTMLDivElement>(null)
