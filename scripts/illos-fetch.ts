@@ -113,7 +113,14 @@ try {
       continue
     }
     const rawFile = join(cache, `${entry.name}.svg`)
-    const raw = existsSync(rawFile) ? await readFile(rawFile, 'utf8') : await get(entry.url)
+    // A file you downloaded yourself (assets/images, git-ignored: the licence forbids redistributing it) wins.
+    const local = entry.local ? join(root, entry.local) : ''
+    const raw =
+      local && existsSync(local)
+        ? await readFile(local, 'utf8')
+        : existsSync(rawFile)
+          ? await readFile(rawFile, 'utf8')
+          : await get(entry.url)
     await writeFile(rawFile, raw)
     // Storyset's "background-complete" layer (plants, windows…) is dropped for small uses.
     const dropBackground = {

@@ -26,6 +26,10 @@ Thumbs.db
 .claude/settings.local.json
 scripts/.cache/
 
+# Storyset originals you download by hand (licence: not redistributable, decision 0024)
+assets/images/*.svg
+assets/images/.com.google.Chrome.*
+
 # generated
 **/src/paraglide/
 worker-configuration.d.ts
