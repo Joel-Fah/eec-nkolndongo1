@@ -4,11 +4,14 @@
  */
 
 import { env } from 'cloudflare:workers'
+import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
-import type { Env } from '@eec/api/env'
+import type { Env } from '@eec/api-kit'
 import type { APIRoute } from 'astro'
 
 export const prerender = false
 
 const app = createApp()
-export const ALL: APIRoute = ({ request }) => app.fetch(request, env as unknown as Env)
+// cfContext gives waitUntil (background cache refreshes); absent in some dev paths, which is fine.
+export const ALL: APIRoute = ({ request, locals }) =>
+  app.fetch(request, env as unknown as Env, (locals as { cfContext?: ExecutionContext }).cfContext)

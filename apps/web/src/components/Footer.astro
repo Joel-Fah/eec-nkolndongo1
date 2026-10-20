@@ -17,9 +17,9 @@ const switchHref = alternates(Astro.url.pathname)[other]
 const pathOf = (id: string) => pages.find((p) => p.id === id)?.path[locale] ?? ''
 const legal = ['privacy', 'legal'].map((id) => ({ id, path: pathOf(id) }))
 const socials = [
-  ['whatsapp', 'WhatsApp'],
-  ['chat', 'Facebook'],
-  ['play', 'YouTube'],
+  ['whatsapp', 'WhatsApp', 'whatsapp'],
+  ['chat', 'Facebook', 'facebook'],
+  ['play', 'YouTube', 'youtube'],
 ] as const
 const mapTabs = tabs.filter((tab) => tab.children.length)
 ---
@@ -42,14 +42,15 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
     <div class="grid content-start gap-4">
       <div class="w-[min(100%,18rem)] text-[1.05rem]"><SiteLockup variant="two" /></div>
       <p class="max-w-[34ch] text-ink-muted">{t('footer.about')}</p>
+      {/* Filled from the parish settings once approved (lib/settings-client.ts); hidden until then. */}
+      <p class="flex gap-2 text-sm text-ink-muted" data-setting="parish.address" hidden><Icon name="location" size={16} class="mt-0.5 flex-none" /><span data-setting-text></span></p>
       <ul class="flex gap-2" role="list" aria-label={t('footer.follow')}>
         {
-          socials.map(([icon, name]) => (
+          socials.map(([icon, name, key]) => (
             <li>
-              <span class="footer-social" title={`${name} · ${t('footer.social_pending')}`}>
+              <a class="footer-social" data-setting-link={`parish.${key}`} title={`${name} · ${t('footer.social_pending')}`} aria-label={`${name} · ${t('footer.social_pending')}`} data-label-ready={name} rel="noopener" target="_blank">
                 <Icon name={icon} />
-                <span class="sr-only">{`${name} · ${t('footer.social_pending')}`}</span>
-              </span>
+              </a>
             </li>
           ))
         }
@@ -84,6 +85,12 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
     </div>
   </div>
 </footer>
+
+<script>
+  import { applyPublicSettings } from '../lib/settings-client'
+  applyPublicSettings()
+  document.addEventListener('astro:page-load', applyPublicSettings)
+</script>
 
 <style is:global>
   .site-cta {
@@ -160,6 +167,13 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
     .site-footer-card .footer-link {
       min-height: 2.25rem;
     }
+  }
+  /* A social link without an approved address stays inert. */
+  .footer-social:not([href]) {
+    cursor: default;
+  }
+  .footer-social[href]:hover {
+    color: var(--primary);
   }
   .footer-social {
     display: grid;
