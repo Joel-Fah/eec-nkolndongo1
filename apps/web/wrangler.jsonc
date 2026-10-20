@@ -1,40 +1,33 @@
 {
-	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "eec-nkolndongo1",
-	// Our entry wraps Astro's Cloudflare handler (src/worker.ts): the living guide's session gate.
-	"main": "./src/worker.ts",
-	"compatibility_date": "2026-10-01",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"observability": {
-		"enabled": true
-	},
-	// Static pages are served before the Worker runs; these paths must reach it first (the guide's gate in
-	// src/fetch.ts). Everything else static stays free of Worker invocations.
-	"assets": {
-		"run_worker_first": [
-			"/fr/_brand*",
-			"/en/_brand*"
-		]
-	},
-	// Non-secret config. Secrets (AUTH_SECRET, DATABASE_URL_UNPOOLED, S3 keys) are set with
-	// `wrangler secret put` or the dashboard — never here, never in git.
-	// One daily Cron Trigger (the Free plan allows 5): retention at 03:17 UTC, a quiet hour in Yaoundé.
-	"triggers": {
-		"crons": [
-			"17 3 * * *"
-		]
-	},
-	"vars": {
-		"APP_ORIGIN": "http://localhost:8080",
-		"ADMIN_PATH": "admin",
-		"SITE_INDEXABLE": "0"
-	},
-	"hyperdrive": [
-		{
-			"binding": "HYPERDRIVE",
-			"id": "fbb960ccb27f471a859a2b6026e64eaf"
-		}
-	]
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "eec-nkolndongo1",
+  // Our entry wraps Astro's Cloudflare handler (src/worker.ts): the living guide's session gate.
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  // Static pages are served before the Worker runs; these paths must reach it first (the guide's gate in
+  // src/fetch.ts). Everything else static stays free of Worker invocations.
+  "assets": {
+    "run_worker_first": ["/fr/_brand*", "/en/_brand*"]
+  },
+  // Non-secret config. Secrets (AUTH_SECRET, DATABASE_URL_UNPOOLED, S3 keys) are set with
+  // `wrangler secret put` or the dashboard — never here, never in git.
+  // One daily Cron Trigger (the Free plan allows 5): retention at 03:17 UTC, a quiet hour in Yaoundé.
+  "triggers": {
+    "crons": ["17 3 * * *"]
+  },
+  "vars": {
+    "APP_ORIGIN": "http://localhost:8080",
+    "ADMIN_PATH": "admin",
+    "SITE_INDEXABLE": "0"
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "fbb960ccb27f471a859a2b6026e64eaf"
+    }
+  ]
 }
