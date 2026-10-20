@@ -1,0 +1,124 @@
+{
+  "title": "Settings",
+  "lead": "The parish’s details and how the site behaves. A detail only appears on the public site once approved.",
+  "tabs": {
+    "parish": "Parish",
+    "season": "Liturgical season",
+    "features": "Features",
+    "system": "System"
+  },
+  "status": {
+    "validated": "Approved",
+    "pending": "To approve",
+    "empty": "Empty"
+  },
+  "validate": "Approved for the public site",
+  "validate_help": "Only authorised people can approve. Any change removes the approval.",
+  "save": "Save",
+  "saved": "Saved. The public site updates within about two minutes.",
+  "nothing": "Nothing to save.",
+  "error": "Saving failed. Nothing was changed.",
+  "invalid": "A field isn’t in the right format. Check the examples.",
+  "fields": {
+    "nameFr": {
+      "label": "Official name (French)",
+      "ph": "Paroisse de Nkolndongo 1",
+      "help": "The name as it should appear on the site."
+    },
+    "nameEn": {
+      "label": "Official name (English)",
+      "ph": "Nkolndongo 1 Parish",
+      "help": "Leave empty to use the French name."
+    },
+    "shortName": {
+      "label": "Short name",
+      "ph": "EEC Nkolndongo 1",
+      "help": "For titles and small spaces."
+    },
+    "address": {
+      "label": "Address",
+      "ph": "Street, district, city",
+      "help": "An address people can find on foot or by taxi."
+    },
+    "bp": {
+      "label": "PO box",
+      "ph": "BP 000",
+      "help": ""
+    },
+    "phones": {
+      "label": "Phone number(s)",
+      "ph": "+237 6XX XX XX XX",
+      "help": "Several numbers: separate them with a comma."
+    },
+    "email": {
+      "label": "Email address",
+      "ph": "parish@example.com",
+      "help": "The address the office reads regularly."
+    },
+    "whatsapp": {
+      "label": "WhatsApp",
+      "ph": "+237 6XX XX XX XX or channel link",
+      "help": "A number or a WhatsApp channel link."
+    },
+    "facebook": {
+      "label": "Facebook page",
+      "ph": "https://facebook.com/…",
+      "help": "The full link, starting with https."
+    },
+    "youtube": {
+      "label": "YouTube channel",
+      "ph": "https://youtube.com/@…",
+      "help": "The full link, starting with https."
+    },
+    "mapLat": {
+      "label": "Latitude",
+      "ph": "3.8667",
+      "help": "For the map. Copy it from Google Maps (right-click on the church)."
+    },
+    "mapLng": {
+      "label": "Longitude",
+      "ph": "11.5167",
+      "help": ""
+    },
+    "moissonsStart": {
+      "label": "Harvest Festival: start",
+      "ph": "YYYY-MM-DD",
+      "help": "During these dates the site takes on the Harvest Festival colours."
+    },
+    "moissonsEnd": {
+      "label": "Harvest Festival: end",
+      "ph": "YYYY-MM-DD",
+      "help": "Last day included."
+    },
+    "override": {
+      "label": "Force a season",
+      "ph": "None (automatic)",
+      "help": "Rarely needed: the season is computed from the date of Easter."
+    },
+    "overrideUntil": {
+      "label": "Until",
+      "ph": "YYYY-MM-DD",
+      "help": "After this date the automatic calculation resumes."
+    }
+  },
+  "season_none": "None (automatic)",
+  "season_now": "Season shown today: {season}",
+  "features": {
+    "lead": "Core features are always on. The others can be switched off: they then disappear from the site and the admin, without deleting anything.",
+    "always": "Always on",
+    "on": "On",
+    "off": "Off",
+    "confirm_off": "Switch off “{name}”? It will disappear from the site and the admin. Nothing is deleted.",
+    "toggled_on": "“{name}” is on.",
+    "toggled_off": "“{name}” is off.",
+    "none": "No optional features yet: they come with the next modules."
+  },
+  "system": {
+    "version": "Site version",
+    "outbox": "Outbox",
+    "outbox_text": "Messages to pass on (resets, invitations) until emails are sent automatically.",
+    "open": "Open",
+    "retention": "Data retention",
+    "retention_text": "Expired sessions and links removed daily; outbox: 90 days; deleted accounts: 30-day grace; activity log: 24 months."
+  }
+}

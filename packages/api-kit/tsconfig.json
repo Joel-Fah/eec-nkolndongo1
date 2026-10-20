@@ -1,0 +1,7 @@
+{
+  "extends": "@eec/config/tsconfig/worker.json",
+  "include": ["src"],
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "node"]
+  }
+}

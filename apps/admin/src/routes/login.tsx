@@ -1,11 +1,9 @@
+import { errorKey, meQuery, useSessionActions, useT } from '@eec/admin-kit'
 import { Button, TextField } from '@eec/ui/react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { LocaleSwitch, ThemeButton } from '../components/Controls'
 import { Mark } from '../components/Mark'
-import { errorKey } from '../lib/api'
-import { useT } from '../lib/locale'
-import { meQuery, useSessionActions } from '../lib/session'
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context }) => {

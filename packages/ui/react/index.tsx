@@ -355,6 +355,8 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
       <Toast.Content className="toast-text">
         <Toast.Title />
       </Toast.Content>
+      {/* Undo / follow-up action, when the toast has one (actionProps). */}
+      <Toast.Action className="btn btn-secondary btn-sm toast-action" />
       <span className="toast-close">
         <svg className="toast-ring" viewBox="0 0 36 36" aria-hidden="true">
           <circle cx="18" cy="18" r="16" pathLength="100" />

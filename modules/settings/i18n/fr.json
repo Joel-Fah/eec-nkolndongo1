@@ -1,0 +1,124 @@
+{
+  "title": "Paramètres",
+  "lead": "Les informations de la paroisse et la façon dont le site se comporte. Une information n’apparaît sur le site public qu’une fois validée.",
+  "tabs": {
+    "parish": "Paroisse",
+    "season": "Saison liturgique",
+    "features": "Fonctionnalités",
+    "system": "Système"
+  },
+  "status": {
+    "validated": "Validé",
+    "pending": "À valider",
+    "empty": "Vide"
+  },
+  "validate": "Validé pour le site public",
+  "validate_help": "Seules les personnes autorisées peuvent valider. Toute modification retire la validation.",
+  "save": "Enregistrer",
+  "saved": "Enregistré. Le site public se met à jour en deux minutes environ.",
+  "nothing": "Aucun changement à enregistrer.",
+  "error": "L’enregistrement a échoué. Rien n’a été modifié.",
+  "invalid": "Un champ n’est pas au bon format. Vérifiez les exemples.",
+  "fields": {
+    "nameFr": {
+      "label": "Nom officiel (français)",
+      "ph": "Paroisse de Nkolndongo 1",
+      "help": "Le nom tel qu’il doit apparaître sur le site."
+    },
+    "nameEn": {
+      "label": "Nom officiel (anglais)",
+      "ph": "Nkolndongo 1 Parish",
+      "help": "Laissez vide pour utiliser le nom français."
+    },
+    "shortName": {
+      "label": "Nom court",
+      "ph": "EEC Nkolndongo 1",
+      "help": "Pour les titres et les petits espaces."
+    },
+    "address": {
+      "label": "Adresse",
+      "ph": "Rue, quartier, ville",
+      "help": "Une adresse que l’on peut retrouver à pied ou en taxi."
+    },
+    "bp": {
+      "label": "Boîte postale",
+      "ph": "BP 000",
+      "help": ""
+    },
+    "phones": {
+      "label": "Téléphone(s)",
+      "ph": "+237 6XX XX XX XX",
+      "help": "Plusieurs numéros : séparez-les par une virgule."
+    },
+    "email": {
+      "label": "Adresse e-mail",
+      "ph": "paroisse@exemple.cm",
+      "help": "L’adresse lue régulièrement par le secrétariat."
+    },
+    "whatsapp": {
+      "label": "WhatsApp",
+      "ph": "+237 6XX XX XX XX ou lien de la chaîne",
+      "help": "Un numéro ou le lien d’une chaîne WhatsApp."
+    },
+    "facebook": {
+      "label": "Page Facebook",
+      "ph": "https://facebook.com/…",
+      "help": "Le lien complet, commençant par https."
+    },
+    "youtube": {
+      "label": "Chaîne YouTube",
+      "ph": "https://youtube.com/@…",
+      "help": "Le lien complet, commençant par https."
+    },
+    "mapLat": {
+      "label": "Latitude",
+      "ph": "3.8667",
+      "help": "Pour la carte. Copiez-la depuis Google Maps (clic droit sur le temple)."
+    },
+    "mapLng": {
+      "label": "Longitude",
+      "ph": "11.5167",
+      "help": ""
+    },
+    "moissonsStart": {
+      "label": "Fête des Moissons : début",
+      "ph": "AAAA-MM-JJ",
+      "help": "Pendant ces dates, le site prend les couleurs de la Fête des Moissons."
+    },
+    "moissonsEnd": {
+      "label": "Fête des Moissons : fin",
+      "ph": "AAAA-MM-JJ",
+      "help": "Dernier jour inclus."
+    },
+    "override": {
+      "label": "Forcer une saison",
+      "ph": "Aucune (calcul automatique)",
+      "help": "Rarement utile : la saison se calcule seule à partir de la date de Pâques."
+    },
+    "overrideUntil": {
+      "label": "Jusqu’au",
+      "ph": "AAAA-MM-JJ",
+      "help": "Après cette date, le calcul automatique reprend."
+    }
+  },
+  "season_none": "Aucune (calcul automatique)",
+  "season_now": "Saison affichée aujourd’hui : {season}",
+  "features": {
+    "lead": "Les fonctionnalités de base sont toujours actives. Les autres peuvent être coupées : elles disparaissent alors du site et de l’administration, sans rien effacer.",
+    "always": "Toujours active",
+    "on": "Active",
+    "off": "Désactivée",
+    "confirm_off": "Désactiver « {name} » ? Elle disparaîtra du site et de l’administration. Rien n’est effacé.",
+    "toggled_on": "« {name} » est active.",
+    "toggled_off": "« {name} » est désactivée.",
+    "none": "Aucune fonctionnalité optionnelle pour l’instant : elles arrivent avec les prochains modules."
+  },
+  "system": {
+    "version": "Version du site",
+    "outbox": "Boîte d’envoi",
+    "outbox_text": "Les messages à transmettre (réinitialisations, invitations) en attendant l’envoi automatique des e-mails.",
+    "open": "Ouvrir",
+    "retention": "Conservation des données",
+    "retention_text": "Sessions expirées et liens supprimés chaque jour ; boîte d’envoi : 90 jours ; comptes supprimés : 30 jours de délai ; journal d’activité : 24 mois."
+  }
+}

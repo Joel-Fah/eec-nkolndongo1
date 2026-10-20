@@ -1,5 +1,5 @@
+import type { Env } from '@eec/api-kit'
 import { createApp } from './app.ts'
-import type { Env } from './env.ts'
 
 const app = createApp()
 

@@ -1,4 +1,4 @@
-import { useLocale } from '../lib/locale'
+import { useLocale } from '@eec/admin-kit'
 import { useTheme } from '../lib/theme'
 import { Icon } from './Icon'
 

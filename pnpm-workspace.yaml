@@ -1,6 +1,8 @@
 packages:
   - apps/*
   - packages/*
+  - modules
+  - modules/*
   - scripts
 
 # One version per shared dependency, pinned exactly.

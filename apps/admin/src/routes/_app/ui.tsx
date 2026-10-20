@@ -1,3 +1,4 @@
+import { useT } from '@eec/admin-kit'
 import {
   AccordionBox,
   Avatar,
@@ -22,9 +23,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { Icon } from '../../components/Icon'
 import { Illustration } from '../../components/Illustration'
-import { useT } from '../../lib/locale'
+import { Gate } from '../../components/kit'
 
-export const Route = createFileRoute('/_app/ui')({ component: UiGallery })
+// The components gallery needs the design-guide right (Phase 02 §5.5).
+export const Route = createFileRoute('/_app/ui')({
+  component: () => (
+    <Gate permission="core:system-design">
+      <UiGallery />
+    </Gate>
+  ),
+})
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (

@@ -12,8 +12,11 @@
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
+    "@eec/admin-kit": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/i18n": "workspace:*",
+    "@eec/modules": "workspace:*",
+    "@eec/modules-kit": "workspace:*",
     "@eec/ui": "workspace:*",
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "1.1.10",

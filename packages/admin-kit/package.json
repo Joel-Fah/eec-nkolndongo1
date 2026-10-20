@@ -1,0 +1,23 @@
+{
+  "name": "@eec/admin-kit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@eec/i18n": "workspace:*",
+    "@tanstack/react-query": "5.104.4",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
+  }
+}

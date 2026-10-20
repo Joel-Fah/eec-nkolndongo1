@@ -25,6 +25,8 @@ describe('schema conventions', () => {
       'retention_runs',
       'settings_flags',
       'consents',
+      // counter (per-area version, updated_at only)
+      'content_versions',
     ])
     const missing = config
       .filter((t) => !exempt.has(t.name) && !t.columns.some((c) => c.name === 'created_at'))

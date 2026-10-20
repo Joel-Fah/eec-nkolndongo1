@@ -8,6 +8,7 @@ export type Me = {
     name: string
     firstName: string
     lastName: string
+    phone: string | null
     locale: 'fr' | 'en'
     theme: string
     status: string
@@ -15,6 +16,8 @@ export type Me = {
   isSuperAdmin: boolean
   roles: { role: string; groupId: string | null }[]
   permissions: string[]
+  /** Module id → switched on? (feature flags) */
+  modules: Record<string, boolean>
 }
 
 /** null = signed out. */
@@ -43,7 +46,9 @@ export function useSessionActions() {
   return {
     async signIn(email: string, password: string) {
       await api('/auth/sign-in/email', { body: { email, password } })
-      await qc.invalidateQueries({ queryKey: ['me'] })
+      // Not just invalidate: the cached "signed out" answer isn't observed on the login screen, so it would
+      // never refetch and the guard would bounce back to /login. Fetch the fresh one now.
+      await qc.fetchQuery({ ...meQuery, staleTime: 0 })
     },
     async signOut() {
       await api('/auth/sign-out', { body: {} })

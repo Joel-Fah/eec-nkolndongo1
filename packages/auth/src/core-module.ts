@@ -62,6 +62,8 @@ export const systemRoles = [
       'core:users-reset-link',
       'core:groups-read',
       'core:system-outbox',
+      'settings:read',
+      'settings:edit',
     ],
   },
   {

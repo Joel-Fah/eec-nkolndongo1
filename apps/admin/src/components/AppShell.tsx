@@ -1,9 +1,8 @@
 import { Menu } from '@base-ui/react/menu'
+import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { useT } from '../lib/locale'
-import { groups } from '../lib/nav'
-import { useMe, useSessionActions } from '../lib/session'
+import { labelOf, navFor } from '../lib/nav'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
@@ -12,7 +11,7 @@ import { Mark } from './Mark'
 const COLLAPSE_KEY = 'eec-admin-sidebar'
 
 export function AppShell() {
-  const t = useT()
+  const { t, locale } = useLocale()
   const [collapsed, setCollapsed] = useState(() => {
     try {
       return localStorage.getItem(COLLAPSE_KEY) === '1'
@@ -45,7 +44,7 @@ export function AppShell() {
       }
       return !c
     })
-  const to = (id: string) => (id === 'ui' ? '/ui' : `/p/${id}`)
+  const groups = navFor(me)
 
   return (
     <div
@@ -89,14 +88,14 @@ export function AppShell() {
               {g.items.map((i) => (
                 <Link
                   key={i.id}
-                  to={to(i.id)}
+                  to={i.path}
                   className="admin-link"
                   activeProps={{ 'aria-current': 'page' }}
                   onClick={() => setMobileOpen(false)}
-                  title={collapsed ? t(i.label) : undefined}
+                  title={collapsed ? labelOf(i, t, locale) : undefined}
                 >
                   <Icon name={i.icon} />
-                  <span>{t(i.label)}</span>
+                  <span>{labelOf(i, t, locale)}</span>
                 </Link>
               ))}
             </div>
@@ -164,6 +163,9 @@ export function AppShell() {
                       <p className="text-sm font-medium">{me?.user.name}</p>
                       <p className="text-xs text-ink-muted">{me?.user.email}</p>
                     </div>
+                    <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
+                      {t('admin.items.account')}
+                    </Menu.LinkItem>
                     <Menu.Item
                       className="menu-item"
                       onClick={async () => {

@@ -16,7 +16,7 @@
     "test": "turbo run test",
     "check": "turbo run lint typecheck test build",
     "db:migrate": "pnpm --filter @eec/db db:migrate",
-    "db:seed": "pnpm --filter @eec/auth db:seed",
+    "db:seed": "pnpm --filter @eec/modules db:seed",
     "admin:bootstrap": "pnpm --filter @eec/auth admin:bootstrap",
     "fonts:fetch": "pnpm --filter @eec/scripts fonts:fetch",
     "illos:fetch": "pnpm --filter @eec/scripts illos:fetch",

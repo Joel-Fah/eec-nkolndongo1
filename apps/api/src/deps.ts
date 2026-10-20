@@ -1,8 +1,8 @@
+import type { AppEnv, Deps } from '@eec/api-kit'
+import { dbUrl } from '@eec/api-kit'
 import { createAuth, isStaff, loadPrincipal, slideSession } from '@eec/auth'
 import { connect, schema } from '@eec/db'
 import type { MiddlewareHandler } from 'hono'
-import type { AppEnv, Deps } from './context.ts'
-import { dbUrl } from './env.ts'
 
 /** Opens one database connection per request, on first use, and closes it when the response is done. */
 export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {

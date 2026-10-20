@@ -1,11 +1,11 @@
+import type { AppEnv } from '@eec/api-kit'
+import { clientIp, fail, publicRoute } from '@eec/api-kit'
 import { allow, checkPassword, writeAudit } from '@eec/auth'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
 import { eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import type { AppEnv } from '../context.ts'
-import { clientIp, fail, publicRoute } from '../guards.ts'
 
 /** Bump when the privacy policy text changes: people are asked again. Later served from settings. */
 export const POLICY_VERSION = '2026-10-brouillon'

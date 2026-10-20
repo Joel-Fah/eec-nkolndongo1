@@ -1,6 +1,6 @@
+import type { AppEnv } from '@eec/api-kit'
+import { publicRoute } from '@eec/api-kit'
 import { Hono } from 'hono'
-import type { AppEnv } from '../context.ts'
-import { publicRoute } from '../guards.ts'
 
 /**
  * Better Auth's own endpoints (sign-in, sign-up, sign-out, sessions, password reset request).

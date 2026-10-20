@@ -1,0 +1,25 @@
+{
+  "name": "@eec/api-kit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@eec/auth": "workspace:*",
+    "@eec/db": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "hono": "4.13.13"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261016.1",
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

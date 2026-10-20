@@ -789,8 +789,9 @@
 
 /* ── Base UI popups (admin): positioner, tooltip, trigger states ───────────────────────── */
 @layer components {
+  /* Above dialogs and sheets (71): a select or menu opened inside a dialog must show on top of it. */
   .eec-positioner {
-    z-index: 70;
+    z-index: 80;
     outline: none;
   }
   .eec-popup {
@@ -1064,7 +1065,8 @@
     position: fixed;
     inset-inline: 0;
     inset-block-end: 1rem;
-    z-index: 60;
+    /* Toasts (incl. "Undo") stay reachable above dialogs and popups. */
+    z-index: 90;
     display: grid;
     justify-items: center;
     align-items: end;

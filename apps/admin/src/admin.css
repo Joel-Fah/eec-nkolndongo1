@@ -279,3 +279,190 @@ html[data-nav-open] {
 .skip-link:focus-visible {
   inset-block-start: 1rem;
 }
+
+/* ── Admin screens (users, roles, groups, log, outbox, account) ─────────────────────── */
+.admin-panel {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.admin-panel[data-inactive] {
+  opacity: 0.7;
+}
+.admin-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.admin-filters {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.admin-inline-form {
+  display: grid;
+  align-items: end;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.admin-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.admin-table th {
+  padding: 0.875rem 1rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: start;
+  color: var(--ink-muted);
+  background: var(--surface-2);
+}
+.admin-table th:first-child {
+  border-start-start-radius: var(--radius-lg);
+}
+.admin-table th:last-child {
+  border-start-end-radius: var(--radius-lg);
+}
+.admin-table td {
+  padding: 0.875rem 1rem;
+  vertical-align: middle;
+}
+/* Rows separated by a tint on alternate rows, not by lines. */
+.admin-table tbody tr:nth-child(even) td {
+  background: color-mix(in oklab, var(--surface-2) 45%, transparent);
+}
+.admin-table tr[data-clickable] {
+  cursor: pointer;
+}
+.admin-table tr[data-clickable]:hover td {
+  background: var(--primary-soft);
+}
+.admin-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+.admin-dash-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding-inline: 0.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+.admin-dash-link:hover {
+  background: var(--surface-2);
+  color: var(--primary);
+}
+.admin-link-box {
+  display: block;
+  padding: 0.75rem 1rem;
+  overflow-wrap: anywhere;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: var(--text-sm);
+  user-select: all;
+}
+.admin-matrix {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 1rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+.admin-matrix-head {
+  /* Inside the box, not on its edge (a floated legend becomes ordinary content). */
+  float: inline-start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0;
+  margin-block-end: 0.25rem;
+}
+.admin-matrix-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.75rem;
+}
+.admin-matrix-help {
+  flex-basis: 100%;
+  padding-inline-start: 2.25rem;
+  margin-block-end: 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.admin-log {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.admin-log-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+.admin-log-details summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--primary);
+}
+.admin-diff {
+  display: grid;
+  gap: 0.25rem;
+  margin-block-start: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: var(--text-sm);
+}
+.admin-diff > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+}
+.admin-diff dt {
+  font-weight: 600;
+}
+.admin-diff dd {
+  overflow-wrap: anywhere;
+  color: var(--ink-muted);
+}
+.eec-sheet[data-wide] {
+  width: min(100vw - 1.5rem, 52rem);
+}

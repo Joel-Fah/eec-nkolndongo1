@@ -1,0 +1,13 @@
+/**
+ * The single list of modules (Phase 02 §6). Everything that depends on "which modules exist" reads it:
+ * the API mounts, the admin sidebar and routes, the permission seed, the feature flags.
+ * Core (users, roles, groups, audit) is always on; the others can be toggleable.
+ * Data only — no server or browser code here, so both the API and the admin can import it.
+ */
+import { coreModule } from '@eec/auth/core-module'
+import { settingsModule } from '@eec/module-settings'
+import type { DefinedModule } from '@eec/modules-kit'
+
+export const modules: readonly DefinedModule[] = [coreModule, settingsModule]
+
+export const moduleById = (id: string) => modules.find((m) => m.id === id)

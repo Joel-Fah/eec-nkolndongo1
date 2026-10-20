@@ -1,11 +1,10 @@
+import { api, errorKey, useT } from '@eec/admin-kit'
 import { Button, TextField } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { LocaleSwitch, ThemeButton } from '../components/Controls'
 import { Mark } from '../components/Mark'
-import { api, errorKey } from '../lib/api'
-import { useT } from '../lib/locale'
 
 export const Route = createFileRoute('/invite/$token')({ component: Invite })
 

@@ -1,11 +1,19 @@
+import { type AppEnv, sameOrigin } from '@eec/api-kit'
+import { modules } from '@eec/modules'
+import { moduleApis } from '@eec/modules/api'
+import { isModuleEnabled } from '@eec/modules-kit'
 import { Hono } from 'hono'
-import type { AppEnv } from './context.ts'
 import { withDeps } from './deps.ts'
-import { sameOrigin } from './guards.ts'
+import { auditRoutes } from './routes/audit.ts'
 import { authRoutes } from './routes/auth.ts'
+import { flagRoutes, readFlags } from './routes/flags.ts'
+import { groupRoutes } from './routes/groups.ts'
 import { invitationRoutes } from './routes/invitations.ts'
 import { meRoutes } from './routes/me.ts'
 import { memberRoutes } from './routes/members.ts'
+import { outboxRoutes } from './routes/outbox.ts'
+import { roleRoutes } from './routes/roles.ts'
+import { userRoutes } from './routes/users.ts'
 
 export function createApp() {
   const app = new Hono<AppEnv>().basePath('/api')
@@ -16,6 +24,25 @@ export function createApp() {
   app.route('/me', meRoutes)
   app.route('/members', memberRoutes)
   app.route('/', invitationRoutes)
+  // Core administration (always on).
+  app.route('/users', userRoutes)
+  app.route('/roles', roleRoutes)
+  app.route('/groups', groupRoutes)
+  app.route('/audit', auditRoutes)
+  app.route('/outbox', outboxRoutes)
+  app.route('/flags', flagRoutes)
+  // Modules from the registry, at /api/<id>. A switched-off module answers 404 (Phase 02 §6.5).
+  for (const m of modules) {
+    const router = moduleApis[m.id]
+    if (!router) continue
+    if (m.toggleable)
+      app.use(`/${m.id}/*`, async (c, next) => {
+        const flags = await readFlags(await c.var.deps.db())
+        if (!isModuleEnabled(m, flags)) return c.json({ error: { code: 'not_found' } }, 404)
+        await next()
+      })
+    app.route(`/${m.id}`, router)
+  }
   app.onError((err, c) => {
     console.error(
       'api error',

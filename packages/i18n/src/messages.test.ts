@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { createT } from './t.ts'
 import { NNBSP } from './typography.ts'
@@ -16,9 +16,22 @@ function keys(tree: Tree, prefix = ''): string[] {
 const load = (locale: string): Tree =>
   JSON.parse(readFileSync(new URL(`../messages/${locale}.json`, import.meta.url), 'utf8'))
 
+const modulesDir = new URL('../../../modules/', import.meta.url)
+const moduleIds = existsSync(modulesDir)
+  ? readdirSync(modulesDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory() && existsSync(new URL(`${d.name}/i18n/fr.json`, modulesDir)))
+      .map((d) => d.name)
+  : []
+const loadModule = (id: string, locale: string): Tree =>
+  JSON.parse(readFileSync(new URL(`${id}/i18n/${locale}.json`, modulesDir), 'utf8'))
+
 describe('messages', () => {
   it('FR and EN define exactly the same keys', () => {
     expect(keys(load('en')).sort()).toEqual(keys(load('fr')).sort())
+  })
+
+  it.each(moduleIds)('module "%s": FR and EN define exactly the same keys', (id) => {
+    expect(keys(loadModule(id, 'en')).sort()).toEqual(keys(loadModule(id, 'fr')).sort())
   })
 
   it('translates per call and applies French typography', () => {

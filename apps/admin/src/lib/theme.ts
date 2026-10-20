@@ -36,5 +36,13 @@ export function useTheme() {
       return next
     })
   }, [])
-  return { choice, cycle }
+  const set = useCallback((next: ThemeChoice) => {
+    try {
+      localStorage.setItem(KEY, next)
+    } catch {
+      // ignore
+    }
+    setChoice(next)
+  }, [])
+  return { choice, cycle, set }
 }
