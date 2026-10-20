@@ -5,6 +5,7 @@
  * unless `--force` and the typed confirmation.
  */
 import { createInterface } from 'node:readline/promises'
+import { adminPrefix } from '@eec/core'
 import { schema } from '@eec/db'
 import { connectDirect, directUrl } from '@eec/db/node'
 import { and, eq, isNull } from 'drizzle-orm'
@@ -68,7 +69,7 @@ try {
       summaryEn: `Super admin invitation created for ${email}`,
     })
     console.log(
-      `\nOpen this link (single use, expires ${expiresAt.toISOString()}):\n\n  ${origin}/admin/invite/${token}\n`,
+      `\nOpen this link (single use, expires ${expiresAt.toISOString()}):\n\n  ${origin}${adminPrefix(process.env.ADMIN_PATH)}/invite/${token}\n`,
     )
   }
 } finally {

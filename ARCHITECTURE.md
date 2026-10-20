@@ -99,6 +99,7 @@ modules/events/                 workspace package @eec/module-events
 - Members log in on the **public site** only (`/fr/mon-espace`). Staff accounts can be members too.
 - Every mutation writes to the audit log (`audit(c, …)`): who, what, when, a changed-fields diff with secrets
   scrubbed, a salted IP hash. Viewable and exportable (super admin) in the admin.
+- **The admin's address** is `ADMIN_PATH` (default `/admin/`; decision 0025), tolerant of typos in the value.
 - **Internal pages** (`/fr/_brand/`, `/en/_brand/`) are static but gated: `run_worker_first` sends them to
   our Worker entry (`apps/web/src/worker.ts`), which serves them only to a session with `core:system-design`
   and otherwise returns the normal 404.

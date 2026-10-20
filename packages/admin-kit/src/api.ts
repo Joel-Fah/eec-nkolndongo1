@@ -56,6 +56,7 @@ const KNOWN = new Set([
   'password_too_common',
   'invalid_link',
   'email_taken',
+  'bad_origin',
   'network',
 ])
 

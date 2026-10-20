@@ -293,7 +293,10 @@ function System() {
             <p className="font-medium">{t(k('system.outbox'))}</p>
             <p className="text-sm text-ink-muted">{t(k('system.outbox_text'))}</p>
           </div>
-          <a className="btn btn-secondary" href="/admin/outbox">
+          <a
+            className="btn btn-secondary"
+            href={`${(import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/'}outbox`}
+          >
             {t(k('system.open'))}
           </a>
         </div>

@@ -1,6 +1,7 @@
 import type { AppEnv } from '@eec/api-kit'
 import { clientIp, fail, publicRoute, requirePermission } from '@eec/api-kit'
 import { allow, can, checkPassword, consumeLink, createLink, findLink, writeAudit } from '@eec/auth'
+import { adminPrefix } from '@eec/core'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
 import { and, eq, inArray, sql } from 'drizzle-orm'
@@ -59,7 +60,10 @@ export const invitationRoutes = new Hono<AppEnv>()
         ip: clientIp(c),
         userAgent: c.req.header('user-agent'),
       })
-      return c.json({ url: `${c.env.APP_ORIGIN}/admin/invite/${token}`, expiresAt }, 201)
+      return c.json(
+        { url: `${c.env.APP_ORIGIN}${adminPrefix(c.env.ADMIN_PATH)}/invite/${token}`, expiresAt },
+        201,
+      )
     },
   )
 
@@ -162,7 +166,10 @@ export const invitationRoutes = new Hono<AppEnv>()
       ip: clientIp(c),
       userAgent: c.req.header('user-agent'),
     })
-    return c.json({ url: `${c.env.APP_ORIGIN}/admin/reset/${token}`, expiresAt }, 201)
+    return c.json(
+      { url: `${c.env.APP_ORIGIN}${adminPrefix(c.env.ADMIN_PATH)}/reset/${token}`, expiresAt },
+      201,
+    )
   })
 
   .post(

@@ -1,16 +1,19 @@
 /**
  * Local single origin (decision 0017): one URL (http://localhost:8080) in front of
- *   /admin/*  → Vite admin dev server (:5173, base /admin/)
+ *   <ADMIN_PATH>/* (default /admin/) → Vite admin dev server (:5173, same base)
  *   anything else (site, /api, /media) → the Astro + Worker dev server (:4321)
  * Mirrors production, where one Worker serves all three. No dependencies; forwards WebSocket (HMR).
  */
 import { createServer, request } from 'node:http'
 import { connect } from 'node:net'
+import { adminPrefix } from '../packages/core/src/admin-path.ts'
+import { envLocal } from './env-local.ts'
 
 const PORT = Number(process.env.GATEWAY_PORT ?? 8080)
 const ADMIN = { host: '127.0.0.1', port: 5173 }
 const SITE = { host: '127.0.0.1', port: 4321 }
-const pick = (url = '/') => (url === '/admin' || url.startsWith('/admin/') ? ADMIN : SITE)
+const PREFIX = adminPrefix(envLocal('ADMIN_PATH'))
+const pick = (url = '/') => (url === PREFIX || url.startsWith(`${PREFIX}/`) ? ADMIN : SITE)
 
 const server = createServer((req, res) => {
   const target = pick(req.url)

@@ -563,6 +563,9 @@ importers:
       '@better-auth/drizzle-adapter':
         specifier: 1.7.11
         version: 1.7.11(@better-auth/core@1.7.11(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.2)(better-call@1.4.2(zod@4.6.7))(jose@6.2.12)(kysely@0.28.18)(nanostores@1.5.5))(@better-auth/utils@0.5.0)(drizzle-orm@0.45.4(@cloudflare/workers-types@5.20261016.1)(@types/pg@8.15.5)(kysely@0.28.18)(pg@8.23.1))
+      '@eec/core':
+        specifier: workspace:*
+        version: link:../core
       '@eec/db':
         specifier: workspace:*
         version: link:../db

@@ -27,3 +27,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0021 | Parish settings on a static site: fresh without a cache purge | Accepted |
 | 0023 | Erode replaces Fraunces for headings | Accepted |
 | 0024 | Storyset (Cuate) illustrations, recoloured, never committed | Accepted |
+| 0025 | The admin's address is configurable (ADMIN_PATH) | Accepted |

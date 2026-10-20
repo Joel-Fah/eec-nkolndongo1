@@ -27,6 +27,7 @@ const env = Object.fromEntries(
 const wanted = [
   'DATABASE_URL_UNPOOLED',
   'AUTH_SECRET',
+  'ADMIN_PATH',
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
   'AWS_ENDPOINT_URL_S3',

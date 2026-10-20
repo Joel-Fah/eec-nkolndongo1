@@ -1,6 +1,8 @@
 /** `pnpm dev`: refresh .dev.vars, then run the gateway, the site (Astro + Worker) and the admin together. */
 import { spawn, spawnSync } from 'node:child_process'
 import { createServer } from 'node:net'
+import { adminBase } from '../packages/core/src/admin-path.ts'
+import { envLocal } from './env-local.ts'
 
 // Ports must be free first: a leftover server from an earlier run would otherwise make one app fail.
 const ports = { 8080: 'gateway', 4321: 'site', 5173: 'admin' } as const
@@ -67,4 +69,6 @@ function stop() {
 }
 process.on('SIGINT', stop)
 process.on('SIGTERM', stop)
-console.log('\nOpen http://localhost:8080  (site)  ·  http://localhost:8080/admin/  (admin)\n')
+console.log(
+  `\nOpen http://localhost:8080  (site)  ·  http://localhost:8080${adminBase(envLocal('ADMIN_PATH'))}  (admin)\n`,
+)
