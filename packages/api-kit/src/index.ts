@@ -2,6 +2,7 @@
 export * from './audit.ts'
 export * from './cache.ts'
 export * from './content.ts'
+export * from './content-routes.ts'
 export * from './context.ts'
 export * from './env.ts'
 export * from './guards.ts'

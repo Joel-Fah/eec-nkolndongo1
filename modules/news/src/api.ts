@@ -10,10 +10,10 @@ import {
   audit,
   bumpContentVersion,
   cachedJson,
+  contentRoutes,
   fail,
   mayOn,
   requirePermissionAnywhere,
-  signPreview,
   verifyPreview,
   versionFor,
 } from '@eec/api-kit'
@@ -29,7 +29,7 @@ import {
   uniqueSlug,
 } from '@eec/core'
 import type { Db } from '@eec/db'
-import { contentRedirects, contentRevisions, groups, mediaFiles, mediaUsages } from '@eec/db/schema'
+import { contentRedirects, groups, mediaFiles } from '@eec/db/schema'
 import { and, desc, eq, ilike, inArray, isNull, lte, or, type SQL, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -38,8 +38,6 @@ import { newsPosts } from './schema.ts'
 const AREA = 'news'
 const ENTITY = 'news'
 const PAGE = 12
-const REVISION_GAP_MS = 5 * 60 * 1000
-const MAX_REVISIONS = 50
 
 type Row = typeof newsPosts.$inferSelect
 
@@ -69,7 +67,7 @@ export const patchSchema = z
   .partial()
   .strict()
 
-const publishSchema = z
+const _publishSchema = z
   .object({ publishAt: date.optional(), unpublishAt: date.optional() })
   .strict()
 
@@ -97,69 +95,6 @@ const snapshotOf = (r: Row) => ({
   pinned: r.pinned,
   slug: r.slug,
 })
-
-async function saveRevision(
-  db: Db,
-  row: Row,
-  userId: string | null,
-  reason: string,
-  force: boolean,
-) {
-  const [last] = await db
-    .select({ at: contentRevisions.createdAt })
-    .from(contentRevisions)
-    .where(and(eq(contentRevisions.entityType, ENTITY), eq(contentRevisions.entityId, row.id)))
-    .orderBy(desc(contentRevisions.createdAt))
-    .limit(1)
-  if (!force && last && Date.now() - last.at.getTime() < REVISION_GAP_MS) return
-  await db.insert(contentRevisions).values({
-    entityType: ENTITY,
-    entityId: row.id,
-    snapshot: snapshotOf(row),
-    reason,
-    createdBy: userId,
-  })
-  const old = await db
-    .select({ id: contentRevisions.id })
-    .from(contentRevisions)
-    .where(and(eq(contentRevisions.entityType, ENTITY), eq(contentRevisions.entityId, row.id)))
-    .orderBy(desc(contentRevisions.createdAt))
-    .offset(MAX_REVISIONS)
-  if (old.length)
-    await db.delete(contentRevisions).where(
-      inArray(
-        contentRevisions.id,
-        old.map((o) => o.id),
-      ),
-    )
-}
-
-/** Records which library photos the post uses (cover and photos inside the text), so they cannot be deleted. */
-async function syncUsages(db: Db, row: Row) {
-  const ids = new Set<string>()
-  if (row.coverMediaId) ids.add(row.coverMediaId)
-  for (const body of [row.bodyFr, row.bodyEn])
-    for (const m of JSON.stringify(body).matchAll(/"mediaId":"([0-9a-f-]{36})"/g))
-      if (m[1]) ids.add(m[1])
-  await db
-    .delete(mediaUsages)
-    .where(and(eq(mediaUsages.entityType, ENTITY), eq(mediaUsages.entityId, row.id)))
-  if (ids.size) {
-    const existing = await db
-      .select({ id: mediaFiles.id })
-      .from(mediaFiles)
-      .where(inArray(mediaFiles.id, [...ids]))
-    if (existing.length)
-      await db.insert(mediaUsages).values(
-        existing.map((e) => ({
-          mediaId: e.id,
-          entityType: ENTITY,
-          entityId: row.id,
-          field: e.id === row.coverMediaId ? 'cover' : 'body',
-        })),
-      )
-  }
-}
 
 const lifecycleOf = (r: Row) => ({
   state: r.state as 'draft' | 'published' | 'archived',
@@ -286,14 +221,46 @@ function feedXml(
     .join('')}</channel></rss>`
 }
 
-async function load(c: Parameters<typeof mayOn>[0], id: string, permission: string) {
-  const db = await c.var.deps.db()
-  const [row] = await db.select().from(newsPosts).where(eq(newsPosts.id, id)).limit(1)
-  if (!row) return { error: fail(c, 404, 'not_found') as Response }
-  if (!(await mayOn(c, permission, row.groupId)))
-    return { error: fail(c, 403, 'forbidden') as Response }
-  return { db, row }
-}
+const lifecycle = contentRoutes<Row>({
+  entity: ENTITY,
+  area: AREA,
+  table: newsPosts,
+  perms: { read: 'news:read', edit: 'news:edit', publish: 'news:publish', delete: 'news:delete' },
+  labels: {
+    published: { fr: 'Actualité publiée', en: 'News post published' },
+    scheduled: { fr: 'Actualité programmée', en: 'News post scheduled' },
+    unpublished: { fr: 'Actualité retirée du site', en: 'News post taken off the site' },
+    archived: { fr: 'Actualité archivée', en: 'News post archived' },
+    deleted: { fr: 'Actualité supprimée', en: 'News post deleted' },
+    restored: { fr: 'Ancienne version restaurée', en: 'Earlier version restored' },
+  },
+  snapshotOf,
+  restoreSet: (s: ReturnType<typeof snapshotOf>) => ({
+    titleFr: s.titleFr,
+    titleEn: s.titleEn,
+    excerptFr: s.excerptFr,
+    excerptEn: s.excerptEn,
+    bodyFr: cleanDoc(s.bodyFr),
+    bodyEn: cleanDoc(s.bodyEn),
+    coverMediaId: s.coverMediaId,
+    pinned: s.pinned,
+  }),
+  problems: (row, dates) =>
+    publishProblems({ title: row.titleFr, bodyEmpty: isEmptyDoc(row.bodyFr), ...dates }),
+  mediaIdsOf: (row) => {
+    const out: { id: string; field: string }[] = []
+    if (row.coverMediaId) out.push({ id: row.coverMediaId, field: 'cover' })
+    for (const body of [row.bodyFr, row.bodyEn])
+      for (const m of JSON.stringify(body).matchAll(/"mediaId":"([0-9a-f-]{36})"/g))
+        if (m[1]) out.push({ id: m[1], field: 'body' })
+    return out
+  },
+  revisionLabel: (s: ReturnType<typeof snapshotOf>) => ({
+    title: s.titleFr,
+    words: plainText(s.bodyFr).split(' ').filter(Boolean).length,
+  }),
+})
+const { load, saveRevision, syncUsages } = lifecycle
 
 export const newsApi = new Hono<AppEnv>()
   // ——— Public ————————————————————————————————————————————————
@@ -501,180 +468,4 @@ export const newsApi = new Hono<AppEnv>()
     })
     return c.json({ ok: true, slug: next.slug, updatedAt: next.updatedAt })
   })
-  .post('/:id/publish', requirePermissionAnywhere('news:publish'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:publish')
-    if (r.error) return r.error
-    const parsed = publishSchema.safeParse(await c.req.json().catch(() => ({})))
-    if (!parsed.success) return fail(c, 400, 'invalid')
-    const { db, row } = r
-    const publishAt = parsed.data.publishAt === undefined ? row.publishAt : parsed.data.publishAt
-    const unpublishAt =
-      parsed.data.unpublishAt === undefined ? row.unpublishAt : parsed.data.unpublishAt
-    const problems = publishProblems({
-      title: row.titleFr,
-      bodyEmpty: isEmptyDoc(row.bodyFr),
-      publishAt,
-      unpublishAt,
-    })
-    if (problems.length) return c.json({ error: { code: 'not_ready', problems } }, 400)
-    const actor = await c.var.deps.actor()
-    const [next] = await db
-      .update(newsPosts)
-      .set({
-        state: 'published',
-        publishAt,
-        unpublishAt,
-        firstPublishedAt:
-          row.firstPublishedAt ?? (publishAt && publishAt > new Date() ? null : new Date()),
-        updatedBy: actor?.userId,
-      })
-      .where(eq(newsPosts.id, row.id))
-      .returning()
-    if (!next) return fail(c, 404, 'not_found')
-    await saveRevision(db, next, actor?.userId ?? null, 'publish', true)
-    await bumpContentVersion(db, AREA)
-    await audit(c, {
-      action: 'publish',
-      entityType: ENTITY,
-      entityId: row.id,
-      summaryFr: publishAt && publishAt > new Date() ? 'Actualité programmée' : 'Actualité publiée',
-      summaryEn:
-        publishAt && publishAt > new Date() ? 'News post scheduled' : 'News post published',
-    })
-    return c.json({ status: statusOf(lifecycleOf(next)) })
-  })
-  .post('/:id/unpublish', requirePermissionAnywhere('news:publish'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:publish')
-    if (r.error) return r.error
-    const actor = await c.var.deps.actor()
-    await r.db
-      .update(newsPosts)
-      .set({ state: 'draft', updatedBy: actor?.userId })
-      .where(eq(newsPosts.id, r.row.id))
-    await bumpContentVersion(r.db, AREA)
-    await audit(c, {
-      action: 'update',
-      entityType: ENTITY,
-      entityId: r.row.id,
-      summaryFr: 'Actualité retirée du site',
-      summaryEn: 'News post taken off the site',
-    })
-    return c.json({ status: 'draft' })
-  })
-  .post('/:id/archive', requirePermissionAnywhere('news:publish'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:publish')
-    if (r.error) return r.error
-    const actor = await c.var.deps.actor()
-    await r.db
-      .update(newsPosts)
-      .set({ state: 'archived', updatedBy: actor?.userId })
-      .where(eq(newsPosts.id, r.row.id))
-    await bumpContentVersion(r.db, AREA)
-    await audit(c, {
-      action: 'update',
-      entityType: ENTITY,
-      entityId: r.row.id,
-      summaryFr: 'Actualité archivée',
-      summaryEn: 'News post archived',
-    })
-    return c.json({ status: 'archived' })
-  })
-  .delete('/:id', requirePermissionAnywhere('news:delete'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:delete')
-    if (r.error) return r.error
-    await r.db
-      .delete(mediaUsages)
-      .where(and(eq(mediaUsages.entityType, ENTITY), eq(mediaUsages.entityId, r.row.id)))
-    await r.db
-      .delete(contentRevisions)
-      .where(and(eq(contentRevisions.entityType, ENTITY), eq(contentRevisions.entityId, r.row.id)))
-    await r.db
-      .delete(contentRedirects)
-      .where(and(eq(contentRedirects.entityType, ENTITY), eq(contentRedirects.entityId, r.row.id)))
-    await r.db.delete(newsPosts).where(eq(newsPosts.id, r.row.id))
-    await bumpContentVersion(r.db, AREA)
-    await audit(c, {
-      action: 'delete',
-      entityType: ENTITY,
-      entityId: r.row.id,
-      summaryFr: 'Actualité supprimée',
-      summaryEn: 'News post deleted',
-    })
-    return c.json({ ok: true })
-  })
-  .get('/:id/revisions', requirePermissionAnywhere('news:read'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:read')
-    if (r.error) return r.error
-    const rows = await r.db
-      .select({
-        id: contentRevisions.id,
-        reason: contentRevisions.reason,
-        createdAt: contentRevisions.createdAt,
-        snapshot: contentRevisions.snapshot,
-      })
-      .from(contentRevisions)
-      .where(and(eq(contentRevisions.entityType, ENTITY), eq(contentRevisions.entityId, r.row.id)))
-      .orderBy(desc(contentRevisions.createdAt))
-      .limit(MAX_REVISIONS)
-    return c.json({
-      items: rows.map((x) => {
-        const s = x.snapshot as ReturnType<typeof snapshotOf>
-        return {
-          id: x.id,
-          reason: x.reason,
-          createdAt: x.createdAt,
-          title: s.titleFr,
-          words: plainText(s.bodyFr).split(' ').filter(Boolean).length,
-        }
-      }),
-    })
-  })
-  .post('/:id/revisions/:rid/restore', requirePermissionAnywhere('news:edit'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:edit')
-    if (r.error) return r.error
-    const [rev] = await r.db
-      .select()
-      .from(contentRevisions)
-      .where(
-        and(eq(contentRevisions.id, c.req.param('rid')), eq(contentRevisions.entityId, r.row.id)),
-      )
-      .limit(1)
-    if (!rev) return fail(c, 404, 'not_found')
-    const s = rev.snapshot as ReturnType<typeof snapshotOf>
-    const actor = await c.var.deps.actor()
-    // Keep what is there now as a revision first, so a restore can itself be undone.
-    await saveRevision(r.db, r.row, actor?.userId ?? null, 'before-restore', true)
-    const [next] = await r.db
-      .update(newsPosts)
-      .set({
-        titleFr: s.titleFr,
-        titleEn: s.titleEn,
-        excerptFr: s.excerptFr,
-        excerptEn: s.excerptEn,
-        bodyFr: cleanDoc(s.bodyFr),
-        bodyEn: cleanDoc(s.bodyEn),
-        coverMediaId: s.coverMediaId,
-        pinned: s.pinned,
-        updatedBy: actor?.userId,
-      })
-      .where(eq(newsPosts.id, r.row.id))
-      .returning()
-    if (next) {
-      await syncUsages(r.db, next)
-      if (next.state === 'published') await bumpContentVersion(r.db, AREA)
-    }
-    await audit(c, {
-      action: 'update',
-      entityType: ENTITY,
-      entityId: r.row.id,
-      summaryFr: 'Ancienne version restaurée',
-      summaryEn: 'Earlier version restored',
-    })
-    return c.json({ ok: true })
-  })
-  .post('/:id/preview', requirePermissionAnywhere('news:read'), async (c) => {
-    const r = await load(c, c.req.param('id'), 'news:read')
-    if (r.error) return r.error
-    const token = await signPreview(c.env.AUTH_SECRET, ENTITY, r.row.id)
-    return c.json({ token, expiresInDays: 3 })
-  })
+  .route('/', lifecycle.router)
