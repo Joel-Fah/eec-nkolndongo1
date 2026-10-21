@@ -1132,7 +1132,7 @@
       "broke_text": "Quelque chose s’est mal passé. Réessayez dans un instant.",
       "retry": "Réessayer"
     },
-    "loading": "Chargement…"
+    "loading": "Chargement"
   },
   "login": {
     "title": "Connexion",

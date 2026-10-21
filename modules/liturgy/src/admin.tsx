@@ -254,6 +254,7 @@ function Sundays() {
           <Icon name="calendarDay" size={20} />
         </span>
         <span className="grid">
+          {view === 'grid' && <span className="week-caption">{weekLabel(r.date, locale)}</span>}
           <strong>
             {shortDate(`${r.date}T12:00:00Z`, locale, 'UTC')}
             {r.date === current ? ` · ${t(k('today_marker'))}` : ''}
@@ -287,14 +288,22 @@ function Sundays() {
           </Button>
         )}
       </div>
-      <div className="grid gap-4">
-        {groups.map(({ week, r }) => (
-          <section key={r.date} className="grid gap-2" aria-label={week}>
-            <h3 className="week-head">{week}</h3>
-            {view === 'grid' ? <div className="sunday-grid">{card(r)}</div> : card(r)}
-          </section>
-        ))}
-      </div>
+      {view === 'grid' ? (
+        <div className="sunday-grid">
+          {groups.map(({ r }) => (
+            <div key={r.date}>{card(r)}</div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {groups.map(({ week, r }) => (
+            <section key={r.date} className="grid gap-2" aria-label={week}>
+              <h3 className="week-head">{week}</h3>
+              {card(r)}
+            </section>
+          ))}
+        </div>
+      )}
       <div>
         <Button variant="ghost" onClick={() => setWeeks((w) => w + 8)}>
           {t(k('load_more'))}
@@ -363,24 +372,24 @@ function Sundays() {
                 </p>
               </header>
 
-              <fieldset className="form-group">
-                <legend className="form-legend">
+              <section className="form-group">
+                <h3 className="form-legend">
                   <Icon name="info" size={20} />
                   {t(k('section_details'))}
-                </legend>
+                </h3>
                 <TabsBox
                   tabs={[
                     { id: 'fr', label: t(k('lang_fr')), content: text('Fr', form) },
                     { id: 'en', label: t(k('lang_en')), content: text('En', form) },
                   ]}
                 />
-              </fieldset>
+              </section>
 
-              <fieldset className="form-group">
-                <legend className="form-legend">
+              <section className="form-group">
+                <h3 className="form-legend">
                   <Icon name="bookText" size={20} />
                   {t(k('section_readings'))}
-                </legend>
+                </h3>
                 {form.readings.map((r, i) => (
                   <div key={`${r.book}-${i}`} className="flex flex-wrap items-end gap-2">
                     <div className="min-w-40 flex-1">
@@ -463,13 +472,13 @@ function Sundays() {
                     </Button>
                   </div>
                 )}
-              </fieldset>
+              </section>
 
-              <fieldset className="form-group">
-                <legend className="form-legend">
+              <section className="form-group">
+                <h3 className="form-legend">
                   <Icon name="users" size={20} />
                   {t(k('section_people'))}
-                </legend>
+                </h3>
                 <datalist id="liturgy-pastors">
                   {(people.data?.names ?? []).map((n) => (
                     <option key={n} value={n} />
@@ -503,13 +512,13 @@ function Sundays() {
                   onCheckedChange={(v: boolean) => setForm({ ...form, namesConsent: v })}
                 />
                 <p className="text-xs text-ink-muted">{t(k('consent_help'))}</p>
-              </fieldset>
+              </section>
 
-              <fieldset className="form-group">
-                <legend className="form-legend">
+              <section className="form-group">
+                <h3 className="form-legend">
                   <Icon name="music" size={20} />
                   {t(k('section_more'))}
-                </legend>
+                </h3>
                 <TextField
                   label={t(k('hymns'))}
                   placeholder=""
@@ -520,7 +529,7 @@ function Sundays() {
                     setForm({ ...form, hymns: e.target.value })
                   }
                 />
-              </fieldset>
+              </section>
 
               <div className="form-actions">
                 <div className="form-actions-side">

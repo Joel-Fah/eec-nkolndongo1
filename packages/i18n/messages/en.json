@@ -1132,7 +1132,7 @@
       "broke_text": "Something went wrong. Please try again in a moment.",
       "retry": "Try again"
     },
-    "loading": "Loading…"
+    "loading": "Loading"
   },
   "login": {
     "title": "Sign in",

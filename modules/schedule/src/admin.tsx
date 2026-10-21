@@ -427,7 +427,6 @@ export default function SchedulePage() {
               </div>
 
               <fieldset className="form-group">
-                <legend className="field-label">{t(k('rhythm'))}</legend>
                 <SelectField
                   label={t(k('rhythm'))}
                   value={editing.anchorSlotId ? 'follows' : editing.rhythm}

@@ -122,6 +122,7 @@ await db
         },
       ],
       featured: true,
+      kind: 'reunion',
       locationFr: 'Salle d’exemple',
     },
     {
@@ -130,6 +131,7 @@ await db
       titleFr: 'Exemple — Le premier samedi du mois',
       startsAt: next(6, 15),
       recurrence: { freq: 'monthly', mode: 'nthWeekday', nth: 1, weekday: 6 },
+      kind: 'etude',
       locationKind: 'other',
       locationFr: 'Lieu d’exemple',
     },
@@ -147,6 +149,28 @@ await db
         ),
       ),
       allDay: true,
+      kind: 'fete',
+    },
+    {
+      slug: 'exemple-retraite-sur-trois-jours',
+      ...published,
+      titleFr: 'Exemple — Retraite sur trois jours',
+      startsAt: new Date(
+        Date.UTC(
+          new Date().getUTCFullYear(),
+          new Date().getUTCMonth(),
+          new Date().getUTCDate() + 12,
+        ),
+      ),
+      endsAt: new Date(
+        Date.UTC(
+          new Date().getUTCFullYear(),
+          new Date().getUTCMonth(),
+          new Date().getUTCDate() + 14,
+        ),
+      ),
+      allDay: true,
+      kind: 'retraite',
     },
   ])
   .onConflictDoNothing()
