@@ -4,6 +4,7 @@ import { eventsApi } from '@eec/module-events/api'
 import { mediaApi } from '@eec/module-media/api'
 import { membersApi } from '@eec/module-members/api'
 import { newsApi } from '@eec/module-news/api'
+import { scheduleApi } from '@eec/module-schedule/api'
 import { settingsApi } from '@eec/module-settings/api'
 import type { Hono } from 'hono'
 
@@ -13,5 +14,6 @@ export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   events: eventsApi,
   members: membersApi,
   news: newsApi,
+  schedule: scheduleApi,
   settings: settingsApi,
 }
