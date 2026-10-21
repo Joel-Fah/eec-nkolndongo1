@@ -13,10 +13,9 @@
     "audio": "Audio",
     "document": "Documents",
     "unused": "Non utilisés",
-    "archived": "Archivés"
+    "archived": "Archivés",
+    "type": "Type de fichier"
   },
-  "empty_title": "Aucun fichier pour l’instant",
-  "empty_text": "Ajoutez une première photo : elle sera prête à être utilisée sur le site.",
   "queue": {
     "title": "À envoyer",
     "alt": "Description de la photo (obligatoire)",
@@ -38,7 +37,8 @@
     "in_use": "Ce fichier est utilisé ailleurs : retirez-le d’abord de son contenu.",
     "alt_required": "Une photo doit toujours avoir une description.",
     "generic": "Une erreur est survenue. Rien n’a été perdu.",
-    "no_storage": "Le stockage n’est pas configuré."
+    "no_storage": "Le stockage n’est pas configuré.",
+    "stock": "Impossible de récupérer cette photo."
   },
   "detail": {
     "title": "Détails du fichier",
@@ -67,5 +67,32 @@
     "archived": "Fichier archivé.",
     "restored": "Fichier restauré.",
     "deleted": "Fichier supprimé."
+  },
+  "tabs": {
+    "upload": "Mes fichiers",
+    "stock": "Banque d’images"
+  },
+  "search_ph": "Nom du fichier ou description…",
+  "empty": {
+    "none_t": "Aucun fichier pour l’instant",
+    "none_p": "Déposez une photo, un enregistrement ou un PDF, ou choisissez une image dans la banque d’images.",
+    "unused_t": "Tout est utilisé",
+    "unused_p": "Aucun fichier ne reste sans emploi : chaque photo ou document est utilisé quelque part sur le site.",
+    "archived_t": "Aucune archive",
+    "archived_p": "Les fichiers que vous archivez (sans les supprimer) apparaîtront ici, prêts à être restaurés.",
+    "search_t": "Aucun résultat",
+    "search_p": "Aucun fichier ne correspond à cette recherche. Essayez un autre mot, ou un autre type.",
+    "reset": "Tout afficher"
+  },
+  "stock": {
+    "search": "Rechercher une photo libre de droits",
+    "placeholder": "Colline, récolte, bois, lumière…",
+    "go": "Chercher",
+    "note": "Photos libres fournies par Pexels. Le nom du photographe est gardé comme crédit et apparaît sur la page des crédits photos.",
+    "add": "Ajouter la photo de {name}",
+    "more": "Voir plus de photos",
+    "empty": "Aucune photo trouvée pour « {q} ».",
+    "not_configured": "La banque d’images n’est pas encore configurée (clé Pexels manquante).",
+    "error": "La banque d’images ne répond pas. Réessayez dans un instant."
   }
 }

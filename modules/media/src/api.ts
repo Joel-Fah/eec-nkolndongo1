@@ -33,6 +33,12 @@ const meta = z.object({
   captionEn: text(500),
   credit: text(200),
   creditUrl: z.url().max(400).optional(),
+  /** A stock photo picked in the admin: where it came from (the credit is shown publicly). */
+  source: z.enum(['upload', 'pexels']).default('upload'),
+  sourceId: z
+    .string()
+    .regex(/^\d{1,12}$/)
+    .optional(),
 })
 const patch = z.object({
   altFr: text(300),
@@ -204,6 +210,79 @@ export const mediaApi = new Hono<AppEnv>()
     })
   })
 
+  // ── Stock photos (Pexels): search and fetch from the admin only; the live site never calls Pexels ─────────────
+  .get('/stock/search', requirePermission('media:upload'), async (c) => {
+    const key = c.env.PEXELS_API_KEY
+    if (!key) return c.json({ error: { code: 'not_configured' } }, 501)
+    const q = (c.req.query('q') ?? '').trim().slice(0, 100)
+    const page = Math.min(50, Math.max(1, Number(c.req.query('page')) || 1))
+    const url = new URL(
+      q ? 'https://api.pexels.com/v1/search' : 'https://api.pexels.com/v1/curated',
+    )
+    if (q) url.searchParams.set('query', q)
+    url.searchParams.set('per_page', '24')
+    url.searchParams.set('page', String(page))
+    const orientation = c.req.query('orientation')
+    if (
+      q &&
+      (orientation === 'landscape' || orientation === 'portrait' || orientation === 'square')
+    )
+      url.searchParams.set('orientation', orientation)
+    const res = await fetch(url, { headers: { authorization: key } }).catch(() => null)
+    if (!res?.ok) return c.json({ error: { code: 'stock_unavailable' } }, 502)
+    const body = (await res.json()) as {
+      photos: {
+        id: number
+        alt: string
+        photographer: string
+        photographer_url: string
+        width: number
+        height: number
+        url: string
+        src: { medium: string }
+      }[]
+      next_page?: string
+    }
+    return c.json({
+      page,
+      more: !!body.next_page,
+      photos: body.photos.map((p) => ({
+        id: p.id,
+        alt: p.alt,
+        photographer: p.photographer,
+        photographerUrl: p.photographer_url,
+        width: p.width,
+        height: p.height,
+        pexelsUrl: p.url,
+        thumb: p.src.medium,
+      })),
+    })
+  })
+
+  // The original of one stock photo, streamed through us (so the browser can resize it like any upload).
+  .get('/stock/:id/file', requirePermission('media:upload'), async (c) => {
+    const key = c.env.PEXELS_API_KEY
+    const id = c.req.param('id')
+    if (!key) return c.json({ error: { code: 'not_configured' } }, 501)
+    if (!/^\d{1,12}$/.test(id)) return fail(c, 400, 'invalid')
+    const meta = await fetch(`https://api.pexels.com/v1/photos/${id}`, {
+      headers: { authorization: key },
+    }).catch(() => null)
+    if (!meta?.ok) return c.json({ error: { code: 'stock_unavailable' } }, 502)
+    const src = ((await meta.json()) as { src?: { large2x?: string } }).src?.large2x
+    // Only Pexels' own image host is ever fetched.
+    if (!src || new URL(src).hostname !== 'images.pexels.com')
+      return c.json({ error: { code: 'stock_unavailable' } }, 502)
+    const img = await fetch(src)
+    if (!img.ok || !img.body) return c.json({ error: { code: 'stock_unavailable' } }, 502)
+    return new Response(img.body, {
+      headers: {
+        'content-type': img.headers.get('content-type') ?? 'image/jpeg',
+        'cache-control': 'private, no-store',
+      },
+    })
+  })
+
   .get('/:id', requirePermission('media:read'), async (c) => {
     const db = await c.var.deps.db()
     const [row] = await db
@@ -275,6 +354,8 @@ export const mediaApi = new Hono<AppEnv>()
         captionEn: m.captionEn || null,
         credit: m.credit || null,
         creditUrl: m.creditUrl || null,
+        source: m.source,
+        sourceId: m.sourceId ?? null,
         createdBy: actor?.userId ?? null,
       })
       .returning()

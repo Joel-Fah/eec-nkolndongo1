@@ -23,6 +23,12 @@ config.vars = {
   ADMIN_PATH: prefix.replace(/^\//, ''),
   SITE_INDEXABLE: envLocal('SITE_INDEXABLE') === '1' ? '1' : '0',
 }
+// Production database: Hyperdrive in front of Neon. Added here, not in wrangler.jsonc, so local dev (which connects
+// straight to the dev branch) never starts Cloudflare's Hyperdrive emulation.
+const deploy = JSON.parse(await readFile(join(root, 'apps/web/deploy.json'), 'utf8')) as {
+  hyperdriveId?: string
+}
+if (deploy.hyperdriveId) config.hyperdrive = [{ binding: 'HYPERDRIVE', id: deploy.hyperdriveId }]
 await writeFile(configFile, JSON.stringify(config))
 console.log(
   `Worker vars: ADMIN_PATH=${config.vars.ADMIN_PATH} SITE_INDEXABLE=${config.vars.SITE_INDEXABLE}`,

@@ -19,7 +19,7 @@ export function securityHeaders({ https, noindex }: HeaderOptions): Record<strin
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+    "img-src 'self' data: blob: https://lh3.googleusercontent.com https://images.pexels.com",
     "media-src 'self'",
     "font-src 'self'",
     "connect-src 'self'",

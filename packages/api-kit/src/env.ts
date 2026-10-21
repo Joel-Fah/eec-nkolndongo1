@@ -17,6 +17,8 @@ export type Env = {
   AWS_REGION?: string
   /** Defaults to « eec-media ». */
   MEDIA_BUCKET?: string
+  /** Pexels API key: the admin's stock-photo search (the live site never calls Pexels). Secret. */
+  PEXELS_API_KEY?: string
   /** « 1 » once the site is launched: until then every page asks search engines to stay away. */
   SITE_INDEXABLE?: string
   /** The single origin (decision 0017), e.g. https://eec-nkolndongo1.workers.dev */

@@ -23,11 +23,5 @@
     "APP_ORIGIN": "https://eec-nkolndongo1.joelfah2003.workers.dev",
     "ADMIN_PATH": "admin",
     "SITE_INDEXABLE": "0"
-  },
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "fbb960ccb27f471a859a2b6026e64eaf"
-    }
-  ]
+  }
 }

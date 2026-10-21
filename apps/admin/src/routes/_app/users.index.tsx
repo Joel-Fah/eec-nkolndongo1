@@ -65,6 +65,7 @@ function Users() {
           placeholder={t('admin.common.search_ph')}
           value={q}
           onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
+          icon="search"
           type="search"
         />
         {roles.data && (

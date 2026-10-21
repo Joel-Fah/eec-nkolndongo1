@@ -100,6 +100,8 @@ export default function MembersPage() {
           <TextField
             label={t(k('search'))}
             placeholder={t(k('search_ph'))}
+            icon="search"
+            type="search"
             value={q}
             onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
           />

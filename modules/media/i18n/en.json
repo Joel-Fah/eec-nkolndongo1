@@ -13,10 +13,9 @@
     "audio": "Audio",
     "document": "Documents",
     "unused": "Not used",
-    "archived": "Archived"
+    "archived": "Archived",
+    "type": "File type"
   },
-  "empty_title": "No files yet",
-  "empty_text": "Add a first photo: it will be ready to use on the site.",
   "queue": {
     "title": "To send",
     "alt": "Photo description (required)",
@@ -38,7 +37,8 @@
     "in_use": "This file is used elsewhere: remove it from its content first.",
     "alt_required": "A photo must always have a description.",
     "generic": "Something went wrong. Nothing was lost.",
-    "no_storage": "Storage is not configured."
+    "no_storage": "Storage is not configured.",
+    "stock": "This photo could not be fetched."
   },
   "detail": {
     "title": "File details",
@@ -67,5 +67,32 @@
     "archived": "File archived.",
     "restored": "File restored.",
     "deleted": "File deleted."
+  },
+  "tabs": {
+    "upload": "My files",
+    "stock": "Stock photos"
+  },
+  "search_ph": "File name or description…",
+  "empty": {
+    "none_t": "No files yet",
+    "none_p": "Drop a photo, a recording or a PDF, or pick an image from the stock library.",
+    "unused_t": "Everything is in use",
+    "unused_p": "No file is left unused: every photo or document is used somewhere on the site.",
+    "archived_t": "No archives",
+    "archived_p": "Files you archive (without deleting them) will appear here, ready to be restored.",
+    "search_t": "No results",
+    "search_p": "No file matches this search. Try another word, or another type.",
+    "reset": "Show everything"
+  },
+  "stock": {
+    "search": "Search a free stock photo",
+    "placeholder": "Hill, harvest, wood, light…",
+    "go": "Search",
+    "note": "Free photos provided by Pexels. The photographer’s name is kept as the credit and appears on the photo credits page.",
+    "add": "Add the photo by {name}",
+    "more": "Show more photos",
+    "empty": "No photo found for “{q}”.",
+    "not_configured": "The stock library is not set up yet (Pexels key missing).",
+    "error": "The stock library is not responding. Please try again in a moment."
   }
 }
