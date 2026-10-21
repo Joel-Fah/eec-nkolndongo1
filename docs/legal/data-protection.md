@@ -36,6 +36,15 @@
 - Media: photos have EXIF/GPS removed in the browser before upload; a photo of people needs the person's consent.
 - Backups are encrypted (age); the private key is offline (decision 0022).
 
+## Added in Phase 03a (2026-10)
+- **Preacher and liturgist names** (module `liturgy`, per Sunday): display names typed by staff. They are public only
+  when the « names consent » box is ticked, which records **who confirmed it and when**; unticking clears it. Names are
+  never copied by « reprendre la semaine précédente » (consent was for one Sunday). Without consent they stay in the admin.
+- **News, events, schedule, verses**: no personal data about parishioners. Staff names are kept only as `created_by` /
+  `updated_by` (internal, audit log), never shown publicly.
+- **Preview links** (news, events): signed, expiring after 3 days, `noindex`, no personal data in the link.
+- Group leaders are scoped: a group-scoped role can edit only its own group's news and events.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

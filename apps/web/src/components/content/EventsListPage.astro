@@ -35,7 +35,7 @@ const ym = /^\d{4}-\d{2}$/.test(q.get('mois') ?? '')
   : `${ty}-${String(tm).padStart(2, '0')}`
 const [y, m] = ym.split('-').map(Number) as [number, number]
 
-// Window: the list shows the next 6 months; the month view the 6 weeks around the month.
+// Window: the list shows the next 100 days; the month view the 6 weeks around the month.
 const iso = (d: Date) => d.toISOString().slice(0, 10)
 const first = new Date(Date.UTC(y, m - 1, 1))
 const lead = (first.getUTCDay() + 6) % 7
@@ -44,7 +44,7 @@ const from = view === 'month' ? iso(gridStart) : todayKey
 const to =
   view === 'month'
     ? iso(new Date(gridStart.getTime() + 42 * 86_400_000))
-    : iso(new Date(Date.now() + 183 * 86_400_000))
+    : iso(new Date(Date.now() + 100 * 86_400_000))
 const params = new URLSearchParams({ locale, from, to })
 if (group) params.set('group', group)
 const result = await publicJson<{ items: EventOcc[] }>(Astro, `/api/events/public?${params}`)

@@ -29,6 +29,7 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0024 | Storyset (Cuate) illustrations, recoloured, never committed | Accepted |
 | 0025 | The admin's address is configurable (ADMIN_PATH) | Accepted |
 | 0027 | How content pages are rendered (on demand from cached JSON) | Accepted |
+| 0029 | Events: structured recurrence, exceptions, own RFC 5545 writer | Accepted |
 | 0032 | Bible translations: public domain only (LSG 1910, WEB) | Accepted |
 | 0026 | Seasonal playground under the footer | Accepted |
 | 0020 | Media storage: S3-compatible, Neon Object Storage first | Accepted |
