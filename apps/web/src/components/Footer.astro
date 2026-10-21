@@ -81,7 +81,7 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
   </div>
 
   <div class="footer-meta">
-    <p class="text-sm text-ink-muted">{t('footer.rights')} · <a class="footer-link text-sm" href="https://storyset.com" rel="noopener" target="_blank">{t('footer.credits')}</a> · {t('footer.credits_pending')}</p>
+    <p class="text-sm text-ink-muted">{t('footer.rights')} · <a class="footer-link text-sm" href="https://storyset.com" rel="noopener" target="_blank">{t('footer.credits')}</a> · <a class="footer-link text-sm" href={href(locale, pathOf('credits'))}>{t('footer.photo_credits')}</a></p>
     <ul class="flex flex-wrap items-center gap-x-4" role="list">
       {legal.map((l) => <li><a class="footer-link text-sm" href={href(locale, l.path)}>{t(labelKey(l.id))}</a></li>)}
     </ul>

@@ -112,6 +112,10 @@
       "legal": {
         "label": "Mentions légales",
         "desc": "Informations légales sur le site."
+      },
+      "credits": {
+        "label": "Crédits photos",
+        "desc": "Qui a pris les photos du site."
       }
     },
     "main": "Menu principal",
@@ -810,7 +814,8 @@
       "pentecote": "Effleurez les flammes",
       "ordinaire": "Effleurez les feuilles",
       "moissons": "Effleurez les épis"
-    }
+    },
+    "photo_credits": "Photos : Pexels"
   },
   "admin": {
     "title": "Administration",
@@ -1400,6 +1405,14 @@
       "s3_p": "Le code de ce site est publié sous licence GNU AGPL v3. Les titres sont en Erode et le texte en Switzer (polices Fontshare, licence ITF Free Font License). Les illustrations viennent de Storyset (storyset.com), utilisées avec mention.",
       "s4_t": "Hébergement",
       "s4_p": "Le site sera hébergé par Cloudflare. L’adresse et les informations de l’hébergeur seront indiquées ici à la mise en ligne."
+    },
+    "credits": {
+      "lead": "Les photos de ce site viennent de photographes qui les partagent librement. Voici leurs noms.",
+      "s1_t": "D’où viennent les photos",
+      "s1_p": "En attendant les photos de notre paroisse, nous utilisons des images de la bibliothèque libre Pexels (paysages, récoltes, textures, lieux de culte). Elles seront remplacées peu à peu par des photos de la communauté, avec l’accord des personnes.",
+      "s2_t": "Les photographes",
+      "empty": "La liste apparaîtra ici dès que des photos seront utilisées.",
+      "photos": "{n} photo(s)"
     }
   },
   "auth": {
@@ -1567,7 +1580,9 @@
     "legal_p": "L’éditeur, l’hébergement, les licences et les crédits.",
     "thanks": "Merci",
     "listen": "Écouter",
-    "soon": "Bientôt"
+    "soon": "Bientôt",
+    "credits_t": "Merci aux photographes",
+    "credits_p": "Les noms derrière les images de ce site."
   },
   "bible": {
     "pdv": "Parole de Vie",

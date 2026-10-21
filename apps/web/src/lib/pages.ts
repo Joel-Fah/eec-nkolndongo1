@@ -13,6 +13,7 @@ export type Block =
   | { t: 'empty'; title: K; text: K; link?: { page: string; label: K } }
   | { t: 'seasons'; title: K; footnote: K }
   | { t: 'note'; text: K }
+  | { t: 'credits'; title: K; empty: K }
 
 export type PageContent = { lead: K; art?: string; blocks: Block[] }
 
@@ -216,6 +217,13 @@ export const content: Record<string, PageContent> = {
       { t: 'text', title: p('privacy.s8_t'), paras: [p('privacy.s8_p')] },
       { t: 'text', title: p('privacy.s9_t'), paras: [p('privacy.s9_p')] },
       { t: 'text', title: p('privacy.s10_t'), paras: [p('privacy.s10_p')] },
+    ],
+  },
+  credits: {
+    lead: p('credits.lead'),
+    blocks: [
+      { t: 'text', title: p('credits.s1_t'), paras: [p('credits.s1_p')] },
+      { t: 'credits', title: p('credits.s2_t'), empty: p('credits.empty') },
     ],
   },
   legal: {

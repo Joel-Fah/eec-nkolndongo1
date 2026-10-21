@@ -209,6 +209,12 @@ export const heroes: Record<string, Hero> = {
     photos: [],
     cards: [info('shield', 'hero.privacy_t', 'hero.privacy_p', { x: 0, y: 0 })],
   },
+  credits: {
+    layout: 'plain',
+    shapes: ['blob'],
+    photos: [],
+    cards: [info('photo', 'hero.credits_t', 'hero.credits_p', { x: 0, y: 0 })],
+  },
   legal: {
     layout: 'plain',
     shapes: ['blob'],

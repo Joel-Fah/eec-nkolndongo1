@@ -112,6 +112,10 @@
       "legal": {
         "label": "Legal notice",
         "desc": "Legal information about the site."
+      },
+      "credits": {
+        "label": "Photo credits",
+        "desc": "Who took the site’s photos."
       }
     },
     "main": "Main menu",
@@ -810,7 +814,8 @@
       "pentecote": "Brush the flames",
       "ordinaire": "Brush the leaves",
       "moissons": "Brush the ears of wheat"
-    }
+    },
+    "photo_credits": "Photos: Pexels"
   },
   "admin": {
     "title": "Administration",
@@ -1400,6 +1405,14 @@
       "s3_p": "This site’s code is published under the GNU AGPL v3 licence. Headings are set in Erode and text in Switzer (Fontshare fonts, ITF Free Font License). Illustrations come from Storyset (storyset.com), used with credit.",
       "s4_t": "Hosting",
       "s4_p": "The site will be hosted by Cloudflare. The host’s address and details will be shown here at launch."
+    },
+    "credits": {
+      "lead": "The photos on this site come from photographers who share them freely. Here are their names.",
+      "s1_t": "Where the photos come from",
+      "s1_p": "Until we have photos of our own parish, we use images from the free Pexels library (landscapes, harvest, textures, places of worship). They will gradually be replaced by photos of the community, with people’s consent.",
+      "s2_t": "The photographers",
+      "empty": "The list will appear here as soon as photos are in use.",
+      "photos": "{n} photo(s)"
     }
   },
   "auth": {
@@ -1567,7 +1580,9 @@
     "legal_p": "Publisher, hosting, licences and credits.",
     "thanks": "Thank you",
     "listen": "Listen",
-    "soon": "Soon"
+    "soon": "Soon",
+    "credits_t": "Thank you to the photographers",
+    "credits_p": "The names behind the images on this site."
   },
   "bible": {
     "pdv": "Parole de Vie",

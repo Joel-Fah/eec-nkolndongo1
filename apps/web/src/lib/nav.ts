@@ -137,6 +137,7 @@ export const utilityPages: { id: string; slug: Slugs }[] = [
   { id: 'account', slug: { fr: 'mon-espace', en: 'my-space' } },
   { id: 'privacy', slug: { fr: 'confidentialite', en: 'privacy' } },
   { id: 'legal', slug: { fr: 'mentions-legales', en: 'legal' } },
+  { id: 'credits', slug: { fr: 'credits-photos', en: 'photo-credits' } },
 ]
 
 export type PageEntry = {

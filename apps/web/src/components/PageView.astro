@@ -118,6 +118,17 @@ const colsClass = {
           </section>
         )
       }
+      if (block.t === 'credits') {
+        return (
+          <section class="pv-section">
+            <div class="pv-head">
+              <span class="pv-num" aria-hidden="true">{n}</span>
+              <h2 class="text-3xl">{t(block.title)}</h2>
+            </div>
+            <ul class="credit-list" role="list" data-credits data-empty={t(block.empty)} data-photos={t('pages.credits.photos', { n: '{n}' })}></ul>
+          </section>
+        )
+      }
       if (block.t === 'seasons') {
         return (
           <section class="pv-section">
@@ -151,7 +162,44 @@ const colsClass = {
   }
 </article>
 
+<script>
+  // The photographers behind the photos, from the library (edge-cached, public). Without it the page says so.
+  const list = document.querySelector<HTMLElement>('[data-credits]')
+  if (list) {
+    const empty = () => {
+      const li = document.createElement('li')
+      li.textContent = list.dataset.empty ?? ''
+      list.replaceChildren(li)
+    }
+    fetch('/api/media/credits', { credentials: 'omit' })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d: { credits: { credit: string; creditUrl: string | null; photos: number }[] }) => {
+        if (!d.credits.length) return empty()
+        list.replaceChildren(
+          ...d.credits.map((c) => {
+            const li = document.createElement('li')
+            const name = c.creditUrl?.startsWith('https://') ? Object.assign(document.createElement('a'), { href: c.creditUrl, rel: 'noopener', target: '_blank', className: 'footer-link' }) : document.createElement('span')
+            name.textContent = c.credit
+            const count = document.createElement('small')
+            count.textContent = ` · ${(list.dataset.photos ?? '').replace('{n}', String(c.photos))}`
+            li.append(name, count)
+            return li
+          }),
+        )
+      })
+      .catch(empty)
+  }
+</script>
+
 <style is:global>
+  .credit-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 0.5rem 1.5rem;
+  }
+  .credit-list small {
+    color: var(--ink-muted);
+  }
   .pv {
     display: grid;
     gap: clamp(4rem, 8vw, 7rem);

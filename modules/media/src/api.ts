@@ -4,7 +4,15 @@
  * bytes and size, and are stored. Audio and PDF are streamed straight to the store as they are.
  * Every change is audited; a file used somewhere (media_usages) cannot be deleted.
  */
-import { type AppEnv, audit, fail, requirePermission } from '@eec/api-kit'
+import {
+  type AppEnv,
+  audit,
+  bumpContentVersion,
+  cachedJson,
+  contentVersion,
+  fail,
+  requirePermission,
+} from '@eec/api-kit'
 import { and, desc, eq, ilike, notExists, or, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
@@ -79,7 +87,43 @@ async function peek(body: ReadableStream<Uint8Array>, n: number) {
   return { head, stream }
 }
 
+/** Photo credits for the public page: one entry per photographer (never a file, never anything private). */
+async function creditsOf(db: Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>) {
+  const rows = await db
+    .select({
+      credit: mediaFiles.credit,
+      creditUrl: sql<string | null>`max(${mediaFiles.creditUrl})`,
+      source: sql<string>`max(${mediaFiles.source})`,
+      photos: sql<number>`count(*)::int`,
+    })
+    .from(mediaFiles)
+    .where(
+      and(
+        eq(mediaFiles.status, 'ready'),
+        eq(mediaFiles.kind, 'image'),
+        sql`coalesce(${mediaFiles.credit}, '') <> ''`,
+      ),
+    )
+    .groupBy(mediaFiles.credit)
+    .orderBy(mediaFiles.credit)
+  return { credits: rows }
+}
+
 export const mediaApi = new Hono<AppEnv>()
+  // Anonymous and edge-cached: the names behind the photos (footer « Photos : Pexels » → credits page).
+  .get('/credits', async (c) => {
+    const db = await c.var.deps.db().catch(() => null)
+    const version = db ? await contentVersion(db, 'media').catch(() => 0) : 0
+    return cachedJson(c, {
+      key: `media/credits/v${version}`,
+      ttl: 300,
+      keep: 60 * 60 * 24 * 7,
+      load: async () => {
+        if (!db) throw new Error('database unavailable')
+        return creditsOf(db)
+      },
+    })
+  })
   .get('/', requirePermission('media:read'), async (c) => {
     const db = await c.var.deps.db()
     const q = c.req.query()
@@ -241,6 +285,7 @@ export const mediaApi = new Hono<AppEnv>()
       summaryFr: `Photo ajoutée : « ${m.originalName} »`,
       summaryEn: `Photo added: “${m.originalName}”`,
     })
+    await bumpContentVersion(db, 'media')
     return c.json(dto(row as Row), 201)
   })
 
@@ -281,6 +326,7 @@ export const mediaApi = new Hono<AppEnv>()
       summaryFr: `${type.kind === 'audio' ? 'Audio' : 'Document'} ajouté : « ${name} »`,
       summaryEn: `${type.kind === 'audio' ? 'Audio' : 'Document'} added: “${name}”`,
     })
+    await bumpContentVersion(db, 'media')
     return c.json(dto(row as Row), 201)
   })
 
@@ -307,6 +353,7 @@ export const mediaApi = new Hono<AppEnv>()
       summaryEn: `Description edited: “${before.originalName}”`,
       diff: Object.keys(set),
     })
+    await bumpContentVersion(db, 'media')
     return c.json({ ok: true })
   })
 
@@ -333,6 +380,7 @@ export const mediaApi = new Hono<AppEnv>()
       summaryFr: `Fichier supprimé : « ${row.originalName} »`,
       summaryEn: `File deleted: “${row.originalName}”`,
     })
+    await bumpContentVersion(db, 'media')
     return c.json({ ok: true })
   })
 
@@ -349,6 +397,7 @@ async function setStatus(c: Context<AppEnv>, status: 'ready' | 'archived') {
     summaryFr: `${status === 'archived' ? 'Fichier archivé' : 'Fichier restauré'} : « ${row.originalName} »`,
     summaryEn: `${status === 'archived' ? 'File archived' : 'File restored'}: “${row.originalName}”`,
   })
+  await bumpContentVersion(db, 'media')
   return c.json({ ok: true })
 }
 
