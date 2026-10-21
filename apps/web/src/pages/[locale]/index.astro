@@ -6,6 +6,7 @@ import Illustration from '@eec/ui/astro/Illustration.astro'
 import HeroStream from '../../components/home/HeroStream.astro'
 import SeasonStrip from '../../components/home/SeasonStrip.astro'
 import Site from '../../layouts/Site.astro'
+import { eventsListHref } from '../../lib/events-routes'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
@@ -124,6 +125,14 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       </a>
     </div>
   </section>
+  <section class="home-section" aria-labelledby="upcoming-title" data-upcoming data-locale={locale} data-base={eventsListHref(locale)} hidden>
+    <div class="home-section-head">
+      <h2 id="upcoming-title" class="text-4xl">{t('events.site.upcoming_t')}</h2>
+    </div>
+    <ul class="up-list" data-upcoming-list role="list"></ul>
+    <p class="ln-all"><a href={eventsListHref(locale)}>{t('events.site.upcoming_all')}</a></p>
+  </section>
+
   <section class="home-section" aria-labelledby="latest-title" data-latest-news data-locale={locale} data-base={newsListHref(locale)} data-more={t('news.site.latest_all')} hidden>
     <div class="home-section-head">
       <h2 id="latest-title" class="text-4xl">{t('news.site.latest_t')}</h2>
@@ -135,8 +144,11 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 
 <script>
   import { showLatestNews } from '../../lib/latest-news-client'
+  import { showUpcoming } from '../../lib/upcoming-client'
   showLatestNews()
+  showUpcoming()
   document.addEventListener('astro:page-load', showLatestNews)
+  document.addEventListener('astro:page-load', showUpcoming)
 </script>
 
 <script>
@@ -321,10 +333,41 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       stroke-dashoffset: 0;
     }
   }
+  .up-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+  .up-card {
+    display: grid;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    text-decoration: none;
+  }
+  .up-card time {
+    color: var(--primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .up-card strong {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.2;
+  }
+  .up-card span {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
 </style>
 
 <style is:global>
-  [data-latest-news][hidden] {
+  [data-latest-news][hidden],
+  [data-upcoming][hidden] {
     display: none;
   }
   .ln-list {
@@ -375,5 +418,35 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     .ln-card:hover {
       transform: none;
     }
+  }
+  .up-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+  .up-card {
+    display: grid;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    text-decoration: none;
+  }
+  .up-card time {
+    color: var(--primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .up-card strong {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.2;
+  }
+  .up-card span {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
   }
 </style>

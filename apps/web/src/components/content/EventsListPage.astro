@@ -1,0 +1,465 @@
+---
+/**
+ * The agenda (page « Événements »): a list by default (this week / this month / later), or a month grid
+ * (`?vue=mois&mois=2026-11`, no JavaScript), filterable by group (`?groupe=jape`). Occurrences come from the
+ * cached public API; cancelled ones stay visible, struck through, with their note.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { type EventOcc, publicJson } from '../../lib/content-api'
+import {
+  dayKey,
+  dayText,
+  eventHref,
+  eventsListHref,
+  feedHref,
+  TZ,
+  timeText,
+} from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const q = Astro.url.searchParams
+const view = q.get('vue') === 'mois' || q.get('vue') === 'month' ? 'month' : 'list'
+const group = /^[a-z0-9-]{1,40}$/.test(q.get('groupe') ?? '') ? q.get('groupe') : null
+const todayKey = dayKey(new Date())
+const [ty, tm] = todayKey.split('-').map(Number) as [number, number]
+const ym = /^\d{4}-\d{2}$/.test(q.get('mois') ?? '')
+  ? (q.get('mois') as string)
+  : `${ty}-${String(tm).padStart(2, '0')}`
+const [y, m] = ym.split('-').map(Number) as [number, number]
+
+// Window: the list shows the next 6 months; the month view the 6 weeks around the month.
+const iso = (d: Date) => d.toISOString().slice(0, 10)
+const first = new Date(Date.UTC(y, m - 1, 1))
+const lead = (first.getUTCDay() + 6) % 7
+const gridStart = new Date(Date.UTC(y, m - 1, 1 - lead))
+const from = view === 'month' ? iso(gridStart) : todayKey
+const to =
+  view === 'month'
+    ? iso(new Date(gridStart.getTime() + 42 * 86_400_000))
+    : iso(new Date(Date.now() + 183 * 86_400_000))
+const params = new URLSearchParams({ locale, from, to })
+if (group) params.set('group', group)
+const result = await publicJson<{ items: EventOcc[] }>(Astro, `/api/events/public?${params}`)
+const items = result.state === 'ok' ? result.data.items : []
+const groups = [
+  ...new Map(
+    items.filter((i) => i.groupKey).map((i) => [i.groupKey as string, i.group as string]),
+  ).entries(),
+]
+
+const label = (key: string) => t(`events.site.${key}` as 'events.site.today')
+const link = (extra: Record<string, string | null>) => {
+  const p = new URLSearchParams()
+  const merged: Record<string, string | null> = {
+    vue: view === 'month' ? 'mois' : null,
+    mois: view === 'month' ? ym : null,
+    groupe: group,
+    ...extra,
+  }
+  for (const [k, v] of Object.entries(merged)) if (v) p.set(k, v)
+  const s = p.toString()
+  return `${eventsListHref(locale)}${s ? `?${s}` : ''}`
+}
+const monthLabel = new Intl.DateTimeFormat(locale, {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+}).format(first)
+const shiftMonth = (n: number) => {
+  const d = new Date(Date.UTC(y, m - 1 + n, 1))
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+}
+
+// Sections for the list: this week (until Sunday), this month, later.
+const dow = (new Date(`${todayKey}T00:00:00Z`).getUTCDay() + 6) % 7
+const weekEnd = iso(new Date(new Date(`${todayKey}T00:00:00Z`).getTime() + (6 - dow) * 86_400_000))
+const monthEnd = iso(new Date(Date.UTC(ty, tm, 0)))
+const keyOf = (o: EventOcc) => (o.allDay ? o.startsAt.slice(0, 10) : dayKey(o.startsAt))
+const upcoming = items.filter((o) => keyOf(o) >= todayKey)
+const sections = [
+  { id: 'this_week', items: upcoming.filter((o) => keyOf(o) <= weekEnd) },
+  { id: 'this_month', items: upcoming.filter((o) => keyOf(o) > weekEnd && keyOf(o) <= monthEnd) },
+  { id: 'later', items: upcoming.filter((o) => keyOf(o) > monthEnd) },
+].filter((s) => s.items.length)
+const byDay = new Map<string, EventOcc[]>()
+for (const o of items) byDay.set(keyOf(o), [...(byDay.get(keyOf(o)) ?? []), o])
+const weekdays = Array.from({ length: 7 }, (_, i) =>
+  new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2026, 0, 5 + i)),
+  ),
+)
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('evenements'))} description={t('pages.evenements.lead')}>
+  <link slot="head" rel="alternate" type="text/calendar" title={t('events.site.subscribe')} href={feedHref(locale, group)} />
+  <PageHero id="evenements" />
+  <section class="ev">
+    <div class="ev-bar">
+      <div class="ev-seg" role="group" aria-label={t(labelKey('evenements'))}>
+        <a href={link({ vue: null, mois: null })} aria-current={view === 'list' ? 'true' : undefined}>{label('view_list')}</a>
+        <a href={link({ vue: 'mois', mois: ym })} aria-current={view === 'month' ? 'true' : undefined}>{label('view_month')}</a>
+      </div>
+      {
+        groups.length > 0 && (
+          <nav class="ev-groups" aria-label={label('filter_group')}>
+            <a href={link({ groupe: null })} aria-current={!group ? 'true' : undefined}>{label('all_groups')}</a>
+            {groups.map(([key, name]) => <a href={link({ groupe: key })} aria-current={group === key ? 'true' : undefined}>{name}</a>)}
+          </nav>
+        )
+      }
+    </div>
+
+    {
+      result.state === 'unavailable' ? (
+        <UnavailableState />
+      ) : view === 'month' ? (
+        <div class="ev-month">
+          <div class="ev-month-head">
+            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(-1) })} rel="prev">← <span class="ev-sr">{label('prev_month')}</span></a>
+            <h2 class="ev-month-title">{monthLabel}</h2>
+            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(1) })} rel="next"><span class="ev-sr">{label('next_month')}</span> →</a>
+          </div>
+          <div class="ev-grid">
+            {weekdays.map((w) => <span class="ev-wd" aria-hidden="true">{w}</span>)}
+            {
+              Array.from({ length: 42 }, (_, i) => {
+                const d = new Date(gridStart.getTime() + i * 86_400_000)
+                const key = iso(d)
+                const day = byDay.get(key) ?? []
+                return (
+                  <div class="ev-day" data-out={d.getUTCMonth() !== m - 1 ? '' : undefined} data-today={key === todayKey ? '' : undefined}>
+                    <span class="ev-daynum">{d.getUTCDate()}</span>
+                    {day.map((o) => (
+                      <a class="ev-chip" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
+                        <span class="ev-chip-time">{timeText(o.startsAt, locale, o.allDay, '')}</span> {o.title}
+                      </a>
+                    ))}
+                  </div>
+                )
+              })
+            }
+          </div>
+          <ul class="ev-monthlist">
+            {
+              items.filter((o) => o.startsAt && keyOf(o) >= iso(first) && keyOf(o) < iso(new Date(Date.UTC(y, m, 1)))).map((o) => (
+                <li>
+                  <a class="ev-card" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
+                    <span class="ev-body">
+                      <strong class="ev-title">{o.title}</strong>
+                      <span class="ev-meta">{dayText(o.startsAt, locale, o.allDay, 'full')} · {timeText(o.startsAt, locale, o.allDay, label('all_day'))}</span>
+                      {o.cancelled && <span class="ev-flag">{label('cancelled')}</span>}
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="ev-feed"><a href={feedHref(locale, group)}>{label('subscribe')}</a></p>
+        </div>
+      ) : sections.length === 0 ? (
+        <div class="ev-empty">
+          <Illustration name="calendar" class="ev-art" />
+          <p class="ev-empty-title">{label(group ? 'empty_filter_t' : 'empty_t')}</p>
+          <p>{label(group ? 'empty_filter_p' : 'empty_p')}</p>
+          <Button href={feedHref(locale, group)} variant="secondary">{label('subscribe')}</Button>
+        </div>
+      ) : (
+        <>
+          {
+            sections.map((s) => (
+              <section aria-labelledby={`ev-${s.id}`} class="ev-section">
+                <h2 id={`ev-${s.id}`} class="ev-h">{label(s.id)}</h2>
+                <ul class="ev-list">
+                  {
+                    s.items.map((o) => {
+                      const d = new Date(o.allDay ? o.startsAt : o.startsAt)
+                      const tz = o.allDay ? 'UTC' : TZ
+                      return (
+                        <li>
+                          <a class="ev-card" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
+                            <span class="ev-date" aria-hidden="true">
+                              <span class="ev-date-d">{new Intl.DateTimeFormat(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
+                              <span class="ev-date-m">{new Intl.DateTimeFormat(locale, { month: 'short', timeZone: tz }).format(d)}</span>
+                            </span>
+                            <span class="ev-body">
+                              <strong class="ev-title">{o.title}</strong>
+                              <span class="ev-meta">
+                                {dayText(o.startsAt, locale, o.allDay, 'full')} · {timeText(o.startsAt, locale, o.allDay, label('all_day'))}
+                                {o.location ? ` · ${o.location}` : o.locationKind === 'temple' ? ` · ${label('place_temple')}` : ''}
+                                {o.group ? ` · ${o.group}` : ''}
+                              </span>
+                              {o.cancelled && <span class="ev-flag">{label('cancelled')}{o.note ? ` — ${o.note}` : ''}</span>}
+                              {o.moved && <span class="ev-flag ev-flag-moved">{label('moved')}{o.note ? ` — ${o.note}` : ''}</span>}
+                            </span>
+                          </a>
+                        </li>
+                      )
+                    })
+                  }
+                </ul>
+              </section>
+            ))
+          }
+          <p class="ev-feed"><a href={feedHref(locale, group)}>{label('subscribe')}</a> · <span class="ev-feed-help">{label('subscribe_help')}</span></p>
+        </>
+      )
+    }
+  </section>
+</Site>
+
+<style>
+  .ev {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .ev-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ev-seg,
+  .ev-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .ev-seg {
+    padding: 0.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .ev-seg a,
+  .ev-groups a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+  }
+  .ev-groups a {
+    background: var(--surface-2);
+  }
+  .ev-seg a[aria-current],
+  .ev-groups a[aria-current] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .ev-section {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .ev-h {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .ev-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .ev-card {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    text-decoration: none;
+    transition: transform var(--duration-ui) var(--ease-out);
+  }
+  .ev-card:hover {
+    transform: translateY(-0.125rem);
+  }
+  .ev-date {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.75rem;
+    padding-block: 0.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    color: var(--primary);
+    line-height: 1.1;
+  }
+  .ev-date-d {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .ev-date-m {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+  }
+  .ev-body {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .ev-title {
+    font-size: var(--text-xl);
+  }
+  .ev-meta {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  .ev-card[data-cancelled] .ev-title {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .ev-flag {
+    justify-self: start;
+    padding-inline: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .ev-flag-moved {
+    background: var(--gold-soft, var(--surface-2));
+    color: var(--ink);
+  }
+  .ev-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .ev-empty :global(.ev-art) {
+    width: min(100%, 16rem);
+    height: auto;
+  }
+  .ev-empty-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .ev-feed {
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+  .ev-feed-help {
+    color: var(--ink-muted);
+  }
+  .ev-month {
+    display: grid;
+    gap: 1rem;
+  }
+  .ev-month-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .ev-month-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    text-transform: capitalize;
+  }
+  .ev-step {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    text-decoration: none;
+  }
+  .ev-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .ev-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+  .ev-wd {
+    padding: 0.25rem;
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: capitalize;
+  }
+  .ev-day {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+    min-height: 4.5rem;
+    padding: 0.375rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .ev-day[data-out] {
+    opacity: 0.45;
+  }
+  .ev-day[data-today] .ev-daynum {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    justify-self: start;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: var(--primary-ink, #fff);
+  }
+  .ev-chip {
+    overflow: hidden;
+    padding: 0.125rem 0.25rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    font-size: var(--text-xs);
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ev-chip[data-cancelled] {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  .ev-chip-time {
+    font-weight: 600;
+  }
+  .ev-monthlist {
+    display: none;
+    gap: 0.75rem;
+  }
+  @media (max-width: 47.99rem) {
+    .ev-grid {
+      display: none;
+    }
+    .ev-monthlist {
+      display: grid;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ev-card,
+    .ev-card:hover {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>

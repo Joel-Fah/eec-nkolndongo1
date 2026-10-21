@@ -1,0 +1,12 @@
+---
+import EventDetailPage from '../../../../components/content/EventDetailPage.astro'
+import { rightEventsPath } from '../../../../lib/events-routes'
+
+export const prerender = false
+if (!rightEventsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+const { slug } = Astro.params
+const token = slug === 'apercu' ? (Astro.url.searchParams.get('t') ?? '') : undefined
+---
+
+<EventDetailPage slug={slug} token={token} />
