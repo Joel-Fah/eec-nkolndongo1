@@ -71,6 +71,13 @@
       "when": 1792574261572,
       "tag": "0009_liturgy",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792580019453,
+      "tag": "0010_events_kind_schedule_rhythm",
+      "breakpoints": true
     }
   ]
 }
