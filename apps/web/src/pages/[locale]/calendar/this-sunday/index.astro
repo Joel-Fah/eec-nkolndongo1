@@ -1,0 +1,11 @@
+---
+import ThisSundayPage from '../../../../components/content/ThisSundayPage.astro'
+import { pages } from '../../../../lib/nav'
+
+export const prerender = false
+const locale = Astro.currentLocale === 'en' ? 'en' : 'fr'
+const path = pages.find((p) => p.id === 'dimanche')?.path[locale] ?? ''
+if (!Astro.url.pathname.startsWith(`/${locale}/${path}`)) return Astro.rewrite('/404')
+---
+
+<ThisSundayPage />

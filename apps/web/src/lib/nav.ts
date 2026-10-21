@@ -90,6 +90,12 @@ export const tabs: NavTab[] = [
         art: 'a-whole-year',
       },
       {
+        id: 'dimanche',
+        slug: { fr: 'ce-dimanche', en: 'this-sunday' },
+        icon: 'sun',
+        art: 'pray',
+      },
+      {
         id: 'liturgie',
         slug: { fr: 'annee-liturgique', en: 'liturgical-year' },
         icon: 'sun',

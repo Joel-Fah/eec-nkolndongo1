@@ -7,6 +7,7 @@ import { seasonNames } from '@eec/ui/tokens'
 import { localeOf, useT } from '../lib/i18n'
 import { href, labelKey, pages } from '../lib/nav'
 import { content } from '../lib/pages'
+import LiturgyDial from './page/LiturgyDial.astro'
 import '../styles/patterns.css'
 
 interface Props {
@@ -140,7 +141,8 @@ const colsClass = {
               <h2 class="text-4xl">{t(block.title)}</h2>
             </div>
             <p class="w-fit rounded-md bg-primary-soft px-4 py-2 font-medium text-primary">{t('pages.liturgie.now', { season: t(`season.${season}` as 'season.avent') })}</p>
-            <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="list">
+            <LiturgyDial />
+            <ul class="pv-seasons-list grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="list">
               {seasonNames.map((s) => (
                 <li data-season={s} class:list={['season-card', s === season && 'is-current']}>
                   <span class="season-dot" aria-hidden="true"></span>

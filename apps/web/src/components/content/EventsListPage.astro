@@ -14,6 +14,7 @@ import {
   eventHref,
   eventsListHref,
   feedHref,
+  fmt,
   TZ,
   timeText,
 } from '../../lib/events-routes'
@@ -189,8 +190,8 @@ Astro.response.headers.set(
                         <li>
                           <a class="ev-card" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
                             <span class="ev-date" aria-hidden="true">
-                              <span class="ev-date-d">{new Intl.DateTimeFormat(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
-                              <span class="ev-date-m">{new Intl.DateTimeFormat(locale, { month: 'short', timeZone: tz }).format(d)}</span>
+                              <span class="ev-date-d">{fmt(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
+                              <span class="ev-date-m">{fmt(locale, { month: 'short', timeZone: tz }).format(d)}</span>
                             </span>
                             <span class="ev-body">
                               <strong class="ev-title">{o.title}</strong>

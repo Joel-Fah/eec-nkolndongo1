@@ -60,5 +60,30 @@
   "verse_deleted": "Verset supprimé",
   "delete": "Supprimer",
   "no_verses": "Aucun verset pour l’instant.",
-  "no_text": "sans texte"
+  "no_text": "sans texte",
+  "site": {
+    "dial_label": "Saisons de l’année liturgique",
+    "prev": "Saison précédente",
+    "next": "Dimanches suivants",
+    "sundays_of_season": "Dimanches à venir dans cette saison",
+    "title": "Ce dimanche",
+    "lead": "Le dimanche qui vient : son thème, ses lectures, le culte.",
+    "theme": "Thème",
+    "readings": "Lectures",
+    "preacher": "Message",
+    "liturgist": "Liturgie",
+    "hymns": "Cantiques",
+    "notes": "À noter",
+    "service_at": "Culte à {time}",
+    "service_soon": "L’heure du culte sera publiée bientôt.",
+    "not_ready_t": "Ce dimanche se prépare",
+    "not_ready_p": "Le détail de ce dimanche sera publié ici dès qu’il sera prêt.",
+    "previous": "Dimanches précédents",
+    "add_calendar": "Ajouter à mon calendrier",
+    "verse_of_day": "Verset du jour",
+    "this_sunday": "Dimanche {date}",
+    "unavailable_t": "Cette page ne se charge pas pour l’instant",
+    "unavailable_p": "Ce n’est pas de votre fait. Réessayez dans un moment.",
+    "retry": "Réessayer"
+  }
 }

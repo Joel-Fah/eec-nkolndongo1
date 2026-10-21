@@ -1,5 +1,6 @@
 ---
 import type { NewsItem } from '../../lib/content-api'
+import { fmt } from '../../lib/events-routes'
 import { localeOf, useT } from '../../lib/i18n'
 /**
  * A card for any content item in a list (news today; events, guides… later): photo, title, summary, date.
@@ -15,9 +16,7 @@ interface Props {
 const { item, href, featured = false } = Astro.props
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
-const date = new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(
-  new Date(item.publishedAt),
-)
+const date = fmt(locale, { dateStyle: 'long' }).format(new Date(item.publishedAt))
 ---
 
 <article class:list={['cc', featured && 'cc-featured']}>

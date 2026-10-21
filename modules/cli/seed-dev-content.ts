@@ -7,7 +7,9 @@ import { cleanDoc, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { mediaFiles } from '@eec/db/schema'
 import { eventsItems } from '@eec/module-events/schema'
+import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
+import { scheduleSlots } from '@eec/module-schedule/schema'
 import { and, eq, like } from 'drizzle-orm'
 
 assertBranch(['dev'])
@@ -16,6 +18,9 @@ const { db, close } = await connectDirect()
 if (process.argv.includes('--clear')) {
   await db.delete(newsPosts).where(like(newsPosts.slug, 'exemple-%'))
   await db.delete(eventsItems).where(like(eventsItems.slug, 'exemple-%'))
+  await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
+  await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
+  await db.delete(liturgySundays).where(eq(liturgySundays.themeFr, 'Exemple de thème'))
   console.log('Example posts and events removed.')
   await close()
   process.exit(0)
@@ -145,5 +150,77 @@ await db
     },
   ])
   .onConflictDoNothing()
-console.log(`Seeded ${titles.length} example posts (exemple-1…) and 3 example events.`)
+// Schedule: obviously fictional slots, already approved so the pages can be judged.
+await db.insert(scheduleSlots).values([
+  {
+    kind: 'culte',
+    labelFr: 'Exemple — Culte du dimanche',
+    labelEn: 'Example — Sunday service',
+    weekday: 0,
+    startTime: '09:00',
+    endTime: '11:00',
+    placeFr: 'Lieu d’exemple',
+    validated: true,
+  },
+  {
+    kind: 'priere',
+    labelFr: 'Exemple — Prière du mercredi',
+    labelEn: 'Example — Wednesday prayer',
+    weekday: 3,
+    startTime: '18:00',
+    validated: true,
+  },
+  {
+    kind: 'etude_biblique',
+    labelFr: 'Exemple — Étude biblique',
+    labelEn: 'Example — Bible study',
+    weekday: 5,
+    startTime: '17:30',
+    endTime: '19:00',
+    validated: true,
+  },
+])
+// Liturgy: the coming Sunday (theme and readings are examples), and the four verses already used on the sign-in screen
+// (Louis Segond 1910 / World English Bible, public domain: to check against a printed copy, decision 0032).
+const sundayDate = (() => {
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + ((7 - d.getUTCDay()) % 7 || 7))
+  return d.toISOString().slice(0, 10)
+})()
+await db
+  .insert(liturgySundays)
+  .values({
+    date: sundayDate,
+    themeFr: 'Exemple de thème',
+    themeEn: 'Example theme',
+    readings: [
+      { book: 'jhn', chapter: 3, from: 16, to: null },
+      { book: 'psa', chapter: 23 },
+    ],
+    state: 'published',
+    publishedAt: new Date(),
+  })
+  .onConflictDoNothing()
+await db.insert(liturgyVerses).values([
+  {
+    ref: { book: 'mat', chapter: 11, from: 28 },
+    textFr: 'Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.',
+    textEn: 'Come to me, all you who labor and are heavily burdened, and I will give you rest.',
+  },
+  {
+    ref: { book: 'psa', chapter: 23, from: 1 },
+    textFr: 'L’Éternel est mon berger : je ne manquerai de rien.',
+    textEn: 'Yahweh is my shepherd: I shall lack nothing.',
+  },
+  {
+    ref: { book: 'jhn', chapter: 3, from: 16 },
+    textFr:
+      'Car Dieu a tant aimé le monde qu’il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu’il ait la vie éternelle.',
+    textEn:
+      'For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.',
+  },
+])
+console.log(
+  `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, a Sunday and 3 verses.`,
+)
 await close()

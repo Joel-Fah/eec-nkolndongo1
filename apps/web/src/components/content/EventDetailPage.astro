@@ -4,7 +4,7 @@ import Button from '@eec/ui/astro/Button.astro'
 import '../../styles/richtext.css'
 import Site from '../../layouts/Site.astro'
 import { type EventDetail, publicJson } from '../../lib/content-api'
-import { dayText, eventHref, eventsListHref, TZ, timeText } from '../../lib/events-routes'
+import { dayText, eventHref, eventsListHref, fmt, TZ, timeText } from '../../lib/events-routes'
 import { localeOf, useT } from '../../lib/i18n'
 import Picture from '../Picture.astro'
 import LangFallbackNote from './LangFallbackNote.astro'
@@ -73,8 +73,8 @@ const d = ev ? new Date(ev.startsAt) : new Date()
         <>
           <header class="ed-head">
             <span class="ed-date" aria-hidden="true">
-              <span class="ed-date-d">{new Intl.DateTimeFormat(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
-              <span class="ed-date-m">{new Intl.DateTimeFormat(locale, { month: 'short', timeZone: tz }).format(d)}</span>
+              <span class="ed-date-d">{fmt(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
+              <span class="ed-date-m">{fmt(locale, { month: 'short', timeZone: tz }).format(d)}</span>
             </span>
             <div class="ed-titles">
               <h1 class="ed-title" data-cancelled={ev.cancelled ? '' : undefined}>{ev.title}</h1>

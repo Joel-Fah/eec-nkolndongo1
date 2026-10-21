@@ -1,0 +1,236 @@
+---
+/**
+ * « Ce dimanche »: the coming Sunday (or today's until 14:00): season colour, name, theme, readings, the service
+ * time (approved schedule only), and the other published Sundays. People's names appear only when the API says they
+ * agreed. Data: cached public API; on a cold database a friendly state, never a 500.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import UnavailableState from './UnavailableState.astro'
+
+type Sunday = {
+  date: string
+  season: string
+  name: string
+  theme: string
+  readings: { label: string }[]
+  preacher: string
+  liturgist: string
+  hymns: string
+  notes: string
+  published: boolean
+}
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const label = (key: string, vars?: Record<string, string>) =>
+  t(`liturgy.site.${key}` as 'liturgy.site.title', vars)
+const [cur, list, next, verse] = await Promise.all([
+  publicJson<Sunday>(Astro, `/api/liturgy/public/sunday?locale=${locale}`),
+  publicJson<{ current: string; items: Sunday[] }>(
+    Astro,
+    `/api/liturgy/public/sundays?locale=${locale}`,
+  ),
+  publicJson<{ next: { startsAt: string; kind: string; when: string } | null }>(
+    Astro,
+    '/api/schedule/public/next',
+  ),
+  publicJson<{ verse: { ref: string; text: string; translation: string } | null }>(
+    Astro,
+    `/api/liturgy/public/verse?locale=${locale}`,
+  ),
+])
+const s = cur.state === 'ok' ? cur.data : null
+const others = list.state === 'ok' ? list.data.items.filter((x) => x.date !== s?.date) : []
+const before = others
+  .filter((x) => x.date < (s?.date ?? ''))
+  .slice(-4)
+  .reverse()
+const after = others.filter((x) => x.date > (s?.date ?? '')).slice(0, 4)
+const day = (d: string) =>
+  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(`${d}T00:00:00Z`),
+  )
+const serviceTime =
+  next.state === 'ok' && next.data.next && s && next.data.next.startsAt.slice(0, 10) >= s.date
+    ? new Intl.DateTimeFormat(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Africa/Douala',
+      }).format(new Date(next.data.next.startsAt))
+    : ''
+const v = verse.state === 'ok' ? verse.data.verse : null
+Astro.response.headers.set(
+  'cache-control',
+  cur.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('dimanche'))} description={t('liturgy.site.lead')}>
+  <article class="cs" data-season={s?.season}>
+    <header class="cs-head">
+      <p class="cs-kicker"><span class="cs-dot" aria-hidden="true"></span>{label('title')}</p>
+      <h1 class="cs-title">{s ? s.name : label('title')}</h1>
+      {s && <p class="cs-date">{day(s.date)}</p>}
+    </header>
+    {
+      cur.state === 'unavailable' ? (
+        <UnavailableState />
+      ) : !s || !s.published ? (
+        <div class="cs-empty">
+          <h2>{label('not_ready_t')}</h2>
+          <p>{label('not_ready_p')}</p>
+        </div>
+      ) : (
+        <div class="cs-card">
+          {s.theme && <p class="cs-theme"><span class="cs-label">{label('theme')}</span>{s.theme}</p>}
+          {s.readings.length > 0 && (
+            <div>
+              <h2 class="cs-label">{label('readings')}</h2>
+              <ul class="cs-readings">{s.readings.map((r) => <li>{r.label}</li>)}</ul>
+            </div>
+          )}
+          {s.preacher && <p><span class="cs-label">{label('preacher')}</span>{s.preacher}</p>}
+          {s.liturgist && <p><span class="cs-label">{label('liturgist')}</span>{s.liturgist}</p>}
+          {s.hymns && <p><span class="cs-label">{label('hymns')}</span>{s.hymns}</p>}
+          {s.notes && <p><span class="cs-label">{label('notes')}</span>{s.notes}</p>}
+          <p class="cs-time">{serviceTime ? label('service_at', { time: serviceTime }) : label('service_soon')}</p>
+        </div>
+      )
+    }
+    {v && (
+      <figure class="cs-verse">
+        <blockquote>{v.text}</blockquote>
+        <figcaption>{v.ref} · {v.translation}</figcaption>
+      </figure>
+    )}
+    {
+      (before.length > 0 || after.length > 0) && (
+        <div class="cs-others">
+          {after.length > 0 && (
+            <section>
+              <h2 class="cs-h">{label('next')}</h2>
+              <ul>{after.map((x) => <li><strong>{day(x.date)}</strong> — {x.name}{x.theme ? ` · ${x.theme}` : ''}</li>)}</ul>
+            </section>
+          )}
+          {before.length > 0 && (
+            <section>
+              <h2 class="cs-h">{label('previous')}</h2>
+              <ul>{before.map((x) => <li><strong>{day(x.date)}</strong> — {x.name}{x.theme ? ` · ${x.theme}` : ''}</li>)}</ul>
+            </section>
+          )}
+        </div>
+      )
+    }
+    <p><Button href={locale === 'fr' ? '/fr/agenda/annee-liturgique/' : '/en/calendar/liturgical-year/'} variant="secondary">{t('nav.items.liturgie.label')}</Button></p>
+  </article>
+</Site>
+
+<style>
+  .cs {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 48rem);
+    margin-inline: auto;
+    padding-block: 3rem 4rem;
+  }
+  .cs-head {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .cs-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  .cs-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .cs-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .cs-date {
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .cs-date::first-letter {
+    text-transform: uppercase;
+  }
+  .cs-card,
+  .cs-empty {
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 35%, transparent);
+  }
+  .cs-empty {
+    background: var(--surface-2);
+    box-shadow: none;
+  }
+  .cs-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .cs-theme {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .cs-readings {
+    display: grid;
+    gap: 0.25rem;
+    font-size: var(--text-lg, 1.125rem);
+  }
+  .cs-time {
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .cs-verse {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--gold-soft, var(--surface-2));
+  }
+  .cs-verse blockquote {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-style: italic;
+  }
+  .cs-verse figcaption {
+    margin-block-start: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .cs-others {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .cs-h {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-block-end: 0.5rem;
+  }
+  .cs-others ul {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .cs-others strong {
+    text-transform: capitalize;
+  }
+</style>

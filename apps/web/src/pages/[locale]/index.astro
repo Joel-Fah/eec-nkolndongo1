@@ -8,7 +8,7 @@ import SeasonStrip from '../../components/home/SeasonStrip.astro'
 import Site from '../../layouts/Site.astro'
 import { eventsListHref } from '../../lib/events-routes'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
-import { href, pages } from '../../lib/nav'
+import { href, pages as navPages, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
 import { visibleStats } from '../../lib/stats'
 import '../../styles/patterns.css'
@@ -100,7 +100,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
         <SeasonStrip />
       </a>
 
-      <figure class="bento-card bento-verse">
+      <figure class="bento-card bento-verse" data-verse-of-day data-locale={locale}>
         <span class="bento-verse-mark" aria-hidden="true">{locale === 'fr' ? '«' : '“'}</span>
         <blockquote class="bento-verse-text">{t('home.verse')}</blockquote>
         <figcaption class="bento-verse-cite">{t('home.verse_cite')}</figcaption>
@@ -125,6 +125,17 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       </a>
     </div>
   </section>
+  <section class="home-section" aria-labelledby="sunday-title" data-sunday data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
+    <a class="sunday-card" data-sunday-link href={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')}>
+      <p class="sunday-kicker"><span class="sunday-dot" aria-hidden="true"></span><span id="sunday-title">{t('liturgy.site.title')}</span></p>
+      <strong class="sunday-name" data-sunday-name></strong>
+      <span class="sunday-date" data-sunday-date></span>
+      <span class="sunday-theme" data-sunday-theme hidden></span>
+      <span class="sunday-readings" data-sunday-readings hidden></span>
+      <span class="sunday-time" data-sunday-time hidden></span>
+    </a>
+  </section>
+
   <section class="home-section" aria-labelledby="upcoming-title" data-upcoming data-locale={locale} data-base={eventsListHref(locale)} hidden>
     <div class="home-section-head">
       <h2 id="upcoming-title" class="text-4xl">{t('events.site.upcoming_t')}</h2>
@@ -144,7 +155,10 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 
 <script>
   import { showLatestNews } from '../../lib/latest-news-client'
+  import { showSunday } from '../../lib/sunday-client'
   import { showUpcoming } from '../../lib/upcoming-client'
+  showSunday()
+  document.addEventListener('astro:page-load', showSunday)
   showLatestNews()
   showUpcoming()
   document.addEventListener('astro:page-load', showLatestNews)
@@ -363,11 +377,58 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     color: var(--ink-muted);
     font-size: var(--text-sm);
   }
+  .sunday-card {
+    display: grid;
+    gap: 0.375rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 40%, transparent);
+    text-decoration: none;
+  }
+  .sunday-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .sunday-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .sunday-name {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+  }
+  .sunday-date,
+  .sunday-readings {
+    color: var(--ink-muted);
+    text-transform: capitalize;
+  }
+  .sunday-theme {
+    font-size: var(--text-lg, 1.125rem);
+  }
+  .sunday-time {
+    justify-self: start;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
 </style>
 
 <style is:global>
   [data-latest-news][hidden],
-  [data-upcoming][hidden] {
+  [data-upcoming][hidden],
+  [data-sunday][hidden] {
     display: none;
   }
   .ln-list {
@@ -448,5 +509,51 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   .up-card span {
     color: var(--ink-muted);
     font-size: var(--text-sm);
+  }
+  .sunday-card {
+    display: grid;
+    gap: 0.375rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 40%, transparent);
+    text-decoration: none;
+  }
+  .sunday-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .sunday-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .sunday-name {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+  }
+  .sunday-date,
+  .sunday-readings {
+    color: var(--ink-muted);
+    text-transform: capitalize;
+  }
+  .sunday-theme {
+    font-size: var(--text-lg, 1.125rem);
+  }
+  .sunday-time {
+    justify-self: start;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
   }
 </style>

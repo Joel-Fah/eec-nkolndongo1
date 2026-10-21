@@ -60,5 +60,30 @@
   "verse_deleted": "Verse deleted",
   "delete": "Delete",
   "no_verses": "No verses yet.",
-  "no_text": "no text"
+  "no_text": "no text",
+  "site": {
+    "dial_label": "Seasons of the liturgical year",
+    "prev": "Previous season",
+    "next": "Next Sundays",
+    "sundays_of_season": "Coming Sundays in this season",
+    "title": "This Sunday",
+    "lead": "The coming Sunday: its theme, readings and service.",
+    "theme": "Theme",
+    "readings": "Readings",
+    "preacher": "Message",
+    "liturgist": "Liturgy",
+    "hymns": "Hymns",
+    "notes": "Good to know",
+    "service_at": "Service at {time}",
+    "service_soon": "The service time will be published soon.",
+    "not_ready_t": "This Sunday is being prepared",
+    "not_ready_p": "The details of this Sunday will be published here as soon as they are ready.",
+    "previous": "Previous Sundays",
+    "add_calendar": "Add to my calendar",
+    "verse_of_day": "Verse of the day",
+    "this_sunday": "Sunday {date}",
+    "unavailable_t": "This page is not loading right now",
+    "unavailable_p": "This is not your fault. Please try again in a moment.",
+    "retry": "Try again"
+  }
 }

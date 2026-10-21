@@ -116,6 +116,10 @@
       "credits": {
         "label": "Photo credits",
         "desc": "Who took the site’s photos."
+      },
+      "dimanche": {
+        "label": "This Sunday",
+        "desc": "The theme, readings and service of the coming Sunday."
       }
     },
     "main": "Main menu",

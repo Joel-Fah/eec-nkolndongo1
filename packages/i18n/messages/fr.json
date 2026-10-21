@@ -116,6 +116,10 @@
       "credits": {
         "label": "Crédits photos",
         "desc": "Qui a pris les photos du site."
+      },
+      "dimanche": {
+        "label": "Ce dimanche",
+        "desc": "Le thème, les lectures et le culte du dimanche qui vient."
       }
     },
     "main": "Menu principal",

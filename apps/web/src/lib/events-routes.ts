@@ -13,6 +13,18 @@ export const feedHref = (locale: Locale, group?: string | null) =>
   `/${locale}/${locale === 'fr' ? 'agenda/calendrier.ics' : 'calendar/feed.ics'}${group ? `?groupe=${group}` : ''}`
 
 export const TZ = 'Africa/Douala'
+
+/** Intl formatters are slow to build (≈ 0.2 ms each); a list of 25 cards must not build 100. Cached per options. */
+const formatters = new Map<string, Intl.DateTimeFormat>()
+export const fmt = (locale: string, options: Intl.DateTimeFormatOptions) => {
+  const key = `${locale}|${JSON.stringify(options)}`
+  let f = formatters.get(key)
+  if (!f) {
+    f = new Intl.DateTimeFormat(locale, options)
+    formatters.set(key, f)
+  }
+  return f
+}
 /** Local (Douala) calendar day of an instant, as YYYY-MM-DD. */
 export const dayKey = (d: Date | string) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date(d))
