@@ -14,6 +14,12 @@ Everything here is meant to be doable by Joël (or the person after) without gue
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | — | GitHub secrets (deploy, preview) |
 | `ADMIN_PATH`, `SITE_INDEXABLE` | `.env.local` | GitHub repository **variables** (also `vars` in `wrangler.jsonc`) |
 
+## First deploy (by hand, once)
+`bash scripts/ops/first-deploy.sh` — reads `.env.production.local` into the shell only, checks the branch and database,
+asks you to type DEPLOY, then builds, migrates and seeds the production database, deploys the Worker and sends its
+secrets. Afterwards `pnpm admin:bootstrap` (with the same environment loaded) creates the super admin through a single-use
+link. From then on, merges to `main` deploy through the `deploy` workflow.
+
 ## Deploy
 1. Merge to `main`: the `deploy` workflow lints, tests, builds (`pnpm build:site` puts the admin inside the site at
    `ADMIN_PATH`), applies migrations to the production Neon branch, then `wrangler deploy`.
