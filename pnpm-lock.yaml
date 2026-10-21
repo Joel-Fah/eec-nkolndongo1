@@ -898,6 +898,9 @@ importers:
       pg:
         specifier: 8.23.1
         version: 8.23.1
+      thumbhash:
+        specifier: 0.1.1
+        version: 0.1.1
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
