@@ -2,6 +2,7 @@
 import type { AppEnv } from '@eec/api-kit'
 import { mediaApi } from '@eec/module-media/api'
 import { membersApi } from '@eec/module-members/api'
+import { newsApi } from '@eec/module-news/api'
 import { settingsApi } from '@eec/module-settings/api'
 import type { Hono } from 'hono'
 
@@ -9,5 +10,6 @@ import type { Hono } from 'hono'
 export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   media: mediaApi,
   members: membersApi,
+  news: newsApi,
   settings: settingsApi,
 }

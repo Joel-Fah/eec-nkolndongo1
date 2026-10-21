@@ -1,7 +1,8 @@
 /** The media library: one row per file (an image row lists its resized variants), and where each is used. */
-import { createdAt, id, timestamps } from '@eec/db/columns'
-import { user } from '@eec/db/schema'
+
 import { index, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { createdAt, id, timestamps } from '../columns.ts'
+import { user } from './auth.ts'
 
 export type MediaVariant = { key: string; width: number; size: number; mime: string }
 

@@ -13,11 +13,11 @@ import {
   requirePermission,
   versionFor,
 } from '@eec/api-kit'
+import { type MediaVariant, mediaFiles, mediaUsages } from '@eec/db/schema'
 import { and, desc, eq, ilike, notExists, or, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
 import { LIMITS, type MediaKind, mediaKey, sniff } from './rules.ts'
-import { type MediaVariant, mediaFiles, mediaUsages } from './schema.ts'
 import { createStore } from './store.ts'
 
 const QUOTA = 5 * 1024 * 1024 * 1024 // Neon Object Storage, Free plan

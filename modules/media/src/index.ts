@@ -1,8 +1,8 @@
 /** Public surface of the media module: its manifest and the shared rules. */
 import { defineModule } from '@eec/modules-kit'
 
+export type { MediaVariant } from '@eec/db/schema'
 export * from './rules.ts'
-export type { MediaVariant } from './schema.ts'
 
 export const mediaModule = defineModule({
   id: 'media',

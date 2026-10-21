@@ -1,4 +1,4 @@
-import { can, type Principal } from '@eec/auth'
+import { can, canAnywhere, type Principal } from '@eec/auth'
 import type { Context, MiddlewareHandler } from 'hono'
 import type { AppEnv } from './context.ts'
 
@@ -24,6 +24,27 @@ export function requirePermission(
   }
   mw.__guard = permission
   return mw
+}
+
+/**
+ * Gate for group-scoped modules when the group is only known after reading the resource: the person must hold the
+ * right for at least one scope here, and the handler then checks the exact group with `mayOn`.
+ */
+export function requirePermissionAnywhere(permission: string): Guarded {
+  const mw: Guarded = async (c, next) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    if (!canAnywhere(actor.principal as Principal, permission)) return fail(c, 403, 'forbidden')
+    await next()
+  }
+  mw.__guard = `${permission} (checked per group)`
+  return mw
+}
+
+/** The exact check, once the resource's group is known. */
+export async function mayOn(c: Context<AppEnv>, permission: string, groupId: string | null) {
+  const actor = await c.var.deps.actor()
+  return !!actor && can(actor.principal as Principal, permission, { groupId })
 }
 
 /** Signed-in user acting on their own data (profile, password, sessions). */

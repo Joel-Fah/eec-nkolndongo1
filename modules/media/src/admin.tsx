@@ -5,6 +5,7 @@
  */
 import { Dialog } from '@base-ui/react/dialog'
 import { ApiError, api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import type { MediaVariant } from '@eec/db/schema'
 import type { MessageKey } from '@eec/i18n'
 import {
   Badge,
@@ -20,7 +21,6 @@ import { useEffect, useRef, useState } from 'react'
 import { thumbHashToDataURL } from 'thumbhash'
 import { processImage } from './process.ts'
 import { LIMITS, type MediaKind } from './rules.ts'
-import type { MediaVariant } from './schema.ts'
 
 type Item = {
   id: string
