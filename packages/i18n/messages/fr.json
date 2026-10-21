@@ -1623,5 +1623,79 @@
     "qa_settings": "Paramètres",
     "qa_outbox": "Boîte d’envoi",
     "qa_activity": "Activité récente"
+  },
+  "content": {
+    "status": {
+      "draft": "Brouillon",
+      "scheduled": "Programmé",
+      "published": "Publié",
+      "archived": "Archivé"
+    },
+    "save": {
+      "dirty": "Modifications en attente…",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "error": "Pas enregistré. Nouvel essai en cours…"
+    },
+    "editor": {
+      "toolbar": "Mise en forme",
+      "bold": "Gras",
+      "italic": "Italique",
+      "heading": "Titre de section",
+      "bullets": "Liste à puces",
+      "numbers": "Liste numérotée",
+      "quote": "Citation",
+      "link": "Lien",
+      "photo": "Photo de la médiathèque",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "link_label": "Adresse du lien",
+      "link_apply": "Appliquer",
+      "link_remove": "Retirer le lien",
+      "link_invalid": "Ce lien n’est pas accepté. Utilisez une adresse https://, un courriel (mailto:) ou un téléphone (tel:)."
+    },
+    "picker": {
+      "title": "Choisir une photo",
+      "search": "Rechercher une photo",
+      "search_ph": "Nom ou description",
+      "empty": "Aucune photo trouvée",
+      "empty_help": "Ajoutez des photos dans la médiathèque, puis revenez ici.",
+      "no_alt": "Sans description",
+      "cancel": "Annuler"
+    },
+    "cover": {
+      "label": "Photo principale",
+      "none": "Aucune photo choisie.",
+      "choose": "Choisir une photo",
+      "change": "Changer",
+      "remove": "Retirer"
+    },
+    "publish": {
+      "title": "Publier",
+      "title_change": "Modifier les dates",
+      "when": "Quand ?",
+      "now": "Maintenant",
+      "later": "Plus tard, à un jour et une heure choisis",
+      "from": "Visible à partir du",
+      "until": "Retirer du site le (facultatif)",
+      "until_help": "Après cette date, la page n’est plus visible, mais elle reste dans vos archives.",
+      "confirm_now": "Publier maintenant",
+      "confirm_later": "Programmer",
+      "problem_title": "Ajoutez un titre.",
+      "problem_body": "Ajoutez du texte.",
+      "problem_dates": "La date de retrait doit venir après la date de publication."
+    },
+    "revisions": {
+      "title": "Versions précédentes",
+      "lead": "Le texte est gardé à chaque publication et de temps en temps pendant que vous écrivez. Restaurer garde aussi la version actuelle.",
+      "empty": "Pas encore de version enregistrée.",
+      "restore": "Restaurer",
+      "close": "Fermer",
+      "words": "{n} mots",
+      "reason_autosave": "Enregistrement automatique",
+      "reason_publish": "Publication",
+      "reason_before-restore": "Avant une restauration",
+      "reason_save": "Enregistrement"
+    }
   }
 }

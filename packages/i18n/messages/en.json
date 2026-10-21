@@ -1623,5 +1623,79 @@
     "qa_settings": "Settings",
     "qa_outbox": "Outbox",
     "qa_activity": "Recent activity"
+  },
+  "content": {
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "save": {
+      "dirty": "Changes waiting…",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Not saved. Trying again…"
+    },
+    "editor": {
+      "toolbar": "Formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "heading": "Section heading",
+      "bullets": "Bulleted list",
+      "numbers": "Numbered list",
+      "quote": "Quote",
+      "link": "Link",
+      "photo": "Photo from the library",
+      "undo": "Undo",
+      "redo": "Redo",
+      "link_label": "Link address",
+      "link_apply": "Apply",
+      "link_remove": "Remove link",
+      "link_invalid": "This link is not accepted. Use an https:// address, an email (mailto:) or a phone number (tel:)."
+    },
+    "picker": {
+      "title": "Choose a photo",
+      "search": "Search for a photo",
+      "search_ph": "Name or description",
+      "empty": "No photo found",
+      "empty_help": "Add photos in the media library, then come back here.",
+      "no_alt": "No description",
+      "cancel": "Cancel"
+    },
+    "cover": {
+      "label": "Main photo",
+      "none": "No photo chosen.",
+      "choose": "Choose a photo",
+      "change": "Change",
+      "remove": "Remove"
+    },
+    "publish": {
+      "title": "Publish",
+      "title_change": "Change the dates",
+      "when": "When?",
+      "now": "Now",
+      "later": "Later, on a day and time I choose",
+      "from": "Visible from",
+      "until": "Take off the site on (optional)",
+      "until_help": "After this date the page is no longer visible, but it stays in your archive.",
+      "confirm_now": "Publish now",
+      "confirm_later": "Schedule",
+      "problem_title": "Add a title.",
+      "problem_body": "Add some text.",
+      "problem_dates": "The end date must come after the publishing date."
+    },
+    "revisions": {
+      "title": "Earlier versions",
+      "lead": "The text is kept at every publication and from time to time while you write. Restoring also keeps the current version.",
+      "empty": "No saved version yet.",
+      "restore": "Restore",
+      "close": "Close",
+      "words": "{n} words",
+      "reason_autosave": "Automatic save",
+      "reason_publish": "Publication",
+      "reason_before-restore": "Before a restore",
+      "reason_save": "Save"
+    }
   }
 }

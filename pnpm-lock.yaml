@@ -229,6 +229,9 @@ importers:
       '@eec/admin-kit':
         specifier: workspace:*
         version: link:../../packages/admin-kit
+      '@eec/content-kit':
+        specifier: workspace:*
+        version: link:../../packages/content-kit
       '@eec/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -427,6 +430,9 @@ importers:
       '@eec/auth':
         specifier: workspace:*
         version: link:../packages/auth
+      '@eec/core':
+        specifier: workspace:*
+        version: link:../packages/core
       '@eec/db':
         specifier: workspace:*
         version: link:../packages/db
@@ -445,6 +451,9 @@ importers:
       '@eec/modules-kit':
         specifier: workspace:*
         version: link:../packages/modules-kit
+      drizzle-orm:
+        specifier: 0.45.4
+        version: 0.45.4(@cloudflare/workers-types@5.20261016.1)(@types/pg@8.15.5)(kysely@0.28.18)(pg@8.23.1)
       hono:
         specifier: 4.13.13
         version: 4.13.13
@@ -619,6 +628,9 @@ importers:
       '@eec/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@eec/content-kit':
+        specifier: workspace:*
+        version: link:../../packages/content-kit
       '@eec/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -640,24 +652,6 @@ importers:
       '@tanstack/react-query':
         specifier: 5.104.4
         version: 5.104.4(@types/react@19.3.0)(react@19.3.1)
-      '@tiptap/core':
-        specifier: 3.32.0
-        version: 3.32.0(@tiptap/pm@3.32.0)
-      '@tiptap/extension-link':
-        specifier: 3.32.0
-        version: 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)
-      '@tiptap/extension-placeholder':
-        specifier: 3.32.0
-        version: 3.32.0(@tiptap/extensions@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))
-      '@tiptap/pm':
-        specifier: 3.32.0
-        version: 3.32.0
-      '@tiptap/react':
-        specifier: 3.32.0
-        version: 3.32.0(@floating-ui/dom@1.8.0)(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@tiptap/starter-kit':
-        specifier: 3.32.0
-        version: 3.32.0
       drizzle-orm:
         specifier: 0.45.4
         version: 0.45.4(@cloudflare/workers-types@5.20261016.1)(@types/pg@8.15.5)(kysely@0.28.18)(pg@8.23.1)
@@ -848,6 +842,61 @@ importers:
         version: 5.0.5(@types/node@24.19.2)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/config: {}
+
+  packages/content-kit:
+    dependencies:
+      '@base-ui/react':
+        specifier: 1.9.0
+        version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@eec/admin-kit':
+        specifier: workspace:*
+        version: link:../admin-kit
+      '@eec/core':
+        specifier: workspace:*
+        version: link:../core
+      '@eec/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@eec/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@tanstack/react-query':
+        specifier: 5.104.4
+        version: 5.104.4(@types/react@19.3.0)(react@19.3.1)
+      '@tiptap/core':
+        specifier: 3.32.0
+        version: 3.32.0(@tiptap/pm@3.32.0)
+      '@tiptap/extension-placeholder':
+        specifier: 3.32.0
+        version: 3.32.0(@tiptap/extensions@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))
+      '@tiptap/pm':
+        specifier: 3.32.0
+        version: 3.32.0
+      '@tiptap/react':
+        specifier: 3.32.0
+        version: 3.32.0(@floating-ui/dom@1.8.0)(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@tiptap/starter-kit':
+        specifier: 3.32.0
+        version: 3.32.0
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+    devDependencies:
+      '@eec/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@types/node@24.19.2)(vite@8.3.4(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/core:
     devDependencies:

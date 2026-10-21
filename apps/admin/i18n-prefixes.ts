@@ -9,6 +9,7 @@ export const ADMIN_NAMESPACES = [
   'auth',
   'bible',
   'common',
+  'content',
   'dash',
   'footer',
   'lockup',

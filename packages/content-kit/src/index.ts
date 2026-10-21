@@ -1,0 +1,9 @@
+/** The shared pieces of every content screen (admin side): see docs/design (living guide → Content). */
+export { type SaveState, useAutosave } from './autosave.ts'
+export { ConfirmDialog } from './ConfirmDialog.tsx'
+export { CoverField } from './CoverField.tsx'
+export { MediaPicker, mediaSrc, type PickedMedia } from './MediaPicker.tsx'
+export { type PublishChoice, PublishDialog } from './PublishDialog.tsx'
+export { RevisionsDrawer } from './RevisionsDrawer.tsx'
+export { SaveIndicator } from './SaveIndicator.tsx'
+export { StatusBadge } from './status.tsx'
