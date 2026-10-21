@@ -2,6 +2,7 @@
 import type { AppEnv } from '@eec/api-kit'
 import { departmentsApi } from '@eec/module-departments/api'
 import { eventsApi } from '@eec/module-events/api'
+import { guidesApi } from '@eec/module-guides/api'
 import { liturgyApi } from '@eec/module-liturgy/api'
 import { mediaApi } from '@eec/module-media/api'
 import { membersApi } from '@eec/module-members/api'
@@ -13,6 +14,7 @@ import type { Hono } from 'hono'
 // biome-ignore lint/suspicious/noExplicitAny: routers have their own schemas; the app only mounts them
 export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   departments: departmentsApi,
+  guides: guidesApi,
   liturgy: liturgyApi,
   media: mediaApi,
   events: eventsApi,

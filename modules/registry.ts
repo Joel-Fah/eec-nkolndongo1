@@ -7,6 +7,7 @@
 import { coreModule } from '@eec/auth/core-module'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
+import { guidesModule } from '@eec/module-guides'
 import { liturgyModule } from '@eec/module-liturgy'
 import { mediaModule } from '@eec/module-media'
 import { membersModule } from '@eec/module-members'
@@ -25,6 +26,7 @@ export const modules: readonly DefinedModule[] = [
   scheduleModule,
   liturgyModule,
   departmentsModule,
+  guidesModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

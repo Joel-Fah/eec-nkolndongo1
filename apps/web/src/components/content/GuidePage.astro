@@ -1,0 +1,308 @@
+---
+/**
+ * One guide as a step checklist: accordion steps (native <details>, keyboard-complete), ticks and progress kept in the
+ * visitor's browser only, a print view, and a way to ask a question.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import '../../styles/richtext.css'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { askHref, guidesHref } from '../../lib/guides-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import LangFallbackNote from './LangFallbackNote.astro'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  slug: string
+}
+type Guide = {
+  slug: string
+  icon: string
+  title: string
+  intro: string
+  audience: string
+  fallback: boolean
+  steps: {
+    n: number
+    id: string
+    title: string
+    html: string
+    documents: string[]
+    duration: string
+    contact: string
+  }[]
+}
+const { slug } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`guides.site.${key}` as 'guides.site.back', vars)
+const found = await publicJson<{ guide: Guide | null }>(
+  Astro,
+  `/api/guides/public/item/${encodeURIComponent(slug)}?locale=${locale}`,
+)
+const guide = found.state === 'ok' ? found.data.guide : null
+const unavailable = found.state === 'unavailable'
+if (!guide && !unavailable) Astro.response.status = 404
+Astro.response.headers.set(
+  'cache-control',
+  guide ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={guide?.title ?? s('not_found_t')} description={guide?.intro} noindex={!guide}>
+  <article class="gd" data-guide={guide?.slug} data-nojs data-progress-label={s('progress', { done: '{done}', total: '{total}' })}>
+    <p class="gd-back"><a href={guidesHref(locale)}><Icon name="chevronLeft" size={20} />{s('back')}</a></p>
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !guide ? (
+        <div class="gd-missing">
+          <h1>{s('not_found_t')}</h1>
+          <p>{s('not_found_p')}</p>
+          <Button href={guidesHref(locale)}>{s('back')}</Button>
+        </div>
+      ) : (
+        <>
+          <header class="gd-head">
+            {guide.audience && <p class="gd-aud">{guide.audience}</p>}
+            <h1 class="gd-title">{guide.title}</h1>
+            {guide.intro && <p class="gd-lead">{guide.intro}</p>}
+          </header>
+          {guide.fallback && <LangFallbackNote />}
+          <div class="gd-progress">
+            <div class="gd-bar" role="progressbar" aria-label={s('progress_label')} aria-valuemin="0" aria-valuemax={guide.steps.length} aria-valuenow="0" data-progress>
+              <span class="gd-fill" data-progress-fill></span>
+            </div>
+            <p class="gd-count" data-progress-text aria-live="polite">{s('progress', { done: '0', total: String(guide.steps.length) })}</p>
+            <p class="gd-actions">
+              <button type="button" class="gd-btn" data-print><Icon name="print" size={20} />{s('print')}</button>
+              <button type="button" class="gd-btn" data-reset>{s('reset')}</button>
+            </p>
+          </div>
+          <ol class="gd-steps">
+            {
+              guide.steps.map((st) => (
+                <li class="gd-step">
+                  <input type="checkbox" class="gd-check" id={`st-${st.id}`} data-step={st.id} disabled aria-label={`${s('done')} : ${st.title}`} />
+                  <details class="gd-details" open={st.n === 1}>
+                    <summary class="gd-sum"><span class="gd-n">{st.n}</span><span class="gd-st">{st.title}</span></summary>
+                    <div class="gd-body">
+                      {st.html && <div class="gd-text" set:html={st.html} />}
+                      {st.documents.length > 0 && (
+                        <div>
+                          <h2 class="gd-h">{s('documents')}</h2>
+                          <ul class="gd-docs">{st.documents.map((d) => <li>{d}</li>)}</ul>
+                        </div>
+                      )}
+                      {(st.duration || st.contact) && (
+                        <p class="gd-meta">
+                          {st.duration && <span><strong>{s('duration')} :</strong> {st.duration}</span>}
+                          {st.contact && <span><strong>{s('contact')} :</strong> {st.contact}</span>}
+                        </p>
+                      )}
+                    </div>
+                  </details>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="gd-done" role="status">{s('complete')}</p>
+          <p class="gd-ask"><Button href={askHref(locale)} variant="secondary">{s('ask')}</Button></p>
+        </>
+      )
+    }
+  </article>
+</Site>
+
+<script>
+  import { initGuide } from '../../scripts/guide-checklist'
+  initGuide()
+  document.addEventListener('astro:page-load', initGuide)
+</script>
+
+<style>
+  .gd {
+    display: grid;
+    gap: 1.25rem;
+    width: min(100% - 2rem, 48rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .gd-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .gd-head {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .gd-aud {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary);
+  }
+  .gd-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .gd-lead {
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .gd-progress {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .gd-bar {
+    height: 0.625rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs, 0.25rem);
+    background: color-mix(in oklab, var(--ink) 10%, transparent);
+  }
+  .gd-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--primary);
+    transition: width var(--duration-ui) var(--ease-out);
+  }
+  .gd-count {
+    font-weight: 600;
+  }
+  .gd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .gd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .gd[data-nojs] .gd-actions,
+  .gd[data-nojs] .gd-bar,
+  .gd[data-nojs] .gd-count {
+    display: none;
+  }
+  .gd-steps {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .gd-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .gd[data-nojs] .gd-check {
+    display: none;
+  }
+  .gd[data-nojs] .gd-step {
+    grid-template-columns: 1fr;
+  }
+  .gd-check {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-block-start: 0.25rem;
+    accent-color: var(--primary);
+  }
+  .gd-step[data-done] .gd-st {
+    text-decoration: line-through;
+    color: var(--ink-muted);
+  }
+  .gd-sum {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .gd-n {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: var(--text-sm);
+  }
+  .gd-body {
+    display: grid;
+    gap: 0.875rem;
+    padding-block: 0.5rem 0.25rem;
+  }
+  .gd-text {
+    line-height: 1.7;
+  }
+  .gd-text :global(> * + *) {
+    margin-block-start: 0.75em;
+  }
+  .gd-h {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .gd-docs {
+    list-style: disc;
+    padding-inline-start: 1.25rem;
+  }
+  .gd-meta {
+    display: grid;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .gd-done {
+    display: none;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .gd[data-complete] .gd-done {
+    display: block;
+  }
+  .gd-missing {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  @media print {
+    .gd-back,
+    .gd-actions,
+    .gd-ask,
+    .gd-check,
+    .gd-done {
+      display: none;
+    }
+    .gd-step {
+      box-shadow: none;
+      break-inside: avoid;
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

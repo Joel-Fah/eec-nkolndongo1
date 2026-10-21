@@ -21,6 +21,7 @@
     "@eec/core": "workspace:*",
     "@eec/db": "workspace:*",
     "@eec/module-departments": "workspace:*",
+    "@eec/module-guides": "workspace:*",
     "@eec/module-liturgy": "workspace:*",
     "@eec/module-media": "workspace:*",
     "@eec/module-events": "workspace:*",

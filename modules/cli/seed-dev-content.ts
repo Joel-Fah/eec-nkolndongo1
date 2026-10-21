@@ -8,6 +8,7 @@ import { assertBranch, connectDirect } from '@eec/db/node'
 import { groups, mediaFiles } from '@eec/db/schema'
 import { departmentPages, departmentPeople } from '@eec/module-departments/schema'
 import { eventsItems } from '@eec/module-events/schema'
+import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
@@ -23,6 +24,7 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
+  await db.delete(guides).where(like(guides.slug, 'exemple-%'))
   await db.delete(groups).where(like(groups.key, 'exemple-%')) // their pages and people go with them
   console.log('Example posts, events and groups removed.')
   await close()
@@ -394,6 +396,56 @@ for (const [i, g] of exGroups.entries()) {
       groupId: grp.id,
       validated: true,
     })
+}
+// Guides: the five structures from the brief as empty drafts (wording to be validated), plus one published example.
+const structures = [
+  ['Le baptême d’un enfant', 'child-baptism', 'Baptism of a child'],
+  ['Le baptême d’un adulte et la confirmation', 'adult-baptism', 'Adult baptism and confirmation'],
+  ['Le mariage (bénédiction nuptiale)', 'marriage', 'Marriage (nuptial blessing)'],
+  ['Le deuil et le service funèbre', 'bereavement', 'Bereavement and funeral service'],
+  ['Adhérer à la paroisse', 'joining', 'Joining the parish'],
+] as const
+for (const [i, [fr, slug, en]] of structures.entries())
+  await db
+    .insert(guides)
+    .values({
+      slug: `exemple-${slug}`,
+      titleFr: `Exemple — ${fr}`,
+      titleEn: `Example — ${en}`,
+      sortOrder: i,
+      state: 'draft',
+    })
+    .onConflictDoNothing()
+const [demo] = await db
+  .insert(guides)
+  .values({
+    slug: 'exemple-parcours',
+    state: 'published',
+    icon: 'checklist',
+    titleFr: 'Exemple — Un parcours en quatre étapes',
+    titleEn: 'Example — A four-step guide',
+    introFr:
+      'Un parcours d’exemple pour juger la liste à cocher, l’impression et la barre de progression.',
+    audienceFr: 'Exemple',
+    sortOrder: 9,
+  })
+  .onConflictDoUpdate({ target: guides.slug, set: { state: 'published' } })
+  .returning()
+if (demo) {
+  await db.delete(guideSteps).where(eq(guideSteps.guideId, demo.id))
+  await db.insert(guideSteps).values(
+    ['Prendre contact', 'Rassembler les documents', 'Rencontrer l’équipe', 'Confirmer la date'].map(
+      (title, i) => ({
+        guideId: demo.id,
+        sortOrder: i,
+        titleFr: `Exemple — ${title}`,
+        bodyFr: cleanDoc({ type: 'doc', content: [para(lorem)] }),
+        documentsFr: i === 1 ? 'Un document d’exemple\nUn autre document d’exemple' : '',
+        durationFr: i === 2 ? 'Environ 30 minutes (exemple)' : '',
+        contactFr: i === 0 ? 'Le secrétariat (exemple)' : '',
+      }),
+    ),
+  )
 }
 console.log(
   `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
