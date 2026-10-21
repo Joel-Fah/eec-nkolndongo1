@@ -7,7 +7,8 @@ import type { IconName } from '@eec/ui/icons'
 
 type Slugs = Record<Locale, string>
 
-export type NavChild = { id: string; slug: Slugs; icon: IconName }
+/** `art`: the Storyset illustration shown when this sub-menu item is hovered (packages/ui/illustrations/storyset.json). */
+export type NavChild = { id: string; slug: Slugs; icon: IconName; art: string }
 export type NavTab = {
   id: 'discover' | 'live' | 'calendar' | 'news' | 'give'
   slug: Slugs
@@ -21,61 +22,110 @@ export const tabs: NavTab[] = [
   {
     id: 'discover',
     icon: 'compass',
-    art: 'nav-discover',
+    art: 'church',
     slug: { fr: 'decouvrir', en: 'discover' },
     children: [
-      { id: 'histoire', slug: { fr: 'notre-histoire', en: 'our-story' }, icon: 'hourglass' },
+      {
+        id: 'histoire',
+        slug: { fr: 'notre-histoire', en: 'our-story' },
+        icon: 'hourglass',
+        art: 'adventure',
+      },
       {
         id: 'croyances',
         slug: { fr: 'ce-que-nous-croyons', en: 'what-we-believe' },
         icon: 'bible',
+        art: 'pray',
       },
       {
         id: 'pasteurs',
         slug: { fr: 'pasteurs-et-conseil', en: 'pastors-and-council' },
         icon: 'account',
+        art: 'conversation',
       },
-      { id: 'trouver', slug: { fr: 'nous-trouver', en: 'find-us' }, icon: 'location' },
+      {
+        id: 'trouver',
+        slug: { fr: 'nous-trouver', en: 'find-us' },
+        icon: 'location',
+        art: 'destination',
+      },
     ],
   },
   {
     id: 'live',
     icon: 'heart',
-    art: 'nav-live',
+    art: 'community',
     slug: { fr: 'vivre', en: 'live' },
     children: [
       {
         id: 'cultes',
         slug: { fr: 'cultes-et-horaires', en: 'services-and-times' },
         icon: 'church',
+        art: 'music',
       },
-      { id: 'departements', slug: { fr: 'departements', en: 'departments' }, icon: 'users' },
-      { id: 'pratique', slug: { fr: 'vie-pratique', en: 'practical-life' }, icon: 'checklist' },
+      {
+        id: 'departements',
+        slug: { fr: 'departements', en: 'departments' },
+        icon: 'users',
+        art: 'community',
+      },
+      {
+        id: 'pratique',
+        slug: { fr: 'vie-pratique', en: 'practical-life' },
+        icon: 'checklist',
+        art: 'family',
+      },
     ],
   },
   {
     id: 'calendar',
     icon: 'calendar',
-    art: 'nav-calendar',
+    art: 'a-whole-year',
     slug: { fr: 'agenda', en: 'calendar' },
     children: [
-      { id: 'evenements', slug: { fr: 'evenements', en: 'events' }, icon: 'calendar' },
-      { id: 'liturgie', slug: { fr: 'annee-liturgique', en: 'liturgical-year' }, icon: 'sun' },
-      { id: 'moissons', slug: { fr: 'fete-des-moissons', en: 'harvest-festival' }, icon: 'plant' },
+      {
+        id: 'evenements',
+        slug: { fr: 'evenements', en: 'events' },
+        icon: 'calendar',
+        art: 'a-whole-year',
+      },
+      {
+        id: 'liturgie',
+        slug: { fr: 'annee-liturgique', en: 'liturgical-year' },
+        icon: 'sun',
+        art: 'calendar',
+      },
+      {
+        id: 'moissons',
+        slug: { fr: 'fete-des-moissons', en: 'harvest-festival' },
+        icon: 'plant',
+        art: 'gardening',
+      },
     ],
   },
   {
     id: 'news',
     icon: 'newspaper',
-    art: 'nav-news',
+    art: 'messaging-fun',
     slug: { fr: 'actualites', en: 'news' },
     children: [
-      { id: 'nouvelles', slug: { fr: 'nouvelles', en: 'latest' }, icon: 'newspaper' },
-      { id: 'predications', slug: { fr: 'predications', en: 'sermons' }, icon: 'headphones' },
+      {
+        id: 'nouvelles',
+        slug: { fr: 'nouvelles', en: 'latest' },
+        icon: 'newspaper',
+        art: 'messaging-fun',
+      },
+      {
+        id: 'predications',
+        slug: { fr: 'predications', en: 'sermons' },
+        icon: 'headphones',
+        art: 'group-discussion',
+      },
       {
         id: 'meditations',
         slug: { fr: 'meditations-et-bulletin', en: 'meditations-and-bulletin' },
         icon: 'book',
+        art: 'stay-at-home',
       },
     ],
   },
@@ -87,6 +137,7 @@ export const utilityPages: { id: string; slug: Slugs }[] = [
   { id: 'account', slug: { fr: 'mon-espace', en: 'my-space' } },
   { id: 'privacy', slug: { fr: 'confidentialite', en: 'privacy' } },
   { id: 'legal', slug: { fr: 'mentions-legales', en: 'legal' } },
+  { id: 'credits', slug: { fr: 'credits-photos', en: 'photo-credits' } },
 ]
 
 export type PageEntry = {

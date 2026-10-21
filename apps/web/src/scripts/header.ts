@@ -1,6 +1,6 @@
 /**
  * Header behaviour: mega-panels (hover-intent ≈ 120 ms, click/Enter/Space, Esc, arrow keys, outside
- * click), hide on scroll down / show on scroll up, translucent → solid. Re-initialised after every
+ * click), droplet merge of the pods, tuck away on scroll down (a glimpse stays) / reveal on scroll up, hover or tap. Re-initialised after every
  * Astro page transition. No dependency.
  */
 const INTENT_MS = 120
@@ -92,14 +92,111 @@ export function initHeader() {
     for (const menu of menus) if (isOpen(menu)) close(menu, menu.contains(document.activeElement))
   })
 
-  // Hide on scroll down, show on scroll up; solid once scrolled.
+  // The three pods (two on phones) join like water droplets over the first 140 px of scroll, and part again
+  // on the way back up. `--merge` goes 0 → 1; the goo layer behind the pods draws the joined shape.
+  const bar = header.querySelector<HTMLElement>('.site-header-bar')
+  const goo = header.querySelector<HTMLElement>('[data-goo]')
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)')
+  const MERGE_PX = 140
+  const measure = () => {
+    if (!bar || !goo) return
+    const pods = [...bar.querySelectorAll<HTMLElement>('.site-pod')].filter(
+      (x) => x.offsetWidth > 0,
+    )
+    const radius = 20
+    const shift = (role: string | undefined, side: 'a' | 'b') =>
+      role === 'l' && side === 'a'
+        ? 'var(--dl) * var(--merge)'
+        : role === 'r' && side === 'b'
+          ? 'var(--dr) * var(--merge) * -1'
+          : '0px'
+    const bridges = pods.slice(0, -1).map((a, i) => {
+      const b = pods[i + 1] as HTMLElement
+      const x0 = a.offsetLeft + a.offsetWidth - radius
+      const w = b.offsetLeft + radius - x0
+      const sa = shift(a.dataset.pod, 'a')
+      const sb = shift(b.dataset.pod, 'b')
+      const el = document.createElement('div')
+      el.className = 'site-goo-bridge'
+      Object.assign(el.style, {
+        left: `calc(${x0}px + ${sa})`,
+        width: `calc(${w}px - ${sa} + ${sb})`,
+        top: `${a.offsetTop}px`,
+        height: `${a.offsetHeight}px`,
+      })
+      return el
+    })
+    goo.replaceChildren(
+      ...pods.map((pod) => {
+        const blob = document.createElement('div')
+        blob.className = 'site-goo-blob'
+        blob.dataset.pod = pod.dataset.pod ?? ''
+        Object.assign(blob.style, {
+          left: `${pod.offsetLeft}px`,
+          top: `${pod.offsetTop}px`,
+          width: `${pod.offsetWidth}px`,
+          height: `${pod.offsetHeight}px`,
+        })
+        return blob
+      }),
+      ...bridges,
+    )
+    const overlap = 8
+    const gap = (i: number) => {
+      const a = pods[i]
+      const b = pods[i + 1]
+      return a && b ? Math.max(0, b.offsetLeft - (a.offsetLeft + a.offsetWidth)) : 0
+    }
+    // Three pods: the outer ones travel to the middle one. Two pods: both travel half way.
+    const [dl, dr] =
+      pods.length === 3
+        ? [gap(0) + overlap, gap(1) + overlap]
+        : [gap(0) / 2 + overlap / 2, gap(0) / 2 + overlap / 2]
+    header.style.setProperty('--dl', `${dl}px`)
+    header.style.setProperty('--dr', `${dr}px`)
+    header.setAttribute('data-goo', '')
+  }
+  measure()
+  if (bar && 'ResizeObserver' in window) new ResizeObserver(measure).observe(bar)
+  document.fonts?.ready.then(measure)
+
+  // Away from the top the bar tucks away on scroll down, leaving a glimpse of its lower edge; scrolling up,
+  // hovering it (mouse) or tapping the glimpse (touch) brings it back.
+  const fine = matchMedia('(hover: hover) and (pointer: fine)')
   let lastY = window.scrollY
   let ticking = false
+  let hovered = false
+  let idle = 0
+  const away = () => window.scrollY > MERGE_PX + 40
+  // A bar brought back by hover or tap tucks away again after a few quiet seconds.
+  const settle = () => {
+    window.clearTimeout(idle)
+    if (!away()) return
+    idle = window.setTimeout(() => {
+      const busy =
+        menus.some(isOpen) ||
+        document.querySelector('dialog[open]') ||
+        header.querySelector(':focus-visible')
+      if (busy) return settle()
+      hovered = false
+      header.setAttribute('data-hidden', '')
+    }, 3000)
+  }
   const update = () => {
     const y = window.scrollY
+    const p = Math.min(1, Math.max(0, y / MERGE_PX))
+    header.style.setProperty(
+      '--merge',
+      reduced.matches ? (y > 40 ? '1' : '0') : String(p * p * (3 - 2 * p)),
+    )
     header.toggleAttribute('data-scrolled', y > 8)
     const menuOpen = menus.some(isOpen) || document.querySelector('dialog[open]')
-    const hide = y > lastY && y > 120 && !menuOpen && !header.contains(document.activeElement)
+    const hide =
+      y > lastY &&
+      y > MERGE_PX + 40 &&
+      !menuOpen &&
+      !hovered &&
+      !header.contains(document.activeElement)
     header.toggleAttribute('data-hidden', hide)
     lastY = y
     ticking = false
@@ -114,6 +211,41 @@ export function initHeader() {
     },
     { passive: true },
   )
-  header.addEventListener('focusin', () => header.removeAttribute('data-hidden'))
+  // Keyboard focus brings it back; a pointer press does not (a tap on the glimpse is handled below).
+  header.addEventListener('focusin', (e) => {
+    if ((e.target as HTMLElement).matches(':focus-visible')) header.removeAttribute('data-hidden')
+  })
+  let wasHidden = false
+  header.addEventListener(
+    'pointerdown',
+    () => (wasHidden = header.hasAttribute('data-hidden')),
+    true,
+  )
+  header.addEventListener('pointermove', (e) => {
+    if (!fine.matches || e.pointerType !== 'mouse') return
+    if (header.hasAttribute('data-hidden')) {
+      // Revealed by the mouse, and only if the bar was tucked away (not while it is moving).
+      hovered = true
+      header.removeAttribute('data-hidden')
+    }
+    if (hovered) settle()
+  })
+  header.addEventListener('pointerleave', () => {
+    if (hovered) settle()
+    hovered = false
+  })
+  // Touch: the first tap on the tucked-away bar only brings it back (nothing underneath is activated).
+  header.addEventListener(
+    'click',
+    (e) => {
+      if (!wasHidden && !header.hasAttribute('data-hidden')) return
+      wasHidden = false
+      e.preventDefault()
+      e.stopPropagation()
+      header.removeAttribute('data-hidden')
+      settle()
+    },
+    true,
+  )
   update()
 }

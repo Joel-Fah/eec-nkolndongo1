@@ -1,34 +1,28 @@
 ---
 /**
- * Inline illustration from packages/ui/illustrations. Ids become `data-part` attributes (unique
- * per page, still targetable by GSAP). Decorative unless `title` is given.
+ * A Storyset (Cuate) illustration, recoloured to our palette (decision 0024). Two files per illustration,
+ * light and dark, fetched by `pnpm illos:fetch` into /illustrations/ (never committed: licence). Only the
+ * one for the current theme is displayed, and `loading="lazy"` means a hidden one is never downloaded.
+ * Decorative unless `title` is given. No idle animation: movement, if any, comes from the container.
  */
-const files = import.meta.glob<string>('../illustrations/*.svg', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-})
+import manifest from '../illustrations/storyset.json'
 
 interface Props {
   name: string
   title?: string
   class?: string
-  /** Opt in to the idle animation (apps/web/src/scripts/illustration-idle.ts). */
-  animate?: boolean
+  /** Above the fold: load at once. */
+  eager?: boolean
+  [attr: `data-${string}`]: string | number | undefined
 }
-
-const { name, title, class: className, animate = false } = Astro.props
-const source = files[`../illustrations/${name}.svg`]
-if (!source) throw new Error(`Unknown illustration: ${name}`)
-
-const a11y = title ? 'role="img"' : 'aria-hidden="true" focusable="false"'
-const svg = source
-  .replace(/\sid="/g, ' data-part="')
-  .replace(
-    '<svg ',
-    `<svg ${a11y} data-illustration="${name}"${animate ? ' data-animate' : ''}${className ? ` class="${className}"` : ''} `,
-  )
-  .replace(/(<svg[^>]*>)/, title ? `$1<title>${title}</title>` : '$1')
+const { name, title, class: className, eager = false, ...rest } = Astro.props
+if (!manifest.some((m) => m.name === name))
+  throw new Error(`Unknown illustration: ${name} (packages/ui/illustrations/storyset.json)`)
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+const loading = eager ? 'eager' : 'lazy'
 ---
 
-<Fragment set:html={svg} />
+<span class:list={['illo', className]} {...rest} role={title ? 'img' : undefined} aria-label={title} aria-hidden={title ? undefined : 'true'}>
+  <img class="illo-light" src={`${base}/illustrations/${name}-light.svg`} alt="" width="500" height="500" loading={loading} decoding="async" />
+  <img class="illo-dark" src={`${base}/illustrations/${name}-dark.svg`} alt="" width="500" height="500" loading={loading} decoding="async" />
+</span>

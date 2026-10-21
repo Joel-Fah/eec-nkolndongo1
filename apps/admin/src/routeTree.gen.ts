@@ -12,8 +12,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppAccountRouteImport } from './routes/_app/account'
+import { Route as AppAuditRouteImport } from './routes/_app/audit'
+import { Route as AppGroupsRouteImport } from './routes/_app/groups'
+import { Route as AppOutboxRouteImport } from './routes/_app/outbox'
+import { Route as AppRolesRouteImport } from './routes/_app/roles'
 import { Route as AppUiRouteImport } from './routes/_app/ui'
-import { Route as AppPIdRouteImport } from './routes/_app/p.$id'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ResetTokenRouteImport } from './routes/reset.$token'
+import { Route as AppMModuleRouteImport } from './routes/_app/m.$module'
+import { Route as AppUsersIndexRouteImport } from './routes/_app/users.index'
+import { Route as AppUsersIdRouteImport } from './routes/_app/users.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -29,48 +38,163 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGroupsRoute = AppGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutboxRoute = AppOutboxRouteImport.update({
+  id: '/outbox',
+  path: '/outbox',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRolesRoute = AppRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppUiRoute = AppUiRouteImport.update({
   id: '/ui',
   path: '/ui',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPIdRoute = AppPIdRouteImport.update({
-  id: '/p/$id',
-  path: '/p/$id',
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetTokenRoute = ResetTokenRouteImport.update({
+  id: '/reset/$token',
+  path: '/reset/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMModuleRoute = AppMModuleRouteImport.update({
+  id: '/m/$module',
+  path: '/m/$module',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersIndexRoute = AppUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersIdRoute = AppUsersIdRouteImport.update({
+  id: '/users/$id',
+  path: '/users/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/account': typeof AppAccountRoute
+  '/audit': typeof AppAuditRoute
+  '/groups': typeof AppGroupsRoute
+  '/outbox': typeof AppOutboxRoute
+  '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
-  '/p/$id': typeof AppPIdRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
+  '/m/$module': typeof AppMModuleRoute
+  '/users/$id': typeof AppUsersIdRoute
+  '/users/': typeof AppUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/account': typeof AppAccountRoute
+  '/audit': typeof AppAuditRoute
+  '/groups': typeof AppGroupsRoute
+  '/outbox': typeof AppOutboxRoute
+  '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
   '/': typeof AppIndexRoute
-  '/p/$id': typeof AppPIdRoute
+  '/m/$module': typeof AppMModuleRoute
+  '/users/$id': typeof AppUsersIdRoute
+  '/users': typeof AppUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/account': typeof AppAccountRoute
+  '/_app/audit': typeof AppAuditRoute
+  '/_app/groups': typeof AppGroupsRoute
+  '/_app/outbox': typeof AppOutboxRoute
+  '/_app/roles': typeof AppRolesRoute
   '/_app/ui': typeof AppUiRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/reset/$token': typeof ResetTokenRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/p/$id': typeof AppPIdRoute
+  '/_app/m/$module': typeof AppMModuleRoute
+  '/_app/users/$id': typeof AppUsersIdRoute
+  '/_app/users/': typeof AppUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/ui' | '/p/$id'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/account'
+    | '/audit'
+    | '/groups'
+    | '/outbox'
+    | '/roles'
+    | '/ui'
+    | '/invite/$token'
+    | '/reset/$token'
+    | '/m/$module'
+    | '/users/$id'
+    | '/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/ui' | '/' | '/p/$id'
-  id: '__root__' | '/_app' | '/login' | '/_app/ui' | '/_app/' | '/_app/p/$id'
+  to:
+    | '/login'
+    | '/account'
+    | '/audit'
+    | '/groups'
+    | '/outbox'
+    | '/roles'
+    | '/ui'
+    | '/invite/$token'
+    | '/reset/$token'
+    | '/'
+    | '/m/$module'
+    | '/users/$id'
+    | '/users'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/account'
+    | '/_app/audit'
+    | '/_app/groups'
+    | '/_app/outbox'
+    | '/_app/roles'
+    | '/_app/ui'
+    | '/invite/$token'
+    | '/reset/$token'
+    | '/_app/'
+    | '/_app/m/$module'
+    | '/_app/users/$id'
+    | '/_app/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  InviteTokenRoute: typeof InviteTokenRoute
+  ResetTokenRoute: typeof ResetTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -96,6 +220,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/account': {
+      id: '/_app/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/audit': {
+      id: '/_app/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/groups': {
+      id: '/_app/groups'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof AppGroupsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/outbox': {
+      id: '/_app/outbox'
+      path: '/outbox'
+      fullPath: '/outbox'
+      preLoaderRoute: typeof AppOutboxRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/roles': {
+      id: '/_app/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof AppRolesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/ui': {
       id: '/_app/ui'
       path: '/ui'
@@ -103,26 +262,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUiRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/p/$id': {
-      id: '/_app/p/$id'
-      path: '/p/$id'
-      fullPath: '/p/$id'
-      preLoaderRoute: typeof AppPIdRouteImport
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset/$token': {
+      id: '/reset/$token'
+      path: '/reset/$token'
+      fullPath: '/reset/$token'
+      preLoaderRoute: typeof ResetTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/m/$module': {
+      id: '/_app/m/$module'
+      path: '/m/$module'
+      fullPath: '/m/$module'
+      preLoaderRoute: typeof AppMModuleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users/': {
+      id: '/_app/users/'
+      path: '/users'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AppUsersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users/$id': {
+      id: '/_app/users/$id'
+      path: '/users/$id'
+      fullPath: '/users/$id'
+      preLoaderRoute: typeof AppUsersIdRouteImport
       parentRoute: typeof AppRoute
     }
   }
 }
 
 interface AppRouteChildren {
+  AppAccountRoute: typeof AppAccountRoute
+  AppAuditRoute: typeof AppAuditRoute
+  AppGroupsRoute: typeof AppGroupsRoute
+  AppOutboxRoute: typeof AppOutboxRoute
+  AppRolesRoute: typeof AppRolesRoute
   AppUiRoute: typeof AppUiRoute
   AppIndexRoute: typeof AppIndexRoute
-  AppPIdRoute: typeof AppPIdRoute
+  AppMModuleRoute: typeof AppMModuleRoute
+  AppUsersIdRoute: typeof AppUsersIdRoute
+  AppUsersIndexRoute: typeof AppUsersIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAccountRoute: AppAccountRoute,
+  AppAuditRoute: AppAuditRoute,
+  AppGroupsRoute: AppGroupsRoute,
+  AppOutboxRoute: AppOutboxRoute,
+  AppRolesRoute: AppRolesRoute,
   AppUiRoute: AppUiRoute,
   AppIndexRoute: AppIndexRoute,
-  AppPIdRoute: AppPIdRoute,
+  AppMModuleRoute: AppMModuleRoute,
+  AppUsersIdRoute: AppUsersIdRoute,
+  AppUsersIndexRoute: AppUsersIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -130,6 +331,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  InviteTokenRoute: InviteTokenRoute,
+  ResetTokenRoute: ResetTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

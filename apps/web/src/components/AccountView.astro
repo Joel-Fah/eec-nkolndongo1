@@ -1,0 +1,907 @@
+---
+/**
+ * Mon espace. Signed out: one card, two tabs (create an account / sign in) — never two forms side by
+ * side. Sign-up goes in three short steps (who you are → password → choices); consents are never
+ * pre-ticked. Signed in: a calm personal dashboard. One small vanilla script, texts come from i18n.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Choice from '@eec/ui/astro/Choice.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Tabs from '@eec/ui/astro/Tabs.astro'
+import google from '@eec/ui/brand/google-g.svg?raw'
+import { localeOf, useT } from '../lib/i18n'
+import { href, pages } from '../lib/nav'
+import { peoplePhotos, photoSrc } from '../lib/placeholders'
+import '../styles/patterns.css'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const privacyPath = pages.find((p) => p.id === 'privacy')?.path[locale] ?? ''
+const errors = [
+  'invalid_credentials',
+  'rate_limited',
+  'password_too_short',
+  'password_too_long',
+  'password_too_common',
+  'email_taken',
+  'bad_origin',
+  'generic',
+  'network',
+] as const
+const messages = {
+  ...Object.fromEntries(errors.map((e) => [e, t(`auth.err.${e}` as 'auth.err.generic')])),
+  required: t('member.field_required'),
+  email: t('member.email_invalid'),
+}
+const photos = peoplePhotos().slice(0, 3)
+const steps = [t('member.step1_t'), t('member.step2_t'), t('member.step3_t')]
+const benefits = [
+  ['account', 'pages.account.l1'],
+  ['check', 'pages.account.l2'],
+  ['calendar', 'pages.account.l3'],
+] as const
+const tiles = [
+  ['users', 'groups'],
+  ['bible', 'card'],
+] as const
+---
+
+<section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), wait: t('member.google_wait'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale} data-me-msgs={JSON.stringify({ privacy: t('member.privacy_line', { date: '{date}', v: '{v}' }), newsSince: t('member.news_since', { date: '{date}' }), newsOff: t('member.news_off'), pending: t('member.delete_pending', { date: '{date}' }), staff: t('member.delete_staff'), current: t('member.devices_current'), device: t('member.devices_unknown') })}>
+  <div class="acct-intro">
+    <p class="acct-eyebrow"><Icon name="lock" size={16} />{t('member.eyebrow')}</p>
+    <h1 class="acct-title">{t('member.h1')}</h1>
+    <p class="acct-lead">{t('member.lead')}</p>
+  </div>
+
+  <aside class="acct-side" aria-label={t('member.benefits_label')}>
+    {
+      photos.length > 0 && (
+        <div class="acct-photos" aria-hidden="true">
+          {photos.map((p, i) => (
+            <img src={photoSrc(p, 480, 'webp')} alt="" width="480" height="640" style={`--i:${i};background:${p.color}`} />
+          ))}
+        </div>
+      )
+    }
+    <ul class="acct-benefits" role="list">
+      {benefits.map(([icon, key]) => <li><span class="acct-benefit-icon"><Icon name={icon} size={20} /></span>{t(key)}</li>)}
+    </ul>
+    <p class="acct-trust"><Icon name="shield" size={20} />{t('pages.account.s2_p_short')}</p>
+  </aside>
+
+  <div class="acct-card" data-when="out" hidden>
+    <p class="field-error acct-banner" data-google-banner hidden role="alert"></p>
+    <Tabs id="acct" label={t('member.title')} tabs={[{ id: 'signup', label: t('member.tab_signup') }, { id: 'signin', label: t('member.tab_signin') }]}>
+      <div slot="signup" class="acct-panel">
+        <button type="button" class="btn btn-secondary btn-lg acct-google" data-google="signup">
+          <span class="acct-google-g" set:html={google} /><span data-label>{t('member.google')}</span>
+        </button>
+        <p class="acct-or"><span>{t('member.or_email')}</span></p>
+
+        <form data-form="signup" novalidate>
+          <div class="acct-progress" aria-hidden="true">{steps.map((_, i) => <span data-bar={i}></span>)}</div>
+          <p class="acct-step" data-step-text aria-live="polite">{t('member.step', { n: '1', total: '3' })} · {steps[0]}</p>
+
+          <fieldset class="acct-fields" data-step="0">
+            <legend class="sr-only">{steps[0]}</legend>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Field id="su-first" name="firstName" label={t('member.first_name')} placeholder={t('common.ph.first_name')} autocomplete="given-name" required />
+              <Field id="su-last" name="lastName" label={t('member.last_name')} placeholder={t('common.ph.last_name')} autocomplete="family-name" required />
+            </div>
+            <Field id="su-email" name="email" type="email" label={t('member.email')} placeholder={t('common.ph.email')} autocomplete="email" required />
+          </fieldset>
+
+          <fieldset class="acct-fields" data-step="1" hidden>
+            <legend class="sr-only">{steps[1]}</legend>
+            <Field id="su-pass" name="password" type="password" label={t('member.password')} placeholder={t('common.ph.new_password')} hint={t('auth.password.hint')} autocomplete="new-password" required />
+            <Field id="su-phone" name="phone" type="tel" label={t('member.phone')} placeholder={t('common.ph.phone')} autocomplete="tel" />
+          </fieldset>
+
+          <fieldset class="acct-fields" data-step="2" hidden>
+            <legend class="sr-only">{steps[2]}</legend>
+            <!-- Consents: never pre-ticked. -->
+            <div class="acct-consent">
+              <Choice id="su-privacy" name="acceptPrivacy" label={t('member.consent_privacy')} />
+              <a class="acct-link" href={href(locale, privacyPath)}>{t('member.consent_privacy_link')}<Icon name="external" size={16} /></a>
+              <p class="field-error" data-privacy-error hidden role="alert">{t('member.consent_required')}</p>
+            </div>
+            <div class="acct-consent">
+              <Choice id="su-news" name="acceptNews" label={t('member.consent_news')} />
+            </div>
+          </fieldset>
+
+          <p class="field-error" data-error hidden role="alert"></p>
+          <div class="acct-actions">
+            <Button variant="ghost" size="lg" data-back hidden><Icon name="arrowLeft" />{t('member.back')}</Button>
+            <Button type="submit" size="lg" class="acct-submit" data-next-label={t('member.next')} data-submit-label={t('member.signup_submit')}><span data-submit-text>{t('member.next')}</span><Icon name="arrowRight" /></Button>
+          </div>
+        </form>
+      </div>
+
+      <div slot="signin" class="acct-panel">
+        <p class="acct-panel-lead">{t('member.signin_lead')}</p>
+        <button type="button" class="btn btn-secondary btn-lg acct-google" data-google="signin">
+          <span class="acct-google-g" set:html={google} /><span data-label>{t('member.google')}</span>
+        </button>
+        <p class="acct-or"><span>{t('member.or_email')}</span></p>
+        <form data-form="signin" class="acct-fields" novalidate>
+          <Field id="si-email" name="email" type="email" label={t('member.email')} placeholder={t('common.ph.email')} autocomplete="username" required />
+          <Field id="si-pass" name="password" type="password" label={t('member.password')} placeholder={t('common.ph.password')} autocomplete="current-password" required />
+          <p class="field-error" data-error hidden role="alert"></p>
+          <Button type="submit" size="lg" class="acct-submit">{t('member.signin_submit')}<Icon name="arrowRight" /></Button>
+          <p class="acct-hint">{t('member.forgot')}</p>
+        </form>
+      </div>
+    </Tabs>
+  </div>
+
+  <div class="acct-card acct-home" data-when="in" hidden>
+    <div class="acct-hello">
+      <span class="acct-avatar" aria-hidden="true">
+        <img data-photo alt="" hidden width="56" height="56" referrerpolicy="no-referrer" />
+        <span data-initials></span>
+      </span>
+      <div>
+        <h2 class="text-3xl" data-hello-target></h2>
+        <p class="text-ink-muted">{t('member.welcome')}</p>
+      </div>
+    </div>
+    <ul class="acct-tiles" role="list">
+      {
+        tiles.map(([icon, key]) => (
+          <li class="acct-tile">
+            <span class="acct-benefit-icon"><Icon name={icon} size={20} /></span>
+            <p class="font-semibold">{t(`member.tile_${key}_t` as 'member.tile_profile_t')}</p>
+            <p class="text-sm text-ink-muted">{t(`member.tile_${key}_p` as 'member.tile_profile_p')}</p>
+            <span class="acct-soon">{t('member.soon')}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="acct-panels">
+      <details class="acct-panel" data-panel="profile">
+        <summary>{t('member.panel_profile')}</summary>
+        <form data-form="profile" class="acct-fields" novalidate>
+          <Field id="pf-first" name="firstName" label={t('member.first_name')} placeholder={t('common.ph.first_name')} autocomplete="given-name" />
+          <Field id="pf-last" name="lastName" label={t('member.last_name')} placeholder={t('common.ph.last_name')} autocomplete="family-name" />
+          <Field id="pf-phone" name="phone" type="tel" label={t('member.phone')} placeholder={t('common.ph.phone')} autocomplete="tel" />
+          <p class="acct-ok" data-profile-ok hidden role="status">{t('member.profile_saved')}</p>
+          <Button type="submit" variant="secondary">{t('member.profile_save')}</Button>
+        </form>
+      </details>
+      <details class="acct-panel" data-panel="data">
+        <summary>{t('member.panel_data')}</summary>
+        <div class="acct-fields">
+          <p class="text-sm text-ink-muted" data-privacy-line></p>
+          <Choice id="pf-news" name="news" label={t('member.news_label')} />
+          <p class="text-sm text-ink-muted" data-news-line></p>
+          <div class="acct-row">
+            <Button variant="secondary" data-export><Icon name="download" />{t('member.export')}</Button>
+            <p class="text-sm text-ink-muted">{t('member.export_help')}</p>
+          </div>
+          <div class="acct-danger" data-delete-zone>
+            <p class="font-semibold">{t('member.delete')}</p>
+            <p class="text-sm text-ink-muted" data-delete-help>{t('member.delete_help')}</p>
+            <p class="text-sm" data-delete-pending hidden role="status"></p>
+            <Button variant="secondary" data-delete-open>{t('member.delete')}</Button>
+            <Button variant="secondary" data-delete-cancel hidden>{t('member.delete_cancel')}</Button>
+          </div>
+        </div>
+      </details>
+      <details class="acct-panel" data-panel="devices">
+        <summary>{t('member.panel_devices')}</summary>
+        <div class="acct-fields">
+          <ul class="grid gap-2 text-sm" data-devices role="list"></ul>
+          <Button variant="secondary" data-signout-others>{t('member.devices_others')}</Button>
+        </div>
+      </details>
+    </div>
+    <div><Button variant="secondary" data-signout><Icon name="logout" />{t('member.signout')}</Button></div>
+  </div>
+
+  <div class="acct-leaving" data-leaving hidden role="status" aria-live="polite">
+    <div class="acct-leaving-badge"><Icon name="church" size={24} /></div>
+    <p class="acct-leaving-text">{t('member.leaving')}</p>
+    <span class="acct-leaving-bar" aria-hidden="true"><span></span></span>
+  </div>
+
+  <dialog class="dialog acct-dialog" data-delete-dialog aria-labelledby="dd-title">
+    <form method="dialog" class="dialog-body">
+      <h2 id="dd-title" class="dialog-title">{t('member.delete_title')}</h2>
+      <p class="text-ink-muted">{t('member.delete_text')}</p>
+      <div class="dialog-actions">
+        <Button variant="secondary" data-dd-cancel>{t('admin.common.cancel')}</Button>
+        <Button type="submit" data-dd-go>{t('member.delete_go')}</Button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog acct-dialog" data-google-dialog aria-labelledby="gd-title">
+    <form method="dialog" class="dialog-body" data-google-form>
+      <h2 id="gd-title" class="dialog-title">{t('member.google_title')}</h2>
+      <p class="text-ink-muted">{t('member.google_text')}</p>
+      <div class="acct-consent">
+        <Choice id="gd-privacy" name="acceptPrivacy" label={t('member.consent_privacy')} />
+        <a class="acct-link" href={href(locale, privacyPath)}>{t('member.consent_privacy_link')}<Icon name="external" size={16} /></a>
+        <p class="field-error" data-gd-error hidden role="alert">{t('member.consent_required')}</p>
+      </div>
+      <div class="acct-consent">
+        <Choice id="gd-news" name="acceptNews" label={t('member.consent_news')} />
+      </div>
+      <div class="dialog-actions">
+        <Button variant="secondary" data-gd-cancel>{t('admin.common.cancel')}</Button>
+        <Button type="submit" data-gd-go><span class="acct-google-g" set:html={google} /><span data-label>{t('member.google')}</span></Button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="acct-card acct-loading" data-when="loading" aria-hidden="true">
+    <span class="skeleton" style="height:2.75rem"></span>
+    <span class="skeleton" style="height:3rem"></span>
+    <span class="skeleton" style="height:3rem"></span>
+    <span class="skeleton" style="height:3.25rem"></span>
+  </div>
+</section>
+
+<script>
+  const found = document.querySelector<HTMLElement>('[data-account]')
+  if (found) {
+    const root: HTMLElement = found
+    const errors = JSON.parse(root.dataset.errors ?? '{}') as Record<string, string>
+    const show = (state: 'in' | 'out' | 'loading') => {
+      for (const el of root.querySelectorAll<HTMLElement>('[data-when]')) el.hidden = el.dataset.when !== state
+    }
+    const msg = (code: string) => errors[code] ?? errors.generic ?? ''
+    async function call(path: string, body?: unknown, method?: string) {
+      try {
+        const res = await fetch(`/api${path}`, { method: method ?? (body === undefined ? 'GET' : 'POST'), credentials: 'same-origin', headers: body === undefined ? undefined : { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
+        const json = await res.json().catch(() => ({}))
+        if (res.ok) return { ok: true as const, json }
+        const code = res.status === 429 ? 'rate_limited' : (json.error?.code ?? (json.code ? String(json.code).toLowerCase() : 'generic'))
+        return { ok: false as const, code: code === 'invalid_email_or_password' ? 'invalid_credentials' : code }
+      } catch {
+        return { ok: false as const, code: 'network' }
+      }
+    }
+    async function refresh() {
+      const me = await call('/me')
+      if (me.ok) {
+        const name: string = me.json.user.firstName || me.json.user.name || ''
+        const photo = root.querySelector<HTMLImageElement>('[data-photo]')
+        if (photo && me.json.user.image) {
+          photo.src = me.json.user.image
+          photo.hidden = false
+          root.querySelector<HTMLElement>('[data-initials]')?.setAttribute('hidden', '')
+        }
+        const target = root.querySelector('[data-hello-target]')
+        if (target) target.textContent = (root.dataset.hello ?? '').replace('{name}', name)
+        const initials = root.querySelector('[data-initials]')
+        if (initials) initials.textContent = name.slice(0, 1).toUpperCase()
+        show('in')
+        loadPanels(me.json.user)
+      } else show('out')
+    }
+    const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement | null
+
+    /** Marks a field invalid with a message under it (and clears it on the next input). */
+    function invalid(el: HTMLInputElement, text: string) {
+      el.setAttribute('aria-invalid', 'true')
+      const id = `${el.id}-live-error`
+      let p = document.getElementById(id)
+      if (!p) {
+        p = document.createElement('p')
+        p.id = id
+        p.className = 'field-error'
+        el.closest('.field')?.append(p)
+        el.setAttribute('aria-describedby', [el.getAttribute('aria-describedby'), id].filter(Boolean).join(' '))
+      }
+      p.textContent = text
+      el.addEventListener('input', () => {
+        el.removeAttribute('aria-invalid')
+        p?.remove()
+      }, { once: true })
+    }
+    function check(scope: HTMLElement) {
+      let first: HTMLInputElement | null = null
+      for (const el of scope.querySelectorAll<HTMLInputElement>('input.input')) {
+        if (el.validity.valid) continue
+        invalid(el, el.validity.typeMismatch ? (errors.email ?? '') : (errors.required ?? ''))
+        first ??= el
+      }
+      first?.focus()
+      return !first
+    }
+
+
+    // ── Mon compte: profile, privacy choices, copy of my data, deletion, devices ──────────────────
+    const me = JSON.parse(root.dataset.meMsgs ?? '{}') as Record<string, string>
+    const day = (d: string) => new Date(d).toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })
+    const fill = (tpl: string, vars: Record<string, string>) => Object.entries(vars).reduce((o, [k, v]) => o.replace(`{${k}}`, v), tpl)
+    async function loadPanels(profile?: { firstName?: string; lastName?: string; phone?: string | null }) {
+      const pf = root.querySelector<HTMLFormElement>('[data-form="profile"]')
+      if (pf && profile) {
+        const set = (n: string, v?: string | null) => { const el = input(pf, n); if (el) el.value = v ?? '' }
+        set('firstName', profile.firstName)
+        set('lastName', profile.lastName)
+        set('phone', profile.phone)
+      }
+      const pr = await call('/me/privacy')
+      if (pr.ok) {
+        const privacy = pr.json.consents.find((c: { kind: string; withdrawnAt: string | null }) => c.kind === 'privacy')
+        const news = pr.json.consents.find((c: { kind: string; withdrawnAt: string | null }) => c.kind === 'news' && !c.withdrawnAt)
+        const line = root.querySelector('[data-privacy-line]')
+        if (line && privacy) line.textContent = fill(me.privacy ?? '', { date: day(privacy.grantedAt), v: privacy.policyVersion })
+        const box = root.querySelector<HTMLInputElement>('input[name="news"]')
+        if (box) box.checked = !!news
+        const nl = root.querySelector('[data-news-line]')
+        if (nl) nl.textContent = news ? fill(me.newsSince ?? '', { date: day(news.grantedAt) }) : (me.newsOff ?? '')
+        const pending = root.querySelector<HTMLElement>('[data-delete-pending]')
+        const open = root.querySelector<HTMLElement>('[data-delete-open]')
+        const cancel = root.querySelector<HTMLElement>('[data-delete-cancel]')
+        const help = root.querySelector<HTMLElement>('[data-delete-help]')
+        const asked = !!pr.json.deletionRequestedAt
+        if (pending) { pending.hidden = !asked; if (asked) pending.textContent = fill(me.pending ?? '', { date: day(pr.json.purgeOn) }) }
+        if (open) open.hidden = asked || !pr.json.canDelete
+        if (cancel) cancel.hidden = !asked
+        if (help && !pr.json.canDelete) help.textContent = me.staff ?? ''
+      }
+      const ss = await call('/me/sessions')
+      const list = root.querySelector('[data-devices]')
+      if (ss.ok && list) {
+        list.replaceChildren(...ss.json.sessions.map((s: { userAgent: string | null; createdAt: string; current: boolean }) => {
+          const li = document.createElement('li')
+          li.textContent = `${s.userAgent ? (/Android|iPhone|iPad/.test(s.userAgent) ? 'Mobile' : 'Ordinateur') : (me.device ?? '')} · ${day(s.createdAt)}${s.current ? ` · ${me.current ?? ''}` : ''}`
+          return li
+        }))
+      }
+    }
+    root.querySelector<HTMLFormElement>('[data-form="profile"]')?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const f = e.currentTarget as HTMLFormElement
+      const r = await call('/me', { firstName: input(f, 'firstName')?.value.trim(), lastName: input(f, 'lastName')?.value.trim(), phone: input(f, 'phone')?.value.trim() || null }, 'PATCH')
+      const ok = f.querySelector<HTMLElement>('[data-profile-ok]')
+      if (ok) ok.hidden = !r.ok
+    })
+    root.querySelector<HTMLInputElement>('input[name="news"]')?.addEventListener('change', async (e) => {
+      await call('/me/consents/news', { granted: (e.currentTarget as HTMLInputElement).checked })
+      loadPanels()
+    })
+    root.querySelector('[data-export]')?.addEventListener('click', async () => {
+      const res = await fetch('/api/me/export', { credentials: 'same-origin' })
+      if (!res.ok) return
+      const url = URL.createObjectURL(await res.blob())
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'mes-donnees-eec-nkolndongo1.json' })
+      a.click()
+      URL.revokeObjectURL(url)
+    })
+    const dd = root.querySelector<HTMLDialogElement>('[data-delete-dialog]')
+    root.querySelector('[data-delete-open]')?.addEventListener('click', () => dd?.showModal())
+    dd?.querySelector('[data-dd-cancel]')?.addEventListener('click', (e) => { e.preventDefault(); dd.close() })
+    dd?.querySelector('form')?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      await call('/me/delete', {})
+      dd.close()
+      loadPanels()
+    })
+    root.querySelector('[data-delete-cancel]')?.addEventListener('click', async () => {
+      await call('/me/delete', undefined, 'DELETE')
+      loadPanels()
+    })
+    root.querySelector('[data-signout-others]')?.addEventListener('click', async () => {
+      await call('/me/sessions', undefined, 'DELETE')
+      loadPanels()
+    })
+
+    // Sign-up in three steps.
+    const signup = root.querySelector<HTMLFormElement>('[data-form="signup"]')
+    if (signup) {
+      let step = 0
+      const sets = [...signup.querySelectorAll<HTMLElement>('[data-step]')]
+      const back = signup.querySelector<HTMLButtonElement>('[data-back]')
+      const submitText = signup.querySelector<HTMLElement>('[data-submit-text]')
+      const submit = signup.querySelector<HTMLButtonElement>('.acct-submit')
+      const stepText = signup.querySelector<HTMLElement>('[data-step-text]')
+      const goto = (n: number) => {
+        step = n
+        sets.forEach((set, i) => { set.hidden = i !== n })
+        for (const bar of signup.querySelectorAll<HTMLElement>('[data-bar]')) bar.toggleAttribute('data-on', Number(bar.dataset.bar) <= n)
+        if (back) back.hidden = n === 0
+        if (submitText && submit) submitText.textContent = (n === sets.length - 1 ? submit.dataset.submitLabel : submit.dataset.nextLabel) ?? ''
+        const legend = sets[n]?.querySelector('legend')?.textContent ?? ''
+        if (stepText) stepText.textContent = `${(root.dataset.stepLabel ?? '').replace('{n}', String(n + 1))} · ${legend}`
+        sets[n]?.querySelector<HTMLInputElement>('input')?.focus()
+      }
+      goto(0)
+      sets[0]?.querySelector('input')?.blur()
+      back?.addEventListener('click', () => goto(step - 1))
+      signup.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const current = sets[step]
+        if (!current || !check(current)) return
+        if (step < sets.length - 1) return goto(step + 1)
+        const priv = signup.querySelector<HTMLElement>('[data-privacy-error]')
+        const missing = !input(signup, 'acceptPrivacy')?.checked
+        if (priv) priv.hidden = !missing
+        if (missing) return
+        const err = signup.querySelector<HTMLElement>('[data-error]')
+        if (err) err.hidden = true
+        submit?.setAttribute('aria-busy', 'true')
+        const v = (n: string) => input(signup, n)?.value.trim() ?? ''
+        const result = await call('/members/signup', { firstName: v('firstName'), lastName: v('lastName'), email: v('email'), password: input(signup, 'password')?.value ?? '', phone: v('phone') || undefined, acceptPrivacy: true, acceptNews: !!input(signup, 'acceptNews')?.checked })
+        submit?.removeAttribute('aria-busy')
+        if (result.ok) return refresh()
+        // Errors about the password or the address send the visitor back to the right step.
+        if (result.code.startsWith('password')) goto(1)
+        else if (result.code === 'email_taken') goto(0)
+        if (err) {
+          err.textContent = msg(result.code)
+          err.hidden = false
+        }
+      })
+    }
+
+    const signin = root.querySelector<HTMLFormElement>('[data-form="signin"]')
+    signin?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      if (!check(signin)) return
+      const err = signin.querySelector<HTMLElement>('[data-error]')
+      const button = signin.querySelector<HTMLButtonElement>('button[type=submit]')
+      if (err) err.hidden = true
+      button?.setAttribute('aria-busy', 'true')
+      const result = await call('/auth/sign-in/email', { email: input(signin, 'email')?.value.trim() ?? '', password: input(signin, 'password')?.value ?? '' })
+      button?.removeAttribute('aria-busy')
+      if (result.ok) return refresh()
+      if (err) {
+        err.textContent = msg(result.code)
+        err.hidden = false
+      }
+    })
+
+    // Google: sign-up asks for the (unticked) consent first; sign-in goes straight through for existing members.
+    const msgs = JSON.parse(root.dataset.googleMsgs ?? '{}') as Record<string, string>
+    const lang = root.dataset.lang === 'en' ? 'en' : 'fr'
+    const banner = root.querySelector<HTMLElement>('[data-google-banner]')
+    const say = (text: string) => {
+      if (!banner) return
+      banner.textContent = text
+      banner.hidden = !text
+    }
+    const startGoogle = async (consent: { privacy: boolean; news: boolean }) => {
+      say('')
+      // The round trip (our server, then Google) takes a few seconds: show it on every Google button.
+      const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-google]'), ...(dialog?.querySelectorAll<HTMLButtonElement>('[data-gd-go]') ?? [])]
+      const busy = (on: boolean) => {
+        for (const b of buttons) {
+          b.toggleAttribute('data-busy', on)
+          b.disabled = on
+          b.setAttribute('aria-busy', String(on))
+          const label = b.querySelector<HTMLElement>('[data-label]')
+          if (label) {
+            if (on) {
+              label.dataset.was = label.textContent ?? ''
+              label.textContent = msgs.wait ?? ''
+            } else if (label.dataset.was) label.textContent = label.dataset.was
+          }
+        }
+      }
+      busy(true)
+      const r = await call('/members/google', { locale: lang, acceptPrivacy: consent.privacy, acceptNews: consent.news })
+      if (r.ok && r.json.url) window.location.assign(r.json.url)
+      else {
+        busy(false)
+        say(r.ok ? (msgs.fail ?? '') : msg(r.code))
+      }
+    }
+    const dialog = root.querySelector<HTMLDialogElement>('[data-google-dialog]')
+    for (const b of root.querySelectorAll<HTMLButtonElement>('[data-google]'))
+      b.addEventListener('click', () => {
+        if (b.dataset.google === 'signup') dialog?.showModal()
+        else startGoogle({ privacy: false, news: false })
+      })
+    dialog?.querySelector('[data-gd-cancel]')?.addEventListener('click', (e) => {
+      e.preventDefault()
+      dialog.close()
+    })
+    dialog?.querySelector<HTMLFormElement>('[data-google-form]')?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const form = e.currentTarget as HTMLFormElement
+      const privacy = (form.elements.namedItem('acceptPrivacy') as HTMLInputElement).checked
+      const err = form.querySelector<HTMLElement>('[data-gd-error]')
+      if (err) err.hidden = privacy
+      if (!privacy) return
+      startGoogle({ privacy: true, news: (form.elements.namedItem('acceptNews') as HTMLInputElement).checked })
+    })
+    // Coming back from Google with a problem.
+    const params = new URLSearchParams(location.search)
+    const back = params.get('google')
+    if (back) {
+      const code = params.get('error')
+      // Google refusing the exchange is not the visitor's doing (and not an account clash): say so.
+      const refused = back === 'error' && ['invalid_code', 'server_error', 'internal_server_error'].includes(code ?? '')
+      say(`${refused ? msgs.unavailable : (msgs[back] ?? msgs.error ?? '')}${code ? ` (${code})` : ''}`)
+      history.replaceState(null, '', location.pathname)
+    }
+
+    root.querySelector('[data-signout]')?.addEventListener('click', async () => {
+      // Feedback at once (the request can take a few seconds), and never flash back too fast.
+      const screen = root.querySelector<HTMLElement>('[data-leaving]')
+      if (screen) screen.hidden = false
+      await Promise.all([call('/auth/sign-out', {}), new Promise((r) => setTimeout(r, 1600))])
+      show('out')
+      if (screen) screen.hidden = true
+    })
+    refresh()
+  }
+</script>
+
+<style is:global>
+  .acct {
+    display: grid;
+    gap: 2rem;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 6vw, 5rem) 1rem 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "intro" "card" "side";
+  }
+  @media (min-width: 64rem) {
+    .acct {
+      grid-template-columns: 1fr minmax(0, 30rem);
+      grid-template-areas: "intro card" "side card";
+      grid-template-rows: auto 1fr;
+      gap: 2.5rem 4rem;
+      padding-inline: 2rem;
+    }
+  }
+  .acct-intro {
+    grid-area: intro;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+  .acct-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--season-ink);
+  }
+  .acct-title {
+    font-size: clamp(2.5rem, 1.6rem + 3.4vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .acct-lead {
+    max-width: 34rem;
+    font-size: var(--text-lg);
+    color: var(--ink-muted);
+  }
+  .acct-side {
+    grid-area: side;
+    display: grid;
+    gap: 1.75rem;
+    align-content: start;
+  }
+  .acct-photos {
+    display: flex;
+    padding-inline-start: 1rem;
+  }
+  .acct-photos img {
+    width: 7.5rem;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    margin-inline-start: -1.25rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 4px var(--bg), var(--elevation-2);
+    transform: rotate(calc((var(--i) - 1) * 6deg)) translateY(calc(var(--i) * 6px - 6px));
+    transition: transform var(--duration-nav) var(--ease-spring);
+  }
+  .acct-photos:hover img {
+    transform: rotate(calc((var(--i) - 1) * 9deg)) translateX(calc((var(--i) - 1) * 0.75rem));
+  }
+  .acct-leaving {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.25rem;
+    background: var(--bg);
+    animation: acct-leaving-in 0.35s var(--ease-soft) both;
+  }
+  .acct-leaving[hidden] {
+    display: none;
+  }
+  @keyframes acct-leaving-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .acct-leaving-badge {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--elevation-2);
+  }
+  .acct-leaving-text {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    text-align: center;
+  }
+  .acct-leaving-bar {
+    width: 5rem;
+    height: 0.25rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+  }
+  .acct-leaving-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--primary);
+    transform-origin: left;
+    animation: acct-leaving-fill 1.6s var(--ease-in-out) both;
+  }
+  @keyframes acct-leaving-fill {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .acct-banner {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--danger-soft);
+  }
+  .acct-dialog {
+    width: min(100% - 2rem, 30rem);
+  }
+  .acct-avatar {
+    overflow: hidden;
+  }
+  .acct-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .acct-benefits {
+    display: grid;
+    gap: 0.875rem;
+  }
+  .acct-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+  .acct-benefit-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .acct-trust {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 34rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .acct-trust svg {
+    flex: none;
+    color: var(--primary);
+  }
+  .acct-card {
+    grid-area: card;
+    align-self: start;
+    display: grid;
+    gap: 1.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line), var(--elevation-3);
+    --focus-gap: var(--surface);
+  }
+  @media (min-width: 64rem) {
+    .acct-card {
+      position: sticky;
+      top: 6.5rem;
+    }
+  }
+  .acct-card .tabs-list {
+    width: 100%;
+    margin-block-end: 1.5rem;
+  }
+  .acct-card .tab {
+    flex: 1;
+  }
+  .acct-card .tab-panel:focus-visible {
+    border-radius: var(--radius-md);
+  }
+  .acct-panel {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .acct-panel-lead {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+  }
+  .acct-card > * {
+    min-width: 0;
+  }
+  .acct-google {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    height: auto;
+    padding-block: 0.5rem;
+    white-space: normal;
+  }
+  .acct-google-g svg {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .acct-soon {
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-xs);
+    background: var(--gold-soft);
+    color: var(--gold-ink);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+  .acct-fields {
+    display: grid;
+    gap: 1.125rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    animation: acct-in var(--duration-ui) var(--ease-out);
+  }
+  @keyframes acct-in {
+    from {
+      opacity: 0;
+      transform: translateX(var(--rise));
+    }
+  }
+  .acct-consent {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .acct-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-block-start: 1.25rem;
+  }
+  .acct-submit {
+    flex: 1;
+    width: 100%;
+  }
+  .acct-hint {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    text-align: center;
+  }
+  .acct-hello {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .acct-avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--season);
+    color: var(--on-season);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .acct-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.75rem;
+  }
+  .acct-tile {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  /* Waiting for Google: a ring instead of the G, the label says what is happening. */
+  .acct-google[data-busy] .acct-google-g,
+  [data-gd-go][data-busy] .acct-google-g {
+    display: none;
+  }
+  .acct-google[data-busy]::before,
+  [data-gd-go][data-busy]::before {
+    content: "";
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: conic-gradient(currentColor 0 25%, color-mix(in oklab, currentColor 25%, transparent) 0);
+    -webkit-mask: radial-gradient(circle, transparent 54%, var(--ink) 56%);
+    mask: radial-gradient(circle, transparent 54%, var(--ink) 56%);
+    animation: acct-spin 0.8s linear infinite;
+  }
+  @keyframes acct-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .acct-google[data-busy]::before,
+    [data-gd-go][data-busy]::before {
+      animation: none;
+    }
+  }
+  .acct-panels {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .acct-panel {
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .acct-panel > summary {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .acct-panel[open] > summary {
+    margin-block-end: 0.5rem;
+  }
+  .acct-panel .acct-fields {
+    padding-block-end: 1rem;
+  }
+  .acct-row {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  .acct-danger {
+    display: grid;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--danger) 7%, var(--surface));
+  }
+  .acct-ok {
+    color: var(--success);
+    font-size: var(--text-sm);
+  }
+  .acct-loading {
+    gap: 1rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .acct-fields {
+      animation: none;
+    }
+  }
+</style>

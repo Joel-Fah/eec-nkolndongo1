@@ -45,6 +45,9 @@ export const colors = {
   'illo-paper': { light: '#FFFDF8', dark: '#EAE3D3' },
   'illo-shadow': { light: '#16201A', dark: '#050906' },
   'illo-line': { light: '#B0461F', dark: '#C8603A' },
+  /** Photos: text and glass cards over an image stay light whatever the theme, on a dark scrim. */
+  'on-photo': { light: '#FFFFFF', dark: '#FFFFFF' },
+  scrim: { light: '#0B120E', dark: '#050906' },
   /** ⚑ Focus: gold ring + an outer ring that guarantees 3:1 (gold alone fails on cream). */
   'focus-outer': { light: '#1F5C3A', dark: '#0E1612' },
 } as const satisfies Record<string, Themed>
@@ -98,6 +101,37 @@ export const seasonNames = Object.keys(seasons) as Season[]
 /** Illustration skin tones — warm browns, same in both themes. */
 export const skin = ['#C68B5E', '#9C6440', '#6E4129', '#4A2A1A'] as const
 
+/**
+ * Storyset (Cuate) illustrations are recoloured into these, one file per theme (scripts/illos-fetch.ts,
+ * decision 0024): the accent becomes our gold, slate and greys follow the theme, skin tones become ours.
+ */
+export const storysetPalette = {
+  light: {
+    accent: '#E8B931',
+    accentDeep: '#C9971C',
+    slate: '#22302A',
+    slate2: '#3A4A42',
+    slate3: '#5A6A62',
+    paper: '#FFFDF8',
+    mist: '#EFEAE0',
+    mist2: '#DED7C8',
+    mist3: '#B9B1A0',
+    blush: '#E98360',
+  },
+  dark: {
+    accent: '#F0C64B',
+    accentDeep: '#C9A23A',
+    slate: '#3F4F48',
+    slate2: '#56675F',
+    slate3: '#728279',
+    paper: '#EAE3D3',
+    mist: '#1D2A23',
+    mist2: '#2A3830',
+    mist3: '#3E4D45',
+    blush: '#E98360',
+  },
+} as const
+
 /** Soft, warm, layered shadows tinted with ink; in dark: deeper shadow + a faint top highlight. */
 export const elevation = {
   1: {
@@ -118,8 +152,8 @@ export const radius = { xs: 6, sm: 10, md: 14, lg: 20, xl: 28 } as const
 
 export const fonts = {
   sans: '"Switzer", "Switzer Fallback", "Switzer Fallback Android", ui-sans-serif, system-ui, sans-serif',
-  /** Headings, lockups, big numbers. Fraunces (SIL OFL, soft + wonk) — chosen by Joël on the brand board. */
-  display: '"Fraunces", "Fraunces Fallback", "Fraunces Fallback Android", ui-serif, Georgia, serif',
+  /** Headings, lockups, big numbers. Erode (Fontshare, ITF FFL) — replaced Fraunces (decision 0023). */
+  display: '"Erode", "Erode Fallback", "Erode Fallback Android", ui-serif, Georgia, serif',
 } as const
 
 export const motion = {
@@ -146,16 +180,16 @@ export const motion = {
   rise: { normal: 12, reduced: 0 },
 } as const
 
-/** Fluid type scale (px at 360 → 1280 px viewport); body 17 → 18 px, ratio ~1.25 → 1.333. */
+/** Fluid type scale (px at 360 → 1280 px viewport); body 15 → 16 px (SaaS-sized, 2026-10-20), ratio ~1.25 → 1.333. */
 export const type = {
-  xs: [13, 13, 1.45],
-  sm: [14.5, 15, 1.5],
-  base: [17, 18, 1.6],
-  lg: [19.5, 22, 1.5],
-  xl: [23, 28, 1.3],
-  '2xl': [28, 37, 1.2],
-  '3xl': [33, 50, 1.12],
-  '4xl': [40, 67, 1.05],
+  xs: [12, 12.5, 1.45],
+  sm: [13.5, 14, 1.5],
+  base: [15, 16, 1.6],
+  lg: [17, 18.5, 1.5],
+  xl: [19.5, 23, 1.35],
+  '2xl': [23, 29, 1.25],
+  '3xl': [27, 38, 1.15],
+  '4xl': [32, 54, 1.08],
 } as const satisfies Record<string, readonly [number, number, number]>
 
 /** Text/background pairs that must pass WCAG AA in both themes. [fg, bg, min ratio] */

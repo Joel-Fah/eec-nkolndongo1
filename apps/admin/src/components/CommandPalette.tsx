@@ -1,8 +1,8 @@
 import { Dialog } from '@base-ui/react/dialog'
+import { useLocale, useMe } from '@eec/admin-kit'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useT } from '../lib/locale'
-import { allItems } from '../lib/nav'
+import { labelOf, navFor } from '../lib/nav'
 import { Icon } from './Icon'
 
 /** ⌘K / Ctrl+K quick navigation over the admin routes (a shell: actions come with the modules). */
@@ -13,7 +13,8 @@ export function CommandPalette({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const t = useT()
+  const { t, locale } = useLocale()
+  const me = useMe().data
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -24,15 +25,13 @@ export function CommandPalette({
     const q = query.trim().toLowerCase()
     const base = [
       { id: 'dashboard', icon: 'home' as const, text: t('admin.dashboard'), to: '/' },
-      ...allItems.map((i) => ({
-        id: i.id,
-        icon: i.icon,
-        text: t(i.label),
-        to: i.id === 'ui' ? '/ui' : `/p/${i.id}`,
-      })),
+      ...navFor(me).flatMap((g) =>
+        g.items.map((i) => ({ id: i.id, icon: i.icon, text: labelOf(i, t, locale), to: i.path })),
+      ),
+      { id: 'account', icon: 'account' as const, text: t('admin.items.account'), to: '/account' },
     ]
     return q ? base.filter((r) => r.text.toLowerCase().includes(q)) : base
-  }, [query, t])
+  }, [query, t, locale, me])
 
   useEffect(() => setActive(0), [query])
   useEffect(() => {

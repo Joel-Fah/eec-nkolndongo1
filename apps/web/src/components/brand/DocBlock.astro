@@ -32,7 +32,7 @@ const t = useT(Astro.currentLocale)
     role="group"
     aria-label={`${t('brand.components.demo')} — ${name}`}
     data-theme={dark ? 'dark' : undefined}
-    class="grid min-h-24 content-center gap-4 rounded-lg bg-surface-2 p-5 text-ink"
+    class="grid min-h-24 min-w-0 grid-cols-[minmax(0,1fr)] content-center gap-4 rounded-lg bg-surface-2 p-5 text-ink"
   >
     <slot />
   </div>

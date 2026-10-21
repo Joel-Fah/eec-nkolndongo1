@@ -19,7 +19,7 @@
     "./react": "./react/index.tsx"
   },
   "scripts": {
-    "build": "node ../../scripts/fonts-fetch.ts",
+    "build": "node ../../scripts/fonts-fetch.ts && node ../../scripts/illos-fetch.ts",
     "tokens": "node src/build-tokens.ts",
     "lint": "biome check .",
     "typecheck": "tsc",

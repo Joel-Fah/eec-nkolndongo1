@@ -1,0 +1,60 @@
+{
+  "title": "Membres",
+  "lead": "Les personnes qui ont créé un compte sur le site. Les fiches sont en lecture seule : chacun modifie ses informations dans « Mon espace ».",
+  "search": "Rechercher (nom, adresse, téléphone)",
+  "search_ph": "Marie, marie@exemple.cm, 6…",
+  "group": "Groupe",
+  "all_groups": "Tous les groupes",
+  "status": "Statut",
+  "all_status": "Tous",
+  "status_active": "Actif",
+  "status_deactivated": "Désactivé",
+  "since": "Inscrits depuis le",
+  "export": "Exporter en CSV",
+  "export_confirm": "Ce fichier contient des noms, adresses e-mail et numéros de téléphone. Chaque export est enregistré. Continuer ?",
+  "exported": "Fichier prêt. L’export a été enregistré dans le journal.",
+  "count": "{n} personne(s) affichée(s)",
+  "more": "Voir plus",
+  "empty_title": "Aucun membre pour l’instant",
+  "empty_text": "Dès que quelqu’un crée un compte dans « Mon espace », il apparaît ici.",
+  "col": {
+    "name": "Nom",
+    "email": "Adresse e-mail",
+    "phone": "Téléphone",
+    "joined": "Inscrit le",
+    "groups": "Groupes",
+    "news": "Nouvelles"
+  },
+  "news_yes": "Oui",
+  "news_no": "Non",
+  "deletion": "Suppression demandée le {date}",
+  "detail": {
+    "title": "Fiche membre",
+    "last_seen": "Dernière visite",
+    "consents": "Consentements",
+    "kind_privacy": "Politique de confidentialité",
+    "kind_news": "Recevoir les nouvelles",
+    "granted": "accordé le {date}",
+    "withdrawn": "retiré le {date}",
+    "version": "version {v}",
+    "no_groups": "Aucun groupe."
+  },
+  "err": {
+    "generic": "Une erreur est survenue.",
+    "forbidden": "Vous n’avez pas accès à cette action."
+  },
+  "dash": {
+    "title": "Les membres en chiffres",
+    "total": "Membres actifs",
+    "new_month": "Nouveaux ce mois-ci",
+    "news": "Abonnés aux nouvelles",
+    "by_group": "Par groupe",
+    "trend": "Nouveaux membres par mois",
+    "trend_table": "Voir les chiffres du graphique",
+    "month": "Mois",
+    "new": "Nouveaux",
+    "empty": "Pas encore de membres : les chiffres apparaîtront avec les premières inscriptions.",
+    "recent": "Activité récente",
+    "no_groups": "Aucun groupe pour l’instant : créez-les dans « Groupes »."
+  }
+}

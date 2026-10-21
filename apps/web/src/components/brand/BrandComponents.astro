@@ -8,16 +8,21 @@ import Choice from '@eec/ui/astro/Choice.astro'
 import Dialog from '@eec/ui/astro/Dialog.astro'
 import EmptyState from '@eec/ui/astro/EmptyState.astro'
 import Field from '@eec/ui/astro/Field.astro'
+import Figure from '@eec/ui/astro/Figure.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Mark from '@eec/ui/astro/Mark.astro'
+import Marquee from '@eec/ui/astro/Marquee.astro'
 import Menu from '@eec/ui/astro/Menu.astro'
 import Ornament from '@eec/ui/astro/Ornament.astro'
+import Pagination from '@eec/ui/astro/Pagination.astro'
 import Skeleton from '@eec/ui/astro/Skeleton.astro'
 import Tabs from '@eec/ui/astro/Tabs.astro'
 import Tooltip from '@eec/ui/astro/Tooltip.astro'
 import Verse from '@eec/ui/astro/Verse.astro'
 import { localeOf, useT } from '../../lib/i18n'
+import { peoplePhotos, photoSrc } from '../../lib/placeholders'
+import { type ShapeId, shapes } from '../../lib/shapes'
 import SiteLockup from '../SiteLockup.astro'
 import ThemeToggle from '../ThemeToggle.astro'
 import DocBlock from './DocBlock.astro'
@@ -34,7 +39,6 @@ type Id =
   | 'verse'
   | 'ornament'
   | 'docblock'
-  | 'motion_idle'
   | 'button'
   | 'fields'
   | 'choices'
@@ -48,6 +52,22 @@ type Id =
   | 'transitions'
   | 'adminshell'
   | 'preloader'
+  | 'errorscreen'
+  | 'picture'
+  | 'marquee'
+  | 'pagination'
+  | 'insetfields'
+  | 'search'
+  | 'imagery'
+  | 'tables'
+  | 'charts'
+  | 'shapes'
+const demoPhotos = peoplePhotos().slice(0, 3)
+const shapeIds = Object.keys(shapes) as ShapeId[]
+const chartMonths = Array.from({ length: 12 }, (_, i) =>
+  new Intl.DateTimeFormat(locale, { month: 'short' }).format(new Date(2026, i, 1)),
+)
+const chartData = [4, 6, 5, 9, 8, 12, 10, 14, 13, 17, 16, 21]
 const doc = (id: Id) => ({
   id: id.replace('_', '-'),
   name: t(`brand.components.${id}.name` as 'brand.components.icon.name'),
@@ -81,11 +101,7 @@ const doc = (id: Id) => ({
     </DocBlock>
 
     <DocBlock {...doc('illustration')}>
-      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" />
-    </DocBlock>
-
-    <DocBlock {...doc('motion_idle')}>
-      <Illustration name="hymn-book-handover" class="h-auto w-full max-w-sm" animate />
+      <Illustration name="reading-book" class="h-auto w-full max-w-sm" />
     </DocBlock>
 
     <DocBlock {...doc('theme')}>
@@ -117,9 +133,9 @@ const doc = (id: Id) => ({
 
     <DocBlock {...doc('fields')}>
       <div class="grid gap-5 md:grid-cols-2">
-        <Field id="d-name" label={t('ui.field_name')} hint={t('ui.field_hint')} />
-        <Field id="d-name2" label={t('ui.field_name')} error={t('ui.field_error')} />
-        <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} />
+        <Field id="d-name" label={t('ui.field_name')} placeholder={t('common.ph.name')} hint={t('ui.field_hint')} />
+        <Field id="d-name2" label={t('ui.field_name')} placeholder={t('common.ph.name')} error={t('ui.field_error')} />
+        <Field id="d-notes" kind="textarea" label={t('ui.field_notes')} placeholder={t('common.ph.notes')} />
         <Field id="d-dept" kind="select" label={t('ui.select_label')} placeholder={t('ui.select_placeholder')} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t(`ui.o${n}` as 'ui.o1') }))} />
       </div>
     </DocBlock>
@@ -173,12 +189,85 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('surfaces')}>
       <div class="grid gap-4 md:grid-cols-2">
         <Card><div class="flex items-center gap-3"><Avatar initials="EE" /><h4 class="text-lg">{t('ui.card_title')}</h4></div><p class="text-ink-muted">{t('ui.card_text')}</p></Card>
-        <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="hymn-book-handover" class="h-auto w-full" /></EmptyState>
+        <EmptyState title={t('ui.empty_title')} text={t('ui.empty_text')}><Illustration slot="art" name="reading-book" class="h-auto w-full" /></EmptyState>
       </div>
     </DocBlock>
 
     <DocBlock {...doc('preloader')}>
-      <div class="preloader-demo text-primary"><Mark variant="lockup-line" class="w-full max-w-md" /></div>
+      <div class="preloader-demo text-primary"><Mark variant="lockup-short-line" class="eec-preloader-lockup w-full max-w-md" /></div>
+    </DocBlock>
+
+    <DocBlock {...doc('picture')}><p class="text-sm text-ink-muted">{t('brand.components.picture.demo')}</p></DocBlock>
+
+    <DocBlock {...doc('errorscreen')}><p class="text-sm text-ink-muted">{t('brand.components.errorscreen.demo')}</p></DocBlock>
+
+
+    <DocBlock {...doc('marquee')}>
+      <Marquee items={[t('ui.marquee1'), t('ui.marquee2'), t('ui.marquee3')]} label={t('ui.marquee_label')} pauseLabel={t('ui.marquee_pause')} playLabel={t('ui.marquee_play')} />
+    </DocBlock>
+
+    <DocBlock {...doc('pagination')}>
+      <div class="grid gap-4">
+        <Pagination page={5} pages={12} href="#p{n}" label={t('ui.pagination_label')} prevLabel={t('ui.pagination_prev')} nextLabel={t('ui.pagination_next')} pageLabel={t('ui.pagination_page', { n: '{n}' })} />
+        <Pagination page={1} pages={3} href="#p{n}" label={t('ui.pagination_label')} prevLabel={t('ui.pagination_prev')} nextLabel={t('ui.pagination_next')} pageLabel={t('ui.pagination_page', { n: '{n}' })} />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('insetfields')}>
+      <div class="grid gap-4 md:grid-cols-2">
+        <Field id="d-in-mail" type="email" icon="mail" label={t('member.email')} placeholder={t('common.ph.email')} />
+        <Field id="d-in-phone" type="tel" icon="phone" label={t('member.phone')} placeholder={t('common.ph.phone')} />
+        <Field id="d-in-pass" type="password" label={t('member.password')} placeholder={t('common.ph.password')} toggle={{ show: t('common.password_show'), hide: t('common.password_hide') }} hint={t('ui.inset_hint')} />
+        <Field id="d-in-err" type="email" icon="mail" label={t('member.email')} placeholder={t('common.ph.email')} error={t('member.email_invalid')} value="marie@" />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('search')}>
+      <form class="grid gap-3 md:grid-cols-[1fr_auto] md:items-end" role="search" onsubmit="return false">
+        <Field id="d-search" type="search" icon="search" label={t('ui.search_label')} placeholder={t('ui.search_placeholder')} />
+        <Button type="submit">{t('ui.search_go')}</Button>
+      </form>
+    </DocBlock>
+
+    <DocBlock {...doc('imagery')}>
+      <div class="grid items-start gap-4 md:grid-cols-3">
+        <Figure src={demoPhotos[0] ? photoSrc(demoPhotos[0], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="4/3" caption={t('ui.imagery_caption')} credit={t('ui.imagery_credit')} zoom />
+        <Figure src={demoPhotos[1] ? photoSrc(demoPhotos[1], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="1/1" zoom />
+        <Figure src={demoPhotos[2] ? photoSrc(demoPhotos[2], 800, 'webp') : undefined} alt={t('ui.imagery_alt')} ratio="3/4" caption={t('ui.imagery_caption')} />
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('tables')}>
+      <div class="table-wrap">
+        <table class="table">
+          <caption>{t('ui.table_caption')}</caption>
+          <thead><tr><th scope="col">{t('ui.table_name')}</th><th scope="col">{t('ui.table_group')}</th><th scope="col" class="num">{t('ui.table_count')}</th></tr></thead>
+          <tbody>
+            {['A', 'B', 'C', 'D'].map((x, i) => <tr><th scope="row">{t('ui.table_example', { x })}</th><td>{t('ui.table_group_example', { x })}</td><td class="num">{[24, 18, 31, 9][i]}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('charts')}>
+      <div class="grid gap-6 lg:grid-cols-3" data-charts data-labels={JSON.stringify(chartMonths)} data-values={JSON.stringify(chartData)} data-series={t('ui.chart_series')}>
+        <figure class="chart-card lg:col-span-2"><canvas data-chart="line" role="img" aria-label={t('ui.chart_line')} height="200"></canvas></figure>
+        <figure class="chart-card"><canvas data-chart="doughnut" role="img" aria-label={t('ui.chart_doughnut')} height="200"></canvas></figure>
+        <figure class="chart-card lg:col-span-3"><canvas data-chart="bar" role="img" aria-label={t('ui.chart_bar')} height="120"></canvas></figure>
+      </div>
+      <details class="text-sm">
+        <summary class="cursor-pointer text-ink-muted">{t('ui.chart_table')}</summary>
+        <div class="table-wrap mt-2"><table class="table"><thead><tr><th scope="col">{t('ui.chart_month')}</th><th scope="col" class="num">{t('ui.chart_value')}</th></tr></thead><tbody>{chartMonths.map((m, i) => <tr><th scope="row">{m}</th><td class="num">{chartData[i]}</td></tr>)}</tbody></table></div>
+      </details>
+    </DocBlock>
+
+    <DocBlock {...doc('shapes')}>
+      <svg width="0" height="0" aria-hidden="true" focusable="false" class="absolute">
+        {shapeIds.map((id) => <clipPath id={`shape-${id}`} clipPathUnits="objectBoundingBox" set:html={shapes[id].defs} />)}
+      </svg>
+      <ul class="shape-gallery" role="list">
+        {shapeIds.map((id, i) => <li><span class="shape-demo" style={`clip-path:url(#shape-${id});aspect-ratio:${shapes[id].ar};--hue:${i % 4}`}></span><span class="text-xs text-ink-muted">{id}</span></li>)}
+      </ul>
     </DocBlock>
 
     <DocBlock {...doc('header')}><p class="text-sm text-ink-muted">{t('brand.components.header.demo')}</p></DocBlock>
@@ -197,3 +286,86 @@ const doc = (id: Id) => ({
     <p class="text-ink-muted">{t('brand.components.upcoming')}</p>
   </div>
 </Section>
+
+<script>
+  // Charts (Chart.js, loaded only when the guide's charts come into view). Colours come from the design tokens and
+  // follow light/dark; animation is off with reduced motion. The same numbers are in the table below them.
+  const host = document.querySelector<HTMLElement>('[data-charts]')
+  if (host) {
+    type ChartLib = typeof import('chart.js')
+    let charts: InstanceType<ChartLib['Chart']>[] = []
+    const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim()
+    async function draw() {
+      const lib: ChartLib = await import('chart.js')
+      lib.Chart.register(lib.LineController, lib.BarController, lib.DoughnutController, lib.LineElement, lib.BarElement, lib.ArcElement, lib.PointElement, lib.CategoryScale, lib.LinearScale, lib.Tooltip, lib.Legend, lib.Filler)
+      for (const c of charts) c.destroy()
+      const labels = JSON.parse(host?.dataset.labels ?? '[]') as string[]
+      const values = JSON.parse(host?.dataset.values ?? '[]') as number[]
+      const series = host?.dataset.series ?? ''
+      const ink = css('ink-muted')
+      const primary = css('primary')
+      const palette = [primary, css('gold'), css('clay'), css('season'), css('info')]
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+      const base = { responsive: true, maintainAspectRatio: false, animation: reduce ? (false as const) : { duration: 700 }, plugins: { legend: { labels: { color: ink, usePointStyle: true } } } }
+      const scales = { x: { ticks: { color: ink }, grid: { display: false } }, y: { ticks: { color: ink }, grid: { color: css('line') } } }
+      charts = []
+      for (const canvas of host?.querySelectorAll<HTMLCanvasElement>('canvas[data-chart]') ?? []) {
+        const kind = canvas.dataset.chart
+        const box = canvas.parentElement
+        if (box) box.style.height = kind === 'bar' ? '14rem' : '16rem'
+        if (kind === 'line')
+          charts.push(new lib.Chart(canvas, { type: 'line', data: { labels, datasets: [{ label: series, data: values, borderColor: primary, backgroundColor: `color-mix(in oklab, ${primary} 14%, transparent)`, fill: true, tension: 0.35, pointBackgroundColor: css('surface'), pointBorderColor: primary, pointBorderWidth: 2 }] }, options: { ...base, scales } }))
+        if (kind === 'bar')
+          charts.push(new lib.Chart(canvas, { type: 'bar', data: { labels, datasets: [{ label: series, data: values, backgroundColor: primary, borderRadius: 6 }] }, options: { ...base, scales } }))
+        if (kind === 'doughnut')
+          charts.push(new lib.Chart(canvas, { type: 'doughnut', data: { labels: labels.slice(0, 4), datasets: [{ data: values.slice(-4), backgroundColor: palette, borderColor: css('surface'), borderWidth: 3 }] }, options: { ...base, cutout: '62%' } }))
+      }
+    }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e?.isIntersecting) return
+      io.disconnect()
+      draw()
+      // Light/dark switch: redraw with the new colours.
+      new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    }, { rootMargin: '200px' })
+    io.observe(host)
+  }
+</script>
+
+<style is:global>
+  .chart-card {
+    position: relative;
+    margin: 0;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .shape-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+    gap: 1rem;
+  }
+  .shape-gallery li {
+    display: grid;
+    min-width: 0;
+    overflow: clip;
+    justify-items: center;
+    gap: 0.375rem;
+  }
+  .shape-demo {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--season) 70%, var(--gold)));
+  }
+  .shape-demo[style*="--hue:1"] {
+    background: linear-gradient(135deg, var(--gold), var(--clay));
+  }
+  .shape-demo[style*="--hue:2"] {
+    background: linear-gradient(135deg, var(--season), var(--primary));
+  }
+  .shape-demo[style*="--hue:3"] {
+    background: linear-gradient(135deg, var(--clay), var(--season));
+  }
+</style>

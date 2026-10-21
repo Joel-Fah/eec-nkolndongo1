@@ -1,53 +1,45 @@
 import { Menu } from '@base-ui/react/menu'
-import { Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { useT } from '../lib/locale'
-import { groups } from '../lib/nav'
+import { labelOf, navFor } from '../lib/nav'
+import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
-import { Mark } from './Mark'
-
-const COLLAPSE_KEY = 'eec-admin-sidebar'
+import { LeavingScreen } from './LeavingScreen'
 
 export function AppShell() {
-  const t = useT()
-  const [collapsed, setCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem(COLLAPSE_KEY) === '1'
-    } catch {
-      return false
-    }
-  })
+  const { t, locale } = useLocale()
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   useEffect(() => {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
   }, [mobileOpen])
+  const me = useMe().data
+  const { signOut } = useSessionActions()
+  const navigate = useNavigate()
+  const initials = (me?.user.name ?? '??')
+    .split(/\s+/)
+    .map((w) => w[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
   const path = useRouterState({ select: (s) => s.location.pathname })
-  const toggle = () =>
-    setCollapsed((c) => {
-      try {
-        localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1')
-      } catch {
-        // ignore
-      }
-      return !c
-    })
-  const to = (id: string) => (id === 'ui' ? '/ui' : `/p/${id}`)
+  const groups = navFor(me)
 
   return (
-    <div
-      className="admin-shell"
-      data-collapsed={collapsed ? '' : undefined}
-      data-mobile-open={mobileOpen ? '' : undefined}
-    >
+    <div className="admin-shell" data-mobile-open={mobileOpen ? '' : undefined}>
       <a className="skip-link" href="#main">
         {t('admin.skip')}
       </a>
       <aside className="admin-sidebar" aria-label={t('admin.sidebar')}>
         <div className="admin-brand">
+          <Link to="/" aria-label={t('admin.dashboard')} className="admin-brand-link">
+            <Brand />
+          </Link>
           <button
             type="button"
             className="btn btn-ghost btn-icon admin-close"
@@ -56,10 +48,6 @@ export function AppShell() {
           >
             <Icon name="close" size={24} />
           </button>
-          <Link to="/" aria-label={t('admin.dashboard')} className="admin-brand-link">
-            <Mark className="admin-mark" />
-            <span className="admin-brand-text">{t('site.name')}</span>
-          </Link>
         </div>
         <nav className="admin-nav">
           <Link
@@ -68,7 +56,6 @@ export function AppShell() {
             activeOptions={{ exact: true }}
             activeProps={{ 'aria-current': 'page' }}
             onClick={() => setMobileOpen(false)}
-            title={collapsed ? t('admin.dashboard') : undefined}
           >
             <Icon name="home" />
             <span>{t('admin.dashboard')}</span>
@@ -79,37 +66,18 @@ export function AppShell() {
               {g.items.map((i) => (
                 <Link
                   key={i.id}
-                  to={to(i.id)}
+                  to={i.path}
                   className="admin-link"
                   activeProps={{ 'aria-current': 'page' }}
                   onClick={() => setMobileOpen(false)}
-                  title={collapsed ? t(i.label) : undefined}
                 >
                   <Icon name={i.icon} />
-                  <span>{t(i.label)}</span>
+                  <span>{labelOf(i, t, locale)}</span>
                 </Link>
               ))}
             </div>
           ))}
         </nav>
-        <button
-          type="button"
-          className="btn btn-ghost admin-collapse"
-          onClick={toggle}
-          aria-expanded={!collapsed}
-          aria-label={collapsed ? t('admin.expand') : t('admin.collapse')}
-          title={collapsed ? t('admin.expand') : t('admin.collapse')}
-        >
-          <span
-            style={{
-              display: 'inline-flex',
-              transform: collapsed ? 'rotate(0)' : 'rotate(180deg)',
-            }}
-          >
-            <Icon name="arrowRight" />
-          </span>
-          <span className="admin-collapse-text">{t('admin.collapse')}</span>
-        </button>
       </aside>
       {mobileOpen && (
         <button
@@ -145,22 +113,32 @@ export function AppShell() {
             <ThemeButton />
             <Menu.Root>
               <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
-                EE
+                {initials}
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">
                   <Menu.Popup className="eec-popover eec-popup">
-                    <p className="px-3 py-2 text-sm font-medium">{t('admin.user.name')}</p>
-                    <Menu.Item className="menu-item" disabled>
-                      {t('admin.user.profile')}
-                    </Menu.Item>
-                    <Menu.Item className="menu-item" disabled>
+                    <div className="grid px-3 py-2">
+                      <p className="text-sm font-medium">{me?.user.name}</p>
+                      <p className="text-xs text-ink-muted">{me?.user.email}</p>
+                    </div>
+                    <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
+                      {t('admin.items.account')}
+                    </Menu.LinkItem>
+                    <Menu.Item
+                      className="menu-item menu-item-danger"
+                      onClick={async () => {
+                        // Feedback at once (the request can take a few seconds), and never flash back too fast.
+                        setLeaving(true)
+                        await Promise.all([
+                          signOut().catch(() => {}),
+                          new Promise((r) => setTimeout(r, 1600)),
+                        ])
+                        navigate({ to: '/login' })
+                      }}
+                    >
                       {t('admin.user.signout')}
                     </Menu.Item>
-                    <p className="px-3 py-2 text-xs text-ink-muted">{t('admin.user.pending')}</p>
-                    <Menu.LinkItem className="menu-item" render={<Link to="/login" />}>
-                      {t('login.title')}
-                    </Menu.LinkItem>
                   </Menu.Popup>
                 </Menu.Positioner>
               </Menu.Portal>
@@ -172,6 +150,7 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      {leaving && <LeavingScreen />}
     </div>
   )
 }

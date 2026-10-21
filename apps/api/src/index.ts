@@ -1,7 +1,9 @@
-import { Hono } from 'hono'
+import type { Env } from '@eec/api-kit'
+import { createApp } from './app.ts'
 
-const app = new Hono()
+const app = createApp()
 
-app.get('/health', (c) => c.json({ status: 'ok' }))
-
-export default app
+export { app }
+export default {
+  fetch: (req: Request, env: Env, ctx: ExecutionContext) => app.fetch(req, env, ctx),
+} satisfies ExportedHandler<Env>

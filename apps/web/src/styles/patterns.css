@@ -1,0 +1,262 @@
+/*
+ * Shared page patterns (documented on /_brand → Motifs de page): key figures, bento cards, account card
+ * bits. Imported by the pages that use them and by the living guide. Tokens only.
+ */
+
+/* Key figures */
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  width: min(100% - 2rem, 64rem);
+}
+@media (min-width: 48rem) {
+  .home-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.home-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.home-stat dt {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.home-stat dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.125rem;
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+.home-stat-example {
+  margin-inline-start: auto;
+  align-self: center;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-xs);
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* Bento cards */
+.bento {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 48rem) {
+  .bento {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .bento-visit {
+    grid-column: span 4;
+    grid-row: span 2;
+  }
+  .bento-groups,
+  .bento-season {
+    grid-column: span 2;
+  }
+  .bento-verse {
+    grid-column: span 3;
+  }
+  .bento-account,
+  .bento-story {
+    grid-column: span 3;
+  }
+}
+@media (min-width: 64rem) {
+  .bento-verse {
+    grid-column: span 2;
+  }
+  .bento-account,
+  .bento-story {
+    grid-column: span 2;
+  }
+}
+.bento-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 1.5rem;
+  padding: 1.75rem;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    var(--elevation-1);
+  transition:
+    transform var(--duration-ui) var(--ease-out),
+    box-shadow var(--duration-ui) var(--ease-out);
+}
+a.bento-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--primary) 35%, var(--line)),
+    var(--elevation-2);
+}
+/* Pointer light inside the card (desktop). */
+.bento-card[data-glow]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    22rem circle at var(--mx, 50%) var(--my, -20%),
+    color-mix(in oklab, var(--season) 12%, transparent),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-ui) var(--ease-out);
+  pointer-events: none;
+}
+.bento-card[data-glow]:hover::before {
+  opacity: 1;
+}
+.bento-card > * {
+  position: relative;
+}
+.bento-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.bento-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-block-start: auto;
+  font-weight: 600;
+  color: var(--primary);
+}
+.bento-more svg {
+  transition: transform var(--duration-ui) var(--ease-out);
+}
+a.bento-card:hover .bento-more svg {
+  transform: translateX(4px);
+}
+.bento-visit {
+  min-height: 30rem;
+  background: color-mix(in oklab, var(--primary-soft) 55%, var(--surface));
+}
+/* Cropped style: the scene is bigger than its card and cut by the bottom edge. */
+.bento-art {
+  position: absolute;
+  inset-inline: 8%;
+  inset-block-end: -30%;
+  width: 84%;
+  height: auto;
+  transition: transform var(--duration-nav) var(--ease-spring);
+}
+.bento-visit:hover .bento-art {
+  transform: translateY(-0.5rem) scale(1.02);
+}
+.bento-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.bento-chips li {
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition:
+    transform var(--duration-ui) var(--ease-spring) calc(var(--i) * 30ms),
+    background-color var(--duration-ui) var(--ease-out) calc(var(--i) * 30ms);
+}
+.bento-groups:hover .bento-chips li {
+  transform: translateY(-3px);
+  background: var(--primary-soft);
+}
+.bento-verse {
+  margin: 0;
+  align-content: space-between;
+  background: var(--gold-soft);
+}
+.bento-verse-mark {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  line-height: 0.5;
+  color: var(--gold-ink);
+}
+.bento-verse-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-style: italic;
+  line-height: 1.3;
+}
+.bento-verse-cite {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gold-ink);
+}
+
+/* Account card */
+.acct-or {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+/* The "or" rule: two full tinted bars, not a border. */
+.acct-or::before,
+.acct-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.acct-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.375rem;
+  margin-block-end: 0.75rem;
+}
+.acct-progress span {
+  height: 0.25rem;
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  transition: background-color var(--duration-ui) var(--ease-out);
+}
+.acct-progress span[data-on] {
+  background: var(--primary);
+}
+.acct-step {
+  margin-block-end: 1rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.acct-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  padding-inline-start: 2.25rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--primary);
+}

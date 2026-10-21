@@ -1,28 +1,37 @@
+import { useLocale, useMe } from '@eec/admin-kit'
 import { Card } from '@eec/ui/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Headcount } from '../../components/Headcount'
 import { Icon } from '../../components/Icon'
-import { useT } from '../../lib/locale'
-import { groups } from '../../lib/nav'
+import { QuickActions } from '../../components/QuickActions'
+import { RecentActivity } from '../../components/RecentActivity'
+import { WelcomeBanner } from '../../components/WelcomeBanner'
+import { labelOf, navFor } from '../../lib/nav'
 
 export const Route = createFileRoute('/_app/')({ component: Dashboard })
 
+/** What this person can manage, grouped like the menu. */
 function Dashboard() {
-  const t = useT()
+  const { t, locale } = useLocale()
+  const me = useMe().data
+  const groups = navFor(me)
   return (
     <div className="grid gap-8">
-      <header className="grid gap-2">
-        <h1 className="text-4xl">{t('admin.dashboard')}</h1>
-        <p className="max-w-[62ch] text-lg text-ink-muted">{t('admin.dashboard_text')}</p>
-      </header>
+      <WelcomeBanner />
+      <QuickActions />
+      <Headcount />
+      <RecentActivity />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {groups.map((g) => (
           <Card key={g.id}>
             <h2 className="text-xl">{t(g.label)}</h2>
-            <ul className="grid gap-1 text-ink-muted">
+            <ul className="grid gap-1">
               {g.items.map((i) => (
-                <li key={i.id} className="flex items-center gap-2">
-                  <Icon name={i.icon} size={16} />
-                  {t(i.label)}
+                <li key={i.id}>
+                  <Link to={i.path} className="admin-dash-link">
+                    <Icon name={i.icon} size={16} />
+                    {labelOf(i, t, locale)}
+                  </Link>
                 </li>
               ))}
             </ul>

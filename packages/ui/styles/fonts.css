@@ -1,7 +1,7 @@
 /*
  * Self-hosted fonts — no third-party requests.
  * Switzer: Fontshare (ITF Free Font License) — fetched by `pnpm fonts:fetch`, served unmodified, never
- * committed (decision 0015). Fraunces: SIL OFL 1.1, subset and committed. Preload: Switzer (layout).
+ * committed (decision 0015). Erode (headings) the same way (decision 0023). Preload: Switzer (layout).
  */
 
 @font-face {
@@ -20,15 +20,15 @@
 }
 
 @font-face {
-  font-family: "Fraunces";
-  src: url("../fonts/fraunces/Fraunces-Display.woff2") format("woff2");
+  font-family: "Erode";
+  src: url("../fonts/fontshare/erode/Erode-Variable.woff2") format("woff2");
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Fraunces";
-  src: url("../fonts/fraunces/Fraunces-DisplayItalic.woff2") format("woff2");
+  font-family: "Erode";
+  src: url("../fonts/fontshare/erode/Erode-VariableItalic.woff2") format("woff2");
   font-weight: 300 700;
   font-style: italic;
   font-display: swap;
@@ -52,18 +52,18 @@
   line-gap-override: 0%;
 }
 @font-face {
-  font-family: "Fraunces Fallback";
+  font-family: "Erode Fallback";
   src: local("Georgia");
-  size-adjust: 106.1%;
-  ascent-override: 92.2%;
-  descent-override: 24%;
+  size-adjust: 94.1%;
+  ascent-override: 103.6%;
+  descent-override: 28.2%;
   line-gap-override: 0%;
 }
 @font-face {
-  font-family: "Fraunces Fallback Android";
+  font-family: "Erode Fallback Android";
   src: local("Noto Serif"), local("NotoSerif-Regular");
-  size-adjust: 96.5%;
-  ascent-override: 101.3%;
-  descent-override: 26.4%;
+  size-adjust: 87.6%;
+  ascent-override: 111.3%;
+  descent-override: 30.2%;
   line-gap-override: 0%;
 }

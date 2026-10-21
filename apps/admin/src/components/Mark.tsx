@@ -20,7 +20,6 @@ export function Mark({
   svg = label
     ? svg.replace(/<title>[^<]*<\/title>/, `<title>${label}</title>`)
     : svg.replace(' role="img"', ' aria-hidden="true"').replace(/<title>[^<]*<\/title>/, '')
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: our own brand SVG
   return (
     <span
       className={className}

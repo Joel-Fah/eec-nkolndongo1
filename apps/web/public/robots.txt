@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://eec-nkolndongo1.workers.dev/sitemap-index.xml

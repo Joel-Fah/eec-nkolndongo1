@@ -1,0 +1,36 @@
+{
+  "name": "@eec/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./permissions": "./src/permissions.ts",
+    "./core-module": "./src/core-module.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "spike": "node --env-file=../../.env.local src/cli/spike.ts",
+    "admin:bootstrap": "node --env-file=../../.env.local src/cli/bootstrap.ts",
+    "clean:test-data": "node --env-file=../../.env.local src/cli/clean-test-data.ts"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "1.7.11",
+    "@eec/core": "workspace:*",
+    "@eec/db": "workspace:*",
+    "@eec/modules-kit": "workspace:*",
+    "better-auth": "1.7.11",
+    "drizzle-orm": "0.45.4",
+    "hono": "4.13.13"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/pg": "8.15.5",
+    "pg": "8.23.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "extends": "@eec/config/tsconfig/react.json",
+  "compilerOptions": { "types": ["node", "@cloudflare/workers-types"] },
+  "include": ["src"]
+}

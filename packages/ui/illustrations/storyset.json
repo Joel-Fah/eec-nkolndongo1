@@ -1,0 +1,166 @@
+[
+  {
+    "name": "church",
+    "url": "https://stories.freepiklabs.com/storage/78212/Church_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "community",
+    "url": "https://stories.freepiklabs.com/storage/31823/Community_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Départements"
+  },
+  {
+    "name": "events",
+    "url": "https://stories.freepiklabs.com/storage/51828/Events_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "news",
+    "url": "https://stories.freepiklabs.com/storage/39809/News_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "together",
+    "url": "https://stories.freepiklabs.com/storage/42807/Together_Mesa-de-trabajo-1.svg",
+    "background": true,
+    "use": "Spare (superseded by group)"
+  },
+  {
+    "name": "reading-book",
+    "url": "https://stories.freepiklabs.com/storage/57226/Reading-book_Mesa-de-trabajo-1.svg",
+    "background": true,
+    "use": "Empty states"
+  },
+  {
+    "name": "sign-up",
+    "url": "https://stories.freepiklabs.com/storage/53407/Sign-up-(1)_Mesa-de-trabajo-1.svg",
+    "background": true,
+    "use": "Mon espace"
+  },
+  {
+    "name": "destination",
+    "url": "https://stories.freepiklabs.com/storage/38520/Destination_Mesa-de-trabajo-1.svg",
+    "background": true,
+    "use": "404 · Menu → Nous trouver"
+  },
+  {
+    "name": "adventure",
+    "url": "https://stories.freepiklabs.com/storage/46855/Adventure_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Notre histoire"
+  },
+  {
+    "name": "pray",
+    "url": "https://stories.freepiklabs.com/storage/26411/Pray-(1)_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Ce que nous croyons"
+  },
+  {
+    "name": "conversation",
+    "url": "https://stories.freepiklabs.com/storage/15178/Conversation_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Pasteurs et Conseil"
+  },
+  {
+    "name": "music",
+    "url": "https://stories.freepiklabs.com/storage/49302/Music_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Cultes et horaires"
+  },
+  {
+    "name": "family",
+    "url": "https://stories.freepiklabs.com/storage/29335/Family_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Vie pratique"
+  },
+  {
+    "name": "calendar",
+    "url": "https://stories.freepiklabs.com/storage/34434/4761599_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Année liturgique"
+  },
+  {
+    "name": "gardening",
+    "url": "https://stories.freepiklabs.com/storage/48661/Gardening_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Fête des Moissons"
+  },
+  {
+    "name": "chatting",
+    "url": "https://stories.freepiklabs.com/storage/38768/Chatting_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "book-lover",
+    "url": "https://stories.freepiklabs.com/storage/15167/Book-lover_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Spare (superseded)"
+  },
+  {
+    "name": "messaging-fun",
+    "url": "https://stories.freepiklabs.com/storage/30217/Messaging-fun_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Nouvelles"
+  },
+  {
+    "name": "group-discussion",
+    "url": "https://stories.freepiklabs.com/storage/57410/Group-discussion_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Prédications"
+  },
+  {
+    "name": "stay-at-home",
+    "url": "https://stories.freepiklabs.com/storage/15121/Stay-at-home_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Méditations et bulletin"
+  },
+  {
+    "name": "group",
+    "url": "https://stories.freepiklabs.com/storage/57389/Group-(1)_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Home → Venir un dimanche"
+  },
+  {
+    "name": "a-whole-year",
+    "url": "https://stories.freepiklabs.com/storage/41714/A-Whole-Year_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Menu → Événements"
+  },
+  {
+    "name": "cherry-tree",
+    "url": "https://stories.freepiklabs.com/storage/65870/Cherry-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "404 page, bottom, cropped (original colours)",
+    "precision": 0,
+    "recolour": false
+  },
+  {
+    "name": "working-from-anywhere",
+    "url": "https://stories.freepiklabs.com/storage/45971/Working-from-anywhere_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "precision": 1,
+    "use": "500 page, bottom, cropped (original colours)"
+  },
+  {
+    "name": "magic-tree",
+    "url": "https://stories.freepiklabs.com/storage/62547/Magic-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "use": "Admin dashboard welcome, light mode (original colours)",
+    "noBackdrop": true
+  },
+  {
+    "name": "sauce-tree",
+    "url": "https://stories.freepiklabs.com/storage/62596/Sauce-tree_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "recolour": false,
+    "use": "Admin dashboard welcome, dark mode (original colours)",
+    "noBackdrop": true
+  }
+]

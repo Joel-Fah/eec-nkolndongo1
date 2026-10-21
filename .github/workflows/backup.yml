@@ -1,0 +1,54 @@
+# Weekly encrypted database backup to the backups bucket (a short job: it dumps, encrypts with the PUBLIC age key,
+# uploads, and keeps the last 12). The private key stays offline with Joël. A scheduled GitHub job is the one
+# exception to "schedules run on Cloudflare" (docs/ops/ci-cd.md): a Worker cannot run the dump. Also runnable by hand.
+name: backup
+
+on:
+  schedule:
+    - cron: '23 2 * * 0' # Sundays, 02:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      MEDIA_COPY_BUCKET: ${{ secrets.MEDIA_COPY_BUCKET }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter @eec/scripts...
+      - run: pnpm backup
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+          AWS_ENDPOINT_URL_S3: ${{ secrets.AWS_ENDPOINT_URL_S3 }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+      # A second copy of the media files in R2 (only copies what is new; never deletes). Skipped until the R2 secrets exist.
+      - name: Media second copy (R2)
+        if: ${{ env.MEDIA_COPY_BUCKET != '' }}
+        run: pnpm media:sync
+        env:
+          MEDIA_COPY_BUCKET: ${{ secrets.MEDIA_COPY_BUCKET }}
+          MEDIA_COPY_ENDPOINT: ${{ secrets.MEDIA_COPY_ENDPOINT }}
+          MEDIA_COPY_ACCESS_KEY_ID: ${{ secrets.MEDIA_COPY_ACCESS_KEY_ID }}
+          MEDIA_COPY_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_COPY_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ secrets.AWS_ENDPOINT_URL_S3 }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          MEDIA_BUCKET: eec-media

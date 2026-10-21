@@ -1,0 +1,36 @@
+{
+  "name": "@eec/modules",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./registry.ts",
+    "./api": "./api.ts",
+    "./admin": "./admin.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run boundaries",
+    "db:seed": "node --env-file=../.env.local cli/seed.ts"
+  },
+  "dependencies": {
+    "@eec/api-kit": "workspace:*",
+    "@eec/auth": "workspace:*",
+    "@eec/db": "workspace:*",
+    "@eec/module-media": "workspace:*",
+    "@eec/module-members": "workspace:*",
+    "@eec/module-settings": "workspace:*",
+    "@eec/modules-kit": "workspace:*",
+    "hono": "4.13.13",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261016.1",
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

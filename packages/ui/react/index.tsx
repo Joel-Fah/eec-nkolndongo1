@@ -16,7 +16,8 @@ import { Switch } from '@base-ui/react/switch'
 import { Tabs } from '@base-ui/react/tabs'
 import { Toast } from '@base-ui/react/toast'
 import { Tooltip } from '@base-ui/react/tooltip'
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { type ButtonHTMLAttributes, type ReactNode, useState } from 'react'
+import { type IconName, iconSvg } from '../src/icons.ts'
 
 const cx = (...parts: (string | false | undefined | null)[]) => parts.filter(Boolean).join(' ')
 
@@ -57,25 +58,89 @@ export function Button({
 /* ── Field: label + control + hint + error ────────────────────────────── */
 export function TextField({
   label,
+  placeholder,
   hint,
   error,
   textarea,
   className,
+  icon,
+  end,
+  passwordToggle,
+  type,
   ...rest
 }: {
   label: string
+  /** Required: an example of the expected answer (e.g. « marie@exemple.cm »), never a repeat of the label. */
+  placeholder: string
   hint?: string
   error?: string
   textarea?: boolean
   className?: string
+  /** An icon inside the field, at the start (search, mail, phone…). */
+  icon?: IconName
+  /** Anything inside the field, at the end (a unit, a clear button). */
+  end?: ReactNode
+  /** For `type="password"`: labels of the show/hide eye button (from i18n). Adds the button. */
+  passwordToggle?: { show: string; hide: string }
+  type?: string
 } & Record<string, unknown>) {
+  const [shown, setShown] = useState(false)
+  const isPassword = type === 'password' && !!passwordToggle
+  const inset = !!icon || !!end || isPassword
+  const control = textarea ? (
+    <Field.Control
+      render={<textarea className={cx('textarea', className)} />}
+      placeholder={placeholder}
+      {...rest}
+    />
+  ) : (
+    <Field.Control
+      render={
+        <Input
+          className={cx('input', className)}
+          data-icon={icon ? '' : undefined}
+          data-end={end || isPassword ? '' : undefined}
+        />
+      }
+      placeholder={placeholder}
+      type={isPassword && shown ? 'text' : type}
+      {...rest}
+    />
+  )
   return (
     <Field.Root invalid={!!error} className="field">
       <Field.Label className="field-label">{label}</Field.Label>
-      {textarea ? (
-        <Field.Control render={<textarea className={cx('textarea', className)} />} {...rest} />
+      {inset && !textarea ? (
+        <div className="input-wrap">
+          {icon && (
+            <span
+              className="input-icon"
+              aria-hidden="true"
+              dangerouslySetInnerHTML={{ __html: iconSvg(icon, { size: 20 }) }}
+            />
+          )}
+          {control}
+          {isPassword ? (
+            <button
+              type="button"
+              className="input-end input-toggle"
+              aria-label={shown ? passwordToggle.hide : passwordToggle.show}
+              aria-pressed={shown}
+              onClick={() => setShown((v) => !v)}
+            >
+              <span
+                aria-hidden="true"
+                dangerouslySetInnerHTML={{
+                  __html: iconSvg(shown ? 'eyeOff' : 'eye', { size: 20 }),
+                }}
+              />
+            </button>
+          ) : (
+            end && <span className="input-end">{end}</span>
+          )}
+        </div>
       ) : (
-        <Field.Control render={<Input className={cx('input', className)} />} {...rest} />
+        control
       )}
       {hint && <Field.Description className="field-hint">{hint}</Field.Description>}
       {error && (
@@ -344,6 +409,8 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
       <Toast.Content className="toast-text">
         <Toast.Title />
       </Toast.Content>
+      {/* Undo / follow-up action, when the toast has one (actionProps). */}
+      <Toast.Action className="btn btn-secondary btn-sm toast-action" />
       <span className="toast-close">
         <svg className="toast-ring" viewBox="0 0 36 36" aria-hidden="true">
           <circle cx="18" cy="18" r="16" pathLength="100" />

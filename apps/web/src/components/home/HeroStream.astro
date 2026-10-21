@@ -1,0 +1,351 @@
+---
+/**
+ * Hero card stream: a deck of tilted cards drifting from one edge of the screen to the other — the
+ * community in photos, with word cards (what we do) shuffled in. Hover/focus a card: the stream slows,
+ * the card straightens, lifts and shows its caption; a soft light follows the pointer. CSS animation
+ * only (the track is rendered twice for a seamless loop; the copy is aria-hidden). Reduced motion /
+ * no drift, the row scrolls by hand with snap points. A pause button stops the drift (WCAG 2.2.2); Save-Data
+ * starts paused.
+ * In production there are no people placeholders: the stream is made of word cards only.
+ */
+import Icon from '@eec/ui/astro/Icon.astro'
+import type { IconName } from '@eec/ui/icons'
+import { localeOf, useT } from '../../lib/i18n'
+import { peoplePhotos, photoSrc } from '../../lib/placeholders'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const photos = peoplePhotos()
+
+const words: { key: string; icon: IconName; tone: 'primary' | 'gold' | 'clay' | 'season' }[] = [
+  { key: 'sing', icon: 'music', tone: 'gold' },
+  { key: 'pray', icon: 'prayer', tone: 'primary' },
+  { key: 'grow', icon: 'plant', tone: 'season' },
+  { key: 'share', icon: 'heart', tone: 'clay' },
+  { key: 'listen', icon: 'bible', tone: 'primary' },
+  { key: 'welcome', icon: 'home', tone: 'gold' },
+]
+
+type Card =
+  | { kind: 'photo'; photo: (typeof photos)[number]; label: string; wide: boolean }
+  | { kind: 'word'; key: string; icon: IconName; tone: string }
+const labels = ['sing', 'pray', 'grow', 'share', 'listen', 'welcome']
+/** What each placeholder photo shows (dev-only photos; real photos will carry their own caption). */
+const captionOf: Record<number, string> = {
+  7520735: 'sing',
+  7520369: 'sing',
+  29643853: 'sing',
+  9002043: 'sing',
+  11536521: 'pray',
+  14210156: 'pray',
+  6284489: 'listen',
+  19783489: 'grow',
+  15234466: 'grow',
+  4262410: 'welcome',
+  31914895: 'welcome',
+  35276949: 'share',
+  8910380: 'share',
+}
+const cards: Card[] = []
+if (photos.length) {
+  // Two photos, one word card, repeated. Portrait and landscape alternate where a 4:3 crop exists.
+  let wideCount = 0
+  photos.forEach((photo, i) => {
+    const wide = !!photo.landscape && wideCount++ % 2 === 0
+    cards.push({
+      kind: 'photo',
+      photo,
+      wide,
+      label: t(
+        `home.stream.${captionOf[photo.id] ?? labels[i % labels.length]}` as 'home.stream.sing',
+      ),
+    })
+    const word = words[Math.floor(i / 2) % words.length]
+    if (i % 2 === 1 && word) cards.push({ kind: 'word', ...word })
+  })
+} else {
+  for (const word of [...words, ...words]) cards.push({ kind: 'word', ...word })
+}
+const tilt = [-5, 3, -2, 4, -3, 2, -4, 5]
+const lift = [0, 18, -6, 12, -14, 6, 20, -8]
+---
+
+<div class="stream-wrap">
+<div class="stream" data-stream>
+  {
+    [0, 1].map((copy) => (
+      <ul class="stream-track" role="list" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? t('home.stream.label') : undefined}>
+        {cards.map((card, i) => (
+          <li class:list={['stream-card', card.kind === 'photo' && card.wide && 'is-wide']} style={`--tilt:${tilt[i % tilt.length]}deg;--lift:${lift[i % lift.length]}px`} data-glow data-kind={card.kind} data-tone={card.kind === 'word' ? card.tone : undefined}>
+            {card.kind === 'photo' ? (
+              <figure class="stream-figure">
+                <picture>
+                  <source type="image/avif" srcset={`${photoSrc(card.photo, 480, 'avif', card.wide)} 480w, ${photoSrc(card.photo, 800, 'avif', card.wide)} 800w`} sizes={card.wide ? '26rem' : '15rem'} />
+                  <img src={photoSrc(card.photo, 480, 'webp', card.wide)} srcset={`${photoSrc(card.photo, 480, 'webp', card.wide)} 480w, ${photoSrc(card.photo, 800, 'webp', card.wide)} 800w`} sizes={card.wide ? '26rem' : '15rem'} alt={copy === 0 ? card.photo.alt : ''} width="480" height={card.wide ? 360 : 640} loading={i < 4 && copy === 0 ? 'eager' : 'lazy'} decoding="async" style={`background-image:url(${card.photo.blur});background-color:${card.photo.color}`} />
+                </picture>
+                <figcaption class="stream-caption">
+                  <span class="stream-chip">{card.label}</span>
+                  <span class="stream-credit">{t('home.stream.credit', { name: card.photo.photographer })}</span>
+                </figcaption>
+              </figure>
+            ) : (
+              <div class="stream-word">
+                <span class="stream-word-icon"><Icon name={card.icon} size={24} /></span>
+                <p class="stream-word-title">{t(`home.stream.${card.key}` as 'home.stream.sing')}</p>
+                <p class="stream-word-text">{t(`home.stream.${card.key}_p` as 'home.stream.sing_p')}</p>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    ))
+  }
+</div>
+<button type="button" class="stream-toggle btn btn-ghost btn-sm" data-stream-toggle data-state="playing" data-pause={t('home.stream.pause')} data-play={t('home.stream.play')}>
+  <Icon name="pause" size={16} class="stream-toggle-pause" /><Icon name="play" size={16} class="stream-toggle-play" />
+  <span data-stream-toggle-label>{t('home.stream.pause')}</span>
+</button>
+</div>
+
+<script>
+  // The drift slows down and stops gently on hover (and on the pause button, WCAG 2.2.2), then picks up
+  // again: the CSS animation's playbackRate is eased instead of a hard pause. Save-Data starts paused.
+  const setup = () => {
+    for (const wrap of document.querySelectorAll<HTMLElement>('.stream-wrap')) {
+      if (wrap.dataset.js !== undefined) continue
+      wrap.dataset.js = ''
+      const button = wrap.querySelector<HTMLButtonElement>('[data-stream-toggle]')
+      const label = wrap.querySelector<HTMLElement>('[data-stream-toggle-label]')
+      const stream = wrap.querySelector<HTMLElement>('[data-stream]')
+      const anims = () => [...wrap.querySelectorAll<HTMLElement>('.stream-track')].flatMap((el) => el.getAnimations())
+      let rate = 1
+      let frame = 0
+      let paused = false
+      let hovering = false
+      const ease = (target: number, ms: number) => {
+        cancelAnimationFrame(frame)
+        const from = rate
+        const start = performance.now()
+        const step = (now: number) => {
+          const p = Math.min(1, (now - start) / ms)
+          rate = from + (target - from) * (1 - (1 - p) ** 3)
+          for (const a of anims()) a.playbackRate = rate
+          if (p < 1) frame = requestAnimationFrame(step)
+        }
+        frame = requestAnimationFrame(step)
+      }
+      const apply = () => ease(paused || hovering ? 0 : 1, paused || hovering ? 900 : 1200)
+      const set = (value: boolean) => {
+        paused = value
+        wrap.toggleAttribute('data-paused', value)
+        if (button) button.dataset.state = value ? 'paused' : 'playing'
+        if (label && button) label.textContent = (value ? button.dataset.play : button.dataset.pause) ?? ''
+        apply()
+      }
+      stream?.addEventListener('pointerenter', () => {
+        hovering = true
+        apply()
+      })
+      stream?.addEventListener('pointerleave', () => {
+        hovering = false
+        apply()
+      })
+      const nav = navigator as Navigator & { connection?: { saveData?: boolean } }
+      if (nav.connection?.saveData) set(true)
+      button?.addEventListener('click', () => set(!paused))
+    }
+  }
+  setup()
+  document.addEventListener('astro:page-load', setup)
+</script>
+
+<style is:global>
+  .stream-wrap {
+    display: grid;
+    justify-items: center;
+  }
+  .stream-toggle {
+    margin-block-start: -1.5rem;
+    color: var(--ink-muted);
+  }
+  .stream-toggle[data-state="playing"] .stream-toggle-play,
+  .stream-toggle[data-state="paused"] .stream-toggle-pause {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stream-toggle {
+      display: none;
+    }
+  }
+  .stream {
+    --card-w: clamp(11.5rem, 16vw, 15rem);
+    --gap: clamp(-1.25rem, -1.4vw, -0.5rem);
+    --speed: 130s;
+    position: relative;
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    padding-block: 3rem 3.5rem;
+    /* Cards appear and leave through a soft fade at both edges. */
+    -webkit-mask: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+    mask: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+  .stream-track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0;
+    padding-inline-end: calc(var(--gap) * -1 + 1rem);
+    animation: stream-drift var(--speed) linear infinite;
+  }
+  /* Without JS, hovering still pauses (the script eases the speed instead). */
+  .stream-wrap:not([data-js]) .stream:hover .stream-track,
+  .stream-wrap:not([data-js])[data-paused] .stream-track {
+    animation-play-state: paused;
+  }
+  @keyframes stream-drift {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  .stream-card {
+    position: relative;
+    flex: none;
+    width: var(--card-w);
+    aspect-ratio: 3 / 4;
+    margin-inline-start: var(--gap);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-2);
+    transform: translateY(var(--lift)) rotate(var(--tilt));
+    transition:
+      transform var(--duration-nav) var(--ease-spring),
+      box-shadow var(--duration-ui) var(--ease-out);
+  }
+  .stream-card.is-wide {
+    width: calc(var(--card-w) * 16 / 9);
+    aspect-ratio: 4 / 3;
+  }
+  .stream-card:hover {
+    z-index: 2;
+    transform: translateY(calc(var(--lift) - 1.25rem)) rotate(0deg) scale(1.1);
+    box-shadow: var(--elevation-3);
+  }
+  /* Light that follows the pointer (set by the data-glow helper in @eec/ui/primitives). */
+  .stream-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(18rem circle at var(--mx, 50%) var(--my, 0%), rgb(255 255 255 / 0.22), transparent 45%);
+    opacity: 0;
+    transition: opacity var(--duration-ui) var(--ease-out);
+    pointer-events: none;
+  }
+  .stream-card:hover::after {
+    opacity: 1;
+  }
+  .stream-figure {
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 0.375rem;
+  }
+  .stream-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius-lg) - 0.375rem);
+    background-size: cover;
+  }
+  .stream-caption {
+    position: absolute;
+    inset: auto 0.875rem 0.875rem;
+    display: grid;
+    justify-items: start;
+    gap: 0.375rem;
+  }
+  .stream-chip {
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .stream-credit {
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-xs);
+    background: rgb(0 0 0 / 0.55);
+    font-size: var(--text-xs);
+    color: white;
+    opacity: 0;
+    transform: translateY(0.25rem);
+    transition:
+      opacity var(--duration-ui) var(--ease-out),
+      transform var(--duration-ui) var(--ease-out);
+  }
+  .stream-card:hover .stream-credit {
+    opacity: 1;
+    transform: none;
+  }
+  .stream-word {
+    display: grid;
+    align-content: space-between;
+    height: 100%;
+    padding: 1.25rem;
+    border-radius: inherit;
+  }
+  .stream-card[data-tone="primary"] {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+  .stream-card[data-tone="gold"] {
+    background: var(--gold);
+    color: var(--on-gold);
+  }
+  .stream-card[data-tone="clay"] {
+    background: var(--clay-ink);
+    color: var(--on-primary);
+  }
+  .stream-card[data-tone="season"] {
+    background: var(--season);
+    color: var(--on-season);
+  }
+  .stream-word-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, currentColor 14%, transparent);
+  }
+  .stream-word-title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .stream-word-text {
+    font-size: var(--text-sm);
+    opacity: 0.86;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stream {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+    .stream-track {
+      animation: none;
+    }
+    .stream-track[aria-hidden] {
+      display: none;
+    }
+    .stream-card {
+      scroll-snap-align: center;
+    }
+  }
+</style>

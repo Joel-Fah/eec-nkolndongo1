@@ -1,7 +1,14 @@
 ---
+/**
+ * An invitation card, then a minimalist floating footer (same 80rem frame as the header, every corner
+ * rounded): the parish and the site map. The legal line, language and theme sit below the card.
+ */
+import { getSeason } from '@eec/core'
+import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
+import { seasonNames } from '@eec/ui/tokens'
 import { localeOf, useT } from '../lib/i18n'
-import { alternates, href, labelKey, pages } from '../lib/nav'
+import { alternates, href, labelKey, pages, tabKey, tabs } from '../lib/nav'
 import SiteLockup from './SiteLockup.astro'
 import ThemeToggle from './ThemeToggle.astro'
 
@@ -9,45 +16,75 @@ const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const other = locale === 'fr' ? 'en' : 'fr'
 const switchHref = alternates(Astro.url.pathname)[other]
-const legal = ['privacy', 'legal'].map((id) => ({
-  id,
-  path: pages.find((p) => p.id === id)?.path[locale] ?? '',
-}))
+const pathOf = (id: string) => pages.find((p) => p.id === id)?.path[locale] ?? ''
+const legal = ['privacy', 'legal'].map((id) => ({ id, path: pathOf(id) }))
 const socials = [
-  ['whatsapp', 'WhatsApp'],
-  ['chat', 'Facebook'],
-  ['play', 'YouTube'],
+  ['whatsapp', 'WhatsApp', 'whatsapp'],
+  ['chat', 'Facebook', 'facebook'],
+  ['play', 'YouTube', 'youtube'],
 ] as const
+const season = getSeason()
+const hints = Object.fromEntries(
+  seasonNames.map((n) => [n, t(`footer.play.${n}` as 'footer.play.ordinaire')]),
+)
+const mapTabs = tabs.filter((tab) => tab.children.length)
 ---
 
-<footer class="site-footer mt-24">
-  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:px-8 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
-    <div class="grid content-start gap-4">
-      <div class="w-[min(100%,20rem)] text-[1.15rem]"><SiteLockup variant="two" /></div>
-      <p class="max-w-[36ch] text-ink-muted">{t('footer.about')}</p>
+<aside class="site-cta" aria-labelledby="site-cta-title">
+  <div class="site-cta-card">
+    <div class="grid gap-2">
+      <h2 id="site-cta-title" class="text-3xl">{t('footer.invite_title')}</h2>
+      <p class="max-w-[48ch] text-ink-muted">{t('footer.invite_text')}</p>
     </div>
-    <div class="grid content-start gap-2">
-      <h2 class="font-display text-lg font-medium">{t('footer.visit')}</h2>
-      <p class="flex gap-2 text-ink-muted"><Icon name="location" class="mt-1 flex-none" />{t('footer.address')}</p>
-      <p class="text-sm font-medium">{t('footer.hours_title')}</p>
-      <p class="flex gap-2 text-ink-muted"><Icon name="clock" class="mt-1 flex-none" />{t('footer.hours')}</p>
-    </div>
-    <div class="grid content-start gap-2">
-      <h2 class="font-display text-lg font-medium">{t('footer.follow')}</h2>
-      <ul class="grid gap-1" role="list">
-        {socials.map(([icon, name]) => <li class="flex min-h-11 items-center gap-2 text-ink-muted"><Icon name={icon} />{name} · {t('footer.social_pending')}</li>)}
-      </ul>
-    </div>
-    <div class="grid content-start gap-2">
-      <h2 class="font-display text-lg font-medium">{t('footer.legal')}</h2>
-      <ul class="grid gap-1" role="list">
-        {legal.map((l) => <li><a class="flex min-h-11 items-center underline-offset-4 hover:underline" href={href(locale, l.path)}>{t(labelKey(l.id))}</a></li>)}
-      </ul>
-      <p class="text-sm text-ink-muted">{t('footer.credits')} · <span>{t('footer.credits_pending')}</span></p>
+    <div class="flex flex-wrap gap-3">
+      <Button href={href(locale, pathOf('trouver'))} size="lg"><Icon name="location" />{t('footer.invite_find')}</Button>
+      <Button href={href(locale, pathOf('account'))} size="lg" variant="secondary">{t('footer.invite_account')}</Button>
     </div>
   </div>
-  <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 pb-10 md:px-8">
-    <p class="text-sm text-ink-muted">{t('footer.rights')}</p>
+</aside>
+
+<footer class="site-footer">
+  <div class="site-footer-card">
+    <div class="grid content-start gap-4">
+      <div class="w-[min(100%,18rem)] text-[1.05rem]"><SiteLockup variant="two" /></div>
+      <p class="max-w-[34ch] text-ink-muted">{t('footer.about')}</p>
+      {/* Filled from the parish settings once approved (lib/settings-client.ts); hidden until then. */}
+      <p class="flex gap-2 text-sm text-ink-muted" data-setting="parish.address" hidden><Icon name="location" size={16} class="mt-0.5 flex-none" /><span data-setting-text></span></p>
+      <ul class="flex gap-2" role="list" aria-label={t('footer.follow')}>
+        {
+          socials.map(([icon, name, key]) => (
+            <li>
+              <a class="footer-social" data-setting-link={`parish.${key}`} title={`${name} · ${t('footer.social_pending')}`} aria-label={`${name} · ${t('footer.social_pending')}`} data-label-ready={name} rel="noopener" target="_blank">
+                <Icon name={icon} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    {
+      mapTabs.map((tab) => (
+        <nav class="grid content-start gap-3" aria-label={t(tabKey(tab.id))}>
+          <h2 class="footer-heading">{t(tabKey(tab.id))}</h2>
+          <ul class="grid gap-1" role="list">
+            {tab.children.map((child) => (
+              <li>
+                <a class="footer-link" href={href(locale, `${tab.slug[locale]}/${child.slug[locale]}`)}>
+                  {t(labelKey(child.id))}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+
+  <div class="footer-meta">
+    <p class="text-sm text-ink-muted">{t('footer.rights')} · <a class="footer-link text-sm" href="https://storyset.com" rel="noopener" target="_blank">{t('footer.credits')}</a> · <a class="footer-link text-sm" href={href(locale, pathOf('credits'))}>{t('footer.photo_credits')}</a></p>
+    <ul class="flex flex-wrap items-center gap-x-4" role="list">
+      {legal.map((l) => <li><a class="footer-link text-sm" href={href(locale, l.path)}>{t(labelKey(l.id))}</a></li>)}
+    </ul>
     <div class="flex items-center gap-2" role="group" aria-label={t('footer.controls')}>
       <a href={switchHref} hreflang={other} lang={other} class="btn btn-ghost btn-sm" aria-label={t('common.language.switch_label')}><Icon name="language" size={16} />{t('common.language.switch_to')}</a>
       <ThemeToggle />
@@ -55,9 +92,211 @@ const socials = [
   </div>
 </footer>
 
+{/* Seasonal playground: things fall as the footer comes into view; brush the pointer through them. */}
+<div class="site-playground" data-playground data-hints={JSON.stringify(hints)} aria-hidden="true">
+  <canvas></canvas>
+  <span class="playground-fan" aria-hidden="true" set:html={`<svg viewBox="0 0 64 64" width="64" height="64" focusable="false" aria-hidden="true"><path class="f0" d="M32 59L-1.1 33.1A42 42 0 0 1 8.1 24.5Z"/><path class="f1" d="M32 59L8.1 24.5A42 42 0 0 1 19.5 18.9Z"/><path class="f0" d="M32 59L19.5 18.9A42 42 0 0 1 32.0 17.0Z"/><path class="f1" d="M32 59L32.0 17.0A42 42 0 0 1 44.5 18.9Z"/><path class="f0" d="M32 59L44.5 18.9A42 42 0 0 1 55.9 24.5Z"/><path class="f1" d="M32 59L55.9 24.5A42 42 0 0 1 65.1 33.1Z"/><g class="ribs"><path d="M32 59L-1.1 33.1"/><path d="M32 59L8.1 24.5"/><path d="M32 59L19.5 18.9"/><path d="M32 59L32.0 17.0"/><path d="M32 59L44.5 18.9"/><path d="M32 59L55.9 24.5"/><path d="M32 59L65.1 33.1"/></g><path class="handle" d="M32 59L32 63"/></svg>`} />
+  <p class="playground-hint">{hints[season]}</p>
+</div>
+
+<script>
+  import { applyPublicSettings } from '../lib/settings-client'
+  applyPublicSettings()
+  document.addEventListener('astro:page-load', applyPublicSettings)
+
+  // The playground loads (and starts) only when the footer is about to be seen.
+  let stop: (() => void) | undefined
+  document.addEventListener('astro:before-swap', () => stop?.())
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-playground]')
+    if (!root) return
+    const hint = root.querySelector('.playground-hint')
+    const hints = JSON.parse(root.dataset.hints ?? '{}') as Record<string, string>
+    const sync = () => {
+      const text = hints[document.documentElement.dataset.season ?? '']
+      if (hint && text) hint.textContent = text
+    }
+    sync()
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) return
+        io.disconnect()
+        import('../scripts/playground').then((m) => {
+          stop = m.initPlayground(root)
+        })
+      },
+      { rootMargin: '0px 0px 240px 0px' },
+    )
+    io.observe(root)
+  })
+</script>
+
 <style is:global>
+  .site-cta {
+    margin-block-start: 6rem;
+    padding-inline: 0.75rem;
+  }
+  .site-cta-card {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    background: color-mix(in oklab, var(--season) 10%, var(--surface));
+    box-shadow: inset 0 0 0 1px var(--line), var(--elevation-1);
+  }
+  @media (min-width: 64rem) {
+    .site-cta-card {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 2.75rem 3.5rem;
+    }
+  }
   .site-footer {
+    margin-block-start: 1rem;
+    padding: 0 0.75rem 0.5rem;
+  }
+  .site-footer-card {
+    display: grid;
+    gap: 2.5rem 2rem;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 2.5rem 1.5rem;
+    border-radius: var(--radius-xl);
     background: var(--surface-2);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: inset 0 0 0 1px var(--line);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-footer-card > :first-child {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 48rem) {
+    .site-footer-card {
+      padding: 3rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .site-footer-card {
+      grid-template-columns: 1.6fr repeat(4, minmax(0, 1fr));
+    }
+    .site-footer-card > :first-child {
+      grid-column: auto;
+    }
+  }
+  .footer-heading {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--ink-muted);
+    transition: color var(--duration-micro) var(--ease-out);
+  }
+  .footer-link:hover {
+    color: var(--primary);
+  }
+  @media (min-width: 64rem) {
+    .site-footer-card .footer-link {
+      min-height: 2.25rem;
+    }
+  }
+  /* A social link without an approved address stays inert. */
+  .footer-social:not([href]) {
+    cursor: default;
+  }
+  .footer-social[href]:hover {
+    color: var(--primary);
+  }
+  .footer-social {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink-muted);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  /* The playground: seasonal things fall here and pile up; the pointer stirs them (scripts/playground.ts). */
+  .site-playground {
+    position: relative;
+    height: clamp(16rem, 30vw + 5rem, 26rem);
+    margin-block-start: 0.5rem;
+    touch-action: pan-y;
+  }
+  /* The canvas reaches above the playground (set by the script) and draws over the footer; it never takes the pointer. */
+  .site-playground canvas {
+    position: absolute;
+    inset-inline: 0;
+    width: 100%;
+    z-index: 6;
+    pointer-events: none;
+  }
+  /* The hand fan that follows the mouse here (the native cursor is hidden only while the script runs). */
+  .site-playground.has-fan {
+    cursor: none;
+  }
+  .playground-fan {
+    position: absolute;
+    inset: 0 auto auto 0;
+    z-index: 7;
+    display: none;
+    width: 4rem;
+    height: 4rem;
+    transform-origin: 50% 90%;
+    transition: rotate 0.12s var(--ease-out), opacity 0.2s;
+    pointer-events: none;
+    filter: drop-shadow(0 0.25rem 0.375rem color-mix(in oklab, var(--ink) 25%, transparent));
+  }
+  .site-playground.has-fan .playground-fan[data-on] {
+    display: block;
+  }
+  .playground-fan .f0 {
+    fill: var(--gold-soft);
+  }
+  .playground-fan .f1 {
+    fill: var(--primary-soft);
+  }
+  .playground-fan .ribs path,
+  .playground-fan .handle {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+  .playground-fan .handle {
+    stroke-width: 3;
+  }
+  .playground-hint {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-start: 1.25rem;
+    margin: 0;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    pointer-events: none;
+    transition: opacity var(--duration-story) var(--ease-soft);
+  }
+  .site-playground.is-played .playground-hint {
+    opacity: 0;
+  }
+  /* Below the card: the legal line, language and theme. */
+  .footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 0.75rem 1rem;
   }
 </style>

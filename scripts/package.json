@@ -7,11 +7,25 @@
     "fonts:fetch": "node fonts-fetch.ts",
     "contrast": "node contrast-check.ts",
     "brand:icons": "node brand-icons.ts",
-    "lint": "biome check . && node check-design-rules.ts"
+    "lint": "biome check . && node check-design-rules.ts",
+    "dev:vars": "node dev-vars.ts",
+    "dev:gateway": "node dev-gateway.ts",
+    "illos:fetch": "node illos-fetch.ts",
+    "backup": "node backup/backup.ts",
+    "restore": "node backup/restore.ts",
+    "media:sync": "node backup/media-sync.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/pg": "8.15.5",
     "sharp": "0.35.5",
     "svgo": "4.1.0"
+  },
+  "dependencies": {
+    "age-encryption": "0.3.1",
+    "aws4fetch": "1.0.20",
+    "drizzle-orm": "0.45.4",
+    "pg": "8.23.1",
+    "thumbhash": "0.1.1"
   }
 }

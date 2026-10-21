@@ -2,7 +2,15 @@
   "$schema": "https://turborepo.com/schema.json",
   "extends": ["//"],
   "tasks": {
-    "test": { "dependsOn": ["build"] },
-    "typecheck": { "dependsOn": ["build"] }
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "typecheck": {
+      "dependsOn": ["build"]
+    },
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", "../../modules/*/i18n/**"],
+      "outputs": ["src/paraglide/**", "messages/merged/**"]
+    }
   }
 }

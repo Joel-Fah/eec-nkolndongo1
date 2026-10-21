@@ -1,0 +1,73 @@
+---
+/**
+ * A photo from the media library (decision 0020): responsive `srcset` from its variants, the ThumbHash as a
+ * blurred background while it loads, the description in the page's language, lazy by default. People who
+ * asked for reduced data get the smallest variant. Pass the fields the media API returns.
+ */
+import { thumbHashToDataURL } from 'thumbhash'
+
+type Variant = { key: string; width: number; size: number; mime: string }
+interface Props {
+  media: {
+    variants: Variant[]
+    placeholder?: string | null
+    altFr?: string | null
+    altEn?: string | null
+    width?: number | null
+    height?: number | null
+  }
+  sizes: string
+  class?: string
+  /** Above the fold: load at once. */
+  eager?: boolean
+  /** Decorative image: empty description. */
+  decorative?: boolean
+}
+const { media, sizes, class: className, eager = false, decorative = false } = Astro.props
+const en = Astro.currentLocale === 'en'
+const alt = decorative ? '' : ((en ? media.altEn : media.altFr) ?? media.altFr ?? '')
+const variants = [...media.variants].sort((a, b) => a.width - b.width)
+const smallest = variants[0]
+const largest = variants.at(-1)
+const url = (v: Variant) => `/media/${v.key}`
+const srcset = variants.map((v) => `${url(v)} ${v.width}w`).join(', ')
+let blur: string | undefined
+try {
+  if (media.placeholder)
+    blur = thumbHashToDataURL(Uint8Array.from(atob(media.placeholder), (c) => c.charCodeAt(0)))
+} catch {
+  blur = undefined
+}
+---
+
+{
+  smallest && largest && (
+    <picture class:list={['media-picture', className]} style={blur ? `background-image:url(${blur})` : undefined}>
+      <source media="(prefers-reduced-data: reduce)" srcset={url(smallest)} type={smallest.mime} />
+      <img
+        src={url(largest)}
+        srcset={srcset}
+        sizes={sizes}
+        alt={alt}
+        width={media.width ?? largest.width}
+        height={media.height ?? undefined}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchpriority={eager ? 'high' : 'auto'}
+      />
+    </picture>
+  )
+}
+
+<style is:global>
+  .media-picture {
+    display: block;
+    background-position: center;
+    background-size: cover;
+  }
+  .media-picture img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

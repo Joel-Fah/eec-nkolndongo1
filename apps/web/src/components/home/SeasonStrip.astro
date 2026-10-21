@@ -1,0 +1,101 @@
+---
+/**
+ * The liturgical year as a strip: one segment per season at its real length this year (computed from the
+ * date of Easter), a marker for today, and the next season with a countdown. Season colours come from
+ * tokens ([data-season] on each segment), so it follows the theme.
+ */
+import { civilDateIn, getSeason, seasonRanges } from '@eec/core'
+import { localeOf, useT } from '../../lib/i18n'
+
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const now = new Date()
+const today = civilDateIn(now)
+const current = getSeason(now)
+const utc = (d: { year: number; month: number; day: number }) =>
+  Date.UTC(d.year, d.month - 1, d.day)
+const dayOf = (d: { year: number; month: number; day: number }) =>
+  (utc(d) - Date.UTC(d.year, 0, 1)) / 86_400_000
+const yearLength = dayOf({ year: today.year, month: 12, day: 31 }) + 1
+const ranges = seasonRanges(today.year)
+const segments = ranges.map((r) => ({
+  season: r.season,
+  length: (dayOf(r.to) - dayOf(r.from) + 1) / yearLength,
+}))
+const position = (dayOf(today) + 0.5) / yearLength
+// Next season: the first range starting after today (or the first of next year).
+const next =
+  ranges.find((r) => utc(r.from) > utc(today) && r.season !== current) ??
+  seasonRanges(today.year + 1)[0]
+const days = next ? Math.round((utc(next.from) - utc(today)) / 86_400_000) : 0
+const nextLabel = next ? t(`season.${next.season}` as 'season.avent') : ''
+const months = Array.from({ length: 12 }, (_, m) =>
+  new Intl.DateTimeFormat(locale, { month: 'narrow' }).format(new Date(Date.UTC(2026, m, 15))),
+)
+---
+
+<div class:list={['season-strip', className]}>
+  <div class="season-strip-bar" role="img" aria-label={t('home.season_strip_label', { season: t(`season.${current}` as 'season.avent') })}>
+    {segments.map((s) => <span data-season={s.season} class:list={[s.season === current && 'is-current']} style={`flex-grow:${s.length}`}></span>)}
+    <span class="season-strip-today" style={`inset-inline-start:${(position * 100).toFixed(2)}%`} aria-hidden="true"></span>
+  </div>
+  <div class="season-strip-months" aria-hidden="true">{months.map((m) => <span>{m}</span>)}</div>
+  {next && <p class="season-strip-next" data-season={next.season}><span class="season-strip-dot" aria-hidden="true"></span>{days === 1 ? t('home.season_next_tomorrow', { season: nextLabel }) : t('home.season_next', { season: nextLabel, days: String(days) })}</p>}
+</div>
+
+<style is:global>
+  .season-strip {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .season-strip-bar {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    height: 0.875rem;
+  }
+  .season-strip-bar > span[data-season] {
+    flex-basis: 0;
+    min-width: 3px;
+    border-radius: var(--radius-xs);
+    background: var(--season);
+    opacity: 0.4;
+    transition: opacity var(--duration-ui) var(--ease-out);
+  }
+  .season-strip-bar > span.is-current {
+    opacity: 1;
+  }
+  .season-strip-today {
+    position: absolute;
+    inset-block: -0.3125rem;
+    width: 0.25rem;
+    margin-inline-start: -0.125rem;
+    border-radius: var(--radius-xs);
+    background: var(--ink);
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+  .season-strip-months {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .season-strip-next {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  .season-strip-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+</style>

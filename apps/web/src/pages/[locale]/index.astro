@@ -1,13 +1,15 @@
 ---
 import { getSeason } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
-import Card from '@eec/ui/astro/Card.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
-import Verse from '@eec/ui/astro/Verse.astro'
+import HeroStream from '../../components/home/HeroStream.astro'
+import SeasonStrip from '../../components/home/SeasonStrip.astro'
 import Site from '../../layouts/Site.astro'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
-import { href, pages, tabs } from '../../lib/nav'
+import { href, pages } from '../../lib/nav'
+import { visibleStats } from '../../lib/stats'
+import '../../styles/patterns.css'
 
 export const getStaticPaths = localePaths
 
@@ -15,66 +17,294 @@ const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const season = getSeason()
 const seasonLabel = t(`season.${season}` as 'season.avent')
-const discover = tabs.find((x) => x.id === 'discover')?.slug[locale] ?? ''
-const calendar = tabs.find((x) => x.id === 'calendar')?.slug[locale] ?? ''
-const pathOf = (id: string) => pages.find((p) => p.id === id)?.path[locale] ?? ''
-const start = [
-  { icon: 'church', title: 'home.start1_t', text: 'home.start1_p', to: pathOf('cultes') },
-  { icon: 'users', title: 'home.start2_t', text: 'home.start2_p', to: pathOf('departements') },
-  { icon: 'compass', title: 'home.start3_t', text: 'home.start3_p', to: pathOf('histoire') },
-] as const
+const pathOf = (id: string) => href(locale, pages.find((p) => p.id === id)?.path[locale] ?? '')
+const figures = visibleStats()
+const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welcome'] as const
 ---
 
 <Site title={t('site.name')} description={t('home.lead')}>
-  <section class="hero mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 md:px-8 md:py-24 lg:grid-cols-2">
-    <div class="grid content-center gap-6">
-      <p class="season-chip w-fit rounded-md px-3 py-1.5 text-sm font-semibold">{t('home.season', { season: seasonLabel })}</p>
-      <h1 class="text-5xl md:text-6xl" style="font-size:var(--text-4xl);line-height:1.08">{t('home.title')}</h1>
-      <p class="max-w-[46ch] text-lg text-ink-muted">{t('home.lead')}</p>
-      <div class="flex flex-wrap gap-3">
-        <Button href={href(locale, discover)} size="lg">{t('home.cta_discover')}</Button>
-        <Button href={href(locale, calendar)} size="lg" variant="secondary">{t('home.cta_calendar')}</Button>
+  <section class="home-hero">
+    <div class="home-hero-head">
+      <a class="home-kicker" href={pathOf('liturgie')}>
+        <span class="home-kicker-dot" aria-hidden="true"></span>
+        <span>{t('home.season', { season: seasonLabel })}</span>
+        <Icon name="arrowRight" size={16} />
+      </a>
+      <h1 class="home-title">
+        <span class="home-title-line">{t('home.title_a')}</span>
+        <span class="home-title-line">{t('home.title_b')} <span class="home-title-mark">{t('home.title_c')}<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 17C58 7 122 5 176 9s84 6 120 2" /></svg></span></span>
+      </h1>
+      <p class="home-lead">{t('home.lead')}</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <Button href={pathOf('cultes')} size="lg" data-magnetic>{t('home.cta_visit')}<Icon name="arrowRight" /></Button>
+        <Button href={pathOf('histoire')} size="lg" variant="secondary">{t('home.cta_discover')}</Button>
       </div>
     </div>
-    <div class="hero-art relative">
-      <div class="hero-blob" aria-hidden="true"></div>
-      <Illustration name="hymn-book-handover" class="relative h-auto w-full" animate />
-    </div>
+
+    <HeroStream />
+
+    {
+      figures.length > 0 && (
+        <dl class="home-stats">
+          {figures.map((s) => (
+            <div class="home-stat">
+              <dt>{t(`home.stats.${s.id}` as 'home.stats.years')}</dt>
+              <dd>
+                <span class="home-stat-value" data-count={s.shown}>{s.shown}</span>{s.suffix}
+                {s.isExample && <span class="home-stat-example">{t('home.stats.example')}</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
   </section>
 
-  <section class="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:px-8">
-    <h2 class="text-3xl">{t('home.start_title')}</h2>
-    <div class="grid gap-4 md:grid-cols-3">
-      {
-        start.map((card) => (
-          <Card href={href(locale, card.to)} class="group">
-            <span class="mega-icon"><Icon name={card.icon} /></span>
-            <h3 class="text-xl">{t(card.title)}</h3>
-            <p class="text-ink-muted">{t(card.text)}</p>
-          </Card>
-        ))
-      }
+  <section class="home-section" aria-labelledby="start-title">
+    <div class="home-section-head">
+      <p class="home-eyebrow">{t('home.start_eyebrow')}</p>
+      <h2 id="start-title" class="text-4xl">{t('home.start_title')}</h2>
     </div>
-  </section>
 
-  <section class="mx-auto max-w-3xl px-4 py-10 md:px-8">
-    <Verse mark={locale === 'fr' ? '«' : '“'} cite={t('home.verse_cite')}>{t('home.verse')}</Verse>
+    <div class="bento">
+      <a class="bento-card bento-visit" href={pathOf('cultes')} data-glow>
+        <div class="grid gap-3">
+          <span class="bento-icon"><Icon name="church" /></span>
+          <h3 class="text-2xl">{t('home.start1_t')}</h3>
+          <p class="max-w-[34ch] text-ink-muted">{t('home.start1_p')}</p>
+          <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
+        </div>
+        <Illustration name="group" class="bento-art" />
+      </a>
+
+      <a class="bento-card bento-groups" href={pathOf('departements')} data-glow>
+        <div class="grid gap-3">
+          <span class="bento-icon"><Icon name="users" /></span>
+          <h3 class="text-2xl">{t('home.start2_t')}</h3>
+          <p class="text-ink-muted">{t('home.start2_p')}</p>
+        </div>
+        <ul class="bento-chips" role="list">
+          {groups.map((g, i) => <li style={`--i:${i}`}>{t(`home.groups.${g}` as 'home.groups.choirs')}</li>)}
+        </ul>
+        <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
+      </a>
+
+      <a class="bento-card bento-season" href={pathOf('liturgie')} data-glow>
+        <div class="grid gap-1">
+          <p class="home-eyebrow">{t('home.season_eyebrow')}</p>
+          <h3 class="text-2xl">{seasonLabel}</h3>
+          <p class="text-sm text-ink-muted">{t(`pages.liturgie.season_${season}` as 'pages.liturgie.season_avent')}</p>
+        </div>
+        <SeasonStrip />
+      </a>
+
+      <figure class="bento-card bento-verse">
+        <span class="bento-verse-mark" aria-hidden="true">{locale === 'fr' ? '«' : '“'}</span>
+        <blockquote class="bento-verse-text">{t('home.verse')}</blockquote>
+        <figcaption class="bento-verse-cite">{t('home.verse_cite')}</figcaption>
+      </figure>
+
+      <a class="bento-card bento-account" href={pathOf('account')} data-glow>
+        <div class="grid gap-3">
+          <span class="bento-icon"><Icon name="account" /></span>
+          <h3 class="text-2xl">{t('home.account_t')}</h3>
+          <p class="text-ink-muted">{t('home.account_p')}</p>
+        </div>
+        <span class="bento-more">{t('home.account_cta')}<Icon name="arrowRight" size={16} /></span>
+      </a>
+
+      <a class="bento-card bento-story" href={pathOf('histoire')} data-glow>
+        <div class="grid gap-3">
+          <span class="bento-icon"><Icon name="compass" /></span>
+          <h3 class="text-2xl">{t('home.start3_t')}</h3>
+          <p class="text-ink-muted">{t('home.start3_p')}</p>
+        </div>
+        <span class="bento-more">{t('home.more')}<Icon name="arrowRight" size={16} /></span>
+      </a>
+    </div>
   </section>
 </Site>
 
-<style is:global>
-  .season-chip {
-    background: color-mix(in oklab, var(--season) 14%, var(--surface));
-    color: var(--season-ink);
+<script>
+  // Figures count up once, when they come into view. Reduced motion: they are simply there.
+  const run = () => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          io.unobserve(entry.target)
+          const el = entry.target as HTMLElement
+          const target = Number(el.dataset.count)
+          const start = performance.now()
+          const tick = (now: number) => {
+            const p = Math.min(1, (now - start) / 1400)
+            el.textContent = String(Math.round(target * (1 - (1 - p) ** 4)))
+            if (p < 1) requestAnimationFrame(tick)
+          }
+          requestAnimationFrame(tick)
+        }
+      },
+      { threshold: 0.6 },
+    )
+    for (const el of document.querySelectorAll('[data-count]')) io.observe(el)
   }
-  .hero-art {
+  run()
+  document.addEventListener('astro:after-swap', run)
+</script>
+
+<style is:global>
+  .home-hero {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    padding-block: clamp(3rem, 8vw, 6.5rem) 0;
     isolation: isolate;
   }
-  .hero-blob {
+  /* A faint dot grid, fading out downwards: the "blueprint" texture of a modern product page. */
+  .home-hero::before {
+    content: "";
     position: absolute;
-    inset: 6% 2% 0;
+    inset: -6rem 0 30%;
     z-index: -1;
-    border-radius: var(--radius-xl);
-    background: color-mix(in oklab, var(--season) 16%, var(--bg));
+    background-image: radial-gradient(color-mix(in oklab, var(--ink) 16%, transparent) 1px, transparent 1.5px);
+    background-size: 22px 22px;
+    -webkit-mask: radial-gradient(ellipse 70% 70% at 50% 30%, black, transparent 75%);
+    mask: radial-gradient(ellipse 70% 70% at 50% 30%, black, transparent 75%);
+  }
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: 10% 15% 40%;
+    z-index: -1;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--season) 16%, transparent);
+    filter: blur(80px);
+  }
+  .home-hero-head {
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    max-width: 76rem;
+    padding-inline: 1rem;
+    text-align: center;
+  }
+  .home-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line), var(--elevation-1);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: box-shadow var(--duration-ui) var(--ease-out), transform var(--duration-ui) var(--ease-out);
+  }
+  .home-kicker:hover {
+    transform: translateY(-1px);
+    box-shadow: inset 0 0 0 1px var(--season), var(--elevation-2);
+  }
+  .home-kicker-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--season);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--season) 22%, transparent);
+    animation: kicker-pulse 2.4s var(--ease-in-out) infinite;
+  }
+  @keyframes kicker-pulse {
+    50% {
+      box-shadow: 0 0 0 7px color-mix(in oklab, var(--season) 0%, transparent);
+    }
+  }
+  .home-title {
+    font-size: clamp(2.25rem, 1.2rem + 3.9vw, 4.5rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  /* Two lines on tablet and desktop; on phones each line may wrap. */
+  .home-title-line {
+    display: block;
+  }
+  .home-title-mark {
+    position: relative;
+    display: inline-block;
+    font-style: italic;
+    color: var(--primary);
+  }
+  .home-title-mark svg {
+    position: absolute;
+    inset: auto -2% -0.12em;
+    width: 104%;
+    height: 0.24em;
+    overflow: visible;
+  }
+  .home-title-mark path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: mark-draw 0.9s var(--ease-out) 0.5s forwards;
+  }
+  html:not([data-preloaded]) .home-title-mark path {
+    animation-delay: 2.5s;
+  }
+  @keyframes mark-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .home-lead {
+    max-width: 44rem;
+    font-size: var(--text-lg);
+    color: var(--ink-muted);
+  }
+
+  .home-section {
+    display: grid;
+    gap: 2.5rem;
+    max-width: 80rem;
+    margin: clamp(5rem, 10vw, 8rem) auto 0;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .home-section {
+      padding-inline: 2rem;
+    }
+  }
+  .home-section-head {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 40rem;
+  }
+  .home-eyebrow {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--season-ink);
+  }
+
+  /* The little light marks around the book twinkle while the card is hovered. */
+  .bento-visit [data-part="marks"] path:first-child {
+    transform-origin: 270px 160px;
+    transition: transform var(--duration-nav) var(--ease-spring);
+  }
+  .bento-visit:hover [data-part="marks"] path:first-child {
+    transform: scale(1.35) translateY(-4px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .home-kicker-dot {
+      animation: none;
+    }
+    .home-title-mark path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
   }
 </style>

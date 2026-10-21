@@ -4,16 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 5173",
+    "dev": "vite --port 5173 --strictPort",
     "build": "vite build && tsc",
     "preview": "vite preview",
     "lint": "biome check .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
+    "@eec/admin-kit": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/i18n": "workspace:*",
+    "@eec/modules": "workspace:*",
+    "@eec/modules-kit": "workspace:*",
     "@eec/ui": "workspace:*",
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "1.1.10",
@@ -26,11 +30,13 @@
     "@eec/config": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "1.168.47",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "6.1.2",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

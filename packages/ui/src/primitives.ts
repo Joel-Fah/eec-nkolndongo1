@@ -155,6 +155,19 @@ export function initPrimitives() {
       if (dialog instanceof HTMLDialogElement) dialog.showModal()
       return
     }
+    // The eye of a password field: show or hide what is typed.
+    const eye = target.closest<HTMLElement>('[data-pw-toggle]')
+    if (eye) {
+      const input = document.getElementById(eye.dataset.pwToggle ?? '')
+      if (input instanceof HTMLInputElement) {
+        const show = input.type === 'password'
+        input.type = show ? 'text' : 'password'
+        eye.setAttribute('aria-pressed', String(show))
+        eye.setAttribute('aria-label', (show ? eye.dataset.hide : eye.dataset.show) ?? '')
+        eye.toggleAttribute('data-on', show)
+      }
+      return
+    }
     const close = target.closest<HTMLElement>('[data-dialog-close]')
     if (close) {
       close.closest('dialog')?.close()
@@ -282,9 +295,63 @@ export function initPrimitives() {
     true,
   )
 
+  // Cursor-aware glow: any [data-glow] element gets --mx / --my (pointer position, in px) to light itself.
+  // Fine pointers only; a passive listener, one rAF per frame.
+  if (matchMedia('(pointer: fine)').matches) {
+    let frame = 0
+    document.addEventListener(
+      'pointermove',
+      (event) => {
+        const el = (event.target as HTMLElement | null)?.closest?.<HTMLElement>('[data-glow]')
+        if (!el || frame) return
+        frame = requestAnimationFrame(() => {
+          frame = 0
+          const r = el.getBoundingClientRect()
+          el.style.setProperty('--mx', `${event.clientX - r.left}px`)
+          el.style.setProperty('--my', `${event.clientY - r.top}px`)
+        })
+      },
+      { passive: true },
+    )
+    // Magnetic buttons: [data-magnetic] leans a few px towards the pointer, springs back on leave.
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.addEventListener(
+        'pointermove',
+        (event) => {
+          const el = (event.target as HTMLElement | null)?.closest?.<HTMLElement>('[data-magnetic]')
+          if (!el) return
+          const r = el.getBoundingClientRect()
+          const dx = (event.clientX - (r.left + r.width / 2)) / r.width
+          const dy = (event.clientY - (r.top + r.height / 2)) / r.height
+          el.style.translate = `${(dx * 8).toFixed(1)}px ${(dy * 6).toFixed(1)}px`
+        },
+        { passive: true },
+      )
+      document.addEventListener(
+        'pointerout',
+        (event) => {
+          const el = (event.target as HTMLElement | null)?.closest?.<HTMLElement>('[data-magnetic]')
+          if (el && !el.contains(event.relatedTarget as Node | null)) el.style.translate = ''
+        },
+        { passive: true },
+      )
+    }
+  }
+
+  // A tablist inside a hidden container has no size at start-up: re-place the indicator whenever its size
+  // changes (it appears, fonts load, the language changes), not only on resize.
+  const watched = new WeakSet<Element>()
+  const resizer = new ResizeObserver((entries) => {
+    for (const entry of entries) placeIndicator(entry.target as HTMLElement)
+  })
   const placeAll = () => {
-    for (const list of document.querySelectorAll<HTMLElement>('[role="tablist"]'))
+    for (const list of document.querySelectorAll<HTMLElement>('[role="tablist"]')) {
       placeIndicator(list)
+      if (!watched.has(list)) {
+        watched.add(list)
+        resizer.observe(list)
+      }
+    }
   }
   placeAll()
   document.fonts?.ready.then(placeAll)

@@ -7,18 +7,30 @@
     "node": ">=22.22.0"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "node scripts/dev.ts",
+    "dev:stop": "node scripts/dev-stop.ts",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "check": "turbo run lint typecheck test build",
+    "db:migrate": "pnpm --filter @eec/db db:migrate",
+    "db:seed": "pnpm --filter @eec/modules db:seed",
+    "admin:bootstrap": "pnpm --filter @eec/auth admin:bootstrap",
     "fonts:fetch": "pnpm --filter @eec/scripts fonts:fetch",
-    "contrast": "pnpm --filter @eec/scripts contrast"
+    "illos:fetch": "pnpm --filter @eec/scripts illos:fetch",
+    "contrast": "pnpm --filter @eec/scripts contrast",
+    "dev:turbo": "turbo run dev",
+    "backup": "pnpm --filter @eec/scripts backup",
+    "restore": "pnpm --filter @eec/scripts restore",
+    "build:site": "turbo run build && node scripts/assemble-site.ts",
+    "media:sync": "pnpm --filter @eec/scripts media:sync"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@neon/config": "^1.9.2",
+    "@neon/env": "^1.6.3",
     "turbo": "2.11.9",
     "typescript": "catalog:"
   }

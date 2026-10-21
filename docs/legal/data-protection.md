@@ -25,6 +25,17 @@
 | Audit log | 24 months |
 | Server logs | 30 days |
 
+## Implemented in Phase 02 (2026-10)
+- Consents stored per person with the policy version, the optional one withdrawable (Mon espace); the privacy page
+  (FR/EN draft, `[À VALIDER]`) lists what is kept, why, who sees it, for how long and the rights.
+- Mon espace: edit profile, view and withdraw consents, **download my data (JSON)**, **delete my account** (30-day
+  grace, then purged by the daily retention job, which logs every run), sessions.
+- Retention job (`apps/api/src/retention.ts`): sessions/links, outbox 90 days, audit 24 months, accounts past grace.
+- Admin: member list and CSV export need `members:read` / `members:export`; the export is audited and defuses
+  spreadsheet formulas. Dashboard numbers are aggregates.
+- Media: photos have EXIF/GPS removed in the browser before upload; a photo of people needs the person's consent.
+- Backups are encrypted (age); the private key is offline (decision 0022).
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

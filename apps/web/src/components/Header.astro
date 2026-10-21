@@ -18,12 +18,19 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 
 <header class="site-header" data-header>
   <div class="site-header-bar">
-    <a href={home} class="site-brand" aria-label={`${t('site.name')} — ${t('nav.home')}`}>
+    <svg class="site-goo-defs" width="0" height="0" focusable="false" role="presentation" aria-hidden="true">
+      <filter id="eec-goo" x="-20%" y="-60%" width="140%" height="220%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
+      </filter>
+    </svg>
+    <div class="site-goo" data-goo aria-hidden="true"></div>
+    <a href={home} class="site-brand site-pod" data-pod="l" aria-label={`${t('site.name')} — ${t('nav.home')}`}>
       <SiteLockup variant="three" class="site-lockup-narrow text-[0.95rem]" />
       <SiteLockup variant="two" class="site-lockup-wide text-[0.95rem]" />
     </a>
 
-    <nav class="site-nav" aria-label={t('nav.main')}>
+    <nav class="site-nav site-pod" data-pod="c" aria-label={t('nav.main')}>
       <ul class="site-nav-list" role="list">
         {
           tabs.map((tab) => {
@@ -40,11 +47,11 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                     <div id={`panel-${tab.id}`} class="mega" data-menu-panel hidden>
                       <div class="mega-grid">
                         <ul class="mega-list" role="list">
-                          {tab.children.map((child) => {
+                          {tab.children.map((child, i) => {
                             const to = href(locale, `${slug}/${child.slug[locale]}`)
                             return (
                               <li>
-                                <a class="mega-item" href={to} aria-current={current.startsWith(to) ? 'page' : undefined}>
+                                <a class="mega-item" data-i={i} href={to} aria-current={current.startsWith(to) ? 'page' : undefined}>
                                   <span class="mega-icon"><Icon name={child.icon} size={20} /></span>
                                   <span class="mega-text">
                                     <span class="mega-label">{t(labelKey(child.id))}</span>
@@ -55,10 +62,13 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                             )
                           })}
                         </ul>
+                        {/* One illustration per item, cropped by the panel; the hovered/focused item's one shows. */}
                         <aside class="mega-art" aria-hidden="true">
-                          {tab.art && <Illustration name={tab.art} class="mega-illustration" />}
-                          <p class="mega-art-title">{t(`nav.panel.${tab.id}.title` as 'nav.panel.discover.title')}</p>
-                          <p class="mega-art-text">{t(`nav.panel.${tab.id}.text` as 'nav.panel.discover.text')}</p>
+                          <div class="mega-art-text-wrap">
+                            <p class="mega-art-title">{t(`nav.panel.${tab.id}.title` as 'nav.panel.discover.title')}</p>
+                            <p class="mega-art-text">{t(`nav.panel.${tab.id}.text` as 'nav.panel.discover.text')}</p>
+                          </div>
+                          {tab.children.map((child, i) => <Illustration name={child.art} class="mega-illustration" data-art={i} />)}
                         </aside>
                       </div>
                     </div>
@@ -76,7 +86,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       </ul>
     </nav>
 
-    <div class="site-tools">
+    <div class="site-tools site-pod" data-pod="r">
       <button type="button" class="btn btn-ghost btn-icon site-tool-desktop" aria-label={t('nav.search')} disabled title={t('nav.search')}>
         <Icon name="search" />
       </button>
@@ -97,6 +107,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     <div class="mobile-menu-inner">
       <div class="mobile-menu-top">
         <a href={home} class="mobile-menu-brand"><SiteLockup variant="three" class="text-[0.95rem]" /></a>
+        <button type="button" class="btn btn-secondary btn-icon mobile-menu-x" data-dialog-close aria-label={t('nav.close_menu')}><Icon name="close" size={24} /></button>
       </div>
       <nav aria-label={t('nav.main')} class="mobile-menu-nav">
         {
@@ -145,8 +156,15 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 </script>
 
 <style is:global>
-  /* The bar floats: inset from the edges, rounded on every corner, blurred. */
+  /*
+   * The bar is three separate pods on one line (logo, tabs, tools; on phones: logo and the menu button).
+   * At the top of the page they sit apart; scrolling down brings them together like water droplets (a "goo"
+   * layer behind them draws the joined shape), and then the merged bar tucks away, leaving a glimpse.
+   * --merge (0 → 1) is set from the scroll position by scripts/header.ts; --dl / --dr are the distances the
+   * outer pods travel. Without the script every pod keeps its own plain background.
+   */
   .site-header {
+    --merge: 0;
     position: sticky;
     inset-block-start: 0.75rem;
     z-index: 40;
@@ -154,8 +172,15 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     pointer-events: none;
     transition: transform var(--duration-nav) var(--ease-soft);
   }
+  /* Tucked away: a glimpse of its lower edge stays; hovering (mouse), scrolling up or tapping it brings it back. */
   .site-header[data-hidden] {
-    transform: translateY(calc(-100% - 1.5rem));
+    transform: translateY(calc(-100% - 0.25rem));
+  }
+  .site-header[data-hidden] .site-header-bar::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 -1rem;
+    pointer-events: auto;
   }
   .site-header-bar {
     position: relative;
@@ -164,23 +189,65 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     gap: 0.75rem;
     max-width: 80rem;
     margin-inline: auto;
-    padding: 0.5rem 0.625rem 0.5rem 1rem;
-    border-radius: var(--radius-xl);
-    background: color-mix(in oklab, var(--surface) 78%, transparent);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  }
+  .site-pod {
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
     box-shadow: var(--elevation-2);
     pointer-events: auto;
-    transition: background-color var(--duration-nav) var(--ease-soft);
   }
-  .site-header[data-scrolled] .site-header-bar {
-    background: color-mix(in oklab, var(--surface) 92%, transparent);
+  .site-header[data-goo] .site-pod {
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header[data-goo] [data-pod="l"] {
+    translate: calc(var(--dl, 0px) * var(--merge)) 0;
+  }
+  .site-header[data-goo] [data-pod="r"] {
+    translate: calc(var(--dr, 0px) * var(--merge) * -1) 0;
+  }
+  .site-goo-defs {
+    position: absolute;
+  }
+  .site-goo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: none;
+    pointer-events: none;
+    opacity: 0.94;
+    filter: url(#eec-goo) drop-shadow(0 0.25rem 0.75rem color-mix(in oklab, var(--ink) 14%, transparent));
+  }
+  .site-header[data-goo] .site-goo {
+    display: block;
+  }
+  .site-goo-blob {
+    position: absolute;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  /* Joins between neighbouring pods: a flat full-height strip that grows as they meet, so the merged bar has no crease. */
+  .site-goo-bridge {
+    position: absolute;
+    border-radius: 0;
+    background: var(--surface);
+    scale: 1 clamp(0, calc((var(--merge) - 0.7) / 0.3), 1);
+  }
+  .site-goo-blob[data-pod="l"] {
+    translate: calc(var(--dl, 0px) * var(--merge)) 0;
+  }
+  .site-goo-blob[data-pod="r"] {
+    translate: calc(var(--dr, 0px) * var(--merge) * -1) 0;
   }
   .site-brand {
-    display: block;
+    display: flex;
     flex: none;
+    /* The lockup needs a width (container query): this is its content plus the pod's padding. */
     width: 11.5rem;
-    border-radius: var(--radius-md);
+    padding-inline: 1rem;
     text-decoration: none;
   }
   .site-brand .site-lockup-wide {
@@ -195,6 +262,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     align-items: center;
     gap: 0.125rem;
     margin-inline-start: auto;
+    padding: 0.375rem;
   }
   .site-lang {
     min-width: 2.75rem;
@@ -232,11 +300,18 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .navlink[aria-expanded="true"] .eec-chevron {
     transform: rotate(180deg);
   }
+  /* Current section: a soft green tint, green label and icon (no underline). */
   .navlink[aria-current] {
-    text-decoration: underline;
-    text-decoration-color: var(--gold);
-    text-decoration-thickness: 3px;
-    text-underline-offset: 0.45em;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .navlink[aria-current] > svg {
+    color: var(--primary);
+  }
+  .navlink[aria-current]:hover,
+  .navlink[aria-current][aria-expanded="true"] {
+    background: color-mix(in oklab, var(--primary) 16%, var(--surface));
   }
   .site-nav-list {
     display: flex;
@@ -248,10 +323,9 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .mega {
     position: absolute;
     inset-block-start: calc(100% + 0.5rem);
+    /* The whole width of the navbar, not just its content. */
     inset-inline: 0;
     z-index: 5;
-    width: min(100%, 52rem);
-    margin-inline: auto;
     padding: 0.75rem;
     border-radius: var(--radius-xl);
     background: var(--surface-raised);
@@ -268,7 +342,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   }
   .mega-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     gap: 0.75rem;
   }
   .mega-list {
@@ -319,22 +393,50 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     line-height: 1.35;
     color: var(--ink-muted);
   }
+  /* Illustration panel, cropped style: text on top, the scene big and cut by the panel's bottom edge. */
   .mega-art {
-    display: grid;
-    align-content: start;
-    gap: 0.25rem;
-    padding: 0.75rem;
+    position: relative;
+    min-height: 19rem;
+    overflow: hidden;
     border-radius: var(--radius-lg);
-    background: var(--surface-2);
+    background: color-mix(in oklab, var(--season) 9%, var(--surface-2));
+  }
+  .mega-art-text-wrap {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.25rem;
+    max-width: 22rem;
+    padding: 1.25rem 1.5rem;
   }
   .mega-illustration {
-    width: 100%;
-    height: auto;
-    margin-bottom: 0.25rem;
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-end: -42%;
+    width: min(30rem, 100%);
+    translate: -50% 0.75rem;
+    opacity: 0;
+    transition:
+      opacity var(--duration-nav) var(--ease-soft),
+      translate var(--duration-nav) var(--ease-soft);
+    pointer-events: none;
+  }
+  /* Shown: the hovered/focused item's scene; otherwise the current page's; otherwise the first. */
+  .mega-grid:has(.mega-item[data-i="0"]:is(:hover, :focus-visible)) .mega-illustration[data-art="0"],
+  .mega-grid:has(.mega-item[data-i="1"]:is(:hover, :focus-visible)) .mega-illustration[data-art="1"],
+  .mega-grid:has(.mega-item[data-i="2"]:is(:hover, :focus-visible)) .mega-illustration[data-art="2"],
+  .mega-grid:has(.mega-item[data-i="3"]:is(:hover, :focus-visible)) .mega-illustration[data-art="3"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="0"][aria-current="page"]) .mega-illustration[data-art="0"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="1"][aria-current="page"]) .mega-illustration[data-art="1"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="2"][aria-current="page"]) .mega-illustration[data-art="2"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible))):has(.mega-item[data-i="3"][aria-current="page"]) .mega-illustration[data-art="3"],
+  .mega-grid:not(:has(.mega-item:is(:hover, :focus-visible), .mega-item[aria-current="page"])) .mega-illustration[data-art="0"] {
+    opacity: 1;
+    translate: -50% 0;
   }
   .mega-art-title {
     font-family: var(--font-display);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
     font-weight: 500;
     line-height: 1.2;
   }
@@ -351,7 +453,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       gap: 1.25rem;
     }
     .site-brand {
-      width: 19.5rem;
+      width: 17.75rem;
     }
     .site-brand .site-lockup-narrow {
       display: none;
@@ -360,8 +462,9 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       display: flex;
     }
     .site-nav {
-      display: block;
+      display: flex;
       margin-inline: auto;
+      padding: 0.375rem;
     }
     .site-tool-desktop {
       display: inline-flex;
@@ -377,6 +480,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   /* Mobile menu: full screen, floating cards, a soft circular reveal. */
   .mobile-menu {
     background: var(--bg);
+    /* The header (its parent) ignores the pointer so its margins never block the page: undo it here. */
+    pointer-events: auto;
     clip-path: circle(0% at calc(100% - 2.25rem) 2.25rem);
     opacity: 1;
     transform: none;
@@ -405,8 +510,14 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
   }
   .mobile-menu-top {
-    width: 12rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 0.5rem 0.25rem;
+  }
+  .mobile-menu-brand {
+    width: 12rem;
   }
   .mobile-menu-brand {
     display: block;

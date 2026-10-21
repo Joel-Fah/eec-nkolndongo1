@@ -25,6 +25,34 @@
     --mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
   }
 
+  /* ── Illustration (Storyset, one file per theme) ─────────────────────────────────────── */
+  .illo {
+    display: block;
+  }
+  /* Only the file for the current theme is displayed (a hidden lazy <img> is never downloaded). */
+  .illo > img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .illo > .illo-dark {
+    display: none;
+  }
+  [data-theme="dark"] .illo > .illo-light {
+    display: none;
+  }
+  [data-theme="dark"] .illo > .illo-dark {
+    display: block;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .illo:not([data-theme="light"] *) > .illo-light {
+      display: none;
+    }
+    :root:not([data-theme="light"]) .illo:not([data-theme="light"] *) > .illo-dark {
+      display: block;
+    }
+  }
+
   /* ── Button ──────────────────────────────────────────────────────────────────────────── */
   .btn {
     position: relative;
@@ -32,8 +60,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 2.75rem;
-    padding-inline: 1.25rem;
+    min-height: 2.5rem;
+    padding-inline: 1rem;
     border-radius: var(--radius-md);
     font-weight: 500;
     line-height: 1.2;
@@ -93,18 +121,41 @@
   .btn-link:hover:not(:disabled) {
     text-decoration-thickness: 2.5px;
   }
+  [data-magnetic] {
+    transition:
+      translate var(--duration-nav) var(--ease-spring),
+      background-color var(--duration-micro) var(--ease-out),
+      box-shadow var(--duration-micro) var(--ease-out),
+      transform var(--duration-micro) var(--ease-out);
+  }
   .btn-sm {
-    padding-inline: 1rem;
+    min-height: 2.125rem;
+    padding-inline: 0.875rem;
     font-size: var(--text-sm);
   }
   .btn-lg {
-    min-height: 3.25rem;
-    padding-inline: 1.75rem;
-    font-size: var(--text-lg);
+    min-height: 2.75rem;
+    padding-inline: 1.375rem;
+    font-size: var(--text-base);
   }
   .btn-icon {
-    width: 2.75rem;
+    width: 2.5rem;
     padding-inline: 0;
+  }
+  /* Touch devices keep 44 px targets (WCAG 2.2 / design rules); mouse users get the tighter SaaS size. */
+  @media (pointer: coarse) {
+    .btn,
+    .input,
+    .textarea,
+    .select {
+      min-height: 2.75rem;
+    }
+    .btn-sm {
+      min-height: 2.5rem;
+    }
+    .btn-icon {
+      width: 2.75rem;
+    }
   }
 
   /* ── Field, inputs ───────────────────────────────────────────────────────────────────── */
@@ -116,6 +167,7 @@
   .field-label {
     font-weight: 500;
     font-size: var(--text-sm);
+    transition: color var(--duration-micro) var(--ease-out);
   }
   .field-hint {
     font-size: var(--text-sm);
@@ -132,13 +184,293 @@
   .textarea,
   .select {
     width: 100%;
-    min-height: 2.75rem;
+    min-height: 2.5rem;
     padding: 0.5rem 0.875rem;
     border-radius: var(--radius-md);
     background: var(--surface);
     color: var(--ink);
     box-shadow: inset 0 0 0 1.5px var(--line-strong);
     transition: box-shadow var(--duration-micro) var(--ease-out);
+  }
+  /* Inset icons: an icon at the start (search, mail…) and/or a control at the end (the eye of a password). */
+  .input-wrap {
+    position: relative;
+    display: grid;
+    align-items: center;
+  }
+  .input-icon,
+  .input-end {
+    position: absolute;
+    inset-block: 0;
+    display: grid;
+    place-items: center;
+    color: var(--ink-muted);
+  }
+  .input-icon {
+    inset-inline-start: 0.875rem;
+    pointer-events: none;
+  }
+  .input-end {
+    inset-inline-end: 0.5rem;
+    min-width: 2.25rem;
+  }
+  .input-wrap:focus-within .input-icon {
+    color: var(--primary);
+  }
+  .input[data-icon] {
+    padding-inline-start: 2.75rem;
+  }
+  .input[data-end] {
+    padding-inline-end: 2.75rem;
+  }
+  .input-toggle {
+    inset-block: 0.25rem;
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+  }
+  .input-toggle:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  /* The Astro eye shows one of two icons. */
+  .pw-eye-off,
+  [data-pw-toggle][data-on] .pw-eye {
+    display: none;
+  }
+  [data-pw-toggle][data-on] .pw-eye-off {
+    display: inline-flex;
+  }
+
+  /* ── Marquee (announcements) ──────────────────────────────────────────────────────────── */
+  .marquee {
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem 0.25rem 1rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--season) 12%, var(--surface));
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--ink);
+  }
+  .marquee-viewport {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, var(--ink) 4%, var(--ink) 96%, transparent);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--ink) 4%,
+      var(--ink) 96%,
+      transparent
+    );
+  }
+  .marquee-track {
+    display: flex;
+    flex: none;
+    min-width: 100%;
+    align-items: center;
+    justify-content: space-around;
+    gap: 3rem;
+    padding-inline-end: 3rem;
+    animation: marquee-run var(--marquee-duration, 40s) linear infinite;
+  }
+  .marquee-item {
+    flex: none;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .marquee-item::before {
+    content: "";
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-inline-end: 0.75rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  @keyframes marquee-run {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  [dir="rtl"] .marquee-track {
+    animation-direction: reverse;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track,
+  .marquee[data-paused] .marquee-track {
+    animation-play-state: paused;
+  }
+  .marquee-icon-play,
+  .marquee[data-paused] .marquee-icon-pause {
+    display: none;
+  }
+  .marquee[data-paused] .marquee-icon-play {
+    display: inline-flex;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-viewport {
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .marquee-track {
+      flex-wrap: wrap;
+      gap: 0.25rem 1.5rem;
+      animation: none;
+    }
+    .marquee-track[aria-hidden="true"],
+    .marquee-toggle {
+      display: none;
+    }
+  }
+
+  /* ── Pagination ───────────────────────────────────────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .page-list {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    color: var(--ink);
+    transition: background-color var(--duration-micro) var(--ease-out);
+  }
+  .page-link:hover {
+    background: var(--surface-2);
+  }
+  .page-link[aria-current="page"] {
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
+  }
+  .page-link[aria-disabled="true"] {
+    color: var(--ink-muted);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .page-gap {
+    min-width: 1.5rem;
+    text-align: center;
+    color: var(--ink-muted);
+  }
+  @media (max-width: 40rem) {
+    .page-step-text {
+      display: none;
+    }
+  }
+
+  /* ── Tables: tinted rows, no rules; scrolls sideways on a phone, never the page ───────────── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-sm);
+  }
+  .table caption {
+    padding: 0.75rem 1rem;
+    text-align: start;
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  .table th,
+  .table td {
+    padding: 0.75rem 1rem;
+    text-align: start;
+    vertical-align: middle;
+  }
+  .table thead th {
+    background: var(--surface-2);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .table tbody tr:nth-child(even) {
+    background: color-mix(in oklab, var(--surface-2) 55%, transparent);
+  }
+  .table tbody tr:hover {
+    background: var(--primary-soft);
+  }
+  .table .num {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Imagery: a photo in a frame ──────────────────────────────────────────────────────── */
+  .figure {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .figure-frame {
+    position: relative;
+    aspect-ratio: var(--ratio, 4 / 3);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(
+        60% 60% at 80% 20%,
+        color-mix(in oklab, var(--season) 35%, transparent),
+        transparent 70%
+      ),
+      var(--surface-2);
+    box-shadow: var(--elevation-1);
+  }
+  .figure-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .figure-zoom img {
+    transition: scale var(--duration-story) var(--ease-soft);
+  }
+  .figure-zoom:hover img {
+    scale: 1.05;
+  }
+  .figure-credit {
+    position: absolute;
+    inset-block-end: 0.5rem;
+    inset-inline-start: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--scrim) 55%, transparent);
+    color: var(--on-photo);
+    font-size: var(--text-xs);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .figure-caption {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .figure-zoom:hover img {
+      scale: 1;
+    }
   }
   .textarea {
     min-height: 6.5rem;
@@ -148,10 +480,24 @@
   .textarea::placeholder {
     color: var(--ink-muted);
   }
-  .input:hover:not(:disabled),
-  .textarea:hover:not(:disabled),
-  .select:hover:not(:disabled) {
+  .input:hover:not(:disabled, :focus, [aria-invalid="true"]),
+  .textarea:hover:not(:disabled, :focus, [aria-invalid="true"]),
+  .select:hover:not(:disabled, :focus-visible, [aria-expanded="true"], [aria-invalid="true"]) {
     box-shadow: inset 0 0 0 1.5px var(--ink-muted);
+  }
+  /* Focus: a firm 2px forest ring + a soft halo, and the label takes the colour. Clicking into a text
+     field counts too (`:focus`, not only `:focus-visible`): typing needs a clear "you are here". */
+  .input:focus,
+  .textarea:focus,
+  .select:focus-visible,
+  .select[aria-expanded="true"] {
+    outline: 2px solid transparent;
+    box-shadow:
+      inset 0 0 0 2px var(--primary),
+      0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+  .field:focus-within > .field-label {
+    color: var(--primary);
   }
   .input[aria-invalid="true"],
   .textarea[aria-invalid="true"],
@@ -159,6 +505,17 @@
   [data-invalid] > .input,
   .input[data-invalid] {
     box-shadow: inset 0 0 0 2px var(--danger);
+  }
+  .input[aria-invalid="true"]:focus,
+  .textarea[aria-invalid="true"]:focus {
+    box-shadow:
+      inset 0 0 0 2px var(--danger),
+      0 0 0 4px color-mix(in oklab, var(--danger) 18%, transparent);
+  }
+  .field[data-invalid]:focus-within > .field-label,
+  /* biome-ignore lint/style/noDescendingSpecificity: the error colour must win over the focus colour */
+  .field:has([aria-invalid="true"]) > .field-label {
+    color: var(--danger);
   }
   .input:disabled,
   .textarea:disabled,
@@ -388,17 +745,23 @@
       animation: none;
     }
   }
+  /* Empty state, cropped style: the words first, then a large scene cut by the card's bottom edge. */
   .empty {
     display: grid;
     justify-items: center;
     gap: 0.75rem;
-    padding: 2.5rem 1.5rem;
+    padding: 2.5rem 1.5rem 0;
+    overflow: hidden;
     border-radius: var(--radius-xl);
     background: var(--surface);
     text-align: center;
   }
   .empty-art {
-    width: min(100%, 22rem);
+    order: 99;
+    width: min(100%, 26rem);
+    height: 11rem;
+    margin-block-start: 1rem;
+    overflow: hidden;
   }
   .empty-title {
     font-family: var(--font-display);
@@ -472,7 +835,6 @@
   .accordion-trigger::-webkit-details-marker {
     display: none;
   }
-  /* biome-ignore lint/style/noDescendingSpecificity: state selector intentionally follows the base .eec-chevron rule */
   .accordion-item[open] > .accordion-trigger .eec-chevron {
     transform: rotate(180deg);
   }
@@ -673,6 +1035,13 @@
       0 0 0 4px var(--gold),
       0 0 0 6px var(--focus-outer);
   }
+  /* A destructive choice (sign out, delete): the danger colour as soon as it is pointed at. */
+  .menu-item.menu-item-danger:hover,
+  .menu-item.menu-item-danger:focus-visible,
+  .menu-item.menu-item-danger[data-highlighted] {
+    background: color-mix(in oklab, var(--danger) 10%, var(--surface-raised, var(--surface)));
+    color: var(--danger);
+  }
   .menu-item[aria-current="page"] {
     background: var(--primary-soft);
     color: var(--primary);
@@ -729,8 +1098,9 @@
 
 /* ── Base UI popups (admin): positioner, tooltip, trigger states ───────────────────────── */
 @layer components {
+  /* Above dialogs and sheets (71): a select or menu opened inside a dialog must show on top of it. */
   .eec-positioner {
-    z-index: 70;
+    z-index: 80;
     outline: none;
   }
   .eec-popup {
@@ -956,6 +1326,7 @@
     height: 0;
     opacity: 0;
   }
+  /* biome-ignore lint/style/noDescendingSpecificity: only adds a transition; the [open] rotation stays above */
   .accordion-trigger .eec-chevron {
     transition: transform var(--duration-reveal) var(--ease-soft);
   }
@@ -1003,7 +1374,8 @@
     position: fixed;
     inset-inline: 0;
     inset-block-end: 1rem;
-    z-index: 60;
+    /* Toasts (incl. "Undo") stay reachable above dialogs and popups. */
+    z-index: 90;
     display: grid;
     justify-items: center;
     align-items: end;

@@ -4,7 +4,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "src/paraglide/**"]
+      "outputs": ["dist/**", "src/paraglide/**"],
+      "env": ["ADMIN_PATH", "SITE_INDEXABLE"]
     },
     "dev": {
       "dependsOn": ["^build"],

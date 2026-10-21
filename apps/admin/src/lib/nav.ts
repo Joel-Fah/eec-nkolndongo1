@@ -1,53 +1,111 @@
-import type { MessageKey } from '@eec/i18n'
+/**
+ * The admin menu, built from the core entries + the module registry (Phase 02 §6.4), then filtered by what
+ * the signed-in person may do and which modules are on. The API stays the authority; this only hides.
+ */
+import { hasPermission, type Me } from '@eec/admin-kit'
+import type { Locale, MessageKey } from '@eec/i18n'
+import { modules } from '@eec/modules'
+import type { AdminNavEntry } from '@eec/modules-kit'
 import type { IconName } from '@eec/ui/icons'
 
-export type AdminItem = { id: string; icon: IconName; label: MessageKey }
-export type AdminGroup = { id: string; label: MessageKey; items: AdminItem[] }
+export type NavItem = {
+  id: string
+  path: string
+  icon: IconName
+  /** A message key (core) or a bilingual label (modules). */
+  label: MessageKey | { fr: string; en: string }
+  permission: string
+  order: number
+}
+export type NavGroup = { id: AdminNavEntry['group']; label: MessageKey; items: NavItem[] }
 
-const item = (id: string, icon: IconName): AdminItem => ({
-  id,
-  icon,
-  label: `admin.items.${id}` as MessageKey,
-})
+const ORDER: AdminNavEntry['group'][] = [
+  'content',
+  'parish',
+  'members',
+  'finance',
+  'admin',
+  'settings',
+]
 
-/** Sidebar groups (docs/product/navigation.md → Admin navigation). Items are placeholders for now. */
-export const groups: AdminGroup[] = [
+const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
   {
-    id: 'content',
-    label: 'admin.groups.content',
-    items: [
-      item('news', 'book'),
-      item('sermons', 'music'),
-      item('bulletin', 'bible'),
-      item('media', 'download'),
-    ],
+    id: 'users',
+    group: 'admin',
+    path: '/users',
+    icon: 'users',
+    label: 'admin.items.users',
+    permission: 'core:users-read',
+    order: 10,
   },
   {
-    id: 'parish',
-    label: 'admin.groups.parish',
-    items: [
-      item('events', 'calendar'),
-      item('departments', 'users'),
-      item('services', 'church'),
-      item('liturgy', 'sun'),
-    ],
+    id: 'roles',
+    group: 'admin',
+    path: '/roles',
+    icon: 'checklist',
+    label: 'admin.items.roles',
+    permission: 'core:roles-read',
+    order: 20,
   },
   {
-    id: 'members',
-    label: 'admin.groups.members',
-    items: [item('people', 'account'), item('roles', 'settings')],
+    id: 'teams',
+    group: 'admin',
+    path: '/groups',
+    icon: 'church',
+    label: 'admin.items.teams',
+    permission: 'core:groups-read',
+    order: 30,
   },
-  { id: 'finance', label: 'admin.groups.finance', items: [item('giving', 'gift')] },
   {
-    id: 'settings',
-    label: 'admin.groups.settings',
-    items: [
-      item('parish', 'home'),
-      item('modules', 'command'),
-      item('audit', 'clock'),
-      item('ui', 'heart'),
-    ],
+    id: 'audit',
+    group: 'admin',
+    path: '/audit',
+    icon: 'clock',
+    label: 'admin.items.audit',
+    permission: 'core:audit-read',
+    order: 40,
+  },
+  {
+    id: 'outbox',
+    group: 'settings',
+    path: '/outbox',
+    icon: 'mail',
+    label: 'admin.items.outbox',
+    permission: 'core:system-outbox',
+    order: 20,
+  },
+  {
+    id: 'ui',
+    group: 'settings',
+    path: '/ui',
+    icon: 'heart',
+    label: 'admin.items.ui',
+    permission: 'core:system-design',
+    order: 90,
   },
 ]
 
-export const allItems = groups.flatMap((g) => g.items)
+export function navFor(me: Me | null | undefined): NavGroup[] {
+  const fromModules = modules.flatMap((m) =>
+    me?.modules?.[m.id] === false
+      ? []
+      : (m.admin?.nav ?? []).map((n) => ({
+          id: `${m.id}:${n.path}`,
+          group: n.group,
+          path: n.path,
+          icon: n.icon,
+          label: n.label,
+          permission: n.permission,
+          order: n.order,
+        })),
+  )
+  const visible = [...core, ...fromModules].filter((i) => hasPermission(me, i.permission))
+  return ORDER.map((id) => ({
+    id,
+    label: `admin.groups.${id}` as MessageKey,
+    items: visible.filter((i) => i.group === id).sort((a, b) => a.order - b.order),
+  })).filter((g) => g.items.length)
+}
+
+export const labelOf = (item: NavItem, t: (k: MessageKey) => string, locale: Locale) =>
+  typeof item.label === 'string' ? t(item.label) : item.label[locale]

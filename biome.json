@@ -17,7 +17,8 @@
       "!packages/ui/fonts",
       "!packages/ui/brand/**/*.svg",
       "!packages/ui/illustrations/**/*.svg",
-      "!**/public/*.svg"
+      "!**/public/*.svg",
+      "!packages/db/migrations"
     ]
   }
 }

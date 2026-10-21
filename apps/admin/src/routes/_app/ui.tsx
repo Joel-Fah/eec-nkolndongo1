@@ -1,3 +1,4 @@
+import { useT } from '@eec/admin-kit'
 import {
   AccordionBox,
   Avatar,
@@ -22,9 +23,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { Icon } from '../../components/Icon'
 import { Illustration } from '../../components/Illustration'
-import { useT } from '../../lib/locale'
+import { Gate } from '../../components/kit'
 
-export const Route = createFileRoute('/_app/ui')({ component: UiGallery })
+// The components gallery needs the design-guide right (Phase 02 §5.5).
+export const Route = createFileRoute('/_app/ui')({
+  component: () => (
+    <Gate permission="core:system-design">
+      <UiGallery />
+    </Gate>
+  ),
+})
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -64,9 +72,17 @@ function UiGallery() {
 
       <Block title={t('ui.fields')}>
         <div className="grid gap-5 md:grid-cols-2">
-          <TextField label={t('ui.field_name')} hint={t('ui.field_hint')} />
-          <TextField label={t('ui.field_name')} error={t('ui.field_error')} />
-          <TextField label={t('ui.field_notes')} textarea />
+          <TextField
+            label={t('ui.field_name')}
+            placeholder={t('common.ph.name')}
+            hint={t('ui.field_hint')}
+          />
+          <TextField
+            label={t('ui.field_name')}
+            placeholder={t('common.ph.name')}
+            error={t('ui.field_error')}
+          />
+          <TextField label={t('ui.field_notes')} placeholder={t('common.ph.notes')} textarea />
           <div className="grid content-start gap-5">
             <SelectField
               label={t('ui.select_label')}

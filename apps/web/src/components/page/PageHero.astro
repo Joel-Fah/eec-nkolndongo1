@@ -1,0 +1,824 @@
+---
+/**
+ * Page hero (lib/heroes.ts).
+ * - stage: the title centered on top; below, a row of photo shapes (lib/shapes.ts, 1 on phones → 4 on large
+ *   screens) that runs partly past the first screen. Cards are scattered over the row — some overflow the
+ *   pictures sideways or below, never above — and drift gently with the pointer.
+ * - morph: a full-screen photo behind the navbar that settles into a framed rectangle as you scroll
+ *   (CSS scroll-driven animation; reduced motion / older browsers get the final state), cards revealed on it.
+ * - plain: no photo.
+ * No illustrations. Without photos (production, until the media library) shapes keep their form on a tinted,
+ * textured panel.
+ */
+import { getSeason } from '@eec/core'
+import Icon from '@eec/ui/astro/Icon.astro'
+import { heroes } from '../../lib/heroes'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey, pages, tabKey } from '../../lib/nav'
+import { content } from '../../lib/pages'
+import { heroSrc, photosById } from '../../lib/placeholders'
+import { shapes } from '../../lib/shapes'
+import SeasonStrip from '../home/SeasonStrip.astro'
+
+interface Props {
+  id: string
+}
+const { id } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const hero = heroes[id]
+if (!hero) throw new Error(`No hero for page: ${id}`)
+const page = content[id]
+const tab = pages.find((p) => p.id === id)?.tab
+const morph = hero.layout === 'morph'
+// One tile per shape; a tile without its own photo reuses the first.
+const photos = photosById(hero.photos)
+const tileCount = morph ? 1 : Math.max(1, Math.min(4, hero.shapes.length))
+const tiles = Array.from({ length: tileCount }, (_, i) => ({
+  shape: hero.shapes[i] ?? 'blob',
+  photo: photos[i] ?? photos[0],
+}))
+const usedShapes = [...new Set(tiles.map((x) => x.shape))]
+const credits = [...new Set(tiles.map((x) => x.photo?.photographer).filter(Boolean))]
+
+// Facts (stat, progress) show their example only in dev, tagged; unvalidated ones are hidden in production.
+const cards = hero.cards
+  .map((c) =>
+    c.kind === 'stat' || c.kind === 'progress'
+      ? {
+          ...c,
+          shown: c.value ?? (import.meta.env.DEV ? c.example : null),
+          isExample: c.value === null,
+        }
+      : c,
+  )
+  .filter((c) => !('shown' in c) || c.shown !== null)
+const ring = 2 * Math.PI * 26
+const title = t(labelKey(id))
+const lead = page ? t(page.lead) : ''
+const eyebrow = tab ? t(tabKey(tab)) : ''
+const season = getSeason()
+const sizes = morph
+  ? '100vw'
+  : '(min-width: 100rem) 26vw, (min-width: 80rem) 32vw, (min-width: 48rem) 46vw, 120vw'
+const stagger = ['0', '3.5rem', '1rem', '4.5rem']
+---
+
+
+<section class="ph" data-layout={hero.layout} data-tiles={tiles.length} aria-labelledby="ph-title">
+  {
+    hero.layout !== 'plain' && (
+      <svg class="ph-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          {usedShapes.map((sid) => <clipPath id={`ph-${sid}`} clipPathUnits="objectBoundingBox" set:html={shapes[sid].defs} />)}
+        </defs>
+      </svg>
+    )
+  }
+  <div class="ph-frame">
+    <div class="ph-text">
+      {eyebrow && <p class="ph-eyebrow"><span class="ph-dot" aria-hidden="true"></span>{eyebrow}</p>}
+      {hero.giant === 'season' && <p class="ph-giant" aria-hidden="true">{t(`season.${season}` as 'season.avent')}</p>}
+      {hero.giant === 'thanks' && <p class="ph-giant" aria-hidden="true">{t('hero.thanks')}</p>}
+      <h1 id="ph-title" class="ph-title">{title}</h1>
+      {lead && <p class="ph-lead">{lead}</p>}
+      {hero.layout === 'plain' && (
+        <ul class="ph-plain-cards">
+          {cards.map((c) => c.kind === 'info' && <li class="ph-card"><span class="ph-card-icon"><Icon name={c.icon} size={20} /></span><p class="ph-card-title">{t(c.title)}</p><p class="ph-card-text">{t(c.text)}</p></li>)}
+        </ul>
+      )}
+    </div>
+
+    {
+      hero.layout !== 'plain' && (
+        <div class="ph-stage" data-hero-stage>
+          <div class="ph-row">
+            {
+              tiles.map((tile, i) => (
+                <div class="ph-tile" style={`--ar:${shapes[tile.shape].ar};--off:${stagger[i % 4]};--d:${(0.25 + i * 0.12).toFixed(2)}`}>
+                  <div class="ph-echo" style={`clip-path:url(#ph-${tile.shape})`} aria-hidden="true" />
+                  <div class="ph-shape" style={morph ? undefined : `clip-path:url(#ph-${tile.shape})`}>
+                    {tile.photo ? (
+                      <picture>
+                        <source type="image/avif" srcset={`${heroSrc(tile.photo, 1280, 'avif')} 1280w, ${heroSrc(tile.photo, 1920, 'avif')} 1920w`} sizes={sizes} />
+                        <img src={heroSrc(tile.photo, 1280, 'webp')} srcset={`${heroSrc(tile.photo, 1280, 'webp')} 1280w, ${heroSrc(tile.photo, 1920, 'webp')} 1920w`} sizes={sizes} alt={i === 0 ? tile.photo.alt : ''} width={tile.photo.width ?? 1920} height={tile.photo.height ?? 1280} fetchpriority={i === 0 ? 'high' : 'low'} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" style={`background-image:url(${tile.photo.blur});background-color:${tile.photo.color}`} />
+                      </picture>
+                    ) : (
+                      <div class="ph-empty" aria-hidden="true" />
+                    )}
+                  </div>
+                </div>
+              ))
+            }
+
+            <ul class="ph-cards">
+              {
+                cards.map((c, i) => (
+                  <li
+                    class:list={['ph-card', `ph-card-${c.kind}`]}
+                    style={`--x:${c.at.x};--y:${Math.max(0, c.at.y)};--r:${c.at.r ?? 0};--i:${i};--d:${(0.9 + (i % 3) * 0.35).toFixed(2)}`}
+                  >
+                    <div class="ph-card-body">
+                      {c.kind === 'season' ? (
+                        <SeasonStrip />
+                      ) : c.kind === 'progress' ? (
+                        <div class="ph-progress">
+                          <svg viewBox="0 0 60 60" aria-hidden="true">
+                            <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-track" />
+                            <circle cx="30" cy="30" r="26" pathLength={ring} class="ph-progress-bar" style={`stroke-dasharray:${((c.shown ?? 0) / 100) * ring} ${ring}`} />
+                          </svg>
+                          <div>
+                            <p class="ph-card-value">{c.shown}%{c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}</p>
+                            <p class="ph-card-label">{t(c.label)}</p>
+                          </div>
+                        </div>
+                      ) : c.kind === 'player' ? (
+                        <div class="ph-player">
+                          <button type="button" class="ph-play" disabled aria-label={`${t('hero.listen')} — ${t('hero.soon')}`}><Icon name="play" size={24} /></button>
+                          <div class="grid min-w-0 gap-1">
+                            <p class="ph-card-title">{t(c.title)}</p>
+                            <p class="ph-card-text">{t(c.text)}</p>
+                            <span class="ph-wave" aria-hidden="true">{Array.from({ length: 30 }, (_, w) => <i style={`--h:${Math.round((Math.sin(w * 1.7) * 0.5 + 0.5) * 70 + 20)}%`} />)}</span>
+                          </div>
+                        </div>
+                      ) : c.kind === 'step' ? (
+                        <>
+                          <span class="ph-step">{c.n}</span>
+                          <p class="ph-card-title">{t(c.title)}</p>
+                          <p class="ph-card-text">{t(c.text)}</p>
+                        </>
+                      ) : c.kind === 'stat' ? (
+                        <>
+                          <p class="ph-card-value">
+                            {c.shown}
+                            {c.suffix}
+                            {c.isExample && <span class="ph-example">{t('home.stats.example')}</span>}
+                          </p>
+                          <p class="ph-card-label">{t(c.label)}</p>
+                        </>
+                      ) : (
+                        <>
+                          <span class="ph-card-icon"><Icon name={c.icon} size={20} /></span>
+                          <p class="ph-card-title">{t(c.title)}</p>
+                          <p class="ph-card-text">{t(c.text)}</p>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          {credits.length > 0 && <p class="ph-credit">{t('home.stream.credit', { name: credits.join(', ') })}</p>}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  // Cards drift gently with the pointer (each at its own depth), eased every frame. Fine pointers, no
+  // reduced motion; touch and keyboard users get the static composition.
+  const setup = () => {
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    for (const stage of document.querySelectorAll<HTMLElement>('[data-hero-stage]')) {
+      if (stage.dataset.live) continue
+      stage.dataset.live = ''
+      const host = stage.closest<HTMLElement>('.ph')
+      if (!host) continue
+      let tx = 0
+      let ty = 0
+      let x = 0
+      let y = 0
+      let frame = 0
+      const tick = () => {
+        x += (tx - x) * 0.07
+        y += (ty - y) * 0.07
+        host.style.setProperty('--px', x.toFixed(3))
+        host.style.setProperty('--py', y.toFixed(3))
+        frame = Math.abs(tx - x) + Math.abs(ty - y) > 0.002 ? requestAnimationFrame(tick) : 0
+      }
+      const kick = () => {
+        if (!frame) frame = requestAnimationFrame(tick)
+      }
+      host.addEventListener(
+        'pointermove',
+        (e) => {
+          const r = host.getBoundingClientRect()
+          tx = ((e.clientX - r.left) / r.width - 0.5) * 2
+          ty = ((e.clientY - r.top) / Math.max(r.height, 1) - 0.5) * 2
+          kick()
+        },
+        { passive: true },
+      )
+      host.addEventListener('pointerleave', () => {
+        tx = 0
+        ty = 0
+        kick()
+      })
+    }
+  }
+  setup()
+  document.addEventListener('astro:page-load', setup)
+</script>
+
+<style is:global>
+  .ph {
+    --px: 0;
+    --py: 0;
+    padding: 0.5rem 1rem 0;
+    /* Shapes and cards that overflow never add a horizontal scrollbar (clip, not hidden: sticky still works). */
+    overflow-x: clip;
+  }
+  .ph-defs {
+    position: absolute;
+  }
+  .ph-frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    max-width: 100rem;
+    margin-inline: auto;
+    padding-block: 1.5rem 0.5rem;
+  }
+
+  /* ── Text ─────────────────────────────────────────────────────────────────────────── */
+  .ph-text {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 1rem;
+    text-align: center;
+  }
+  .ph-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .ph-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .ph-title {
+    max-width: 22ch;
+    font-size: clamp(2.25rem, 1.2rem + 4vw, 5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .ph-lead {
+    max-width: 38rem;
+    font-size: var(--text-lg);
+    color: var(--ink-muted);
+  }
+  .ph-giant {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 1rem + 7vw, 7.5rem);
+    font-style: italic;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    color: var(--season-ink);
+  }
+
+  /* ── The row of shapes ────────────────────────────────────────────────────────────── */
+  .ph-stage {
+    position: relative;
+  }
+  .ph-row {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .ph-tile {
+    position: relative;
+    flex: 0 0 auto;
+    width: min(118%, 36rem);
+    aspect-ratio: var(--ar);
+    margin-block-start: var(--off, 0);
+    /* The tile itself eases a few pixels with the pointer, less than the cards (depth). */
+    transform: translate(calc(var(--px) * var(--d) * -8px), calc(var(--py) * var(--d) * -6px));
+    filter: drop-shadow(0 1.25rem 1.5rem color-mix(in oklab, var(--ink) 16%, transparent));
+  }
+  .ph-echo,
+  .ph-shape {
+    position: absolute;
+    inset: 0;
+  }
+  .ph-echo {
+    background: color-mix(in oklab, var(--season) 28%, var(--surface-2));
+    translate: 5% 4%;
+    rotate: 3deg;
+  }
+  .ph-shape {
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .ph-shape picture {
+    display: block;
+    height: 100%;
+  }
+  .ph-shape img,
+  .ph-empty {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-size: cover;
+  }
+  .ph-shape img {
+    animation: ph-settle 1.4s var(--ease-soft) both;
+  }
+  @keyframes ph-settle {
+    from {
+      transform: scale(1.08);
+    }
+  }
+  /* No photo yet: a tinted, textured panel in the season colour. */
+  .ph-empty {
+    background:
+      radial-gradient(color-mix(in oklab, var(--ink) 14%, transparent) 1px, transparent 1.5px) 0 0 / 20px 20px,
+      radial-gradient(70% 80% at 80% 20%, color-mix(in oklab, var(--season) 40%, transparent), transparent 70%),
+      radial-gradient(60% 70% at 10% 90%, color-mix(in oklab, var(--gold) 35%, transparent), transparent 70%),
+      var(--surface-2);
+  }
+  .ph-credit {
+    margin-block-start: 0.75rem;
+    font-size: var(--text-xs);
+    text-align: center;
+    color: var(--ink-muted);
+  }
+
+  /* ── Phones: one big shape, wider than the screen (cropped left and right); cards follow ── */
+  .ph-tile:nth-child(n + 2) {
+    display: none;
+  }
+  .ph-cards {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.625rem;
+    margin-block-start: -1.5rem;
+    padding-inline: 0.25rem;
+    order: 2;
+    width: 100%;
+  }
+  .ph-row {
+    flex-wrap: wrap;
+  }
+  .ph-card {
+    display: block;
+    min-width: 0;
+  }
+  .ph-card-body {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-2), inset 0 0 0 1px var(--line);
+    animation: ph-rise var(--duration-nav) var(--ease-soft) calc(0.35s + var(--i) * 90ms) both;
+  }
+  @keyframes ph-rise {
+    from {
+      opacity: 0;
+      translate: 0 1rem;
+    }
+  }
+  .ph-card-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .ph-example {
+    margin-inline-start: 0.375rem;
+    align-self: center;
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--radius-xs);
+    background: var(--warning-soft);
+    color: var(--warning);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .ph-card-label,
+  .ph-card-text {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .ph-card-title {
+    font-weight: 600;
+  }
+  .ph-card-icon,
+  .ph-step {
+    display: grid;
+    place-items: center;
+    width: 2.125rem;
+    height: 2.125rem;
+    margin-block-end: 0.25rem;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .ph-step {
+    background: var(--gold);
+    color: var(--on-gold);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+  .ph-card-season,
+  .ph-card-player {
+    grid-column: 1 / -1;
+  }
+  .ph-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+  .ph-progress svg {
+    flex: none;
+    width: 3.75rem;
+    height: 3.75rem;
+    transform: rotate(-90deg);
+  }
+  .ph-progress circle {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+  .ph-progress-track {
+    stroke: var(--surface-2);
+  }
+  .ph-progress-bar {
+    stroke: var(--gold);
+    animation: ph-fill 1.6s var(--ease-soft) 0.6s both;
+  }
+  @keyframes ph-fill {
+    from {
+      stroke-dasharray: 0 999;
+    }
+  }
+  .ph-player {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .ph-play {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--on-gold);
+    opacity: 0.9;
+    cursor: not-allowed;
+  }
+  .ph-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 1.75rem;
+    margin-block-start: 0.25rem;
+  }
+  .ph-wave i {
+    flex: 1;
+    height: var(--h);
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--primary) 45%, transparent);
+  }
+
+  /* ── Plain (legal pages): a calm typographic hero, no photo ──────────────────────── */
+  [data-layout="plain"] .ph-frame {
+    padding: clamp(2rem, 5vw, 4rem);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(color-mix(in oklab, var(--ink) 10%, transparent) 1px, transparent 1.5px) 0 0 / 22px 22px,
+      var(--surface-2);
+  }
+  .ph-plain-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .ph-plain-cards .ph-card {
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    text-align: start;
+  }
+
+  /* ── Phones, stage: the shape is 18% wider than the screen, centered, so both sides are cropped ── */
+  @media (max-width: 47.99rem) {
+    [data-layout="stage"] .ph-tile {
+      width: 118vw;
+      max-width: none;
+      margin-inline: -9vw;
+    }
+    [data-layout="stage"] .ph-row {
+      justify-content: center;
+    }
+  }
+
+  /* ── From tablets: a row of shapes, scattered cards, text centered above ───────────── */
+  @media (min-width: 48rem) {
+    .ph {
+      padding-inline: 1.5rem;
+    }
+    [data-layout="stage"] .ph-frame {
+      gap: 3rem;
+      padding-block: 3rem 0;
+    }
+    [data-layout="stage"] .ph-text {
+      min-height: 30svh;
+    }
+    [data-layout="stage"] .ph-row {
+      flex-wrap: nowrap;
+      /* 20–30 % of the row runs past the first screen: the row's height is below the fold on purpose. */
+      margin-block-end: -3rem;
+    }
+    [data-layout="stage"] .ph-tile {
+      flex: 1 1 0;
+      width: auto;
+      max-width: 36rem;
+      min-width: 0;
+    }
+    /* 2 shapes on tablets, 3 on laptops, 4 on large displays. */
+    [data-layout="stage"] .ph-tile:nth-child(2) {
+      display: block;
+    }
+    [data-layout="stage"] .ph-tile:nth-child(n + 3) {
+      display: none;
+    }
+    [data-layout="stage"] .ph-cards {
+      position: absolute;
+      inset: 0;
+      display: block;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+    [data-layout="stage"] .ph-card {
+      position: absolute;
+      inset-inline-start: calc(var(--x) * 1%);
+      inset-block-start: calc(var(--y) * 1%);
+      width: 13.5rem;
+      rotate: calc(var(--r) * 1deg);
+      /* Each card drifts at its own depth, following the pointer. */
+      transform: translate(calc(var(--px) * var(--d) * 16px), calc(var(--py) * var(--d) * 11px));
+      pointer-events: auto;
+      transition: rotate 0.9s var(--ease-soft), scale 0.7s var(--ease-soft);
+    }
+    [data-layout="stage"] .ph-card:hover {
+      rotate: calc(var(--r) * 0.35deg);
+      scale: 1.025;
+    }
+    [data-layout="stage"] .ph-card-body {
+      transition: box-shadow 0.7s var(--ease-soft);
+    }
+    [data-layout="stage"] .ph-card:hover .ph-card-body {
+      box-shadow: var(--elevation-3), inset 0 0 0 1px var(--line);
+    }
+    [data-layout="stage"] .ph-card-progress {
+      width: 15rem;
+    }
+    [data-layout="stage"] .ph-card-player {
+      width: 22rem;
+    }
+    [data-layout="stage"] .ph-card-season {
+      width: 22rem;
+    }
+    [data-layout="stage"] .ph-credit {
+      position: relative;
+      margin-block-start: 4.5rem;
+    }
+  }
+  @media (min-width: 80rem) {
+    [data-layout="stage"][data-tiles="3"] .ph-tile:nth-child(3),
+    [data-layout="stage"][data-tiles="4"] .ph-tile:nth-child(3) {
+      display: block;
+    }
+  }
+  @media (min-width: 100rem) {
+    [data-layout="stage"][data-tiles="4"] .ph-tile:nth-child(4) {
+      display: block;
+    }
+  }
+
+  /* ── Morph: full screen behind the navbar, settling into a framed rectangle on scroll ── */
+  [data-layout="morph"] .ph-text {
+    color: var(--on-photo);
+  }
+  [data-layout="morph"] .ph-lead,
+  [data-layout="morph"] .ph-eyebrow {
+    color: var(--on-photo);
+  }
+  [data-layout="morph"] .ph-eyebrow {
+    background: color-mix(in oklab, var(--scrim) 40%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--on-photo) 22%, transparent);
+  }
+  [data-layout="morph"] .ph-shape {
+    clip-path: inset(0 round var(--radius-xl));
+  }
+  [data-layout="morph"] .ph-shape::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--scrim) 30%, transparent), color-mix(in oklab, var(--scrim) 66%, transparent));
+  }
+  [data-layout="morph"] .ph-echo {
+    display: none;
+  }
+  @media (max-width: 63.99rem) {
+    [data-layout="morph"] .ph-text {
+      color: var(--ink);
+    }
+    [data-layout="morph"] .ph-lead {
+      color: var(--ink-muted);
+    }
+    [data-layout="morph"] .ph-eyebrow {
+      color: var(--ink);
+      background: var(--surface);
+    }
+    [data-layout="morph"] .ph-tile {
+      width: 118vw;
+      max-width: none;
+      margin-inline: -9vw;
+      --ar: 0.9;
+    }
+    [data-layout="morph"] .ph-row {
+      justify-content: center;
+    }
+  }
+  @media (min-width: 64rem) {
+    [data-layout="morph"].ph {
+      /* Up behind the navbar: the photo starts at the very top of the screen. */
+      margin-block-start: -4.25rem;
+      padding: 0;
+    }
+    [data-layout="morph"] .ph-frame {
+      display: block;
+      max-width: none;
+      min-height: 100svh;
+      padding: 0;
+    }
+    [data-layout="morph"] .ph-text {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      place-content: center;
+      height: 100svh;
+      padding-inline: 20%;
+      pointer-events: none;
+    }
+    [data-layout="morph"] .ph-title {
+      max-width: 18ch;
+      font-size: clamp(2.75rem, 1rem + 5vw, 6.25rem);
+    }
+    [data-layout="morph"] .ph-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    [data-layout="morph"] .ph-row {
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+    [data-layout="morph"] .ph-tile {
+      position: absolute;
+      inset: 0;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      aspect-ratio: auto;
+      transform: none;
+      filter: none;
+    }
+    /* Final state: a framed rectangle with soft corners, clear of the navbar. */
+    [data-layout="morph"] .ph-shape {
+      clip-path: inset(6.5rem 2rem 2.5rem 2rem round var(--radius-xl));
+    }
+    [data-layout="morph"] .ph-cards {
+      position: absolute;
+      inset: 0;
+      display: block;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+    [data-layout="morph"] .ph-card {
+      position: absolute;
+      inset-inline-start: calc(var(--x) * 1%);
+      inset-block-start: calc(var(--y) * 1%);
+      width: 14rem;
+      rotate: calc(var(--r) * 1deg);
+      transform: translate(calc(var(--px) * var(--d) * 16px), calc(var(--py) * var(--d) * 11px));
+      pointer-events: auto;
+      transition: rotate 0.9s var(--ease-soft), scale 0.7s var(--ease-soft);
+    }
+    [data-layout="morph"] .ph-card:hover {
+      rotate: calc(var(--r) * 0.35deg);
+      scale: 1.025;
+    }
+    [data-layout="morph"] .ph-credit {
+      position: absolute;
+      inset-inline-end: 2.5rem;
+      inset-block-end: 0.75rem;
+      margin: 0;
+      color: var(--on-photo);
+    }
+    @supports (animation-timeline: scroll()) {
+      @media (prefers-reduced-motion: no-preference) {
+        [data-layout="morph"] .ph-frame {
+          min-height: 190svh;
+        }
+        [data-layout="morph"] .ph-text {
+          position: sticky;
+          top: 0;
+        }
+        [data-layout="morph"] .ph-stage {
+          position: sticky;
+          inset: auto;
+          top: 0;
+          height: 100svh;
+          margin-block-start: -100svh;
+        }
+        [data-layout="morph"] .ph-shape {
+          animation: ph-morph cubic-bezier(0.45, 0, 0.2, 1) both;
+          animation-timeline: scroll(root);
+          animation-range: 0 90svh;
+        }
+        [data-layout="morph"] .ph-shape img {
+          animation: ph-zoom linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 90svh;
+        }
+        [data-layout="morph"] .ph-card-body {
+          animation: ph-appear linear both;
+          animation-timeline: scroll(root);
+          animation-range: calc(35svh + var(--i) * 9svh) calc(85svh + var(--i) * 9svh);
+        }
+      }
+    }
+  }
+  @keyframes ph-morph {
+    from {
+      clip-path: inset(0 0 0 0 round 0);
+    }
+    to {
+      clip-path: inset(6.5rem 2rem 2.5rem 2rem round var(--radius-xl));
+    }
+  }
+  @keyframes ph-zoom {
+    from {
+      transform: scale(1.1);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes ph-appear {
+    from {
+      opacity: 0;
+      translate: 0 2.5rem;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ph-shape img,
+    .ph-card-body,
+    .ph-progress-bar {
+      animation: none;
+    }
+    .ph-card,
+    .ph-tile {
+      transform: none !important;
+    }
+  }
+</style>
