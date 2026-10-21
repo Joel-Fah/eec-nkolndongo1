@@ -1,0 +1,306 @@
+---
+/**
+ * « Départements »: the published group pages as cards, filterable by audience (`?pour=jeunes`, plain links), and the
+ * « Où est ta place ? » quiz (browser only, nothing stored). With no published page yet the earlier introduction stays.
+ */
+import { DEPARTMENT_TAGS } from '@eec/core/departments'
+import Button from '@eec/ui/astro/Button.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { departmentHref, departmentsHref } from '../../lib/departments-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import PageView from '../PageView.astro'
+import Picture from '../Picture.astro'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+type Cover = Parameters<typeof Picture>[0]['media']
+type Item = {
+  key: string
+  kind: string
+  name: string
+  tagline: string
+  tags: string[]
+  cover: Cover | null
+}
+type Quiz = {
+  questions: {
+    id: string
+    textFr: string
+    textEn: string
+    answers: { id: string; textFr: string; textEn: string; tags: string[] }[]
+  }[]
+}
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`departments.site.${key}` as 'departments.site.all', vars)
+const result = await publicJson<{ items: Item[]; quiz: Quiz }>(
+  Astro,
+  `/api/departments/public?locale=${locale}`,
+)
+const items = result.state === 'ok' ? result.data.items : []
+const wanted = Astro.url.searchParams.get('pour')
+const tag = (DEPARTMENT_TAGS as readonly string[]).includes(wanted ?? '')
+  ? (wanted as string)
+  : null
+const shown = tag ? items.filter((i) => i.tags.includes(tag)) : items
+const usedTags = DEPARTMENT_TAGS.filter((x) => items.some((i) => i.tags.includes(x)))
+const pick = (fr: string, en: string) => (locale === 'en' && en ? en : fr)
+const quiz =
+  result.state === 'ok'
+    ? result.data.quiz.questions.map((q) => ({
+        id: q.id,
+        text: pick(q.textFr, q.textEn),
+        answers: q.answers.map((a) => ({ id: a.id, text: pick(a.textFr, a.textEn), tags: a.tags })),
+      }))
+    : []
+const quizGroups = items.map((i) => ({
+  key: i.key,
+  name: i.name,
+  tagline: i.tagline,
+  tags: i.tags,
+  href: departmentHref(locale, i.key),
+}))
+const tagLabel = (x: string) => t(`departments.tag_${x}` as 'departments.tag_jeunes')
+const tagData = Object.fromEntries(DEPARTMENT_TAGS.map((x) => [`data-tag_${x}`, tagLabel(x)]))
+const link = (p: string | null) => `${departmentsHref(locale)}${p ? `?pour=${p}` : ''}`
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('departements'))} description={t('pages.departements.lead')}>
+  <PageHero id="departements" />
+  {
+    result.state === 'unavailable' ? (
+      <UnavailableState />
+    ) : items.length === 0 ? (
+      <PageView id="departements" hideHeader />
+    ) : (
+      <section class="dp">
+        {usedTags.length > 1 && (
+          <nav class="dp-filter" aria-label={s('filter')}>
+            <a href={link(null)} aria-current={!tag ? 'true' : undefined}>{s('all')}</a>
+            {usedTags.map((x) => <a href={link(x)} aria-current={tag === x ? 'true' : undefined}>{tagLabel(x)}</a>)}
+          </nav>
+        )}
+        <ul class="dp-grid">
+          {
+            shown.map((i) => (
+              <li class="dp-card">
+                {i.cover && <Picture class="dp-photo" media={i.cover} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" decorative />}
+                <div class="dp-body">
+                  <h2 class="dp-name"><a href={departmentHref(locale, i.key)} class="dp-link">{i.name}</a></h2>
+                  {i.tagline && <p class="dp-tagline">{i.tagline}</p>}
+                  <p class="dp-tags">{i.tags.map((x) => <span>{tagLabel(x)}</span>)}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        {
+          quiz.length > 0 && (
+            <section
+              class="dq"
+              data-quiz
+              hidden
+              data-questions={JSON.stringify(quiz)}
+              data-groups={JSON.stringify(quizGroups)}
+              data-step={s('quiz_step', { n: '{n}', total: '{total}' })}
+              data-result={s('quiz_result')}
+              data-none={s('quiz_none')}
+              data-why={s('quiz_why', { tags: '{tags}' })}
+              data-again={s('quiz_again')}
+              {...tagData}
+            >
+              <h2 class="dq-title">{s('quiz_t')}</h2>
+              <p class="dq-lead">{s('quiz_p')}</p>
+              <div data-quiz-stage aria-live="polite">
+                <Button data-quiz-start>{s('quiz_start')}</Button>
+              </div>
+            </section>
+          )
+        }
+      </section>
+    )
+  }
+</Site>
+
+<script>
+  import { initQuiz } from '../../scripts/departments-quiz'
+  initQuiz()
+  document.addEventListener('astro:page-load', initQuiz)
+</script>
+
+<style is:global>
+  .dp {
+    display: grid;
+    gap: 2rem;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .dp-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .dp-filter a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .dp-filter a[aria-current] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .dp-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+  .dp-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    overflow: hidden;
+    padding: 0.625rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    transition: transform var(--duration-ui) var(--ease-out);
+  }
+  .dp-card:hover {
+    transform: translateY(-2px);
+  }
+  .dp-photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .dp-photo img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .dp-body {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem 0.625rem 0.75rem;
+  }
+  .dp-name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .dp-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .dp-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .dp-tagline {
+    color: var(--ink-muted);
+  }
+  .dp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  .dp-tags span {
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: var(--text-sm);
+  }
+  /* The quiz: a calm card, one question at a time. */
+  .dq {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: color-mix(in oklab, var(--season) 14%, var(--surface));
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--season) 30%, transparent);
+  }
+  .dq[hidden] {
+    display: none;
+  }
+  .dq-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .dq-lead {
+    max-width: 52ch;
+    color: var(--ink-muted);
+  }
+  .dq-step {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .dq-count {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  .dq-q,
+  .dq-result-t {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .dq-answers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .dq-answer,
+  .dq-again {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .dq-answer:hover,
+  .dq-again:hover {
+    background: var(--primary-soft);
+  }
+  .dq-results {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .dq-card {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .dq-link {
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: 600;
+  }
+  .dq-why {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+</style>

@@ -5,7 +5,8 @@
  */
 import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
-import { mediaFiles } from '@eec/db/schema'
+import { groups, mediaFiles } from '@eec/db/schema'
+import { departmentPages, departmentPeople } from '@eec/module-departments/schema'
 import { eventsItems } from '@eec/module-events/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
@@ -22,7 +23,8 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
-  console.log('Example posts and events removed.')
+  await db.delete(groups).where(like(groups.key, 'exemple-%')) // their pages and people go with them
+  console.log('Example posts, events and groups removed.')
   await close()
   process.exit(0)
 }
@@ -310,6 +312,89 @@ await db.insert(liturgyVerses).values([
       'For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.',
   },
 ])
+// Departments: three fictional groups with published pages; one person has agreed to be named, one has not.
+const exGroups = [
+  {
+    key: 'exemple-chorale',
+    nameFr: 'Exemple — Chorale',
+    nameEn: 'Example — Choir',
+    kind: 'choir' as const,
+    tags: ['musique', 'priere'],
+    tagline: 'Une phrase d’accroche d’exemple pour la chorale',
+  },
+  {
+    key: 'exemple-jeunes',
+    nameFr: 'Exemple — Jeunes',
+    nameEn: 'Example — Youth',
+    kind: 'department' as const,
+    tags: ['jeunes', 'service', 'etude'],
+    tagline: 'Une phrase d’accroche d’exemple pour les jeunes',
+  },
+  {
+    key: 'exemple-femmes',
+    nameFr: 'Exemple — Femmes',
+    nameEn: 'Example — Women',
+    kind: 'department' as const,
+    tags: ['femmes', 'priere', 'accueil'],
+    tagline: 'Une phrase d’accroche d’exemple pour les femmes',
+  },
+]
+for (const [i, g] of exGroups.entries()) {
+  const [grp] = await db
+    .insert(groups)
+    .values({ key: g.key, nameFr: g.nameFr, nameEn: g.nameEn, kind: g.kind })
+    .onConflictDoUpdate({
+      target: groups.key,
+      set: { nameFr: g.nameFr, nameEn: g.nameEn, kind: g.kind },
+    })
+    .returning()
+  if (!grp) continue
+  const values = {
+    groupId: grp.id,
+    state: 'published',
+    taglineFr: g.tagline,
+    taglineEn: g.tagline.replace('Une phrase d’accroche d’exemple pour', 'An example tagline for'),
+    bodyFr: cleanDoc({ type: 'doc', content: [para(lorem)] }),
+    meetingFr: 'Rencontre d’exemple, jour et lieu d’exemple',
+    tags: g.tags,
+    coverMediaId: photos[i]?.id ?? null,
+    sortOrder: i,
+  }
+  const [page] = await db
+    .insert(departmentPages)
+    .values(values)
+    .onConflictDoUpdate({ target: departmentPages.groupId, set: values })
+    .returning()
+  if (page && i === 0) {
+    await db.delete(departmentPeople).where(eq(departmentPeople.pageId, page.id))
+    await db.insert(departmentPeople).values([
+      {
+        pageId: page.id,
+        name: 'Exemple — Personne qui a consenti',
+        roleFr: 'Responsable',
+        roleEn: 'Leader',
+        publicConsent: true,
+        consentAt: new Date(),
+      },
+      {
+        pageId: page.id,
+        name: 'Exemple — Personne sans consentement',
+        roleFr: 'Trésorière',
+        roleEn: 'Treasurer',
+      },
+    ])
+  }
+  if (i === 0)
+    await db.insert(scheduleSlots).values({
+      kind: 'etude_biblique',
+      labelFr: 'Exemple — Répétition',
+      labelEn: 'Example — Rehearsal',
+      weekday: 6,
+      startTime: '16:00',
+      groupId: grp.id,
+      validated: true,
+    })
+}
 console.log(
   `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
 )

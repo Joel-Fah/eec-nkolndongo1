@@ -2,6 +2,7 @@
 import { type ComponentType, type LazyExoticComponent, lazy } from 'react'
 
 export const moduleAdmin: Record<string, LazyExoticComponent<ComponentType>> = {
+  departments: lazy(() => import('@eec/module-departments/admin')),
   events: lazy(() => import('@eec/module-events/admin')),
   liturgy: lazy(() => import('@eec/module-liturgy/admin')),
   media: lazy(() => import('@eec/module-media/admin')),

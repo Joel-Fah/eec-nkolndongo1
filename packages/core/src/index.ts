@@ -1,6 +1,7 @@
 export * from './admin-path.ts'
 export * from './bible.ts'
 export * from './dates.ts'
+export * from './departments.ts'
 export * from './event-kinds.ts'
 export * from './ics.ts'
 export * from './lifecycle.ts'

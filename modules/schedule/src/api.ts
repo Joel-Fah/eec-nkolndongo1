@@ -26,6 +26,7 @@ import {
   zonedToUtc,
 } from '@eec/core'
 import type { Db } from '@eec/db'
+import { groups } from '@eec/db/schema'
 import { and, asc, eq, gte } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -185,6 +186,26 @@ export const scheduleApi = new Hono<AppEnv>()
       ttl: 120,
       keep: 60 * 60 * 24 * 7,
       load: async (db) => publicData(db),
+    })
+  })
+  // A group's approved times (its department page): label, day, hours, place.
+  .get('/public/group/:key', async (c) => {
+    const key = c.req.param('key')
+    if (!/^[a-z0-9-]{1,60}$/.test(key)) return fail(c, 404, 'not_found')
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
+    return cachedJson(c, {
+      key: `schedule/group/${key}/v${version}`,
+      ttl: 120,
+      keep: 60 * 60 * 24 * 7,
+      load: async (db) => {
+        const rows = await db
+          .select({ slot: scheduleSlots })
+          .from(scheduleSlots)
+          .innerJoin(groups, eq(groups.id, scheduleSlots.groupId))
+          .where(and(eq(groups.key, key), eq(scheduleSlots.validated, true)))
+          .orderBy(asc(scheduleSlots.weekday), asc(scheduleSlots.startTime))
+        return { slots: rows.map((r) => toSlot(r.slot)) }
+      },
     })
   })
   .get('/public/next', async (c) => {

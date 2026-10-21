@@ -5,6 +5,7 @@
  * Data only — no server or browser code here, so both the API and the admin can import it.
  */
 import { coreModule } from '@eec/auth/core-module'
+import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
 import { liturgyModule } from '@eec/module-liturgy'
 import { mediaModule } from '@eec/module-media'
@@ -23,6 +24,7 @@ export const modules: readonly DefinedModule[] = [
   eventsModule,
   scheduleModule,
   liturgyModule,
+  departmentsModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

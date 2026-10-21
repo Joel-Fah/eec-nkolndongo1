@@ -75,6 +75,13 @@ admin login with a random photo and the logo always with the parish name; menu s
 illustration by default; new Storyset illustrations for news, sermons, meditations, events, home.
 Google sign-in: members can link Google to an existing password account; staff are still refused.
 
+## Phase 03b — started (branch feat/phase-03b-people-pages, from 03a)
+- **C · departments: done (dev).** Module `departments` (migration 0012 applied on dev only), scoped editing, people with
+  recorded consent (name/photo public only with it), public index with audience filter + « Où est ta place ? » quiz
+  (editable in admin, nothing stored), group page (approved times, latest news, next events, contact). Dev seed adds
+  fictional « Exemple — » groups. Next in C: guides, page slots + history climb, council.
+- Not yet: `/_brand` entries for flip-time cards, table picker, department card/quiz.
+
 ## Round 5 UI (2026-10-21, Joël's feedback before B approval)
 - Home « Ce dimanche » smaller with time tile; cherry blossom keeps its white flowers (recoloured to our palette; its background layer had been dropped). Immersive « Ce dimanche » page.
 - Events page: filters and List/Month change results without reloading; sticky week index. Liturgical dial: arc scales on selection.
