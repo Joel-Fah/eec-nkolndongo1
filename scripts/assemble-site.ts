@@ -3,7 +3,7 @@
  * single Worker serves site, admin, API and media (decision 0017). The admin was built with the same base
  * (`apps/admin/vite.config.ts`). Prints what it did; changes nothing else.
  */
-import { cp, rm } from 'node:fs/promises'
+import { cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { adminPrefix } from '../packages/core/src/admin-path.ts'
 import { envLocal } from './env-local.ts'

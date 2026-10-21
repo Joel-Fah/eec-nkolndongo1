@@ -4,7 +4,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "src/paraglide/**"]
+      "outputs": ["dist/**", "src/paraglide/**"],
+      "env": [
+        "ADMIN_PATH",
+        "SITE_INDEXABLE",
+        "CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE"
+      ]
     },
     "dev": {
       "dependsOn": ["^build"],
