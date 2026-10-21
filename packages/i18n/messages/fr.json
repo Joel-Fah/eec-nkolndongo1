@@ -727,7 +727,7 @@
     "start3_t": "Faire connaissance",
     "start3_p": "Ce que nous croyons, ce qui nous rassemble, et le chemin pour nous rejoindre.",
     "verse": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
-    "verse_cite": "Matthieu 11 : 28",
+    "verse_cite": "Matthieu 11 : 28 · LSG",
     "title_a": "Une famille qui chante, prie",
     "title_b": "et avance",
     "cta_visit": "Venir dimanche",
@@ -1457,13 +1457,13 @@
       "text": "Votre compte n’a pas le droit d’accès à cette page. Si c’est une erreur, parlez-en au secrétariat."
     },
     "quotes": {
-      "v1": "Venez à moi, vous tous qui êtes fatigués et qui portez un lourd fardeau. Je vous donnerai du repos.",
+      "v1": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
       "v1_cite": "Matthieu 11 : 28",
-      "v2": "Le Seigneur est mon berger, je ne manque de rien.",
+      "v2": "L’Éternel est mon berger : je ne manquerai de rien.",
       "v2_cite": "Psaume 23 : 1",
-      "v3": "Dieu a tellement aimé le monde qu’il a donné son Fils unique. Ainsi, tous ceux qui croient en lui ne seront pas perdus, mais ils auront la vie éternelle.",
+      "v3": "Car Dieu a tant aimé le monde qu’il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu’il ait la vie éternelle.",
       "v3_cite": "Jean 3 : 16",
-      "v4": "Sois courageux et fort ! N’aie pas peur, car le Seigneur ton Dieu est avec toi partout où tu iras.",
+      "v4": "Ne t’ai-je pas donné cet ordre : Fortifie-toi et prends courage ? Ne t’effraie point et ne t’épouvante point, car l’Éternel, ton Dieu, est avec toi dans tout ce que tu entreprendras.",
       "v4_cite": "Josué 1 : 9"
     }
   },
@@ -1585,8 +1585,8 @@
     "credits_p": "Les noms derrière les images de ce site."
   },
   "bible": {
-    "pdv": "Parole de Vie",
-    "etr": "Easy-to-Read Version"
+    "lsg": "LSG",
+    "web": "WEB"
   },
   "dash": {
     "trend_up": "En hausse de",

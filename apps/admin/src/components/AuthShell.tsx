@@ -107,7 +107,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
               <>
                 <blockquote>{t(quote.text)}</blockquote>
                 <figcaption>
-                  {t(quote.cite)} · {t(locale === 'fr' ? 'bible.pdv' : 'bible.etr')}
+                  {t(quote.cite)} · {t(locale === 'fr' ? 'bible.lsg' : 'bible.web')}
                 </figcaption>
               </>
             ) : (

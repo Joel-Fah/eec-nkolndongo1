@@ -1,8 +1,7 @@
 /**
  * What the sign-in screen shows beside the photo: a verse or a testimonial, drawn at random.
- * Verses are in the versions chosen for being easy to read: Parole de Vie (French), Easy-to-Read Version
- * (English). The version is always named next to the reference. To do: check the wording against the licensed
- * text and the publishers' quotation terms, and let members choose their version. Testimonials are real words from real people: NEVER invent one. An entry
+ * Verses are in the public-domain translations (decision 0032): Louis Segond 1910 (LSG, French) and World English Bible
+ * (WEB, English). The abbreviation is always shown next to the reference. Testimonials are real words from real people: NEVER invent one. An entry
  * counts only when `validated` is true (the person agreed and the content partner approved it); until
  * then the screen shows verses only.
  */
