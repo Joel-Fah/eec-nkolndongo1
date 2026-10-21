@@ -35,7 +35,7 @@ const AREA = 'schedule'
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)
 const text = (n: number) => z.string().max(n)
 
-const slotBody = z
+export const slotBody = z
   .object({
     kind: z.enum(SLOT_KINDS),
     labelFr: text(120).min(1),
@@ -53,7 +53,7 @@ const slotBody = z
   .partial()
   .strict()
 
-const excBody = z
+export const excBody = z
   .object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     slotId: z.string().uuid().nullable(),

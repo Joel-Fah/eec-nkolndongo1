@@ -40,7 +40,7 @@ const ref = z.unknown().transform((v, ctx) => {
   return r as BibleRef
 })
 
-const sundayBody = z
+export const sundayBody = z
   .object({
     nameFr: z.string().max(160),
     nameEn: z.string().max(160),
@@ -65,7 +65,7 @@ const seasonBody = z
   })
   .partial()
   .strict()
-const verseBody = z
+export const verseBody = z
   .object({
     ref,
     textFr: z.string().max(800),
