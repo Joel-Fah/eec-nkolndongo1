@@ -58,8 +58,8 @@ const google = ev
   : ''
 const tz = ev?.allDay ? 'UTC' : TZ
 const span = ev ? spanDays(ev.startsAt, ev.endsAt, ev.allDay, TZ) : null
-const kind =
-  EVENT_KIND_STYLE[((ev?.kind as EventKind) in EVENT_KIND_STYLE ? ev?.kind : 'autre') as EventKind]
+const kindKey = (ev && ev.kind in EVENT_KIND_STYLE ? ev.kind : 'autre') as EventKind
+const kind = EVENT_KIND_STYLE[kindKey]
 const d = ev ? new Date(ev.startsAt) : new Date()
 ---
 
