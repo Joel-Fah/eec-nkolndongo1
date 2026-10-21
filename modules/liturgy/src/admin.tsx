@@ -762,7 +762,7 @@ function Verses() {
                 <Button size="sm" variant="secondary" onClick={() => openForm({ ...v })}>
                   {t(k('edit'))}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => remove.mutate(v.id)}>
+                <Button size="sm" variant="danger" onClick={() => remove.mutate(v.id)}>
                   {t(k('delete'))}
                 </Button>
               </span>

@@ -70,6 +70,7 @@ export type EventOcc = {
   locationKind: string
   fallback: boolean
   featured: boolean
+  kind: string
   group: string | null
   groupKey: string | null
   cover: NewsCover | null

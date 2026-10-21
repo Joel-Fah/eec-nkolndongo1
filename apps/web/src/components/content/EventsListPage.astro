@@ -1,10 +1,20 @@
 ---
+import {
+  daysBetween,
+  EVENT_KIND_STYLE,
+  type EventKind,
+  shortDate,
+  spanDays,
+  weekLabel,
+  weekOf,
+} from '@eec/core'
 /**
  * The agenda (page « Événements »): a list by default (this week / this month / later), or a month grid
  * (`?vue=mois&mois=2026-11`, no JavaScript), filterable by group (`?groupe=jape`). Occurrences come from the
  * cached public API; cancelled ones stay visible, struck through, with their note.
  */
 import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Site from '../../layouts/Site.astro'
 import { type EventOcc, publicJson } from '../../lib/content-api'
@@ -78,23 +88,33 @@ const shiftMonth = (n: number) => {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
 }
 
-// Sections for the list: this week (until Sunday), this month, later.
-const dow = (new Date(`${todayKey}T00:00:00Z`).getUTCDay() + 6) % 7
-const weekEnd = iso(new Date(new Date(`${todayKey}T00:00:00Z`).getTime() + (6 - dow) * 86_400_000))
-const monthEnd = iso(new Date(Date.UTC(ty, tm, 0)))
+// The list is grouped by week (Monday to Sunday), headed « Semaine du … au … »; the current week is marked.
 const keyOf = (o: EventOcc) => (o.allDay ? o.startsAt.slice(0, 10) : dayKey(o.startsAt))
-const upcoming = items.filter((o) => keyOf(o) >= todayKey)
-const sections = [
-  { id: 'this_week', items: upcoming.filter((o) => keyOf(o) <= weekEnd) },
-  { id: 'this_month', items: upcoming.filter((o) => keyOf(o) > weekEnd && keyOf(o) <= monthEnd) },
-  { id: 'later', items: upcoming.filter((o) => keyOf(o) > monthEnd) },
-].filter((s) => s.items.length)
+const upcoming = items.filter((o) => spanDays(o.startsAt, o.endsAt, o.allDay, TZ).to >= todayKey)
+const thisWeek = weekOf(todayKey).from
+const sections = [...new Set(upcoming.map((o) => weekOf(keyOf(o)).from))].sort().map((from) => ({
+  id: from,
+  title: weekLabel(from, locale),
+  current: from === thisWeek,
+  items: upcoming.filter((o) => weekOf(keyOf(o)).from === from),
+}))
+// Month view: an event covering several days shows on each of them.
 const byDay = new Map<string, EventOcc[]>()
-for (const o of items) byDay.set(keyOf(o), [...(byDay.get(keyOf(o)) ?? []), o])
+for (const o of items) {
+  const span = spanDays(o.startsAt, o.endsAt, o.allDay, TZ)
+  for (const d of daysBetween(span.from, span.to)) byDay.set(d, [...(byDay.get(d) ?? []), o])
+}
+const kindStyle = (k: string) =>
+  EVENT_KIND_STYLE[(k as EventKind) in EVENT_KIND_STYLE ? (k as EventKind) : 'autre']
+const rangeText = (o: EventOcc) => {
+  const span = spanDays(o.startsAt, o.endsAt, o.allDay, TZ)
+  const z = o.allDay ? 'UTC' : TZ
+  if (span.to === span.from)
+    return `${shortDate(o.startsAt, locale, z)} · ${timeText(o.startsAt, locale, o.allDay, label('all_day'))}`
+  return `${shortDate(o.startsAt, locale, z)} → ${shortDate(`${span.to}T12:00:00Z`, locale, 'UTC')}`
+}
 const weekdays = Array.from({ length: 7 }, (_, i) =>
-  new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(2026, 0, 5 + i)),
-  ),
+  fmt(locale, { weekday: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, 0, 5 + i))),
 )
 Astro.response.headers.set(
   'cache-control',
@@ -132,14 +152,14 @@ Astro.response.headers.set(
             <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(1) })} rel="next"><span class="ev-sr">{label('next_month')}</span> →</a>
           </div>
           <div class="ev-grid">
-            {weekdays.map((w) => <span class="ev-wd" aria-hidden="true">{w}</span>)}
+            {weekdays.map((w, i) => <span class="ev-wd" data-sunday={i === 6 ? '' : undefined} aria-hidden="true">{w}</span>)}
             {
               Array.from({ length: 42 }, (_, i) => {
                 const d = new Date(gridStart.getTime() + i * 86_400_000)
                 const key = iso(d)
                 const day = byDay.get(key) ?? []
                 return (
-                  <div class="ev-day" data-out={d.getUTCMonth() !== m - 1 ? '' : undefined} data-today={key === todayKey ? '' : undefined}>
+                  <div class="ev-day" data-out={d.getUTCMonth() !== m - 1 ? '' : undefined} data-today={key === todayKey ? '' : undefined} data-sunday={d.getUTCDay() === 0 ? '' : undefined}>
                     <span class="ev-daynum">{d.getUTCDate()}</span>
                     {day.map((o) => (
                       <a class="ev-chip" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
@@ -180,33 +200,26 @@ Astro.response.headers.set(
           {
             sections.map((s) => (
               <section aria-labelledby={`ev-${s.id}`} class="ev-section">
-                <h2 id={`ev-${s.id}`} class="ev-h">{label(s.id)}</h2>
+                <h2 id={`ev-${s.id}`} class="ev-h">{s.title}{s.current && <span class="ev-now">{label('this_week')}</span>}</h2>
                 <ul class="ev-list">
                   {
-                    s.items.map((o) => {
-                      const d = new Date(o.allDay ? o.startsAt : o.startsAt)
-                      const tz = o.allDay ? 'UTC' : TZ
-                      return (
-                        <li>
-                          <a class="ev-card" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
-                            <span class="ev-date" aria-hidden="true">
-                              <span class="ev-date-d">{fmt(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
-                              <span class="ev-date-m">{fmt(locale, { month: 'short', timeZone: tz }).format(d)}</span>
+                    s.items.map((o) => (
+                      <li>
+                        <a class="ev-card" data-cancelled={o.cancelled ? '' : undefined} href={eventHref(locale, o.slug)}>
+                          <span class="ev-kind" data-tone={kindStyle(o.kind).tone} aria-hidden="true"><Icon name={kindStyle(o.kind).icon as 'church'} size={24} /></span>
+                          <span class="ev-body">
+                            <strong class="ev-title">{o.title}</strong>
+                            <span class="ev-meta">
+                              {rangeText(o)}
+                              {o.location ? ` · ${o.location}` : o.locationKind === 'temple' ? ` · ${label('place_temple')}` : ''}
+                              {o.group ? ` · ${o.group}` : ''}
                             </span>
-                            <span class="ev-body">
-                              <strong class="ev-title">{o.title}</strong>
-                              <span class="ev-meta">
-                                {dayText(o.startsAt, locale, o.allDay, 'full')} · {timeText(o.startsAt, locale, o.allDay, label('all_day'))}
-                                {o.location ? ` · ${o.location}` : o.locationKind === 'temple' ? ` · ${label('place_temple')}` : ''}
-                                {o.group ? ` · ${o.group}` : ''}
-                              </span>
-                              {o.cancelled && <span class="ev-flag">{label('cancelled')}{o.note ? ` — ${o.note}` : ''}</span>}
-                              {o.moved && <span class="ev-flag ev-flag-moved">{label('moved')}{o.note ? ` — ${o.note}` : ''}</span>}
-                            </span>
-                          </a>
-                        </li>
-                      )
-                    })
+                            {o.cancelled && <span class="ev-flag">{label('cancelled')}{o.note ? ` — ${o.note}` : ''}</span>}
+                            {o.moved && <span class="ev-flag ev-flag-moved">{label('moved')}{o.note ? ` — ${o.note}` : ''}</span>}
+                          </span>
+                        </a>
+                      </li>
+                    ))
                   }
                 </ul>
               </section>
@@ -288,6 +301,48 @@ Astro.response.headers.set(
   }
   .ev-card:hover {
     transform: translateY(-0.125rem);
+  }
+  .ev-kind {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .ev-kind[data-tone='info'] {
+    background: var(--info-soft, var(--primary-soft));
+    color: var(--info, var(--primary));
+  }
+  .ev-kind[data-tone='gold'] {
+    background: var(--gold-soft, var(--primary-soft));
+    color: var(--gold-deep, var(--ink));
+  }
+  .ev-kind[data-tone='clay'] {
+    background: color-mix(in oklab, var(--clay) 18%, var(--surface));
+    color: var(--clay);
+  }
+  .ev-kind[data-tone='success'] {
+    background: var(--success-soft, var(--primary-soft));
+    color: var(--success, var(--primary));
+  }
+  .ev-now {
+    margin-inline-start: 0.75rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .ev-wd[data-sunday] {
+    color: var(--gold-deep, var(--ink));
+  }
+  .ev-day[data-sunday] {
+    background: color-mix(in oklab, var(--gold) 16%, var(--surface-2));
   }
   .ev-date {
     display: grid;

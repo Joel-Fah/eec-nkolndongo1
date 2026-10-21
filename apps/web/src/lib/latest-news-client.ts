@@ -1,3 +1,5 @@
+import { shortDate } from '@eec/core/dates'
+
 /**
  * Home « Dernières nouvelles »: the home page stays a static file (no render cost, instant). This small script
  * asks the edge-cached /api/news/public for the three newest posts and fills the hidden section; with no news,
@@ -28,7 +30,6 @@ export async function showLatestNews() {
     if (!res.ok) return
     const { items } = (await res.json()) as { items: Item[] }
     if (!items.length) return
-    const fmt = new Intl.DateTimeFormat(locale, { dateStyle: 'long' })
     for (const it of items) {
       const li = document.createElement('li')
       const a = document.createElement('a')
@@ -49,7 +50,7 @@ export async function showLatestNews() {
       body.className = 'ln-body'
       const time = document.createElement('time')
       time.dateTime = it.publishedAt
-      time.textContent = fmt.format(new Date(it.publishedAt))
+      time.textContent = shortDate(it.publishedAt, locale)
       const h = document.createElement('strong')
       h.textContent = it.title
       body.append(time, h)

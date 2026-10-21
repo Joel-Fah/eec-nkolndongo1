@@ -1,3 +1,5 @@
+import { shortDate } from '@eec/core/dates'
+
 /**
  * « Prochainement » on the home page and the next-event line in the Agenda menu: small scripts that ask the
  * edge-cached /api/events/public/next, so those pages stay static files. No events, or the API slow or down:
@@ -25,20 +27,11 @@ const fetchNext = async (locale: string, limit: number) => {
     return []
   }
 }
-const when = (it: Next, locale: string) =>
-  new Intl.DateTimeFormat(
-    locale,
-    it.allDay
-      ? { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }
-      : {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long',
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: TZ,
-        },
-  ).format(new Date(it.startsAt))
+const when = (it: Next, locale: string) => {
+  const day = shortDate(it.startsAt, locale, it.allDay ? 'UTC' : TZ)
+  if (it.allDay) return day
+  return `${day} · ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: TZ }).format(new Date(it.startsAt))}`
+}
 
 export async function showUpcoming() {
   const root = document.querySelector<HTMLElement>('[data-upcoming]')

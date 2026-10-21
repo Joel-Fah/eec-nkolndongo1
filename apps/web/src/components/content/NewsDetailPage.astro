@@ -1,5 +1,6 @@
 ---
 /** One news post. `preview`: opened with a signed link by someone without an account — any state, never indexed. */
+import { shortDate } from '@eec/core/dates'
 import Button from '@eec/ui/astro/Button.astro'
 import '../../styles/richtext.css'
 import Site from '../../layouts/Site.astro'
@@ -44,9 +45,7 @@ Astro.response.headers.set(
   preview || !post ? 'no-store' : 'public, max-age=30, stale-while-revalidate=120',
 )
 if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
-const date = post
-  ? new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(post.publishedAt))
-  : ''
+const date = post ? shortDate(post.publishedAt, locale) : ''
 const url = post ? new URL(newsItemHref(locale, post.slug), Astro.url).href : ''
 const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${url}`)}` : ''
 ---

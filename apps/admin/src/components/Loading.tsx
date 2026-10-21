@@ -1,7 +1,7 @@
 import { useLocale } from '@eec/admin-kit'
 import { useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { Icon } from './Icon'
+import { Mark } from './Mark'
 
 /**
  * Proof that a click was heard. A thin themed bar runs under the top bar while the next screen loads (shown after
@@ -32,17 +32,29 @@ export function NavProgress() {
   )
 }
 
-/** The wait inside the work area (lazy screens): a small spinner and a few quiet lines, in our colours. */
+/**
+ * The wait inside the work area (lazy screens), centred: the mark, wrapped in a turning ring that draws and erases
+ * itself, a short sentence, and three dots that rise in turn. Shapes and colours come from tokens.
+ */
 export function PageLoading() {
   const { t } = useLocale()
   return (
     <div className="page-loading" role="status" aria-live="polite">
-      <span className="page-loading-spin">
-        <Icon name="loading" size={24} />
-      </span>
-      <span>{t('admin.loading')}</span>
-      <span className="skeleton page-loading-line" aria-hidden="true" />
-      <span className="skeleton page-loading-line short" aria-hidden="true" />
+      <div className="page-loading-orb">
+        <svg className="page-loading-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle className="page-loading-track" cx="50" cy="50" r="44" />
+          <circle className="page-loading-arc" cx="50" cy="50" r="44" pathLength="100" />
+        </svg>
+        <Mark className="page-loading-mark" />
+      </div>
+      <p className="page-loading-text">
+        {t('admin.loading')}
+        <span className="page-loading-dots" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+      </p>
     </div>
   )
 }

@@ -4,6 +4,7 @@
  * time (approved schedule only), and the other published Sundays. People's names appear only when the API says they
  * agreed. Data: cached public API; on a cold database a friendly state, never a 500.
  */
+import { shortDate } from '@eec/core/dates'
 import Button from '@eec/ui/astro/Button.astro'
 import Site from '../../layouts/Site.astro'
 import { publicJson } from '../../lib/content-api'
@@ -49,10 +50,7 @@ const before = others
   .slice(-4)
   .reverse()
 const after = others.filter((x) => x.date > (s?.date ?? '')).slice(0, 4)
-const day = (d: string) =>
-  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
-    new Date(`${d}T00:00:00Z`),
-  )
+const day = (d: string) => shortDate(`${d}T12:00:00Z`, locale, 'UTC')
 const serviceTime =
   next.state === 'ok' && next.data.next && s && next.data.next.startsAt.slice(0, 10) >= s.date
     ? new Intl.DateTimeFormat(locale, {

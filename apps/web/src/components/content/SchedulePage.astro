@@ -4,6 +4,7 @@
  * calendar link, plus the changes of the next 14 days. With none approved, the static « bientôt » text stays
  * (nothing unvalidated is ever shown). Data: cached public API.
  */
+import { shortDate } from '@eec/core/dates'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Site from '../../layouts/Site.astro'
 import { type PublicSlot, type PublicSlotException, publicJson } from '../../lib/content-api'
@@ -35,10 +36,7 @@ const todayDow = new Date(
 ).getUTCDay()
 const horizon = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10)
 const soon = exceptions.filter((e) => e.date <= horizon)
-const dateText = (d: string) =>
-  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
-    new Date(`${d}T00:00:00Z`),
-  )
+const dateText = (d: string) => shortDate(`${d}T12:00:00Z`, locale, 'UTC')
 const hasSlots = slots.length > 0
 Astro.response.headers.set(
   'cache-control',

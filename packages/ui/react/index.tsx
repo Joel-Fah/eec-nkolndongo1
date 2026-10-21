@@ -345,22 +345,12 @@ export function TooltipTip({ text, children }: { text: string; children: ReactNo
   )
 }
 
-/** A Hugeicons stroke-rounded icon (decorative; pass `label` to name it). */
-export function Icon({
-  name,
-  size = 20,
-  label,
-}: {
-  name: IconName
-  size?: 16 | 20 | 24
-  label?: string
-}) {
+/** A Hugeicons stroke-rounded icon, decorative (name the control around it with a label). */
+export function Icon({ name, size = 20 }: { name: IconName; size?: 16 | 20 | 24 }) {
   return (
     <span
       className="inline-flex"
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : true}
+      aria-hidden="true"
       // biome-ignore lint/security/noDangerouslySetInnerHtml: our own icon markup, no user data
       dangerouslySetInnerHTML={{ __html: iconSvg(name, { size }) }}
     />

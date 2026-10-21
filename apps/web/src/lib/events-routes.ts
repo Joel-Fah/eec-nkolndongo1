@@ -1,3 +1,4 @@
+import { shortDate } from '@eec/core/dates'
 import type { Locale } from '@eec/i18n'
 import { href, pages } from './nav'
 
@@ -38,8 +39,5 @@ export const dayText = (
   iso: string,
   locale: Locale,
   allDay: boolean,
-  style: 'full' | 'long' | 'short' = 'full',
-) =>
-  new Intl.DateTimeFormat(locale, { dateStyle: style, timeZone: allDay ? 'UTC' : TZ }).format(
-    new Date(iso),
-  )
+  _style: 'full' | 'long' | 'short' = 'short',
+) => shortDate(iso, locale, allDay ? 'UTC' : TZ)

@@ -1,5 +1,6 @@
 ---
 /** One event: date block, place, group, description, coming dates, add to calendar, share. `token`: preview link. */
+import { spanDays } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
 import '../../styles/richtext.css'
 import Site from '../../layouts/Site.astro'
@@ -53,6 +54,7 @@ const google = ev
   ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(ev.title)}&dates=${stamp(ev.startsAt)}/${stamp(ev.endsAt ?? ev.startsAt)}&location=${encodeURIComponent(ev.location)}&details=${encodeURIComponent(url)}`
   : ''
 const tz = ev?.allDay ? 'UTC' : TZ
+const span = ev ? spanDays(ev.startsAt, ev.endsAt, ev.allDay, TZ) : null
 const d = ev ? new Date(ev.startsAt) : new Date()
 ---
 
@@ -78,7 +80,7 @@ const d = ev ? new Date(ev.startsAt) : new Date()
             </span>
             <div class="ed-titles">
               <h1 class="ed-title" data-cancelled={ev.cancelled ? '' : undefined}>{ev.title}</h1>
-              <p class="ed-when">{dayText(ev.startsAt, locale, ev.allDay, 'full')} · {timeText(ev.startsAt, locale, ev.allDay, label('all_day'))}{ev.endsAt && !ev.allDay ? ` – ${timeText(ev.endsAt, locale, false, '')}` : ''}</p>
+              <p class="ed-when">{span && span.to !== span.from ? `${dayText(ev.startsAt, locale, ev.allDay)} → ${dayText(`${span.to}T12:00:00Z`, locale, true)}` : `${dayText(ev.startsAt, locale, ev.allDay)} · ${timeText(ev.startsAt, locale, ev.allDay, label('all_day'))}${ev.endsAt && !ev.allDay ? ` – ${timeText(ev.endsAt, locale, false, '')}` : ''}`}</p>
               <p class="ed-where">{ev.location || (ev.locationKind === 'temple' ? label('place_temple') : '')}{ev.group ? ` · ${label('group', { name: ev.group })}` : ''}</p>
               {ev.cancelled && <p class="ed-flag">{label('cancelled')}{ev.note ? ` — ${ev.note}` : ''}</p>}
               {ev.moved && <p class="ed-flag ed-flag-moved">{label('moved')}{ev.note ? ` — ${ev.note}` : ''}</p>}
@@ -95,7 +97,7 @@ const d = ev ? new Date(ev.startsAt) : new Date()
                   {
                     ev.upcoming.slice(0, 6).map((o) => (
                       <li data-cancelled={o.cancelled ? '' : undefined}>
-                        {dayText(o.startsAt, locale, ev.allDay, 'full')} · {timeText(o.startsAt, locale, ev.allDay, label('all_day'))}
+                        {dayText(o.startsAt, locale, ev.allDay)} · {timeText(o.startsAt, locale, ev.allDay, label('all_day'))}
                         {o.cancelled ? ` — ${label('cancelled')}${o.note ? ` (${o.note})` : ''}` : o.moved ? ` — ${label('moved')}` : ''}
                       </li>
                     ))

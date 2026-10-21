@@ -1,3 +1,5 @@
+import { shortDate } from '@eec/core/dates'
+
 /**
  * Home « Ce dimanche » card and verse of the day: the home page stays a static file; this script reads the
  * edge-cached public API. Nothing published, or the API slow/down: the card stays hidden and the built-in verse
@@ -43,12 +45,7 @@ export async function showSunday() {
         }
       }
       set('[data-sunday-name]', s.name)
-      set(
-        '[data-sunday-date]',
-        new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
-          new Date(`${s.date}T00:00:00Z`),
-        ),
-      )
+      set('[data-sunday-date]', shortDate(`${s.date}T12:00:00Z`, locale, 'UTC'))
       set('[data-sunday-theme]', s.theme)
       set('[data-sunday-readings]', s.readings.map((r) => r.label).join(' · '))
       const at = n?.next && n.next.startsAt.slice(0, 10) >= s.date ? n.next.startsAt : ''
