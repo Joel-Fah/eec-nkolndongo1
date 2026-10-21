@@ -15,6 +15,17 @@ import { createLink } from '../links.ts'
 directUrl()
 const force = process.argv.includes('--force')
 const origin = process.env.APP_ORIGIN ?? 'http://localhost:8080'
+// A link for the live site must not point at localhost: set APP_ORIGIN to the site's address.
+if (
+  process.env.NEON_BRANCH &&
+  process.env.NEON_BRANCH !== 'dev' &&
+  /localhost|127\.0\.0\.1/.test(origin)
+) {
+  console.error(
+    `APP_ORIGIN is ${origin} but the database is the ${process.env.NEON_BRANCH} branch.\nRun again with the live address, for example:\n  APP_ORIGIN=https://eec-nkolndongo1.joelfah2003.workers.dev pnpm admin:bootstrap`,
+  )
+  process.exit(1)
+}
 const rl = createInterface({ input: process.stdin, output: process.stdout })
 // Piped input (scripts, tests) can end before the database answers: read those lines up front.
 const piped: string[] = []

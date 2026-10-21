@@ -10,6 +10,8 @@ cd "$(dirname "$0")/../.."
 ENV_FILE=.env.production.local
 [ -f "$ENV_FILE" ] || { echo "Missing $ENV_FILE"; exit 1; }
 set -a; . "./$ENV_FILE"; set +a
+# The live address, whatever the env file says: links the API and the bootstrap create must point here.
+export APP_ORIGIN="https://eec-nkolndongo1.joelfah2003.workers.dev"
 
 host() { node -e "console.log(new URL(process.env[process.argv[1]] ?? '').host)" "$1" 2>/dev/null || echo "(not set)"; }
 echo "Neon branch : ${NEON_BRANCH:-?}"
