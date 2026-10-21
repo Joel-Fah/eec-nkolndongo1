@@ -37,7 +37,7 @@ export function initDial() {
   const name = root.querySelector<HTMLElement>('[data-dial-name]')
   if (!svg || !panel || !title || !text || !chips.length) return
   // The static list of seasons is for people without JavaScript.
-  document.querySelectorAll<HTMLElement>('.pv-seasons-list').forEach((el) => (el.hidden = true))
+  for (const el of document.querySelectorAll<HTMLElement>('.pv-seasons-list')) el.hidden = true
 
   const base = locale === 'fr' ? '/fr/agenda/ce-dimanche/' : '/en/calendar/this-sunday/'
   let selected = -1
@@ -46,13 +46,14 @@ export function initDial() {
     if (n === selected) return
     selected = n
     const chip = chips[n] as HTMLButtonElement
-    chips.forEach((c, j) => {
+    for (const [j, c] of chips.entries()) {
       c.setAttribute('aria-checked', String(j === n))
       c.tabIndex = j === n ? 0 : -1
-    })
-    arcs.forEach((a, j) =>
-      j === n ? a.setAttribute('data-selected', '') : a.removeAttribute('data-selected'),
-    )
+    }
+    for (const [j, a] of arcs.entries()) {
+      if (j === n) a.setAttribute('data-selected', '')
+      else a.removeAttribute('data-selected')
+    }
     const season = chip.dataset.season ?? ''
     panel.setAttribute('data-season', season)
     title.textContent = chip.dataset.title ?? ''
@@ -91,7 +92,7 @@ export function initDial() {
     }
   }
 
-  chips.forEach((c, i) => c.addEventListener('click', () => select(i)))
+  for (const [i, c] of chips.entries()) c.addEventListener('click', () => select(i))
   root
     .querySelector('[data-dial-prev]')
     ?.addEventListener('click', () => select(selected - 1, false))
@@ -118,8 +119,6 @@ export function initDial() {
     return (((a / (Math.PI * 2)) % 1) + 1) % 1
   }
   const arcAt = (f: number) => {
-    const spans = arcs.map((a) => a.getAttribute('d') ?? '')
-    void spans
     const idx = root.querySelectorAll<SVGPathElement>('.dial-arc') as NodeListOf<SVGPathElement>
     // Arcs are in year order and cover the year: find by the stored fractions.
     return [...idx].findIndex((a) => {
