@@ -12,9 +12,9 @@
     "lint": "biome check .",
     "typecheck": "tsc",
     "test": "vitest run",
-    "spike": "node --env-file=../../.env.local src/cli/spike.ts",
-    "admin:bootstrap": "node --env-file=../../.env.local src/cli/bootstrap.ts",
-    "clean:test-data": "node --env-file=../../.env.local src/cli/clean-test-data.ts"
+    "spike": "node --env-file-if-exists=../../.env.local src/cli/spike.ts",
+    "admin:bootstrap": "node --env-file-if-exists=../../.env.local src/cli/bootstrap.ts",
+    "clean:test-data": "node --env-file-if-exists=../../.env.local src/cli/clean-test-data.ts"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "1.7.11",
