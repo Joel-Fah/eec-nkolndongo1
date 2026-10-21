@@ -1,5 +1,7 @@
 export * from './admin-path.ts'
+export * from './ics.ts'
 export * from './lifecycle.ts'
 export * from './liturgy.ts'
+export * from './recurrence.ts'
 export * from './richtext.ts'
 export { slugify } from './slug.ts'
