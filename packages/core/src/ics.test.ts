@@ -83,6 +83,24 @@ describe('buildIcs', () => {
     expect(ics).toContain('DTSTART;TZID=Africa/Douala:20261115T160000')
     expect(ics.match(/BEGIN:VEVENT/g)?.length).toBe(2)
   })
+  it('starts a series on its first real occurrence when DTSTART does not fit the rule', () => {
+    // Saturday 24 Oct 2026 typed as the start of « the 1st Sunday of the month »: the series starts Sunday 1 Nov.
+    const wrong = zonedToUtc(2026, 10, 24, 15, 0, TZ)
+    const ics = buildIcs({
+      name: 'x',
+      now,
+      events: [
+        {
+          ...base,
+          startsAt: wrong,
+          endsAt: null,
+          recurrence: { freq: 'monthly', mode: 'nthWeekday', nth: 1, weekday: 0 },
+        },
+      ],
+    })
+    expect(ics).toContain('DTSTART;TZID=Africa/Douala:20261101T150000')
+    expect(ics).toContain('RRULE:FREQ=MONTHLY;BYDAY=1SU')
+  })
   it('all-day events use dates, with an exclusive end', () => {
     const day = new Date(Date.UTC(2026, 11, 25))
     const ics = buildIcs({

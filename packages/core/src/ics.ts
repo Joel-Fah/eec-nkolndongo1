@@ -7,6 +7,7 @@
  * also as an override VEVENT with RECURRENCE-ID.
  */
 import {
+  expandOccurrences,
   localParts,
   offsetMinutes,
   type Recurrence,
@@ -103,7 +104,23 @@ export type IcsEvent = Schedulable & {
   updatedAt?: Date
 }
 
-function vevent(e: IcsEvent, now: Date): string[] {
+/**
+ * Calendar apps count DTSTART as an occurrence even when it does not fit the rule (a « 1st Sunday » event whose
+ * first date was typed as a Wednesday). We start the series on its first real occurrence instead.
+ */
+function alignedStart(e: IcsEvent): IcsEvent {
+  if (!e.recurrence) return e
+  const first = expandOccurrences(
+    { ...e, exceptions: [] },
+    e.startsAt,
+    new Date(e.startsAt.getTime() + 800 * 86_400_000),
+  )[0]
+  if (!first || first.startsAt.getTime() === e.startsAt.getTime()) return e
+  return { ...e, startsAt: first.startsAt, endsAt: first.endsAt }
+}
+
+function vevent(source: IcsEvent, now: Date): string[] {
+  const e = alignedStart(source)
   const tz = e.timezone
   const dt = (name: string, d: Date) =>
     e.allDay ? `${name};VALUE=DATE:${dateStamp(d)}` : `${name};TZID=${tz}:${localStamp(d, tz)}`
