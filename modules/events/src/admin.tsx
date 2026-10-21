@@ -369,9 +369,9 @@ function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
           </Button>
         </div>
       </div>
-      <div className="mcal" role="grid" aria-label={monthName}>
+      <div className="mcal">
         {weekdays.map((w) => (
-          <div key={w} className="mcal-head" role="columnheader">
+          <div key={w} className="mcal-head" aria-hidden="true">
             {w}
           </div>
         ))}
@@ -383,7 +383,6 @@ function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
             <button
               key={key}
               type="button"
-              role="gridcell"
               className="mcal-day"
               data-out={d.getUTCMonth() !== ym.m ? '' : undefined}
               data-today={key === todayKey ? '' : undefined}

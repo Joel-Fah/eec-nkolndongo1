@@ -310,7 +310,6 @@ async function coversAndGroups(db: Db, rows: Row[]) {
 }
 
 function toPublic(
-  rows: Row[],
   ctx: Awaited<ReturnType<typeof coversAndGroups>>,
   locale: Locale,
   occs: { row: Row; o: Occurrence }[],
@@ -391,7 +390,7 @@ async function occurrencesIn(
     db,
     slice.map((x) => x.row),
   )
-  return toPublic(rows, ctx, locale, slice)
+  return toPublic(ctx, locale, slice)
 }
 
 const pagePath = (locale: Locale) => (locale === 'fr' ? 'agenda/evenements' : 'calendar/events')
@@ -776,7 +775,7 @@ async function detail(db: Db, row: Row, locale: Locale) {
   )
     .filter((o) => (o.endsAt ?? o.startsAt) >= new Date(now.getTime() - 3_600_000))
     .slice(0, 12)
-  const [first] = toPublic([row], ctx, locale, [
+  const [first] = toPublic(ctx, locale, [
     {
       row,
       o: occs[0] ?? {
@@ -795,7 +794,6 @@ async function detail(db: Db, row: Row, locale: Locale) {
     timezone: row.timezone,
     recurring: !!row.recurrence,
     upcoming: toPublic(
-      [row],
       ctx,
       locale,
       occs.map((o) => ({ row, o })),

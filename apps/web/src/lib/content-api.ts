@@ -53,3 +53,31 @@ export type NewsItem = {
   cover: NewsCover | null
 }
 export type NewsDetail = NewsItem & { html: string; text: string }
+
+export type EventOcc = {
+  eventId: string
+  slug: string
+  title: string
+  description: string
+  date: string
+  startsAt: string
+  endsAt: string | null
+  allDay: boolean
+  cancelled: boolean
+  moved: boolean
+  note: string
+  location: string
+  locationKind: string
+  fallback: boolean
+  featured: boolean
+  group: string | null
+  groupKey: string | null
+  cover: NewsCover | null
+  registrationUrl: string | null
+}
+export type EventDetail = EventOcc & {
+  html: string
+  timezone: string
+  recurring: boolean
+  upcoming: Pick<EventOcc, 'date' | 'startsAt' | 'endsAt' | 'cancelled' | 'moved' | 'note'>[]
+}
