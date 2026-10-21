@@ -171,6 +171,19 @@ export function alternates(pathname: string): Record<Locale, string> {
   const segments = rest.filter(Boolean).join('/')
   const entry = pages.find((page) => page.path.fr === segments || page.path.en === segments)
   if (entry) return { fr: href('fr', entry.path.fr), en: href('en', entry.path.en) }
+  // A page below a known one (a news post): translate the parent, keep the rest (the post's own address).
+  const parent = pages.find(
+    (page) => segments.startsWith(`${page.path.fr}/`) || segments.startsWith(`${page.path.en}/`),
+  )
+  if (parent) {
+    const rest = segments.startsWith(`${parent.path.fr}/`)
+      ? segments.slice(parent.path.fr.length + 1)
+      : segments.slice(parent.path.en.length + 1)
+    return {
+      fr: href('fr', `${parent.path.fr}/${rest}`),
+      en: href('en', `${parent.path.en}/${rest}`),
+    }
+  }
   return { fr: href('fr', segments), en: href('en', segments) }
 }
 

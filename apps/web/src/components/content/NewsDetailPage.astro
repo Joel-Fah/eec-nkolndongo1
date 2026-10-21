@@ -1,0 +1,179 @@
+---
+/** One news post. `preview`: opened with a signed link by someone without an account — any state, never indexed. */
+import Button from '@eec/ui/astro/Button.astro'
+import Site from '../../layouts/Site.astro'
+import { type NewsDetail, publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { newsItemHref, newsListHref } from '../../lib/news-routes'
+import Picture from '../Picture.astro'
+import LangFallbackNote from './LangFallbackNote.astro'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  slug?: string
+  token?: string
+}
+const { slug, token } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const preview = !!token
+type Item = { found: true; post: NewsDetail } | { found: false; redirect: string | null }
+const result = preview
+  ? await publicJson<NewsDetail>(
+      Astro,
+      `/api/news/public/preview/${encodeURIComponent(token ?? '')}?locale=${locale}`,
+    )
+  : await publicJson<Item>(
+      Astro,
+      `/api/news/public/item/${encodeURIComponent(slug ?? '')}?locale=${locale}`,
+    )
+
+let post: NewsDetail | null = null
+if (result.state === 'ok') {
+  const d = result.data as Item | NewsDetail
+  if ('found' in d) {
+    if (d.found) post = d.post
+    else if (d.redirect) return Astro.redirect(newsItemHref(locale, d.redirect), 301)
+  } else post = d
+}
+const unavailable = result.state === 'unavailable'
+if (!post && !unavailable) Astro.response.status = 404
+Astro.response.headers.set(
+  'cache-control',
+  preview || !post ? 'no-store' : 'public, max-age=30, stale-while-revalidate=120',
+)
+if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+const date = post
+  ? new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(post.publishedAt))
+  : ''
+const url = post ? new URL(newsItemHref(locale, post.slug), Astro.url).href : ''
+const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${url}`)}` : ''
+---
+
+<Site title={post?.title ?? t('news.site.not_found_t')} description={post?.excerpt} noindex={preview || !post}>
+  <article class="nd">
+    <p class="nd-back"><a href={newsListHref(locale)}>← {t('news.site.back')}</a></p>
+    {preview && <p class="nd-preview" role="note">{t('news.site.preview_banner')}</p>}
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !post ? (
+        <div class="nd-missing">
+          <h1>{t('news.site.not_found_t')}</h1>
+          <p>{t('news.site.not_found_p')}</p>
+          <Button href={newsListHref(locale)}>{t('news.site.back')}</Button>
+        </div>
+      ) : (
+        <>
+          <header class="nd-head">
+            <p class="nd-meta">
+              <time datetime={post.publishedAt}>{date}</time>
+              {post.group && <span> · {post.group}</span>}
+            </p>
+            <h1 class="nd-title">{post.title}</h1>
+            {post.excerpt && <p class="nd-lead">{post.excerpt}</p>}
+          </header>
+          {post.fallback && <LangFallbackNote />}
+          {post.cover && <Picture class="nd-cover" media={post.cover} sizes="(min-width: 48rem) 46rem, 100vw" eager decorative />}
+          <div class="nd-body" set:html={post.html} />
+          <p class="nd-share">
+            <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer">{t('news.site.share_whatsapp')}</Button>
+          </p>
+        </>
+      )
+    }
+  </article>
+</Site>
+
+<style>
+  .nd {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 46rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .nd-back a {
+    color: var(--ink-muted);
+  }
+  .nd-preview {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--surface-2));
+    font-weight: 600;
+  }
+  .nd-head {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .nd-meta {
+    color: var(--ink-muted);
+  }
+  .nd-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .nd-lead {
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .nd :global(.nd-cover) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-xl);
+    object-fit: cover;
+  }
+  .nd-body {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.75;
+  }
+  .nd-body :global(> * + *) {
+    margin-block-start: 1em;
+  }
+  .nd-body :global(h2) {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-block-start: 1.75em;
+  }
+  .nd-body :global(h3) {
+    font-size: var(--text-xl);
+    font-weight: 600;
+  }
+  .nd-body :global(ul),
+  .nd-body :global(ol) {
+    padding-inline-start: 1.5rem;
+  }
+  .nd-body :global(ul) {
+    list-style: disc;
+  }
+  .nd-body :global(ol) {
+    list-style: decimal;
+  }
+  .nd-body :global(blockquote) {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    font-style: italic;
+  }
+  .nd-body :global(a) {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+  .nd-body :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+  }
+  .nd-body :global(figcaption) {
+    margin-block-start: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .nd-missing {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+  }
+</style>

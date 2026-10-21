@@ -1,0 +1,35 @@
+---
+/**
+ * Shown instead of content when the database is slow or down: plain words, a retry, no error page.
+ * (Decision 0027: public pages never answer 500 because of the database.)
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import { localeOf, useT } from '../../lib/i18n'
+
+const t = useT(localeOf(Astro.currentLocale))
+---
+
+<div class="unavail" role="status">
+  <p class="unavail-title">{t('news.site.unavailable_t')}</p>
+  <p class="unavail-text">{t('news.site.unavailable_p')}</p>
+  <Button href={Astro.url.pathname} variant="secondary">{t('news.site.retry')}</Button>
+</div>
+
+<style>
+  .unavail {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .unavail-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .unavail-text {
+    color: var(--ink-muted);
+  }
+</style>

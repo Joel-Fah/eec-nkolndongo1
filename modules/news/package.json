@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./api": "./src/api.ts",
-    "./admin": "./src/admin.tsx"
+    "./admin": "./src/admin.tsx",
+    "./schema": "./src/schema.ts"
   },
   "scripts": {
     "lint": "biome check .",
@@ -29,12 +30,7 @@
     "zod": "4.6.7",
     "@base-ui/react": "1.9.0",
     "@eec/module-media": "workspace:*",
-    "@tiptap/react": "3.32.0",
-    "@tiptap/pm": "3.32.0",
-    "@tiptap/core": "3.32.0",
-    "@tiptap/starter-kit": "3.32.0",
-    "@tiptap/extension-link": "3.32.0",
-    "@tiptap/extension-placeholder": "3.32.0"
+    "@eec/content-kit": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261016.1",

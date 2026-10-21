@@ -112,15 +112,13 @@ async function saveRevision(
     .orderBy(desc(contentRevisions.createdAt))
     .limit(1)
   if (!force && last && Date.now() - last.at.getTime() < REVISION_GAP_MS) return
-  await db
-    .insert(contentRevisions)
-    .values({
-      entityType: ENTITY,
-      entityId: row.id,
-      snapshot: snapshotOf(row),
-      reason,
-      createdBy: userId,
-    })
+  await db.insert(contentRevisions).values({
+    entityType: ENTITY,
+    entityId: row.id,
+    snapshot: snapshotOf(row),
+    reason,
+    createdBy: userId,
+  })
   const old = await db
     .select({ id: contentRevisions.id })
     .from(contentRevisions)
@@ -278,7 +276,7 @@ function feedXml(
   locale: Locale,
   items: Awaited<ReturnType<typeof publicItems>>['items'],
 ) {
-  const base = `${origin}/${locale}/${locale === 'fr' ? 'actualites' : 'news'}`
+  const base = `${origin}/${locale}/${locale === 'fr' ? 'actualites/nouvelles' : 'news/latest'}`
   const title = locale === 'fr' ? 'EEC Nkolndongo 1 — Actualités' : 'EEC Nkolndongo 1 — News'
   return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>${xml(title)}</title><link>${xml(base)}</link><description>${xml(title)}</description><language>${locale}</language>${items
     .map(
@@ -445,6 +443,13 @@ export const newsApi = new Hono<AppEnv>()
     const patch = parsed.data
     if (patch.groupId !== undefined && patch.groupId !== row.groupId) {
       if (!(await mayOn(c, 'news:edit', patch.groupId))) return fail(c, 403, 'forbidden')
+    }
+    if (patch.coverMediaId) {
+      const [m] = await db
+        .select({ kind: mediaFiles.kind })
+        .from(mediaFiles)
+        .where(eq(mediaFiles.id, patch.coverMediaId))
+      if (m?.kind !== 'image') return fail(c, 400, 'invalid')
     }
     const set: Partial<typeof newsPosts.$inferInsert> = {}
     for (const k of [

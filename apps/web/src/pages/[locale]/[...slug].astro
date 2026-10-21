@@ -11,7 +11,9 @@ import { content } from '../../lib/pages'
 
 export function getStaticPaths() {
   return locales.flatMap((locale) =>
-    pages.map((page) => ({ params: { locale, slug: page.path[locale] }, props: { id: page.id } })),
+    pages
+      .filter((page) => page.id !== 'nouvelles')
+      .map((page) => ({ params: { locale, slug: page.path[locale] }, props: { id: page.id } })),
   )
 }
 
