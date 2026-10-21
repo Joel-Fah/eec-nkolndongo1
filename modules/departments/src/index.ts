@@ -39,7 +39,7 @@ export const departmentsModule = defineModule({
         group: 'parish',
         label: { fr: 'Départements', en: 'Departments' },
         path: '/m/departments',
-        icon: 'users',
+        icon: 'department',
         order: 40,
         permission: 'departments:read',
       },

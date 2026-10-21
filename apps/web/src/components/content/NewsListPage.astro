@@ -32,6 +32,7 @@ Astro.response.headers.set(
   <link slot="head" rel="alternate" type="application/rss+xml" title={t('news.site.latest_t')} href={feed} />
   <PageHero id="nouvelles" />
   <section class="nl">
+    <div class="nl-live" data-live-area>
     {
       result.state === 'unavailable' ? (
         <UnavailableState />
@@ -50,15 +51,22 @@ Astro.response.headers.set(
             ))}
           </ul>
           <nav class="nl-pager" aria-label={t('news.site.page_of', { page: String(page), pages: more ? `${page}+` : String(page) })}>
-            {page > 1 && <Button href={`${newsListHref(locale)}?page=${page - 1}`} variant="secondary">← {t('news.site.newer')}</Button>}
-            {more && <Button href={`${newsListHref(locale)}?page=${page + 1}`} variant="secondary">{t('news.site.older')} →</Button>}
+            {page > 1 && <Button data-live-nav data-live-scroll href={`${newsListHref(locale)}?page=${page - 1}`} variant="secondary">← {t('news.site.newer')}</Button>}
+            {more && <Button data-live-nav data-live-scroll href={`${newsListHref(locale)}?page=${page + 1}`} variant="secondary">{t('news.site.older')} →</Button>}
           </nav>
           <p class="nl-rss"><a href={feed}>{t('news.site.rss')}</a></p>
         </>
       )
     }
+    </div>
   </section>
 </Site>
+
+<script>
+  import { initLiveNav } from '../../scripts/live-nav'
+  initLiveNav()
+  document.addEventListener('astro:page-load', initLiveNav)
+</script>
 
 <style>
   .nl {
@@ -67,6 +75,10 @@ Astro.response.headers.set(
     width: min(100% - 2rem, 72rem);
     margin-inline: auto;
     padding-block: 2rem 4rem;
+  }
+  .nl-live {
+    display: grid;
+    gap: 1.5rem;
   }
   .nl-grid {
     display: grid;

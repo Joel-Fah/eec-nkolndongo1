@@ -156,7 +156,22 @@ Astro.response.headers.set(
     margin-block-start: -5.5rem;
     background: color-mix(in oklab, var(--season) 14%, var(--bg));
   }
+  /* A tilted field of dots in the season colour, fading towards the text side. */
+  .cs::before {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    z-index: -2;
+    background-image: radial-gradient(circle, color-mix(in oklab, var(--season) 55%, var(--ink)) 0.1rem, transparent 0.14rem);
+    background-size: 1.75rem 1.75rem;
+    opacity: 0.35;
+    transform: rotate(-12deg);
+    -webkit-mask-image: radial-gradient(ellipse 60% 55% at 72% 45%, #000, transparent 75%);
+    mask-image: radial-gradient(ellipse 60% 55% at 72% 45%, #000, transparent 75%);
+    pointer-events: none;
+  }
   .cs-art {
+    animation: cs-drift 14s ease-in-out infinite alternate;
     position: absolute;
     inset-block-start: -10%;
     inset-inline-end: -4%;
@@ -166,6 +181,19 @@ Astro.response.headers.set(
     aspect-ratio: 1;
     transform: scaleX(-1);
     pointer-events: none;
+  }
+  @keyframes cs-drift {
+    from {
+      transform: scaleX(-1) translate3d(0, 0, 0) rotate(0deg);
+    }
+    to {
+      transform: scaleX(-1) translate3d(-1.5%, 2%, 0) rotate(2deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-art {
+      animation: none;
+    }
   }
   .cs-first,
   .cs-others,
@@ -262,14 +290,23 @@ Astro.response.headers.set(
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+  .cs-readings {
+    gap: 0.5rem 1.25rem;
+    padding-block-end: 0.625rem;
+  }
   .cs-readings li {
     display: inline-flex;
     align-items: center;
     min-height: 2.5rem;
     padding-inline: 1rem;
     border-radius: var(--radius-md);
-    background: color-mix(in oklab, var(--surface) 80%, transparent);
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: var(--surface);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0.3125rem 0.3125rem 0 0 color-mix(in oklab, var(--surface) 82%, transparent),
+      0.3125rem 0.3125rem 0 1px var(--line),
+      0.625rem 0.625rem 0 0 color-mix(in oklab, var(--surface) 60%, transparent),
+      0.625rem 0.625rem 0 1px color-mix(in oklab, var(--line) 70%, transparent);
     font-weight: 500;
   }
   .cs-facts {

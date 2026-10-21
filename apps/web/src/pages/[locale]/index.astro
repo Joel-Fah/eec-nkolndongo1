@@ -511,11 +511,11 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   }
   .sunday-card .sunday-art {
     position: absolute;
-    inset-block: -35% -35%;
-    inset-inline-end: 7%;
+    inset-block: -45% -45%;
+    inset-inline-end: 5%;
     z-index: -1;
     width: auto;
-    height: 170%;
+    height: 190%;
     aspect-ratio: 1;
     transform: scaleX(-1);
     pointer-events: none;
@@ -610,14 +610,25 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+  /* Each reading sits on top of two empty cards, like a deck: stacked, not sliding. */
+  .sunday-readings {
+    gap: 0.5rem 1.25rem;
+    padding-inline-end: 0.625rem;
+    padding-block-end: 0.625rem;
+  }
   .sunday-readings li {
     display: inline-flex;
     align-items: center;
     min-height: 2.5rem;
     padding-inline: 1rem;
     border-radius: var(--radius-md);
-    background: color-mix(in oklab, var(--surface) 80%, transparent);
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: var(--surface);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0.3125rem 0.3125rem 0 0 color-mix(in oklab, var(--surface) 82%, transparent),
+      0.3125rem 0.3125rem 0 1px var(--line),
+      0.625rem 0.625rem 0 0 color-mix(in oklab, var(--surface) 60%, transparent),
+      0.625rem 0.625rem 0 1px color-mix(in oklab, var(--line) 70%, transparent);
     font-weight: 500;
   }
   .sunday-foot {

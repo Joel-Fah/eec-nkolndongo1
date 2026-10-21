@@ -54,6 +54,17 @@ export function initQuiz() {
           .replace('{total}', String(questions.length)),
       ),
     )
+    const bar = el('div', 'dq-bar')
+    bar.setAttribute('role', 'progressbar')
+    bar.setAttribute('aria-valuemin', '1')
+    bar.setAttribute('aria-valuemax', String(questions.length))
+    bar.setAttribute('aria-valuenow', String(step + 1))
+    for (let i = 0; i < questions.length; i++) {
+      const seg = el('span', 'dq-seg')
+      if (i <= step) seg.dataset.on = ''
+      bar.append(seg)
+    }
+    box.append(bar)
     const h = el('h3', 'dq-q', q.text)
     h.tabIndex = -1
     box.append(h)

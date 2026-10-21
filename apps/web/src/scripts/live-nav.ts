@@ -1,30 +1,35 @@
 /**
- * The agenda's controls (list / month, period, group, month arrows, dates) change only the results, not the page:
- * the new address is fetched, the part under the hero is swapped in place, and the address bar and history follow.
- * Without JavaScript the same links are ordinary page loads. A small scroll-spy keeps the week index in step.
+ * Filters, views and pagination on the public site (agenda, departments, news) change only the results, not the page:
+ * the new address is fetched, the `[data-live-area]` part is swapped in place, and the address bar and history follow.
+ * Without JavaScript the same links are ordinary page loads (pages are rendered on the server, so a link is a request).
+ * A small scroll-spy keeps the agenda's week index in step.
  */
 let bound = false
 
-async function swap(url: string, push: boolean) {
-  const app = document.querySelector<HTMLElement>('[data-ev-app]')
+async function swap(url: string, push: boolean, scroll = false) {
+  const app = document.querySelector<HTMLElement>('[data-live-area]')
   if (!app) {
     location.href = url
     return
   }
   app.setAttribute('data-busy', '')
+  app.style.opacity = '0.6'
+  app.style.transition = 'opacity 0.15s'
   try {
     const res = await fetch(url, { headers: { accept: 'text/html' } })
     if (!res.ok) throw new Error(String(res.status))
     const doc = new DOMParser().parseFromString(await res.text(), 'text/html')
-    const next = doc.querySelector('[data-ev-app]')
+    const next = doc.querySelector('[data-live-area]')
     if (!next) throw new Error('no app')
     app.innerHTML = next.innerHTML
     if (push) history.pushState({ ev: true }, '', url)
     spy()
+    if (scroll) app.scrollIntoView({ block: 'start', behavior: 'smooth' })
   } catch {
     location.href = url
   } finally {
     app.removeAttribute('data-busy')
+    app.style.opacity = ''
   }
 }
 
@@ -52,26 +57,26 @@ function spy() {
   }
 }
 
-export function initEventsNav() {
+export function initLiveNav() {
   spy()
-  if (bound || !document.querySelector('[data-ev-app]')) return
+  if (bound || !document.querySelector('[data-live-area]')) return
   bound = true
   // Capture phase, so the site's page transitions never see these clicks.
   document.addEventListener(
     'click',
     (e) => {
-      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-ev-nav]')
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-live-nav]')
       if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return
       e.preventDefault()
       e.stopImmediatePropagation()
-      void swap(a.href, true)
+      void swap(a.href, true, a.hasAttribute('data-live-scroll'))
     },
     true,
   )
   document.addEventListener(
     'submit',
     (e) => {
-      const form = (e.target as HTMLElement).closest<HTMLFormElement>('form[data-ev-form]')
+      const form = (e.target as HTMLElement).closest<HTMLFormElement>('form[data-live-form]')
       if (!form) return
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -82,6 +87,6 @@ export function initEventsNav() {
     true,
   )
   window.addEventListener('popstate', () => {
-    if (document.querySelector('[data-ev-app]')) void swap(location.href, false)
+    if (document.querySelector('[data-live-area]')) void swap(location.href, false)
   })
 }

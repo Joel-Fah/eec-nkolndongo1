@@ -271,7 +271,7 @@ function PageEditor({ item, onClose }: { item: Item; onClose: () => void }) {
               <fieldset className="grid gap-2">
                 <legend className="field-label">{t(k('tags'))}</legend>
                 <p className="text-sm text-ink-muted">{t(k('tags_help'))}</p>
-                <div className="flex flex-wrap gap-x-5 gap-y-2">
+                <div className="check-group">
                   {DEPARTMENT_TAGS.map((tag) => (
                     <CheckboxField
                       key={tag}
@@ -598,7 +598,7 @@ function QuizEditor({ onClose }: { onClose: () => void }) {
                       }
                     />
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  <div className="check-group">
                     {DEPARTMENT_TAGS.map((tag) => (
                       <CheckboxField
                         key={tag}
