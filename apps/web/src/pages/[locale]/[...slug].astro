@@ -14,9 +14,17 @@ export function getStaticPaths() {
     pages
       .filter(
         (page) =>
-          !['nouvelles', 'evenements', 'cultes', 'dimanche', 'departements', 'pratique'].includes(
-            page.id,
-          ),
+          ![
+            'nouvelles',
+            'evenements',
+            'cultes',
+            'dimanche',
+            'departements',
+            'pratique',
+            'histoire',
+            'croyances',
+            'pasteurs',
+          ].includes(page.id),
       )
       .map((page) => ({ params: { locale, slug: page.path[locale] }, props: { id: page.id } })),
   )

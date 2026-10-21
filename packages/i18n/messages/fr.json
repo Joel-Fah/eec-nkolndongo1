@@ -711,6 +711,48 @@
         "desc": "Sur la page des événements, un index collant liste les semaines affichées et met en évidence celle qui est à l’écran. Masqué sur mobile.",
         "use": "Apparaît à partir de trois semaines ; liens d’ancre #ev-<date>.",
         "a11y": "Navigation étiquetée, aria-current sur la semaine visible."
+      },
+      "fliptime": {
+        "name": "Heure en cartes",
+        "desc": "Une heure en deux cartes douces (heures, minutes), sans trait : utilisée pour l’horaire du culte sur la carte « Ce dimanche » et sa page.",
+        "use": "<p class=\"flip-time\"><span class=\"flip-card\">09</span><span class=\"flip-colon\">:</span><span class=\"flip-card\">00</span></p> ; taille par --flip-size.",
+        "a11y": "Le conteneur porte l’heure complète en aria-label ; les cartes sont aria-hidden."
+      },
+      "tablepicker": {
+        "name": "Choix de la taille d’un tableau",
+        "desc": "Dans l’éditeur, une grille à survoler (8 × 8) prévisualise la taille ; on peut aussi saisir lignes et colonnes (jusqu’à 30 × 10).",
+        "use": "Bouton Tableau de l’éditeur ; clic sur une case ou « Insérer ».",
+        "a11y": "La grille est réservée à la souris ; le clavier passe par les champs lignes et colonnes."
+      },
+      "deptcard": {
+        "name": "Carte de groupe et questionnaire",
+        "desc": "Une carte (photo, nom, phrase d’accroche, public visé) par groupe, filtrable ; le questionnaire « Où est ta place ? » avance question par question avec une barre de progression.",
+        "use": "Page Départements ; la carte entière est un lien. Rien n’est enregistré par le questionnaire.",
+        "a11y": "Filtres en liens (fonctionnent sans JavaScript) ; progression annoncée (progressbar) ; focus sur chaque nouvelle question."
+      },
+      "guidechecklist": {
+        "name": "Parcours à cocher",
+        "desc": "Un guide en étapes dépliables, avec cases à cocher, barre de progression, impression et remise à zéro. Les coches restent dans le navigateur.",
+        "use": "Pages Vie pratique ; impression : toutes les étapes s’ouvrent.",
+        "a11y": "Étapes en <details> (clavier complet) ; case par étape avec libellé ; sans JavaScript, une simple liste."
+      },
+      "historyclimb": {
+        "name": "Gravir la colline",
+        "desc": "La frise de l’histoire : un sentier sinueux se dessine à mesure que l’on défile (GSAP, chargé sur cette page seulement) à travers les étapes, chacune dépliable.",
+        "use": "Page Notre histoire, depuis les étapes publiées en administration.",
+        "a11y": "Sans animation (mouvement réduit, économie de données) : frise simple, sentier déjà tracé, tout reste lisible. Aucun épinglage du défilement."
+      },
+      "councilcard": {
+        "name": "Carte du conseil",
+        "desc": "Une personne (photo, nom, titre, mandat) ou, sans consentement enregistré, le rôle seul.",
+        "use": "Page Pasteurs et Conseil, groupée par rôle.",
+        "a11y": "Aucune donnée personnelle n’est envoyée au navigateur sans consentement."
+      },
+      "liveswap": {
+        "name": "Filtres sans rechargement",
+        "desc": "Sur l’agenda, les départements et les actualités, changer de vue, de filtre ou de page remplace seulement les résultats ; l’adresse et le bouton Retour suivent.",
+        "use": "Zone data-live-area, liens data-live-nav (data-live-scroll pour la pagination).",
+        "a11y": "Sans JavaScript, ce sont de simples liens. Le focus et la position de défilement sont conservés."
       }
     },
     "rules": {

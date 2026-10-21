@@ -711,6 +711,48 @@
         "desc": "On the events page a sticky index lists the weeks shown and highlights the one on screen. Hidden on mobile.",
         "use": "Appears from three weeks; anchor links #ev-<date>.",
         "a11y": "Labelled navigation, aria-current on the visible week."
+      },
+      "fliptime": {
+        "name": "Flip-card time",
+        "desc": "A time as two soft cards (hours, minutes), no divider: used for the service time on the “This Sunday” card and page.",
+        "use": "<p class=\"flip-time\"><span class=\"flip-card\">09</span><span class=\"flip-colon\">:</span><span class=\"flip-card\">00</span></p>; size with --flip-size.",
+        "a11y": "The container carries the full time as its aria-label; the cards are aria-hidden."
+      },
+      "tablepicker": {
+        "name": "Table size picker",
+        "desc": "In the editor, a hover grid (8 × 8) previews the size; rows and columns can also be typed (up to 30 × 10).",
+        "use": "The editor’s Table button; click a cell or “Insert”.",
+        "a11y": "The grid is for the mouse; keyboard users use the rows and columns fields."
+      },
+      "deptcard": {
+        "name": "Group card and quiz",
+        "desc": "A card (photo, name, tagline, audience) per group, filterable; the “Where do you belong?” quiz goes question by question with a progress bar.",
+        "use": "Departments page; the whole card is a link. The quiz stores nothing.",
+        "a11y": "Filters are links (work without JavaScript); progress is announced (progressbar); focus moves to each new question."
+      },
+      "guidechecklist": {
+        "name": "Step checklist",
+        "desc": "A guide as expandable steps, with tick boxes, a progress bar, printing and reset. Ticks stay in the browser.",
+        "use": "Practical life pages; printing opens every step.",
+        "a11y": "Steps are <details> (full keyboard); one labelled box per step; a plain list without JavaScript."
+      },
+      "historyclimb": {
+        "name": "Climbing the hill",
+        "desc": "The history timeline: a winding trail draws itself as you scroll (GSAP, loaded on this page only) through the milestones, each expandable.",
+        "use": "Our story page, from the milestones published in the admin.",
+        "a11y": "Without animation (reduced motion, Save-Data): a plain timeline with the trail already drawn, everything readable. No scroll pinning."
+      },
+      "councilcard": {
+        "name": "Council card",
+        "desc": "A person (photo, name, title, term) or, without recorded consent, the role alone.",
+        "use": "Pastors and Council page, grouped by role.",
+        "a11y": "No personal data is sent to the browser without consent."
+      },
+      "liveswap": {
+        "name": "Filters without reload",
+        "desc": "On the agenda, departments and news, changing view, filter or page replaces only the results; the address and Back button follow.",
+        "use": "data-live-area region, data-live-nav links (data-live-scroll for pagination).",
+        "a11y": "Without JavaScript they are plain links. Focus and scroll position are kept."
       }
     },
     "rules": {

@@ -27,6 +27,7 @@
     "@eec/module-events": "workspace:*",
     "@eec/module-members": "workspace:*",
     "@eec/module-news": "workspace:*",
+    "@eec/module-story": "workspace:*",
     "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",
     "@eec/modules-kit": "workspace:*",

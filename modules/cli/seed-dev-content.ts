@@ -12,6 +12,7 @@ import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
+import { councilMembers, historyMilestones, pageSlots } from '@eec/module-story/schema'
 import { and, eq, like } from 'drizzle-orm'
 
 assertBranch(['dev'])
@@ -24,6 +25,9 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
+  await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
+  await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
+  await db.delete(pageSlots).where(like(pageSlots.valueFr, 'Exemple —%'))
   await db.delete(guides).where(like(guides.slug, 'exemple-%'))
   await db.delete(groups).where(like(groups.key, 'exemple-%')) // their pages and people go with them
   console.log('Example posts, events and groups removed.')
@@ -447,6 +451,42 @@ if (demo) {
     ),
   )
 }
+// Story pages: five fictional milestones (no dates, no facts), council people with and without consent, one slot.
+await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
+await db.insert(historyMilestones).values(
+  [
+    'Les débuts',
+    'Une première étape',
+    'Un temps de croissance',
+    'Un nouveau chapitre',
+    'Aujourd’hui',
+  ].map((title, i) => ({
+    year: `Exemple ${i + 1}`,
+    titleFr: `Exemple — ${title}`,
+    textFr: lorem,
+    mediaId: i % 2 === 0 ? (photos[i]?.id ?? null) : null,
+    sortOrder: i,
+    state: 'published',
+  })),
+)
+await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
+await db.insert(councilMembers).values([
+  {
+    name: 'Exemple — Personne qui a consenti',
+    roleKey: 'pasteur_titulaire',
+    titleFr: 'Titre d’exemple',
+    publicConsent: true,
+    consentAt: new Date(),
+    sortOrder: 0,
+  },
+  {
+    name: 'Exemple — Personne sans consentement',
+    roleKey: 'anciens',
+    titleFr: 'Ancien d’exemple',
+    sortOrder: 0,
+  },
+  { name: 'Exemple — Autre personne sans consentement', roleKey: 'diacres', sortOrder: 0 },
+])
 console.log(
   `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
 )

@@ -14,6 +14,7 @@ import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
 import { scheduleModule } from '@eec/module-schedule'
 import { settingsModule } from '@eec/module-settings'
+import { storyModule } from '@eec/module-story'
 import type { DefinedModule } from '@eec/modules-kit'
 
 export const modules: readonly DefinedModule[] = [
@@ -27,6 +28,7 @@ export const modules: readonly DefinedModule[] = [
   liturgyModule,
   departmentsModule,
   guidesModule,
+  storyModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

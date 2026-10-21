@@ -80,7 +80,14 @@ Google sign-in: members can link Google to an existing password account; staff a
   recorded consent (name/photo public only with it), public index with audience filter + « Où est ta place ? » quiz
   (editable in admin, nothing stored), group page (approved times, latest news, next events, contact). Dev seed adds
   fictional « Exemple — » groups. Next in C: guides, page slots + history climb, council.
-- Not yet: `/_brand` entries for flip-time cards, table picker, department card/quiz.
+- **C · guides: done (dev)** (migration 0013): steps checklist with browser-only ticks, print view, admin editor. « Poser
+  une question » points to « Nous trouver » until the contact form exists (D).
+- **C · story pages: done (dev)** (module `story`, migration 0014): content slots (histoire intro/closing line, croyances
+  intro, pasteurs governance), history milestones with the « Gravir la colline » trail (GSAP on that page only), council with
+  recorded consent. Drafts by default; editing without `story:publish` takes a text back to draft.
+- Not yet in C: home hero texts / invitation / key figures as slots (still `lib/stats.ts` + i18n); 03b D (search, contact,
+  giving, Nous trouver, legal, launch readiness).
+- `/_brand` entries added for the new components.
 
 ## Round 5 UI (2026-10-21, Joël's feedback before B approval)
 - Home « Ce dimanche » smaller with time tile; cherry blossom keeps its white flowers (recoloured to our palette; its background layer had been dropped). Immersive « Ce dimanche » page.
