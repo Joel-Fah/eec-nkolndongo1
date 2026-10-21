@@ -1761,6 +1761,12 @@
       "reason_publish": "Publication",
       "reason_before-restore": "Avant une restauration",
       "reason_save": "Enregistrement"
+    },
+    "guard": {
+      "title": "Abandonner la saisie ?",
+      "text": "Ce que vous avez rempli n’est pas enregistré. Si vous quittez maintenant, vous le perdrez.",
+      "stay": "Continuer à remplir",
+      "leave": "Abandonner"
     }
   }
 }

@@ -15,9 +15,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@base-ui/react": "1.9.0",
     "@eec/admin-kit": "workspace:*",
     "@eec/api-kit": "workspace:*",
     "@eec/auth": "workspace:*",
+    "@eec/content-kit": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/db": "workspace:*",
     "@eec/i18n": "workspace:*",
@@ -27,8 +29,7 @@
     "drizzle-orm": "0.45.4",
     "hono": "4.13.13",
     "react": "catalog:",
-    "zod": "4.6.7",
-    "@base-ui/react": "1.9.0"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261016.1",

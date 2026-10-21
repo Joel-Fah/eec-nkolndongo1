@@ -38,9 +38,22 @@ describe('schedule input', () => {
       }).success,
     ).toBe(true)
     expect(
-      excBody.safeParse({ date, slotId: '11111111-1111-4111-8111-111111111111', kind: 'moved', toDate: date, noteFr: 'x' }).success,
+      excBody.safeParse({
+        date,
+        slotId: '11111111-1111-4111-8111-111111111111',
+        kind: 'moved',
+        toDate: date,
+        noteFr: 'x',
+      }).success,
     ).toBe(false)
-    expect(excBody.safeParse({ date, slotId: '11111111-1111-4111-8111-111111111111', kind: 'moved', noteFr: 'x' }).success).toBe(false)
+    expect(
+      excBody.safeParse({
+        date,
+        slotId: '11111111-1111-4111-8111-111111111111',
+        kind: 'moved',
+        noteFr: 'x',
+      }).success,
+    ).toBe(false)
     expect(excBody.safeParse({ date, slotId: null, kind: 'changed' }).success).toBe(false)
     expect(
       excBody.safeParse({ date, slotId: null, kind: 'changed', startTime: '16:00' }).success,

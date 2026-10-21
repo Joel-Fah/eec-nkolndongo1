@@ -26,6 +26,7 @@ import {
   expandOccurrences,
   type IcsEvent,
   MAX_WINDOW_DAYS,
+  nextOccurrence,
   type Occurrence,
   plainText,
   publishProblems,
@@ -243,26 +244,31 @@ const schedulable = (r: Row): Schedulable => ({
   exceptions: r.exceptions ?? [],
 })
 
-const adminDto = (r: Row, groupName?: string | null) => ({
-  id: r.id,
-  slug: r.slug,
-  status: statusOf(lifecycleOf(r)),
-  groupId: r.groupId,
-  groupName: groupName ?? null,
-  publishAt: r.publishAt,
-  unpublishAt: r.unpublishAt,
-  featured: r.featured,
-  kind: r.kind,
-  titleFr: r.titleFr,
-  titleEn: r.titleEn,
-  startsAt: r.startsAt,
-  endsAt: r.endsAt,
-  allDay: r.allDay,
-  timezone: r.timezone,
-  recurrence: r.recurrence,
-  exceptions: r.exceptions,
-  updatedAt: r.updatedAt,
-})
+const adminDto = (r: Row, groupName?: string | null) => {
+  const next = nextOccurrence(schedulable(r), new Date(Date.now() - 3_600_000))
+  return {
+    id: r.id,
+    slug: r.slug,
+    status: statusOf(lifecycleOf(r)),
+    groupId: r.groupId,
+    groupName: groupName ?? null,
+    publishAt: r.publishAt,
+    unpublishAt: r.unpublishAt,
+    featured: r.featured,
+    kind: r.kind,
+    titleFr: r.titleFr,
+    titleEn: r.titleEn,
+    startsAt: r.startsAt,
+    endsAt: r.endsAt,
+    allDay: r.allDay,
+    timezone: r.timezone,
+    recurrence: r.recurrence,
+    exceptions: r.exceptions,
+    updatedAt: r.updatedAt,
+    nextAt: next?.startsAt.toISOString() ?? null,
+    nextEndsAt: next?.endsAt?.toISOString() ?? null,
+  }
+}
 
 const windowOf = (from: string | undefined, to: string | undefined, defaultDays: number) => {
   const start =
@@ -593,6 +599,7 @@ export const eventsApi = new Hono<AppEnv>()
           cancelled: o.cancelled,
           moved: o.moved,
           recurring: !!row.recurrence,
+          kind: row.kind,
         })),
       )
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))

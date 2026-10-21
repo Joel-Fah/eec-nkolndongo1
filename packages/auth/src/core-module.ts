@@ -78,6 +78,15 @@ export const systemRoles = [
     grants: ['core:groups-read', 'news:read', 'news:edit', 'news:publish'],
   },
   {
+    key: 'pasteur',
+    fr: 'Pasteur',
+    en: 'Pastor',
+    descFr:
+      'Un pasteur ou une pasteure. Sans droit d’administration : sert à proposer les noms pour la prédication.',
+    descEn: 'A pastor. No admin rights: used to suggest names for preaching.',
+    grants: [] as string[],
+  },
+  {
     key: 'responsable-groupe',
     fr: 'Responsable de groupe',
     en: 'Group leader',

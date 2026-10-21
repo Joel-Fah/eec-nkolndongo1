@@ -154,6 +154,30 @@
     "group": "Groupe : {name}",
     "featured": "À la une",
     "directions": "Itinéraire",
-    "directions_soon": "Bientôt : nous trouver"
-  }
+    "directions_soon": "Bientôt : nous trouver",
+    "kind_culte": "Culte",
+    "kind_etude": "Étude biblique",
+    "kind_priere": "Prière",
+    "kind_reunion": "Réunion",
+    "kind_fete": "Fête",
+    "kind_retraite": "Retraite",
+    "kind_sortie": "Sortie",
+    "kind_concert": "Concert",
+    "kind_formation": "Formation",
+    "kind_autre": "Autre"
+  },
+  "no_next": "Sans date à venir",
+  "continues": "suite",
+  "last_day": "Dernier jour (facultatif)",
+  "kind": "Type d’événement",
+  "kind_culte": "Culte",
+  "kind_etude": "Étude biblique",
+  "kind_priere": "Prière",
+  "kind_reunion": "Réunion",
+  "kind_fete": "Fête",
+  "kind_retraite": "Retraite",
+  "kind_sortie": "Sortie",
+  "kind_concert": "Concert",
+  "kind_formation": "Formation",
+  "kind_autre": "Autre"
 }

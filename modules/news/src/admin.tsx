@@ -12,12 +12,13 @@ import {
   StatusBadge,
   useAutosave,
 } from '@eec/content-kit'
-import { type Doc, EMPTY_DOC, isEmptyDoc, publishProblems, type Status } from '@eec/core'
+import { type Doc, EMPTY_DOC, isEmptyDoc, publishProblems, type Status, shortDate } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
 import {
   Badge,
   Button,
   EmptyState,
+  Icon,
   SelectField,
   SwitchField,
   TabsBox,
@@ -103,8 +104,7 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
     },
     onError: () => say(t(k('error')), 'danger'),
   })
-  const fmt = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(iso))
+  const fmt = (iso: string) => shortDate(iso, locale)
   const counts = list.data?.counts
 
   return (
@@ -295,7 +295,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
     unpublishAt: null,
   })
   const fmt = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(iso))
+    `${shortDate(iso, locale)} · ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Douala' }).format(new Date(iso))}`
   const siteUrl = `/${locale}/${locale === 'fr' ? 'actualites/nouvelles' : 'news/latest'}/${draft.slug}/`
   const editor = (lang: 'Fr' | 'En') => {
     const body = (lang === 'Fr' ? draft.bodyFr : draft.bodyEn) ?? EMPTY_DOC
@@ -336,7 +336,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" onClick={() => autosave.flush().finally(onBack)}>
-          ← {t(k('back'))}
+          <Icon name="chevronLeft" size={20} />
+          {t(k('back'))}
         </Button>
         <div className="flex flex-wrap items-center gap-3">
           <SaveIndicator state={autosave.state} />

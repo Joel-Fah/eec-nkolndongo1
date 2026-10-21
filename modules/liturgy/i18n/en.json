@@ -85,5 +85,25 @@
     "unavailable_t": "This page is not loading right now",
     "unavailable_p": "This is not your fault. Please try again in a moment.",
     "retry": "Try again"
-  }
+  },
+  "view_grid": "Grid",
+  "view_list": "List",
+  "add_sunday": "Add a Sunday",
+  "pick_date": "Which Sunday?",
+  "not_sunday": "This date is not a Sunday.",
+  "load_more": "Show 8 more Sundays",
+  "section_details": "Details",
+  "section_readings": "Readings",
+  "section_people": "People",
+  "section_more": "Hymns and notes",
+  "save_draft": "Save draft",
+  "publish_now": "Publish on the site",
+  "preacher_help": "Pick a suggested pastor, or type a name (a guest, another member).",
+  "status_published": "Published on the site",
+  "status_draft": "Draft: not visible yet",
+  "close": "Close",
+  "name_suffix": "Suggested name: {name}",
+  "edit_week": "Edit this Sunday",
+  "lang_fr": "Français",
+  "lang_en": "English"
 }

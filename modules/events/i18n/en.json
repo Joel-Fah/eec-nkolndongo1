@@ -154,6 +154,30 @@
     "group": "Group: {name}",
     "featured": "Featured",
     "directions": "Directions",
-    "directions_soon": "Soon: find us"
-  }
+    "directions_soon": "Soon: find us",
+    "kind_culte": "Service",
+    "kind_etude": "Bible study",
+    "kind_priere": "Prayer",
+    "kind_reunion": "Meeting",
+    "kind_fete": "Feast",
+    "kind_retraite": "Retreat",
+    "kind_sortie": "Outing",
+    "kind_concert": "Concert",
+    "kind_formation": "Training",
+    "kind_autre": "Other"
+  },
+  "no_next": "No upcoming date",
+  "continues": "continues",
+  "last_day": "Last day (optional)",
+  "kind": "Event type",
+  "kind_culte": "Service",
+  "kind_etude": "Bible study",
+  "kind_priere": "Prayer",
+  "kind_reunion": "Meeting",
+  "kind_fete": "Feast",
+  "kind_retraite": "Retreat",
+  "kind_sortie": "Outing",
+  "kind_concert": "Concert",
+  "kind_formation": "Training",
+  "kind_autre": "Other"
 }

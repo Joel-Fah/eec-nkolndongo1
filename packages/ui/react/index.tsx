@@ -345,6 +345,28 @@ export function TooltipTip({ text, children }: { text: string; children: ReactNo
   )
 }
 
+/** A Hugeicons stroke-rounded icon (decorative; pass `label` to name it). */
+export function Icon({
+  name,
+  size = 20,
+  label,
+}: {
+  name: IconName
+  size?: 16 | 20 | 24
+  label?: string
+}) {
+  return (
+    <span
+      className="inline-flex"
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: our own icon markup, no user data
+      dangerouslySetInnerHTML={{ __html: iconSvg(name, { size }) }}
+    />
+  )
+}
+
 /** « Mod+Shift+B » → ⌘ ⇧ B on Apple devices, Ctrl Shift B elsewhere. */
 export function shortcutKeys(shortcut: string): string[] {
   const apple =
@@ -397,7 +419,11 @@ export function ShortcutTip({
 }
 
 /* ── Tabs, accordion ──────────────────────────────────────────────────── */
-export function TabsBox({ tabs }: { tabs: { id: string; label: string; content: ReactNode }[] }) {
+export function TabsBox({
+  tabs,
+}: {
+  tabs: { id: string; label: ReactNode; content: ReactNode }[]
+}) {
   return (
     <Tabs.Root defaultValue={tabs[0]?.id}>
       <Tabs.List className="tabs-list">

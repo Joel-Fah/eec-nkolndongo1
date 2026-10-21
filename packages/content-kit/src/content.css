@@ -300,6 +300,67 @@
   opacity: 0.7;
 }
 /* Month calendar (admin). */
+.mcal-layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .mcal-layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+  .mcal-side {
+    position: sticky;
+    inset-block-start: 1rem;
+  }
+}
+.mcal-flip {
+  display: inline-flex;
+  transform: scaleX(-1);
+}
+.week-head {
+  font-family: var(--font-display);
+  font-size: var(--text-lg, 1.125rem);
+  color: var(--ink-muted);
+}
+.kind-tile {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.kind-tile[data-tone="info"] {
+  background: var(--info-soft, var(--primary-soft));
+  color: var(--info, var(--primary));
+}
+.kind-tile[data-tone="gold"] {
+  background: var(--gold-soft, var(--primary-soft));
+  color: var(--gold-deep, var(--ink));
+}
+.kind-tile[data-tone="clay"] {
+  background: color-mix(in oklab, var(--clay) 18%, var(--surface));
+  color: var(--clay);
+}
+.kind-tile[data-tone="success"] {
+  background: var(--success-soft, var(--primary-soft));
+  color: var(--success, var(--primary));
+}
+.mcal-head[data-sunday],
+.mcal-day[data-sunday] {
+  background: color-mix(in oklab, var(--gold) 16%, var(--surface-2));
+}
+.mcal-head[data-sunday] {
+  background: transparent;
+  color: var(--gold-deep, var(--ink));
+}
+.mcal-chip[data-cont] {
+  opacity: 0.8;
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+}
 .mcal {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -453,4 +514,96 @@
 .rte-content ul[data-type="taskList"] li[data-checked="true"] > div {
   color: var(--ink-muted);
   text-decoration: line-through;
+}
+
+.seg-icon {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.75rem;
+  padding-inline: 0.5rem;
+}
+.sr-only-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.slot-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+}
+.slot-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem 1rem;
+  align-content: start;
+  padding: 1.25rem;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.slot-card-actions {
+  grid-column: 1 / -1;
+}
+.form-group {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.form-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-end: 0.5rem;
+  font-weight: 600;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+.form-actions-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sunday-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+}
+.sunday-card-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+  cursor: pointer;
+}
+.sunday-card-admin[data-current] {
+  box-shadow:
+    inset 0 0 0 2px var(--primary),
+    var(--elevation-1);
+}
+.sunday-card-admin:hover {
+  background: var(--primary-soft);
 }

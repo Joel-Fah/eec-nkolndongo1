@@ -85,5 +85,25 @@
     "unavailable_t": "Cette page ne se charge pas pour l’instant",
     "unavailable_p": "Ce n’est pas de votre fait. Réessayez dans un moment.",
     "retry": "Réessayer"
-  }
+  },
+  "view_grid": "Grille",
+  "view_list": "Liste",
+  "add_sunday": "Ajouter un dimanche",
+  "pick_date": "Quel dimanche ?",
+  "not_sunday": "Cette date n’est pas un dimanche.",
+  "load_more": "Voir 8 dimanches de plus",
+  "section_details": "Détails",
+  "section_readings": "Lectures",
+  "section_people": "Personnes",
+  "section_more": "Cantiques et notes",
+  "save_draft": "Enregistrer le brouillon",
+  "publish_now": "Publier sur le site",
+  "preacher_help": "Choisissez un pasteur proposé, ou écrivez un nom (un invité, un autre membre).",
+  "status_published": "Publié sur le site",
+  "status_draft": "Brouillon : pas encore visible",
+  "close": "Fermer",
+  "name_suffix": "Nom proposé : {name}",
+  "edit_week": "Modifier ce dimanche",
+  "lang_fr": "Français",
+  "lang_en": "English"
 }

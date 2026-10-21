@@ -573,6 +573,9 @@ importers:
       '@eec/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@eec/content-kit':
+        specifier: workspace:*
+        version: link:../../packages/content-kit
       '@eec/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -841,6 +844,9 @@ importers:
       '@eec/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@eec/content-kit':
+        specifier: workspace:*
+        version: link:../../packages/content-kit
       '@eec/core':
         specifier: workspace:*
         version: link:../../packages/core

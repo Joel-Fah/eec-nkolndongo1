@@ -25,6 +25,7 @@ import {
   sundaysFrom,
 } from '@eec/core'
 import type { Db } from '@eec/db'
+import { roles, user, userRoles } from '@eec/db/schema'
 import { and, asc, desc, eq, gte, isNull, lte } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -266,6 +267,19 @@ export const liturgyApi = new Hono<AppEnv>()
         entry: rows.find((r) => r.date === d) ?? null,
       })),
     })
+  })
+  // Names to suggest for the preacher: people given the « Pasteur » role. Free text stays possible (a guest, another member).
+  .get('/people', requirePermission('liturgy:read'), async (c) => {
+    const db = await c.var.deps.db()
+    const rows = await db
+      .select({ name: user.name })
+      .from(userRoles)
+      .innerJoin(roles, eq(roles.id, userRoles.roleId))
+      .innerJoin(user, eq(user.id, userRoles.userId))
+      .where(eq(roles.key, 'pasteur'))
+      .orderBy(asc(user.name))
+      .limit(100)
+    return c.json({ names: [...new Set(rows.map((r) => r.name).filter(Boolean))] })
   })
   .put('/sundays/:date', requirePermission('liturgy:edit'), async (c) => {
     const d = c.req.param('date')

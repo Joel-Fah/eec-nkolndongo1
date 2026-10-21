@@ -1761,6 +1761,12 @@
       "reason_publish": "Publication",
       "reason_before-restore": "Before a restore",
       "reason_save": "Save"
+    },
+    "guard": {
+      "title": "Discard what you typed?",
+      "text": "What you filled in is not saved. If you leave now, you will lose it.",
+      "stay": "Keep filling",
+      "leave": "Discard"
     }
   }
 }

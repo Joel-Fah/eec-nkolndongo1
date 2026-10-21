@@ -12,23 +12,34 @@ import {
   SaveIndicator,
   StatusBadge,
   useAutosave,
+  ViewToggle,
 } from '@eec/content-kit'
 import {
   type Doc,
+  daysBetween,
   EMPTY_DOC,
+  EVENT_KIND_STYLE,
+  EVENT_KINDS,
+  type EventKind,
   type Exception,
   expandOccurrences,
   localParts,
   publishProblems,
   type Recurrence,
   type Status,
+  shortDate,
+  spanDays,
+  weekLabel,
+  weekOf,
   zonedToUtc,
 } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
+import type { IconName } from '@eec/ui/icons'
 import {
   Badge,
   Button,
   EmptyState,
+  Icon,
   SelectField,
   SwitchField,
   TabsBox,
@@ -49,6 +60,7 @@ type Item = {
   publishAt: string | null
   unpublishAt: string | null
   featured: boolean
+  kind: string
   titleFr: string
   titleEn: string
   startsAt: string
@@ -58,6 +70,8 @@ type Item = {
   recurrence: Recurrence | null
   exceptions: Exception[]
   updatedAt: string
+  nextAt: string | null
+  nextEndsAt: string | null
 }
 type Full = Item & {
   descriptionFr: Doc
@@ -87,6 +101,7 @@ type Draft = Pick<
   | 'coverMediaId'
   | 'groupId'
   | 'featured'
+  | 'kind'
   | 'slug'
 >
 type CalItem = {
@@ -100,6 +115,7 @@ type CalItem = {
   cancelled: boolean
   moved: boolean
   recurring: boolean
+  kind: string
 }
 
 const k = (key: string) => `events.${key}` as MessageKey
@@ -148,6 +164,14 @@ export default function EventsPage() {
 }
 
 /* ── List + calendar ──────────────────────────────────────────────────── */
+const kindOf = (k: string) =>
+  EVENT_KIND_STYLE[(k as EventKind) in EVENT_KIND_STYLE ? (k as EventKind) : 'autre']
+const KindTile = ({ kind }: { kind: string }) => (
+  <span className="kind-tile" data-tone={kindOf(kind).tone} aria-hidden="true">
+    <Icon name={kindOf(kind).icon as IconName} size={20} />
+  </span>
+)
+
 function Home({ onOpen }: { onOpen: (id: string) => void }) {
   const { t, locale } = useLocale()
   const me = useMe().data
@@ -169,19 +193,15 @@ function Home({ onOpen }: { onOpen: (id: string) => void }) {
           <p className="text-ink-muted">{t(k('lead'))}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <fieldset className="seg" aria-label={t(k('title'))}>
-            {(['list', 'calendar'] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                className="seg-btn"
-                aria-pressed={view === v}
-                onClick={() => setView(v)}
-              >
-                {t(k(v === 'list' ? 'view_list' : 'view_calendar'))}
-              </button>
-            ))}
-          </fieldset>
+          <ViewToggle
+            value={view}
+            onChange={setView}
+            label={t(k('title'))}
+            options={[
+              { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
+              { id: 'calendar', label: t(k('view_calendar')), icon: 'calendar' },
+            ]}
+          />
           {hasPermission(me, 'events:edit') && (
             <Button loading={create.isPending} onClick={() => create.mutate()}>
               {t(k('write'))}
@@ -218,14 +238,36 @@ function List({
     queryKey: ['events', params.toString()],
     queryFn: () => api<{ items: Item[]; counts: Record<Status, number> }>(`/events?${params}`),
   })
-  const fmt = (iso: string, allDay: boolean) =>
-    new Intl.DateTimeFormat(
-      locale,
-      allDay
-        ? { dateStyle: 'medium', timeZone: 'UTC' }
-        : { dateStyle: 'medium', timeStyle: 'short', timeZone: TZ },
-    ).format(new Date(iso))
   const counts = list.data?.counts
+  // Grouped by the week of the next date (events with no date left go last), earliest week first.
+  const groups = useMemo(() => {
+    const items = list.data?.items ?? []
+    const map = new Map<string, Item[]>()
+    for (const e of items) {
+      const key = e.nextAt
+        ? weekOf(
+            new Intl.DateTimeFormat('en-CA', { timeZone: e.allDay ? 'UTC' : TZ }).format(
+              new Date(e.nextAt),
+            ),
+          ).from
+        : 'past'
+      map.set(key, [...(map.get(key) ?? []), e])
+    }
+    return [...map.entries()].sort(([a], [b]) =>
+      a === 'past' ? 1 : b === 'past' ? -1 : a.localeCompare(b),
+    )
+  }, [list.data])
+  const when = (e: Item) => {
+    const at = e.nextAt ?? e.startsAt
+    const day = shortDate(at, locale, e.allDay ? 'UTC' : TZ)
+    const time = e.allDay
+      ? ''
+      : ` · ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: TZ }).format(new Date(at))}`
+    const span = spanDays(at, e.nextEndsAt ?? (e.nextAt ? null : e.endsAt), e.allDay, TZ)
+    return span.to !== span.from
+      ? `${day} → ${shortDate(`${span.to}T12:00:00Z`, locale, 'UTC')}`
+      : `${day}${time}`
+  }
   return (
     <>
       <div className="flex flex-wrap items-end gap-3">
@@ -264,26 +306,46 @@ function List({
           )}
         </EmptyState>
       ) : (
-        <ul className="grid gap-2">
-          {(list.data?.items ?? []).map((e) => (
-            <li key={e.id}>
-              <button type="button" className="admin-row news-row" onClick={() => onOpen(e.id)}>
-                <span className="grid text-start">
-                  <strong>{e.titleFr || t(k('untitled'))}</strong>
-                  <span className="text-sm text-ink-muted">
-                    {fmt(e.startsAt, e.allDay)}
-                    {e.recurrence ? ` · ${t(k('repeats'))}` : ''}
-                    {e.groupName ? ` · ${e.groupName}` : ''}
-                  </span>
-                </span>
-                <span className="flex items-center gap-2">
-                  {e.featured && <Badge tone="gold">{t(k('featured'))}</Badge>}
-                  <StatusBadge status={e.status} />
-                </span>
-              </button>
-            </li>
+        <div className="grid gap-5">
+          {groups.map(([week, items]) => (
+            <section
+              key={week}
+              className="grid gap-2"
+              aria-label={week === 'past' ? t(k('no_next')) : weekLabel(week, locale)}
+            >
+              <h2 className="week-head">
+                {week === 'past' ? t(k('no_next')) : weekLabel(week, locale)}
+              </h2>
+              <ul className="grid gap-2">
+                {items.map((e) => (
+                  <li key={e.id}>
+                    <button
+                      type="button"
+                      className="admin-row news-row"
+                      onClick={() => onOpen(e.id)}
+                    >
+                      <span className="flex items-center gap-3 text-start">
+                        <KindTile kind={e.kind} />
+                        <span className="grid">
+                          <strong>{e.titleFr || t(k('untitled'))}</strong>
+                          <span className="text-sm text-ink-muted">
+                            {when(e)}
+                            {e.recurrence ? ` · ${t(k('repeats'))}` : ''}
+                            {e.groupName ? ` · ${e.groupName}` : ''}
+                          </span>
+                        </span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        {e.featured && <Badge tone="gold">{t(k('featured'))}</Badge>}
+                        <StatusBadge status={e.status} />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
     </>
   )
@@ -292,8 +354,9 @@ function List({
 function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
   const { t, locale } = useLocale()
   const now = new Date()
+  const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(now)
   const [ym, setYm] = useState({ y: now.getFullYear(), m: now.getMonth() })
-  const [day, setDay] = useState<string | null>(null)
+  const [day, setDay] = useState<string>(todayKey)
   const first = new Date(Date.UTC(ym.y, ym.m, 1))
   const lead = (first.getUTCDay() + 6) % 7 // Monday first
   const gridStart = new Date(Date.UTC(ym.y, ym.m, 1 - lead))
@@ -304,13 +367,13 @@ function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
     queryFn: () =>
       api<{ items: CalItem[] }>(`/events/calendar?from=${iso(gridStart)}&to=${iso(gridEnd)}`),
   })
+  // An event covering several days appears on each of them.
   const byDay = useMemo(() => {
-    const map = new Map<string, CalItem[]>()
+    const map = new Map<string, (CalItem & { first: boolean; last: boolean })[]>()
     for (const it of cal.data?.items ?? []) {
-      const key = new Intl.DateTimeFormat('en-CA', { timeZone: it.allDay ? 'UTC' : TZ }).format(
-        new Date(it.startsAt),
-      )
-      map.set(key, [...(map.get(key) ?? []), it])
+      const span = spanDays(it.startsAt, it.endsAt, it.allDay, TZ)
+      for (const d of daysBetween(span.from, span.to))
+        map.set(d, [...(map.get(d) ?? []), { ...it, first: d === span.from, last: d === span.to }])
     }
     return map
   }, [cal.data])
@@ -324,7 +387,6 @@ function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
       new Date(Date.UTC(2026, 0, 5 + i)),
     ),
   )
-  const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(now)
   const timeOf = (it: CalItem) =>
     it.allDay
       ? ''
@@ -335,114 +397,124 @@ function MonthView({ onOpen }: { onOpen: (id: string) => void }) {
         }).format(new Date(it.startsAt))
   const shift = (n: number) =>
     setYm((c) => ({ y: c.y + Math.floor((c.m + n) / 12), m: (c.m + n + 12) % 12 }))
-  const selected = day ? (byDay.get(day) ?? []) : []
+  const selected = byDay.get(day) ?? []
   return (
-    <div className="admin-panel">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl capitalize">{monthName}</h2>
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => shift(-1)}
-            aria-label={t(k('prev_month'))}
-          >
-            ←
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setYm({ y: now.getFullYear(), m: now.getMonth() })
-              setDay(todayKey)
-            }}
-          >
-            {t(k('today'))}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => shift(1)}
-            aria-label={t(k('next_month'))}
-          >
-            →
-          </Button>
-        </div>
-      </div>
-      <div className="mcal">
-        {weekdays.map((w) => (
-          <div key={w} className="mcal-head" aria-hidden="true">
-            {w}
+    <div className="mcal-layout">
+      <div className="admin-panel">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xl capitalize">{monthName}</h2>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => shift(-1)}
+              aria-label={t(k('prev_month'))}
+            >
+              <Icon name="chevronLeft" size={20} />
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setYm({ y: now.getFullYear(), m: now.getMonth() })
+                setDay(todayKey)
+              }}
+            >
+              {t(k('today'))}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => shift(1)}
+              aria-label={t(k('next_month'))}
+            >
+              <span className="mcal-flip">
+                <Icon name="chevronLeft" size={20} />
+              </span>
+            </Button>
           </div>
-        ))}
-        {Array.from({ length: 42 }, (_, i) => {
-          const d = new Date(gridStart.getTime() + i * 86_400_000)
-          const key = iso(d)
-          const items = byDay.get(key) ?? []
-          return (
-            <button
-              key={key}
-              type="button"
-              className="mcal-day"
-              data-out={d.getUTCMonth() !== ym.m ? '' : undefined}
-              data-today={key === todayKey ? '' : undefined}
-              aria-pressed={day === key}
-              aria-label={`${new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(d)}${items.length ? `, ${items.length}` : ''}`}
-              onClick={() => setDay(key)}
-            >
-              <span className="mcal-num">{d.getUTCDate()}</span>
-              <span className="mcal-chips">
-                {items.slice(0, 3).map((it) => (
-                  <span
-                    key={`${it.id}-${it.startsAt}`}
-                    className="mcal-chip"
-                    data-status={it.status}
-                    data-cancelled={it.cancelled ? '' : undefined}
-                  >
-                    {timeOf(it)} {it.title}
-                  </span>
-                ))}
-                {items.length > 3 && (
-                  <span className="mcal-more">{t(k('more'), { n: String(items.length - 3) })}</span>
-                )}
-              </span>
-              {items.length > 0 && (
-                <span className="mcal-dots" aria-hidden="true">
-                  {'•'.repeat(Math.min(items.length, 3))}
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </div>
-      {day && (
-        <div className="grid gap-2">
-          <h3 className="text-lg">
-            {new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
-              new Date(`${day}T00:00:00Z`),
-            )}
-          </h3>
-          {selected.length === 0 && <p className="text-ink-muted">{t(k('day_empty'))}</p>}
-          {selected.map((it) => (
-            <button
-              key={`${it.id}-${it.startsAt}`}
-              type="button"
-              className="admin-row news-row"
-              onClick={() => onOpen(it.id)}
-            >
-              <span className="grid text-start">
-                <strong data-struck={it.cancelled ? '' : undefined}>{it.title}</strong>
-                <span className="text-sm text-ink-muted">
-                  {timeOf(it) || '—'}
-                  {it.cancelled ? ` · ${t(k('cancelled'))}` : ''}
-                  {it.moved ? ` · ${t(k('moved'))}` : ''}
-                </span>
-              </span>
-              <StatusBadge status={it.status} />
-            </button>
-          ))}
         </div>
-      )}
+        <div className="mcal">
+          {weekdays.map((w, i) => (
+            <div
+              key={w}
+              className="mcal-head"
+              data-sunday={i === 6 ? '' : undefined}
+              aria-hidden="true"
+            >
+              {w}
+            </div>
+          ))}
+          {Array.from({ length: 42 }, (_, i) => {
+            const d = new Date(gridStart.getTime() + i * 86_400_000)
+            const key = iso(d)
+            const items = byDay.get(key) ?? []
+            return (
+              <button
+                key={key}
+                type="button"
+                className="mcal-day"
+                data-out={d.getUTCMonth() !== ym.m ? '' : undefined}
+                data-today={key === todayKey ? '' : undefined}
+                data-sunday={d.getUTCDay() === 0 ? '' : undefined}
+                aria-pressed={day === key}
+                aria-label={`${shortDate(d, locale, 'UTC')}${items.length ? `, ${items.length}` : ''}`}
+                onClick={() => setDay(key)}
+              >
+                <span className="mcal-num">{d.getUTCDate()}</span>
+                <span className="mcal-chips">
+                  {items.slice(0, 3).map((it) => (
+                    <span
+                      key={`${it.id}-${it.startsAt}`}
+                      className="mcal-chip"
+                      data-status={it.status}
+                      data-cancelled={it.cancelled ? '' : undefined}
+                      data-cont={!it.first ? '' : undefined}
+                    >
+                      {it.first ? `${timeOf(it)} ${it.title}` : `↳ ${it.title}`}
+                    </span>
+                  ))}
+                  {items.length > 3 && (
+                    <span className="mcal-more">
+                      {t(k('more'), { n: String(items.length - 3) })}
+                    </span>
+                  )}
+                </span>
+                {items.length > 0 && (
+                  <span className="mcal-dots" aria-hidden="true">
+                    {'•'.repeat(Math.min(items.length, 3))}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <aside className="admin-panel mcal-side" aria-live="polite">
+        <h3 className="text-lg">{shortDate(`${day}T12:00:00Z`, locale, 'UTC')}</h3>
+        {selected.length === 0 && <p className="text-ink-muted">{t(k('day_empty'))}</p>}
+        <ul className="grid gap-2">
+          {selected.map((it) => (
+            <li key={`${it.id}-${it.startsAt}`}>
+              <button type="button" className="admin-row news-row" onClick={() => onOpen(it.id)}>
+                <span className="flex items-center gap-3 text-start">
+                  <KindTile kind={it.kind} />
+                  <span className="grid">
+                    <strong data-struck={it.cancelled ? '' : undefined}>{it.title}</strong>
+                    <span className="text-sm text-ink-muted">
+                      {timeOf(it) || t(k('all_day'))}
+                      {!it.first ? ` · ${t(k('continues'))}` : ''}
+                      {it.cancelled ? ` · ${t(k('cancelled'))}` : ''}
+                      {it.moved ? ` · ${t(k('moved'))}` : ''}
+                    </span>
+                  </span>
+                </span>
+                <StatusBadge status={it.status} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </aside>
     </div>
   )
 }
@@ -487,6 +559,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
       coverMediaId: r.coverMediaId,
       groupId: r.groupId,
       featured: r.featured,
+      kind: r.kind,
       slug: r.slug,
     }
     saved.current = d
@@ -597,15 +670,15 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
     publishAt: null,
     unpublishAt: null,
   })
-  const fmt = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(iso))
+  const clock = (iso: string, zone: string) =>
+    new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: zone }).format(
+      new Date(iso),
+    )
+  const fmt = (iso: string) => `${shortDate(iso, locale, TZ)} · ${clock(iso, TZ)}`
   const fmtOcc = (iso: string) =>
-    new Intl.DateTimeFormat(
-      locale,
-      draft.allDay
-        ? { dateStyle: 'full', timeZone: 'UTC' }
-        : { dateStyle: 'full', timeStyle: 'short', timeZone: tz },
-    ).format(new Date(iso))
+    draft.allDay
+      ? shortDate(iso, locale, 'UTC')
+      : `${shortDate(iso, locale, tz)} · ${clock(iso, tz)}`
   const siteUrl = `/${locale}/${locale === 'fr' ? 'agenda/evenements' : 'calendar/events'}/${draft.slug}/`
   const endBad = draft.endsAt !== null && draft.endsAt < draft.startsAt
   const r = draft.recurrence
@@ -672,7 +745,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" onClick={() => autosave.flush().finally(onBack)}>
-          ← {t(k('back'))}
+          <Icon name="chevronLeft" size={20} />
+          {t(k('back'))}
         </Button>
         <div className="flex flex-wrap items-center gap-3">
           <SaveIndicator state={autosave.state} />
@@ -698,7 +772,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
               checked={draft.allDay}
               onCheckedChange={(v: boolean) => {
                 set('allDay', v)
-                if (v) set('endsAt', null)
+                // The end changes meaning: a last day (inclusive) instead of an end time.
+                set('endsAt', null)
               }}
             />
             <div className="grid gap-4 sm:grid-cols-2">
@@ -715,17 +790,20 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                   }}
                 />
               </label>
-              {!draft.allDay && (
+              {
                 <label className="grid gap-1">
-                  <span className="field-label">{t(k('ends'))}</span>
+                  <span className="field-label">{t(k(draft.allDay ? 'last_day' : 'ends'))}</span>
                   <input
                     className="input"
-                    type="datetime-local"
-                    value={draft.endsAt ? toInput(draft.endsAt, tz, false) : ''}
+                    type={draft.allDay ? 'date' : 'datetime-local'}
+                    value={draft.endsAt ? toInput(draft.endsAt, tz, draft.allDay) : ''}
                     disabled={!canEdit}
                     aria-invalid={endBad}
                     onChange={(e) =>
-                      set('endsAt', e.target.value ? fromInput(e.target.value, tz, false) : null)
+                      set(
+                        'endsAt',
+                        e.target.value ? fromInput(e.target.value, tz, draft.allDay) : null,
+                      )
                     }
                   />
                   {endBad && (
@@ -734,7 +812,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                     </span>
                   )}
                 </label>
-              )}
+              }
             </div>
 
             <SelectField
@@ -1045,6 +1123,12 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
           </div>
 
           <div className="admin-panel">
+            <SelectField
+              label={t(k('kind'))}
+              value={draft.kind}
+              onValueChange={(v) => v && set('kind', v as EventKind)}
+              options={EVENT_KINDS.map((x) => ({ value: x, label: t(k(`kind_${x}`)) }))}
+            />
             <SelectField
               label={t(k('place'))}
               value={draft.locationKind}
