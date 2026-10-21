@@ -16,6 +16,8 @@ export const eventsItems = pgTable(
     unpublishAt: tz('unpublish_at'),
     firstPublishedAt: tz('first_published_at'),
     featured: boolean('featured').notNull().default(false),
+    /** What kind of event (culte, étude, fête…): one icon and colour per kind. */
+    kind: text('kind').notNull().default('autre'),
     titleFr: text('title_fr').notNull().default(''),
     titleEn: text('title_en').notNull().default(''),
     descriptionFr: jsonb('description_fr').notNull().default({ type: 'doc', content: [] }),

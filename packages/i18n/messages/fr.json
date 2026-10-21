@@ -1714,7 +1714,10 @@
       "group_text": "Texte",
       "group_block": "Paragraphe",
       "group_insert": "Insérer",
-      "group_table": "Tableau"
+      "group_table": "Tableau",
+      "headings": "Titres",
+      "alignments": "Alignement",
+      "paragraph": "Paragraphe"
     },
     "picker": {
       "title": "Choisir une photo",

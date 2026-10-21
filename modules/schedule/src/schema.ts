@@ -1,7 +1,8 @@
 /** The weekly rhythm (services, studies, prayer, office hours) and one-off changes to it. */
+import type { SlotRecurrence } from '@eec/core'
 import { id, timestamps, tz } from '@eec/db/columns'
 import { groups, user } from '@eec/db/schema'
-import { boolean, index, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { boolean, index, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 
 export const scheduleSlots = pgTable(
   'schedule_slots',
@@ -20,6 +21,11 @@ export const scheduleSlots = pgTable(
     notesFr: text('notes_fr').notNull().default(''),
     notesEn: text('notes_en').notNull().default(''),
     sortOrder: integer('sort_order').notNull().default(0),
+    /** null = every week. */
+    recurrence: jsonb('recurrence').$type<SlotRecurrence | null>(),
+    /** A slot that follows another (the preparation, 4 days before the Holy Supper). */
+    anchorSlotId: uuid('anchor_slot_id'),
+    offsetDays: integer('offset_days').notNull().default(0),
     /** Nothing reaches the public site until someone allowed to approve has approved it (like the settings). */
     validated: boolean('validated').notNull().default(false),
     validatedBy: uuid('validated_by').references(() => user.id, { onDelete: 'set null' }),
@@ -36,6 +42,8 @@ export const scheduleExceptions = pgTable(
     id: id(),
     /** Local date, YYYY-MM-DD. */
     date: text('date').notNull(),
+    /** cancelled | changed | extra | moved. For `moved`, the new local date: */
+    toDate: text('to_date'),
     /** null = every service that day. */
     slotId: uuid('slot_id').references(() => scheduleSlots.id, { onDelete: 'cascade' }),
     /** cancelled | changed | extra */

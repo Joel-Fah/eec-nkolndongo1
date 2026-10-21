@@ -2,7 +2,7 @@
  * The weekly rhythm of the parish (services, studies, prayer, office hours) and « what is next ». Pure functions,
  * all in the parish's time zone (Africa/Douala). Only validated slots are ever passed in by the callers.
  */
-import { localParts, zonedToUtc } from './recurrence.ts'
+import { localParts, nthWeekdayOfMonth, type Weekday, zonedToUtc } from './recurrence.ts'
 
 export const SLOT_KINDS = [
   'culte',
@@ -14,6 +14,11 @@ export const SLOT_KINDS = [
   'autre',
 ] as const
 export type SlotKind = (typeof SLOT_KINDS)[number]
+
+/** How often a slot happens: every week (or every N weeks), or on given Sundays/weekdays of the month (« the 2nd »). */
+export type SlotRecurrence =
+  | { freq: 'weekly'; interval?: number }
+  | { freq: 'monthly'; nth: number[] }
 
 export type Slot = {
   id: string
@@ -27,6 +32,11 @@ export type Slot = {
   end: string | null
   placeFr?: string
   placeEn?: string
+  /** null/absent: every week. */
+  recurrence?: SlotRecurrence | null
+  /** A slot that follows another one (the preparation, 4 days before the Holy Supper): it moves with it. */
+  anchorId?: string | null
+  offsetDays?: number
 }
 
 export type SlotException = {
@@ -35,9 +45,11 @@ export type SlotException = {
   date: string
   /** The slot concerned; null for « every service that day ». */
   slotId: string | null
-  kind: 'cancelled' | 'changed' | 'extra'
+  kind: 'cancelled' | 'changed' | 'extra' | 'moved'
   noteFr?: string
   noteEn?: string
+  /** `moved`: the new local date (and optionally new times). */
+  toDate?: string
   /** `changed`: the new times. `extra`: the extra gathering (needs `labelFr`). */
   start?: string
   end?: string | null
@@ -53,6 +65,9 @@ export type ServiceInstance = {
   cancelled: boolean
   changed: boolean
   extra: boolean
+  /** Happening on another day than usual (and the original day). */
+  moved: boolean
+  fromDate?: string
   noteFr?: string
   noteEn?: string
 }
@@ -78,6 +93,82 @@ const at = (date: string, time: string, tz: string) => {
   return zonedToUtc(y, m, d, h, mm, tz)
 }
 
+const weekIndex = (date: string) =>
+  Math.floor((Date.parse(`${date}T00:00:00Z`) / 86_400_000 + 3) / 7) // Monday-based weeks since 1970
+
+/** Does the slot's own rhythm put an occurrence on this local date? */
+function happensOn(slot: Slot, date: string): boolean {
+  const d = new Date(`${date}T00:00:00Z`)
+  if (d.getUTCDay() !== slot.weekday) return false
+  const r = slot.recurrence
+  if (!r || r.freq === 'weekly')
+    return !r?.interval || r.interval <= 1 || weekIndex(date) % r.interval === 0
+  const [y, m, day] = date.split('-').map(Number) as [number, number, number]
+  return r.nth.some((n) => nthWeekdayOfMonth(y, m, n as 1, slot.weekday as Weekday) === day)
+}
+
+type Base = {
+  slot: Slot
+  date: string
+  start: string
+  end: string | null
+  cancelled: boolean
+  changed: boolean
+  moved: boolean
+  fromDate?: string
+  noteFr?: string
+  noteEn?: string
+}
+
+/** The occurrences of a slot with its own rhythm, exceptions applied (moved ones land on their new date). */
+function ownInstances(slot: Slot, exceptions: SlotException[], from: string, to: string): Base[] {
+  const out: Base[] = []
+  // Look a little outside the window: an occurrence can be moved into it from just before or after.
+  for (const date of daysFrom(addDays(from, -14), 14 + daysCount(from, to) + 28)) {
+    if (!happensOn(slot, date)) continue
+    const exc = exceptions.find(
+      (e) => e.date === date && (e.slotId === slot.id || e.slotId === null) && e.kind !== 'extra',
+    )
+    let inst: Base = {
+      slot,
+      date,
+      start: slot.start,
+      end: slot.end,
+      cancelled: false,
+      changed: false,
+      moved: false,
+    }
+    if (exc?.kind === 'cancelled')
+      inst = { ...inst, cancelled: true, noteFr: exc.noteFr, noteEn: exc.noteEn }
+    else if (exc?.kind === 'changed' && exc.start)
+      inst = {
+        ...inst,
+        start: exc.start,
+        end: exc.end ?? null,
+        changed: true,
+        noteFr: exc.noteFr,
+        noteEn: exc.noteEn,
+      }
+    else if (exc?.kind === 'moved' && exc.toDate)
+      inst = {
+        ...inst,
+        date: exc.toDate,
+        fromDate: date,
+        start: exc.start ?? slot.start,
+        end: exc.start ? (exc.end ?? null) : slot.end,
+        moved: true,
+        noteFr: exc.noteFr,
+        noteEn: exc.noteEn,
+      }
+    if (inst.date >= from && inst.date <= to) out.push(inst)
+  }
+  return out
+}
+const daysCount = (a: string, b: string) =>
+  Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000)
+const daysFrom = (first: string, n: number) =>
+  Array.from({ length: n }, (_, i) => addDays(first, i))
+
 /** Every service in the `days` days from `from` (local date), exceptions applied, cancelled ones flagged. */
 export function upcomingServices(
   slots: Slot[],
@@ -86,51 +177,77 @@ export function upcomingServices(
   days: number,
   tz = PARISH_TZ,
 ): ServiceInstance[] {
-  const out: ServiceInstance[] = []
   const first = localDate(from, tz)
-  for (let i = 0; i < days; i++) {
-    const date = addDays(first, i)
-    const weekday = new Date(`${date}T00:00:00Z`).getUTCDay()
-    const dayExc = exceptions.filter((e) => e.date === date)
-    for (const slot of slots.filter((s) => s.weekday === weekday)) {
-      const exc = dayExc.find(
-        (e) => (e.slotId === slot.id || e.slotId === null) && e.kind !== 'extra',
-      )
-      const start = exc?.kind === 'changed' && exc.start ? exc.start : slot.start
-      const end = exc?.kind === 'changed' ? (exc.end ?? null) : slot.end
-      out.push({
-        slot,
-        date,
-        startsAt: at(date, start, tz),
-        endsAt: end ? at(date, end, tz) : null,
-        cancelled: exc?.kind === 'cancelled',
-        changed: exc?.kind === 'changed',
-        extra: false,
-        noteFr: exc?.noteFr,
-        noteEn: exc?.noteEn,
-      })
+  const last = addDays(first, days - 1)
+  const out: ServiceInstance[] = []
+  const push = (b: Base) =>
+    out.push({
+      slot: b.slot,
+      date: b.date,
+      startsAt: at(b.date, b.start, tz),
+      endsAt: b.end ? at(b.date, b.end, tz) : null,
+      cancelled: b.cancelled,
+      changed: b.changed,
+      extra: false,
+      moved: b.moved,
+      fromDate: b.fromDate,
+      noteFr: b.noteFr,
+      noteEn: b.noteEn,
+    })
+  const byId = new Map(slots.map((s) => [s.id, s]))
+  for (const slot of slots) {
+    if (slot.anchorId && byId.has(slot.anchorId)) {
+      // Follows its anchor: the same moves and cancellations apply, shifted by the offset.
+      const anchor = byId.get(slot.anchorId) as Slot
+      for (const a of ownInstances(
+        { ...anchor, anchorId: null },
+        exceptions,
+        addDays(first, -(slot.offsetDays ?? 0) - 7),
+        addDays(last, -(slot.offsetDays ?? 0) + 7),
+      )) {
+        const date = addDays(a.date, slot.offsetDays ?? 0)
+        if (date < first || date > last) continue
+        push({
+          slot,
+          date,
+          start: slot.start,
+          end: slot.end,
+          cancelled: a.cancelled,
+          changed: false,
+          moved: a.moved,
+          fromDate: a.fromDate ? addDays(a.fromDate, slot.offsetDays ?? 0) : undefined,
+          noteFr: a.noteFr,
+          noteEn: a.noteEn,
+        })
+      }
+      continue
     }
-    for (const e of dayExc.filter((x) => x.kind === 'extra' && x.start && x.labelFr)) {
-      out.push({
-        slot: {
-          id: e.id ?? `extra-${date}`,
-          kind: 'autre',
-          labelFr: e.labelFr as string,
-          labelEn: e.labelEn || (e.labelFr as string),
-          weekday,
-          start: e.start as string,
-          end: e.end ?? null,
-        },
-        date,
-        startsAt: at(date, e.start as string, tz),
-        endsAt: e.end ? at(date, e.end, tz) : null,
-        cancelled: false,
-        changed: false,
-        extra: true,
-        noteFr: e.noteFr,
-        noteEn: e.noteEn,
-      })
-    }
+    for (const inst of ownInstances(slot, exceptions, first, last)) push(inst)
+  }
+  for (const e of exceptions.filter(
+    (x) => x.kind === 'extra' && x.start && x.labelFr && x.date >= first && x.date <= last,
+  )) {
+    const weekday = new Date(`${e.date}T00:00:00Z`).getUTCDay()
+    out.push({
+      slot: {
+        id: e.id ?? `extra-${e.date}`,
+        kind: 'autre',
+        labelFr: e.labelFr as string,
+        labelEn: e.labelEn || (e.labelFr as string),
+        weekday,
+        start: e.start as string,
+        end: e.end ?? null,
+      },
+      date: e.date,
+      startsAt: at(e.date, e.start as string, tz),
+      endsAt: e.end ? at(e.date, e.end, tz) : null,
+      cancelled: false,
+      changed: false,
+      extra: true,
+      moved: false,
+      noteFr: e.noteFr,
+      noteEn: e.noteEn,
+    })
   }
   return out.sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
 }
@@ -150,7 +267,7 @@ export function nextService(
     slots.filter((s) => kinds.includes(s.kind)),
     exceptions,
     now,
-    15,
+    45,
     tz,
   ).find((s) => !s.cancelled && (s.endsAt ?? new Date(s.startsAt.getTime() + 2 * 3_600_000)) > now)
   if (!found) return null

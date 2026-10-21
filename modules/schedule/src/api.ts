@@ -49,6 +49,29 @@ export const slotBody = z
     notesFr: text(300),
     notesEn: text(300),
     sortOrder: z.number().int().min(0).max(999),
+    recurrence: z
+      .union([
+        z
+          .object({
+            freq: z.literal('weekly'),
+            interval: z.number().int().min(1).max(12).optional(),
+          })
+          .strict(),
+        z
+          .object({
+            freq: z.literal('monthly'),
+            nth: z
+              .array(
+                z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(-1)]),
+              )
+              .min(1)
+              .max(5),
+          })
+          .strict(),
+      ])
+      .nullable(),
+    anchorSlotId: z.string().uuid().nullable(),
+    offsetDays: z.number().int().min(-13).max(13),
   })
   .partial()
   .strict()
@@ -57,7 +80,12 @@ export const excBody = z
   .object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     slotId: z.string().uuid().nullable(),
-    kind: z.enum(['cancelled', 'changed', 'extra']),
+    kind: z.enum(['cancelled', 'changed', 'extra', 'moved']),
+    toDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullable()
+      .default(null),
     noteFr: text(200).default(''),
     noteEn: text(200).default(''),
     startTime: time.nullable().default(null),
@@ -67,6 +95,12 @@ export const excBody = z
   })
   .strict()
   .refine((e) => e.kind !== 'changed' || e.startTime, 'start_required')
+  .refine((e) => e.kind !== 'moved' || (e.toDate && e.toDate !== e.date), 'moved_needs_date')
+  // A moved or cancelled date comes with its reason: the public sees why.
+  .refine(
+    (e) => !['moved', 'cancelled'].includes(e.kind) || e.noteFr.trim() !== '',
+    'reason_required',
+  )
   .refine((e) => e.kind !== 'extra' || (e.startTime && e.labelFr), 'extra_incomplete')
 
 type SlotRow = typeof scheduleSlots.$inferSelect
@@ -84,6 +118,9 @@ const toSlot = (r: SlotRow): Slot => ({
   end: r.endTime,
   placeFr: r.placeFr,
   placeEn: r.placeEn || r.placeFr,
+  recurrence: r.recurrence,
+  anchorId: r.anchorSlotId,
+  offsetDays: r.offsetDays,
 })
 const toExc = (r: ExcRow): SlotException => ({
   id: r.id,
@@ -94,9 +131,27 @@ const toExc = (r: ExcRow): SlotException => ({
   noteEn: r.noteEn || r.noteFr,
   start: r.startTime ?? undefined,
   end: r.endTime,
+  toDate: r.toDate ?? undefined,
   labelFr: r.labelFr,
   labelEn: r.labelEn || r.labelFr,
 })
+
+/** An anchor must be a slot that is not itself anchored (one level only), and not the slot itself. */
+async function anchorOk(db: Db, id: string | null, anchorId: string | null | undefined) {
+  if (!anchorId) return true
+  if (anchorId === id) return false
+  const [a] = await db.select().from(scheduleSlots).where(eq(scheduleSlots.id, anchorId)).limit(1)
+  if (!a || a.anchorSlotId) return false
+  if (id) {
+    const dependents = await db
+      .select({ id: scheduleSlots.id })
+      .from(scheduleSlots)
+      .where(eq(scheduleSlots.anchorSlotId, id))
+      .limit(1)
+    if (dependents.length) return false
+  }
+  return true
+}
 
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: PARISH_TZ }).format(new Date())
 
@@ -246,6 +301,7 @@ export const scheduleApi = new Hono<AppEnv>()
     if (slotProblems({ weekday, start: startTime, end: p.endTime ?? null }).length)
       return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
+    if (!(await anchorOk(db, null, p.anchorSlotId))) return fail(c, 400, 'invalid')
     const actor = await c.var.deps.actor()
     const [row] = await db
       .insert(scheduleSlots)
@@ -262,6 +318,9 @@ export const scheduleApi = new Hono<AppEnv>()
         notesFr: p.notesFr ?? '',
         notesEn: p.notesEn ?? '',
         sortOrder: p.sortOrder ?? 0,
+        recurrence: p.recurrence ?? null,
+        anchorSlotId: p.anchorSlotId ?? null,
+        offsetDays: p.offsetDays ?? 0,
         validated: false,
         createdBy: actor?.userId,
       })
@@ -293,6 +352,7 @@ export const scheduleApi = new Hono<AppEnv>()
       end: p.endTime === undefined ? row.endTime : p.endTime,
     }
     if (slotProblems(next).length) return fail(c, 400, 'invalid')
+    if (!(await anchorOk(db, row.id, p.anchorSlotId))) return fail(c, 400, 'invalid')
     const actor = await c.var.deps.actor()
     const mayValidate = can(actor?.principal as Principal, 'schedule:validate')
     // A change takes the approval away, unless the editor may approve (then it stays approved).

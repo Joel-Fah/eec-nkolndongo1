@@ -22,6 +22,7 @@ import { type Principal, scopeFor } from '@eec/auth'
 import {
   buildIcs,
   cleanDoc,
+  EVENT_KINDS,
   expandOccurrences,
   type IcsEvent,
   MAX_WINDOW_DAYS,
@@ -128,6 +129,7 @@ export const patchSchema = z
     coverMediaId: z.string().uuid().nullable(),
     groupId: z.string().uuid().nullable(),
     featured: z.boolean(),
+    kind: z.enum(EVENT_KINDS),
     slug: z.string().max(120),
   })
   .partial()
@@ -161,6 +163,7 @@ const snapshotOf = (r: Row) => ({
   registrationUrl: r.registrationUrl,
   coverMediaId: r.coverMediaId,
   featured: r.featured,
+  kind: r.kind,
   slug: r.slug,
 })
 
@@ -200,6 +203,7 @@ const lifecycle = contentRoutes<Row>({
     registrationUrl: s.registrationUrl,
     coverMediaId: s.coverMediaId,
     featured: s.featured,
+    kind: s.kind ?? 'autre',
   }),
   problems: (row, dates) => publishProblems({ title: row.titleFr, bodyEmpty: false, ...dates }),
   mediaIdsOf: (row) => {
@@ -248,6 +252,7 @@ const adminDto = (r: Row, groupName?: string | null) => ({
   publishAt: r.publishAt,
   unpublishAt: r.unpublishAt,
   featured: r.featured,
+  kind: r.kind,
   titleFr: r.titleFr,
   titleEn: r.titleEn,
   startsAt: r.startsAt,
@@ -289,6 +294,7 @@ type PublicOcc = {
   locationKind: string
   fallback: boolean
   featured: boolean
+  kind: string
   group: string | null
   groupKey: string | null
   cover: unknown
@@ -334,6 +340,7 @@ function toPublic(
       locationKind: r.locationKind,
       fallback: locale === 'en' && !en,
       featured: r.featured,
+      kind: r.kind,
       group: g ? (locale === 'en' && g.nameEn ? g.nameEn : g.nameFr) : null,
       groupKey: g?.key ?? null,
       cover: m

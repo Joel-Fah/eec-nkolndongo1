@@ -101,7 +101,8 @@
     --btn-bg: var(--surface-2);
   }
   .btn-ghost:hover:not(:disabled) {
-    --btn-bg: var(--surface-2);
+    /* Visible on a plain surface and on the grey rows of the admin lists alike. */
+    --btn-bg: color-mix(in oklab, var(--ink) 9%, transparent);
   }
   .btn-danger {
     --btn-bg: var(--danger-soft);
@@ -1129,6 +1130,39 @@
     color: var(--bg);
     font-size: var(--text-sm);
     line-height: 1.3;
+  }
+  .eec-tooltip-keys {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+  }
+  .eec-kbds {
+    display: inline-flex;
+    gap: 0.25rem;
+  }
+  /* A keycap: a small raised key, drawn with a ring and a soft lower edge (no one-sided border). */
+  .eec-kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding-inline: 0.375rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklab, var(--bg) 14%, transparent);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--bg) 35%, transparent),
+      0 1.5px 0 color-mix(in oklab, var(--bg) 35%, transparent);
+    font-family: inherit;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    line-height: 1;
+  }
+  .menu-item .eec-kbd {
+    background: var(--surface-2);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      0 1.5px 0 var(--line-strong);
   }
   .eec-select-trigger {
     display: flex;

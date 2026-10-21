@@ -3,10 +3,12 @@
  * (~100 KB gzipped) never reaches the public site or the other admin pages. It produces the small JSON document
  * defined in `@eec/core` (`cleanDoc` runs again on the server); the toolbar offers only what that schema allows.
  */
+import { Menu } from '@base-ui/react/menu'
 import { useLocale } from '@eec/admin-kit'
 import { type Doc, safeHref } from '@eec/core'
 import type { IconName } from '@eec/ui/icons'
 import { iconSvg } from '@eec/ui/icons'
+import { Kbd, ShortcutTip } from '@eec/ui/react'
 import { Extension, Node } from '@tiptap/core'
 import Highlight from '@tiptap/extension-highlight'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
@@ -210,19 +212,60 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
     active: boolean,
     action: () => void,
     disabled = false,
+    shortcut?: string,
   ) => (
-    <button
-      key={name}
-      type="button"
-      className="rte-btn"
-      aria-pressed={active}
-      aria-label={label}
-      title={label}
-      disabled={disabled}
-      onClick={run(action)}
-    >
-      <Glyph name={name} />
-    </button>
+    <ShortcutTip key={name} label={label} shortcut={shortcut}>
+      <button
+        type="button"
+        className="rte-btn"
+        data-icon={name}
+        aria-pressed={active}
+        aria-label={label}
+        disabled={disabled}
+        onClick={run(action)}
+      >
+        <Glyph name={name} />
+      </button>
+    </ShortcutTip>
+  )
+  /** A group of related actions in one dropdown (headings, alignment): the button shows the current one. */
+  const menu = (
+    label: string,
+    current: IconName,
+    items: {
+      icon: IconName
+      label: string
+      active: boolean
+      shortcut?: string
+      action: () => void
+    }[],
+  ) => (
+    <Menu.Root>
+      <ShortcutTip label={label}>
+        <Menu.Trigger className="rte-btn rte-menu" aria-label={label} data-icon={current}>
+          <Glyph name={current} />
+          <span className="eec-chevron" aria-hidden="true" />
+        </Menu.Trigger>
+      </ShortcutTip>
+      <Menu.Portal>
+        <Menu.Positioner sideOffset={6} align="start" className="eec-positioner">
+          <Menu.Popup className="eec-popover eec-popup">
+            {items.map((it) => (
+              <Menu.Item
+                key={it.label}
+                className="menu-item rte-menu-item"
+                data-active={it.active ? '' : undefined}
+                onClick={run(it.action)}
+              >
+                <Glyph name={it.icon} />
+                <span className="grow">{it.label}</span>
+                {it.shortcut && <Kbd shortcut={it.shortcut} />}
+              </Menu.Item>
+            ))}
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
   )
   const applyLink = () => {
     const safe = safeHref(href.trim())
@@ -258,77 +301,211 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
     <div className="rte">
       <div className="rte-bar" role="toolbar" aria-label={t('content.editor.toolbar')}>
         <span className="rte-group">
-          {btn('heading', t('content.editor.heading'), state?.h2 ?? false, () =>
-            editor.chain().toggleHeading({ level: 2 }).run(),
+          {btn(
+            'undo',
+            t('content.editor.undo'),
+            false,
+            () => editor.chain().undo().run(),
+            !state?.canUndo,
+            'Mod+Z',
           )}
-          {btn('heading3', t('content.editor.heading3'), state?.h3 ?? false, () =>
-            editor.chain().toggleHeading({ level: 3 }).run(),
-          )}
-          {btn('bold', t('content.editor.bold'), state?.bold ?? false, () =>
-            editor.chain().toggleBold().run(),
-          )}
-          {btn('italic', t('content.editor.italic'), state?.italic ?? false, () =>
-            editor.chain().toggleItalic().run(),
-          )}
-          {btn('underline', t('content.editor.underline'), state?.underline ?? false, () =>
-            editor.chain().toggleUnderline().run(),
-          )}
-          {btn('strike', t('content.editor.strike'), state?.strike ?? false, () =>
-            editor.chain().toggleStrike().run(),
-          )}
-          {btn('highlight', t('content.editor.highlight'), state?.highlight ?? false, () =>
-            editor.chain().toggleHighlight().run(),
-          )}
-          {btn('subscript', t('content.editor.subscript'), state?.sub ?? false, () =>
-            editor.chain().toggleSubscript().run(),
-          )}
-          {btn('superscript', t('content.editor.superscript'), state?.sup ?? false, () =>
-            editor.chain().toggleSuperscript().run(),
+          {btn(
+            'redo',
+            t('content.editor.redo'),
+            false,
+            () => editor.chain().redo().run(),
+            !state?.canRedo,
+            'Mod+Shift+Z',
           )}
         </span>
         <span className="rte-group">
-          {btn('alignLeft', t('content.editor.align_left'), state?.left ?? false, () =>
-            editor.chain().setTextAlign('left').run(),
+          {menu(t('content.editor.headings'), state?.h3 ? 'heading3' : 'heading', [
+            {
+              icon: 'paragraph',
+              label: t('content.editor.paragraph'),
+              active: !state?.h2 && !state?.h3,
+              shortcut: 'Mod+Alt+0',
+              action: () => editor.chain().setParagraph().run(),
+            },
+            {
+              icon: 'heading',
+              label: t('content.editor.heading'),
+              active: state?.h2 ?? false,
+              shortcut: 'Mod+Alt+2',
+              action: () => editor.chain().toggleHeading({ level: 2 }).run(),
+            },
+            {
+              icon: 'heading3',
+              label: t('content.editor.heading3'),
+              active: state?.h3 ?? false,
+              shortcut: 'Mod+Alt+3',
+              action: () => editor.chain().toggleHeading({ level: 3 }).run(),
+            },
+          ])}
+          {btn(
+            'bold',
+            t('content.editor.bold'),
+            state?.bold ?? false,
+            () => editor.chain().toggleBold().run(),
+            false,
+            'Mod+B',
           )}
-          {btn('alignCenter', t('content.editor.align_center'), state?.center ?? false, () =>
-            editor.chain().setTextAlign('center').run(),
+          {btn(
+            'italic',
+            t('content.editor.italic'),
+            state?.italic ?? false,
+            () => editor.chain().toggleItalic().run(),
+            false,
+            'Mod+I',
           )}
-          {btn('alignRight', t('content.editor.align_right'), state?.right ?? false, () =>
-            editor.chain().setTextAlign('right').run(),
+          {btn(
+            'underline',
+            t('content.editor.underline'),
+            state?.underline ?? false,
+            () => editor.chain().toggleUnderline().run(),
+            false,
+            'Mod+U',
           )}
-          {btn('alignJustify', t('content.editor.align_justify'), state?.justify ?? false, () =>
-            editor.chain().setTextAlign('justify').run(),
+          {btn(
+            'strike',
+            t('content.editor.strike'),
+            state?.strike ?? false,
+            () => editor.chain().toggleStrike().run(),
+            false,
+            'Mod+Shift+S',
           )}
-          {btn('listBullet', t('content.editor.bullets'), state?.bullet ?? false, () =>
-            editor.chain().toggleBulletList().run(),
+          {btn(
+            'highlight',
+            t('content.editor.highlight'),
+            state?.highlight ?? false,
+            () => editor.chain().toggleHighlight().run(),
+            false,
+            'Mod+Shift+H',
           )}
-          {btn('listNumber', t('content.editor.numbers'), state?.ordered ?? false, () =>
-            editor.chain().toggleOrderedList().run(),
+          {btn(
+            'subscript',
+            t('content.editor.subscript'),
+            state?.sub ?? false,
+            () => editor.chain().toggleSubscript().run(),
+            false,
+            'Mod+,',
           )}
-          {btn('tasks', t('content.editor.tasks'), state?.task ?? false, () =>
-            editor.chain().toggleTaskList().run(),
-          )}
-          {btn('indentLess', t('content.editor.indent_less'), false, () => shiftIndent(editor, -1))}
-          {btn('indentMore', t('content.editor.indent_more'), false, () => shiftIndent(editor, 1))}
-          {btn('quote', t('content.editor.quote'), state?.quote ?? false, () =>
-            editor.chain().toggleBlockquote().run(),
+          {btn(
+            'superscript',
+            t('content.editor.superscript'),
+            state?.sup ?? false,
+            () => editor.chain().toggleSuperscript().run(),
+            false,
+            'Mod+.',
           )}
         </span>
         <span className="rte-group">
-          <button
-            type="button"
-            className="rte-btn"
-            aria-pressed={state?.link ?? false}
-            aria-label={t('content.editor.link')}
-            title={t('content.editor.link')}
-            onClick={() => {
-              setHref((editor.getAttributes('link').href as string | undefined) ?? '')
-              setHrefError(false)
-              setLinkOpen((o) => !o)
-            }}
-          >
-            <Glyph name="link" />
-          </button>
+          {menu(
+            t('content.editor.alignments'),
+            state?.center
+              ? 'alignCenter'
+              : state?.right
+                ? 'alignRight'
+                : state?.justify
+                  ? 'alignJustify'
+                  : 'alignLeft',
+            [
+              {
+                icon: 'alignLeft',
+                label: t('content.editor.align_left'),
+                active: state?.left ?? false,
+                shortcut: 'Mod+Shift+L',
+                action: () => editor.chain().setTextAlign('left').run(),
+              },
+              {
+                icon: 'alignCenter',
+                label: t('content.editor.align_center'),
+                active: state?.center ?? false,
+                shortcut: 'Mod+Shift+E',
+                action: () => editor.chain().setTextAlign('center').run(),
+              },
+              {
+                icon: 'alignRight',
+                label: t('content.editor.align_right'),
+                active: state?.right ?? false,
+                shortcut: 'Mod+Shift+R',
+                action: () => editor.chain().setTextAlign('right').run(),
+              },
+              {
+                icon: 'alignJustify',
+                label: t('content.editor.align_justify'),
+                active: state?.justify ?? false,
+                shortcut: 'Mod+Shift+J',
+                action: () => editor.chain().setTextAlign('justify').run(),
+              },
+            ],
+          )}
+          {btn(
+            'listBullet',
+            t('content.editor.bullets'),
+            state?.bullet ?? false,
+            () => editor.chain().toggleBulletList().run(),
+            false,
+            'Mod+Shift+8',
+          )}
+          {btn(
+            'listNumber',
+            t('content.editor.numbers'),
+            state?.ordered ?? false,
+            () => editor.chain().toggleOrderedList().run(),
+            false,
+            'Mod+Shift+7',
+          )}
+          {btn(
+            'tasks',
+            t('content.editor.tasks'),
+            state?.task ?? false,
+            () => editor.chain().toggleTaskList().run(),
+            false,
+            'Mod+Shift+9',
+          )}
+          {btn(
+            'indentLess',
+            t('content.editor.indent_less'),
+            false,
+            () => shiftIndent(editor, -1),
+            false,
+            'Shift+Tab',
+          )}
+          {btn(
+            'indentMore',
+            t('content.editor.indent_more'),
+            false,
+            () => shiftIndent(editor, 1),
+            false,
+            'Tab',
+          )}
+          {btn(
+            'quote',
+            t('content.editor.quote'),
+            state?.quote ?? false,
+            () => editor.chain().toggleBlockquote().run(),
+            false,
+            'Mod+Shift+B',
+          )}
+        </span>
+        <span className="rte-group">
+          <ShortcutTip label={t('content.editor.link')}>
+            <button
+              type="button"
+              className="rte-btn"
+              data-icon="link"
+              aria-pressed={state?.link ?? false}
+              aria-label={t('content.editor.link')}
+              onClick={() => {
+                setHref((editor.getAttributes('link').href as string | undefined) ?? '')
+                setHrefError(false)
+                setLinkOpen((o) => !o)
+              }}
+            >
+              <Glyph name="link" />
+            </button>
+          </ShortcutTip>
           {btn(
             'table',
             t('content.editor.table'),
@@ -337,23 +514,6 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
             state?.inTable ?? false,
           )}
           {btn('photo', t('content.editor.photo'), false, () => setPicking(true))}
-        </span>
-        <span className="rte-gap" aria-hidden="true" />
-        <span className="rte-group">
-          {btn(
-            'undo',
-            t('content.editor.undo'),
-            false,
-            () => editor.chain().undo().run(),
-            !state?.canUndo,
-          )}
-          {btn(
-            'redo',
-            t('content.editor.redo'),
-            false,
-            () => editor.chain().redo().run(),
-            !state?.canRedo,
-          )}
         </span>
       </div>
       {state?.inTable && (
