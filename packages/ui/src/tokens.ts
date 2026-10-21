@@ -116,6 +116,8 @@ export const storysetPalette = {
     mist: '#EFEAE0',
     mist2: '#DED7C8',
     mist3: '#B9B1A0',
+    /** The halftone dots of Storyset's backdrop: visible, but quieter than the subject. */
+    dots: '#D3CAB6',
     blush: '#E98360',
   },
   dark: {
@@ -128,6 +130,7 @@ export const storysetPalette = {
     mist: '#1D2A23',
     mist2: '#2A3830',
     mist3: '#3E4D45',
+    dots: '#34443B',
     blush: '#E98360',
   },
 } as const

@@ -8,6 +8,7 @@ import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
 import { LeavingScreen } from './LeavingScreen'
+import { NavProgress } from './Loading'
 
 export function AppShell() {
   const { t, locale } = useLocale()
@@ -89,6 +90,7 @@ export function AppShell() {
       )}
 
       <div className="admin-main">
+        <NavProgress />
         <header className="admin-topbar">
           <button
             type="button"

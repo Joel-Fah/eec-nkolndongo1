@@ -1127,7 +1127,8 @@
       "broke_title": "A hiccup on our side",
       "broke_text": "Something went wrong. Please try again in a moment.",
       "retry": "Try again"
-    }
+    },
+    "loading": "Loading…"
   },
   "login": {
     "title": "Sign in",
@@ -1686,7 +1687,30 @@
       "link_label": "Link address",
       "link_apply": "Apply",
       "link_remove": "Remove link",
-      "link_invalid": "This link is not accepted. Use an https:// address, an email (mailto:) or a phone number (tel:)."
+      "link_invalid": "This link is not accepted. Use an https:// address, an email (mailto:) or a phone number (tel:).",
+      "underline": "Underline",
+      "strike": "Strikethrough",
+      "highlight": "Highlight",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "align_left": "Align left",
+      "align_center": "Center",
+      "align_right": "Align right",
+      "align_justify": "Justify",
+      "heading3": "Subheading",
+      "tasks": "Task list",
+      "indent_more": "Increase indent",
+      "indent_less": "Decrease indent",
+      "table": "Insert a table",
+      "row_add": "Add a row below",
+      "col_add": "Add a column to the right",
+      "row_del": "Delete the row",
+      "col_del": "Delete the column",
+      "table_del": "Delete the table",
+      "group_text": "Text",
+      "group_block": "Paragraph",
+      "group_insert": "Insert",
+      "group_table": "Table"
     },
     "picker": {
       "title": "Choose a photo",

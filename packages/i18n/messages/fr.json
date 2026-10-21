@@ -1127,7 +1127,8 @@
       "broke_title": "Un souci de notre côté",
       "broke_text": "Quelque chose s’est mal passé. Réessayez dans un instant.",
       "retry": "Réessayer"
-    }
+    },
+    "loading": "Chargement…"
   },
   "login": {
     "title": "Connexion",
@@ -1686,7 +1687,30 @@
       "link_label": "Adresse du lien",
       "link_apply": "Appliquer",
       "link_remove": "Retirer le lien",
-      "link_invalid": "Ce lien n’est pas accepté. Utilisez une adresse https://, un courriel (mailto:) ou un téléphone (tel:)."
+      "link_invalid": "Ce lien n’est pas accepté. Utilisez une adresse https://, un courriel (mailto:) ou un téléphone (tel:).",
+      "underline": "Souligné",
+      "strike": "Barré",
+      "highlight": "Surligné",
+      "subscript": "Indice",
+      "superscript": "Exposant",
+      "align_left": "Aligner à gauche",
+      "align_center": "Centrer",
+      "align_right": "Aligner à droite",
+      "align_justify": "Justifier",
+      "heading3": "Sous-titre",
+      "tasks": "Liste de tâches",
+      "indent_more": "Augmenter le retrait",
+      "indent_less": "Diminuer le retrait",
+      "table": "Insérer un tableau",
+      "row_add": "Ajouter une ligne dessous",
+      "col_add": "Ajouter une colonne à droite",
+      "row_del": "Supprimer la ligne",
+      "col_del": "Supprimer la colonne",
+      "table_del": "Supprimer le tableau",
+      "group_text": "Texte",
+      "group_block": "Paragraphe",
+      "group_insert": "Insérer",
+      "group_table": "Tableau"
     },
     "picker": {
       "title": "Choisir une photo",

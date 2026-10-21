@@ -6,6 +6,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { Illustration } from '../../components/Illustration'
 import { Gate } from '../../components/kit'
+import { PageLoading } from '../../components/Loading'
 
 export const Route = createFileRoute('/_app/m/$module')({ component: ModulePage })
 
@@ -21,7 +22,7 @@ function ModulePage() {
     return <EmptyState title={t('notfound.title')} art={<Illustration name="destination" />} />
   return (
     <Gate permission={entry.permission}>
-      <Suspense fallback={<span className="skeleton h-64" aria-busy="true" />}>
+      <Suspense fallback={<PageLoading />}>
         <Page />
       </Suspense>
     </Gate>

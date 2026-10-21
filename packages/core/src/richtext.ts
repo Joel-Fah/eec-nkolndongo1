@@ -5,12 +5,20 @@
  * public site ships no editor code. Pure functions, no dependency, usable in the API, the Worker and the tests.
  */
 
+export type SimpleMark =
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | 'highlight'
+  | 'subscript'
+  | 'superscript'
 export type Mark =
-  | { type: 'bold' | 'italic'; attrs?: undefined }
+  | { type: SimpleMark; attrs?: undefined }
   | { type: 'link'; attrs: { href: string } }
 export type Node = {
   type: string
-  attrs?: Record<string, string | number>
+  attrs?: Record<string, string | number | boolean>
   content?: Node[]
   text?: string
   marks?: Mark[]
@@ -24,13 +32,28 @@ const MAX_NODES = 5000
 const MAX_TEXT = 20_000
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+const SIMPLE_MARKS: readonly string[] = [
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'highlight',
+  'subscript',
+  'superscript',
+]
+const ALIGNS = ['center', 'right', 'justify']
+const MAX_INDENT = 4
+const MAX_SPAN = 20
+
 const BLOCKS: Record<string, readonly string[]> = {
   doc: [
     'paragraph',
     'heading',
     'bulletList',
     'orderedList',
+    'taskList',
     'blockquote',
+    'table',
     'image',
     'horizontalRule',
   ],
@@ -39,7 +62,13 @@ const BLOCKS: Record<string, readonly string[]> = {
   blockquote: ['paragraph'],
   bulletList: ['listItem'],
   orderedList: ['listItem'],
-  listItem: ['paragraph', 'bulletList', 'orderedList'],
+  listItem: ['paragraph', 'bulletList', 'orderedList', 'taskList'],
+  taskList: ['taskItem'],
+  taskItem: ['paragraph', 'bulletList', 'orderedList', 'taskList'],
+  table: ['tableRow'],
+  tableRow: ['tableCell', 'tableHeader'],
+  tableCell: ['paragraph', 'bulletList', 'orderedList'],
+  tableHeader: ['paragraph', 'bulletList', 'orderedList'],
   image: [],
   horizontalRule: [],
   hardBreak: [],
@@ -68,8 +97,8 @@ function cleanMarks(marks: unknown): Mark[] | undefined {
   for (const m of marks) {
     if (!m || typeof m !== 'object') continue
     const { type, attrs } = m as { type?: unknown; attrs?: { href?: unknown } }
-    if (type === 'bold' || type === 'italic') {
-      if (!out.some((x) => x.type === type)) out.push({ type })
+    if (typeof type === 'string' && SIMPLE_MARKS.includes(type)) {
+      if (!out.some((x) => x.type === type)) out.push({ type: type as SimpleMark })
     } else if (type === 'link') {
       const href = safeHref(attrs?.href)
       if (href && !out.some((x) => x.type === 'link')) out.push({ type: 'link', attrs: { href } })
@@ -112,9 +141,23 @@ function cleanNode(raw: unknown, parent: string, depth: number, budget: { n: num
     return [{ type: 'image', attrs }]
   }
   const node: Node = { type: n.type }
-  if (n.type === 'heading') {
-    const level = Number(n.attrs?.level)
-    node.attrs = { level: level === 3 ? 3 : 2 }
+  if (n.type === 'paragraph' || n.type === 'heading') {
+    const attrs: Record<string, string | number | boolean> = {}
+    if (n.type === 'heading') attrs.level = Number(n.attrs?.level) === 3 ? 3 : 2
+    const align = n.attrs?.textAlign
+    if (typeof align === 'string' && ALIGNS.includes(align)) attrs.textAlign = align
+    const indent = Number(n.attrs?.indent)
+    if (Number.isInteger(indent) && indent > 0) attrs.indent = Math.min(indent, MAX_INDENT)
+    if (Object.keys(attrs).length) node.attrs = attrs
+  }
+  if (n.type === 'taskItem') node.attrs = { checked: n.attrs?.checked === true }
+  if (n.type === 'tableCell' || n.type === 'tableHeader') {
+    const attrs: Record<string, number> = {}
+    for (const k of ['colspan', 'rowspan'] as const) {
+      const v = Number(n.attrs?.[k])
+      if (Number.isInteger(v) && v > 1) attrs[k] = Math.min(v, MAX_SPAN)
+    }
+    if (Object.keys(attrs).length) node.attrs = attrs
   }
   if (n.type === 'orderedList' && Number.isInteger(n.attrs?.start) && Number(n.attrs?.start) > 1)
     node.attrs = { start: Math.min(Number(n.attrs?.start), 9999) }
@@ -124,7 +167,16 @@ function cleanNode(raw: unknown, parent: string, depth: number, budget: { n: num
     )
     if (
       content.length === 0 &&
-      ['bulletList', 'orderedList', 'listItem', 'blockquote'].includes(n.type)
+      [
+        'bulletList',
+        'orderedList',
+        'listItem',
+        'blockquote',
+        'taskList',
+        'taskItem',
+        'table',
+        'tableRow',
+      ].includes(n.type)
     )
       return []
     if (content.length) node.content = content
@@ -149,6 +201,11 @@ function renderText(n: Node) {
   for (const m of n.marks ?? []) {
     if (m.type === 'bold') html = `<strong>${html}</strong>`
     else if (m.type === 'italic') html = `<em>${html}</em>`
+    else if (m.type === 'underline') html = `<u>${html}</u>`
+    else if (m.type === 'strike') html = `<s>${html}</s>`
+    else if (m.type === 'highlight') html = `<mark>${html}</mark>`
+    else if (m.type === 'subscript') html = `<sub>${html}</sub>`
+    else if (m.type === 'superscript') html = `<sup>${html}</sup>`
     else if (m.type === 'link') {
       const external = m.attrs.href.startsWith('https://')
       html = `<a href="${esc(m.attrs.href)}"${external ? ' rel="noopener noreferrer" target="_blank"' : ''}>${html}</a>`
@@ -157,15 +214,39 @@ function renderText(n: Node) {
   return html
 }
 
+/** Alignment and indentation are classes (the site's stylesheet defines them), never inline styles. */
+function blockClass(n: Node) {
+  const c: string[] = []
+  if (n.attrs?.textAlign) c.push(`rt-${n.attrs.textAlign}`)
+  if (n.attrs?.indent) c.push(`rt-in-${n.attrs.indent}`)
+  return c.length ? ` class="${c.join(' ')}"` : ''
+}
+
 function render(n: Node): string {
   const inner = () => (n.content ?? []).map(render).join('')
   switch (n.type) {
     case 'text':
       return renderText(n)
     case 'paragraph':
-      return `<p>${inner()}</p>`
+      return `<p${blockClass(n)}>${inner()}</p>`
     case 'heading':
-      return `<h${n.attrs?.level}>${inner()}</h${n.attrs?.level}>`
+      return `<h${n.attrs?.level}${blockClass(n)}>${inner()}</h${n.attrs?.level}>`
+    case 'taskList':
+      return `<ul class="rt-tasks">${inner()}</ul>`
+    case 'taskItem':
+      return `<li class="rt-task"><input type="checkbox" disabled${n.attrs?.checked ? ' checked' : ''}><div>${inner()}</div></li>`
+    case 'table':
+      return `<div class="rt-table"><table><tbody>${inner()}</tbody></table></div>`
+    case 'tableRow':
+      return `<tr>${inner()}</tr>`
+    case 'tableCell':
+    case 'tableHeader': {
+      const tag = n.type === 'tableHeader' ? 'th' : 'td'
+      const span = ['colspan', 'rowspan']
+        .map((k) => (n.attrs?.[k] ? ` ${k}="${n.attrs[k]}"` : ''))
+        .join('')
+      return `<${tag}${span}>${inner()}</${tag}>`
+    }
     case 'blockquote':
       return `<blockquote>${inner()}</blockquote>`
     case 'bulletList':

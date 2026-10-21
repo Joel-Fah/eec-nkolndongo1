@@ -91,6 +91,82 @@ describe('hostile documents', () => {
   })
 })
 
+describe('richer formatting', () => {
+  it('renders the extra marks, alignment, indentation, tasks and tables', () => {
+    const html = renderHtml({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'center', indent: 2, onclick: 'x' },
+          content: [
+            {
+              type: 'text',
+              text: 'a',
+              marks: [
+                { type: 'underline' },
+                { type: 'strike' },
+                { type: 'highlight', attrs: { color: 'red;x' } },
+                { type: 'subscript' },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'taskList',
+          content: [
+            { type: 'taskItem', attrs: { checked: true }, content: [p('fait')] },
+            { type: 'taskItem', content: [p('à faire')] },
+          ],
+        },
+        {
+          type: 'table',
+          content: [
+            {
+              type: 'tableRow',
+              content: [{ type: 'tableHeader', attrs: { colspan: 2 }, content: [p('H')] }],
+            },
+            {
+              type: 'tableRow',
+              content: [
+                { type: 'tableCell', content: [p('x')] },
+                { type: 'tableCell', attrs: { colspan: 9999 }, content: [p('y')] },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+    expect(html).toContain(
+      '<p class="rt-center rt-in-2"><sub><mark><s><u>a</u></s></mark></sub></p>',
+    )
+    expect(html).not.toMatch(/onclick|color|red/)
+    expect(html).toContain('<li class="rt-task"><input type="checkbox" disabled checked>')
+    expect(html).toContain('<li class="rt-task"><input type="checkbox" disabled>')
+    expect(html).toContain('<th colspan="2">')
+    expect(html).toContain('<td colspan="20">')
+    expect(html).toContain('<div class="rt-table"><table>')
+  })
+  it('refuses unknown alignment, huge indentation and nodes in the wrong place', () => {
+    const html = renderHtml({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'expression(alert(1))', indent: 99 },
+          content: [{ type: 'text', text: 'a' }],
+        },
+        { type: 'tableCell', content: [p('stray cell')] },
+        {
+          type: 'table',
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'not a row' }] }],
+        },
+      ],
+    })
+    expect(html).toBe('<p class="rt-in-4">a</p>')
+  })
+})
+
 describe('rendering', () => {
   it('renders marks, lists and quotes', () => {
     const html = renderHtml({

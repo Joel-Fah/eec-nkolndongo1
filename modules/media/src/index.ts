@@ -40,7 +40,7 @@ export const mediaModule = defineModule({
         group: 'content',
         label: { fr: 'Médiathèque', en: 'Media library' },
         path: '/m/media',
-        icon: 'image',
+        icon: 'album',
         order: 20,
         permission: 'media:read',
       },

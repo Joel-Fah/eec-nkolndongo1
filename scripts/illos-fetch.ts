@@ -52,9 +52,12 @@ function hsl(hex: string) {
   return { h: (hue * 60 + 360) % 360, s, l }
 }
 
+/** Stand-in colour for the backdrop's halftone dots, so they get their own (visible) tone in each theme. */
+const DOTS = '#c0ffee'
 type Role = keyof (typeof storysetPalette)['light'] | `skin${0 | 1 | 2 | 3}` | 'keep'
 /** What a Storyset colour *is* (accent, slate, grey, skin…), from its hue, saturation and lightness. */
 function role(hex: string): Role {
+  if (hex.toLowerCase() === DOTS) return 'dots'
   const { h, s, l } = hsl(hex)
   if (l < 0.03) return 'keep'
   if (l > 0.97) return 'paper'
@@ -143,7 +146,16 @@ try {
       }),
     }
     // `precision` rounds the path coordinates only: a global rounding would also round opacities (0.6 → 1).
-    const small = optimize(raw, {
+    // The halftone dots behind the subject keep a visible tone (empty states and cards show them, like Storyset's own).
+    const withDots =
+      entry.recolour === false
+        ? raw
+        : raw.replace(
+            /(<g id="background-simple">)([\s\S]*?)(<\/g>)/,
+            (_m, open: string, body: string, close: string) =>
+              open + body.replace(/#[0-9a-fA-F]{6}\b/g, DOTS) + close,
+          )
+    const small = optimize(withDots, {
       multipass: true,
       floatPrecision: entry.precision === undefined ? 1 : 2,
       plugins: [

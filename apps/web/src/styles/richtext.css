@@ -1,0 +1,68 @@
+/* Rich text from the editor (packages/core richtext → renderHtml): alignment, indentation, tasks, tables, marks. */
+.rt-center {
+  text-align: center;
+}
+.rt-right {
+  text-align: end;
+}
+.rt-justify {
+  text-align: justify;
+  hyphens: auto;
+}
+.rt-in-1 {
+  margin-inline-start: 1.5rem;
+}
+.rt-in-2 {
+  margin-inline-start: 3rem;
+}
+.rt-in-3 {
+  margin-inline-start: 4.5rem;
+}
+.rt-in-4 {
+  margin-inline-start: 6rem;
+}
+.rt-tasks {
+  list-style: none;
+  padding-inline-start: 0.25rem;
+}
+.rt-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+.rt-task > input {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-block-start: 0.45em;
+  accent-color: var(--primary);
+}
+.rt-task > div {
+  flex: 1;
+}
+.rt-table {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+.rt-table table {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+}
+.rt-table th,
+.rt-table td {
+  padding: 0.625rem 0.875rem;
+  vertical-align: top;
+  text-align: start;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.rt-table th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+mark {
+  padding-inline: 0.125em;
+  border-radius: 0.25em;
+  background: var(--gold-soft, color-mix(in oklab, var(--gold) 35%, transparent));
+  color: inherit;
+}
