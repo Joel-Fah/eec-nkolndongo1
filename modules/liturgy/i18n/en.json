@@ -84,7 +84,8 @@
     "this_sunday": "Sunday {date}",
     "unavailable_t": "This page is not loading right now",
     "unavailable_p": "This is not your fault. Please try again in a moment.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "holy_supper": "Holy Supper"
   },
   "view_grid": "Grid",
   "view_list": "List",
@@ -105,5 +106,10 @@
   "name_suffix": "Suggested name: {name}",
   "edit_week": "Edit this Sunday",
   "lang_fr": "Français",
-  "lang_en": "English"
+  "lang_en": "English",
+  "from_short": "From",
+  "to_short": "To",
+  "from_after_to": "The ending verse must come after the starting one.",
+  "holy_supper": "Holy Supper",
+  "holy_supper_switch": "Holy Supper Sunday"
 }

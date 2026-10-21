@@ -23,6 +23,8 @@ export const liturgySundays = pgTable(
       onDelete: 'set null',
     }),
     namesConfirmedAt: tz('names_confirmed_at'),
+    /** A Holy Supper Sunday (Sainte Cène), whatever the season. */
+    holySupper: boolean('holy_supper').notNull().default(false),
     hymns: text('hymns').notNull().default(''),
     notesFr: text('notes_fr').notNull().default(''),
     notesEn: text('notes_en').notNull().default(''),

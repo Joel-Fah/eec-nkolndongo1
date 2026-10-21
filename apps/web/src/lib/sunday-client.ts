@@ -6,6 +6,7 @@ import { shortDate } from '@eec/core/dates'
  * stays. Text is set with textContent only.
  */
 type Sunday = {
+  holySupper?: boolean
   date: string
   season: string
   name: string
@@ -47,6 +48,7 @@ export async function showSunday() {
       set('[data-sunday-name]', s.name)
       set('[data-sunday-date]', shortDate(`${s.date}T12:00:00Z`, locale, 'UTC'))
       set('[data-sunday-theme]', s.theme)
+      set('[data-sunday-tag]', s.holySupper ? (root.dataset.supper ?? '') : '')
       set('[data-sunday-readings]', s.readings.map((r) => r.label).join(' · '))
       const at = n?.next && n.next.startsAt.slice(0, 10) >= s.date ? n.next.startsAt : ''
       set(

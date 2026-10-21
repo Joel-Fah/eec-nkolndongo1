@@ -125,12 +125,13 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       </a>
     </div>
   </section>
-  <section class="home-section" aria-labelledby="sunday-title" data-sunday data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
+  <section class="home-section" aria-labelledby="sunday-title" data-sunday data-supper={t('liturgy.site.holy_supper')} data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
     <a class="sunday-card" data-sunday-link href={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')}>
       <p class="sunday-kicker"><span class="sunday-dot" aria-hidden="true"></span><span id="sunday-title">{t('liturgy.site.title')}</span></p>
       <strong class="sunday-name" data-sunday-name></strong>
       <span class="sunday-date" data-sunday-date></span>
       <span class="sunday-theme" data-sunday-theme hidden></span>
+      <span class="sunday-tag" data-sunday-tag hidden></span>
       <span class="sunday-readings" data-sunday-readings hidden></span>
       <span class="sunday-time" data-sunday-time hidden></span>
     </a>
@@ -423,6 +424,14 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     color: var(--primary);
     font-weight: 600;
   }
+  .sunday-tag {
+    justify-self: start;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--primary-soft));
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
 </style>
 
 <style is:global>
@@ -554,6 +563,14 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     border-radius: var(--radius-md);
     background: var(--primary-soft);
     color: var(--primary);
+    font-weight: 600;
+  }
+  .sunday-tag {
+    justify-self: start;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--primary-soft));
+    font-size: var(--text-sm);
     font-weight: 600;
   }
 </style>

@@ -1,13 +1,16 @@
 ---
 /** One event: date block, place, group, description, coming dates, add to calendar, share. `token`: preview link. */
-import { spanDays } from '@eec/core'
+import { EVENT_KIND_STYLE, type EventKind, spanDays } from '@eec/core'
 import Button from '@eec/ui/astro/Button.astro'
 import '../../styles/richtext.css'
+import Icon from '@eec/ui/astro/Icon.astro'
 import Site from '../../layouts/Site.astro'
 import { type EventDetail, publicJson } from '../../lib/content-api'
 import { dayText, eventHref, eventsListHref, fmt, TZ, timeText } from '../../lib/events-routes'
 import { localeOf, useT } from '../../lib/i18n'
 import Picture from '../Picture.astro'
+import GeneratedBanner from './GeneratedBanner.astro'
+import GoogleCalendarIcon from './GoogleCalendarIcon.astro'
 import LangFallbackNote from './LangFallbackNote.astro'
 import UnavailableState from './UnavailableState.astro'
 
@@ -55,12 +58,14 @@ const google = ev
   : ''
 const tz = ev?.allDay ? 'UTC' : TZ
 const span = ev ? spanDays(ev.startsAt, ev.endsAt, ev.allDay, TZ) : null
+const kind =
+  EVENT_KIND_STYLE[((ev?.kind as EventKind) in EVENT_KIND_STYLE ? ev?.kind : 'autre') as EventKind]
 const d = ev ? new Date(ev.startsAt) : new Date()
 ---
 
 <Site title={ev?.title ?? label('not_found_t')} description={ev?.description} noindex={preview || !ev}>
   <article class="ed">
-    <p class="ed-back"><a href={eventsListHref(locale)}>← {label('back')}</a></p>
+    <p class="ed-back"><a href={eventsListHref(locale)}><Icon name="chevronLeft" size={20} />{label('back')}</a></p>
     {preview && <p class="ed-preview" role="note">{label('preview_banner')}</p>}
     {
       unavailable ? (
@@ -73,48 +78,57 @@ const d = ev ? new Date(ev.startsAt) : new Date()
         </div>
       ) : (
         <>
-          <header class="ed-head">
-            <span class="ed-date" aria-hidden="true">
-              <span class="ed-date-d">{fmt(locale, { day: 'numeric', timeZone: tz }).format(d)}</span>
-              <span class="ed-date-m">{fmt(locale, { month: 'short', timeZone: tz }).format(d)}</span>
-            </span>
-            <div class="ed-titles">
-              <h1 class="ed-title" data-cancelled={ev.cancelled ? '' : undefined}>{ev.title}</h1>
-              <p class="ed-when">{span && span.to !== span.from ? `${dayText(ev.startsAt, locale, ev.allDay)} → ${dayText(`${span.to}T12:00:00Z`, locale, true)}` : `${dayText(ev.startsAt, locale, ev.allDay)} · ${timeText(ev.startsAt, locale, ev.allDay, label('all_day'))}${ev.endsAt && !ev.allDay ? ` – ${timeText(ev.endsAt, locale, false, '')}` : ''}`}</p>
-              <p class="ed-where">{ev.location || (ev.locationKind === 'temple' ? label('place_temple') : '')}{ev.group ? ` · ${label('group', { name: ev.group })}` : ''}</p>
-              {ev.cancelled && <p class="ed-flag">{label('cancelled')}{ev.note ? ` — ${ev.note}` : ''}</p>}
-              {ev.moved && <p class="ed-flag ed-flag-moved">{label('moved')}{ev.note ? ` — ${ev.note}` : ''}</p>}
+          <div class="ed-banner" data-tone={kind.tone}>
+            {ev.cover ? <Picture class="ed-cover" media={ev.cover} sizes="(min-width: 72rem) 68rem, 100vw" eager decorative /> : <GeneratedBanner seed={ev.slug} tone={kind.tone} />}
+            <span class="ed-kind" data-tone={kind.tone}><Icon name={kind.icon as 'church'} size={24} />{label(`kind_${ev.kind}`)}</span>
+          </div>
+          <div class="ed-layout">
+            <div class="ed-main">
+              <header class="ed-head">
+                <h1 class="ed-title" data-cancelled={ev.cancelled ? '' : undefined}>{ev.title}</h1>
+                {ev.cancelled && <p class="ed-flag">{label('cancelled')}{ev.note ? ` — ${ev.note}` : ''}</p>}
+                {ev.moved && <p class="ed-flag ed-flag-moved">{label('moved')}{ev.note ? ` — ${ev.note}` : ''}</p>}
+              </header>
+              {ev.fallback && <LangFallbackNote />}
+              {ev.html ? <div class="ed-body" set:html={ev.html} /> : null}
+              {
+                ev.recurring && ev.upcoming.length > 1 && (
+                  <section class="ed-dates" aria-labelledby="ed-dates-t">
+                    <h2 id="ed-dates-t" class="ed-h">{label('coming_dates')}</h2>
+                    <ul>
+                      {
+                        ev.upcoming.slice(0, 6).map((o) => (
+                          <li data-cancelled={o.cancelled ? '' : undefined}>
+                            {dayText(o.startsAt, locale, ev.allDay)} · {timeText(o.startsAt, locale, ev.allDay, label('all_day'))}
+                            {o.cancelled ? ` — ${label('cancelled')}${o.note ? ` (${o.note})` : ''}` : o.moved ? ` — ${label('moved')}` : ''}
+                          </li>
+                        ))
+                      }
+                    </ul>
+                  </section>
+                )
+              }
             </div>
-          </header>
-          {ev.fallback && <LangFallbackNote />}
-          {ev.cover && <Picture class="ed-cover" media={ev.cover} sizes="(min-width: 48rem) 46rem, 100vw" eager decorative />}
-          {ev.html && <div class="ed-body" set:html={ev.html} />}
-          {
-            ev.recurring && ev.upcoming.length > 1 && (
-              <section class="ed-dates" aria-labelledby="ed-dates-t">
-                <h2 id="ed-dates-t" class="ed-h">{label('coming_dates')}</h2>
-                <ul>
-                  {
-                    ev.upcoming.slice(0, 6).map((o) => (
-                      <li data-cancelled={o.cancelled ? '' : undefined}>
-                        {dayText(o.startsAt, locale, ev.allDay)} · {timeText(o.startsAt, locale, ev.allDay, label('all_day'))}
-                        {o.cancelled ? ` — ${label('cancelled')}${o.note ? ` (${o.note})` : ''}` : o.moved ? ` — ${label('moved')}` : ''}
-                      </li>
-                    ))
-                  }
+            <aside class="ed-side" aria-label={label('recap')}>
+              <div class="ed-card">
+                <h2 class="ed-card-t">{label('recap')}</h2>
+                <ul class="ed-facts">
+                  <li><Icon name="calendar" size={20} /><span>{span && span.to !== span.from ? `${dayText(ev.startsAt, locale, ev.allDay)} → ${dayText(`${span.to}T12:00:00Z`, locale, true)}` : dayText(ev.startsAt, locale, ev.allDay)}</span></li>
+                  {!ev.allDay && <li><Icon name="clock" size={20} /><span>{timeText(ev.startsAt, locale, false, '')}{ev.endsAt ? ` – ${timeText(ev.endsAt, locale, false, '')}` : ''}</span></li>}
+                  <li><Icon name="location" size={20} /><span>{ev.location || (ev.locationKind === 'temple' ? label('place_temple') : label('place_other'))}</span></li>
+                  {ev.group && <li><Icon name="users" size={20} /><span>{ev.group}</span></li>}
+                  {ev.recurring && <li><Icon name="refresh" size={20} /><span>{label('repeats')}</span></li>}
                 </ul>
-              </section>
-            )
-          }
-          <section class="ed-actions" aria-labelledby="ed-add-t">
-            <h2 id="ed-add-t" class="ed-h">{label('add_to_calendar')}</h2>
-            <div class="ed-buttons">
-              <Button href={icsHref} variant="secondary" download>{label('add_ics')}</Button>
-              <Button href={google} variant="secondary" target="_blank" rel="noopener noreferrer">{label('add_google')}</Button>
-              {ev.registrationUrl && <Button href={ev.registrationUrl} target="_blank" rel="noopener noreferrer">{label('register')}</Button>}
-              <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer">{label('share_whatsapp')}</Button>
-            </div>
-          </section>
+                <div class="ed-actions">
+                  <h3 class="ed-card-sub">{label('add_to_calendar')}</h3>
+                  <a class="ed-action" href={google} target="_blank" rel="noopener noreferrer"><GoogleCalendarIcon /><span>{label('add_google')}</span><Icon name="external" size={16} /></a>
+                  <a class="ed-action" href={icsHref} download><Icon name="calendar" size={20} /><span>{label('add_ics')}</span></a>
+                  {ev.registrationUrl && <a class="ed-action ed-action-primary" href={ev.registrationUrl} target="_blank" rel="noopener noreferrer"><Icon name="check" size={20} /><span>{label('register')}</span><Icon name="external" size={16} /></a>}
+                  <a class="ed-action" href={wa} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} /><span>{label('share_whatsapp')}</span><Icon name="external" size={16} /></a>
+                </div>
+              </div>
+            </aside>
+          </div>
         </>
       )
     }
@@ -125,12 +139,16 @@ const d = ev ? new Date(ev.startsAt) : new Date()
   .ed {
     display: grid;
     gap: 1.5rem;
-    width: min(100% - 2rem, 46rem);
+    width: min(100% - 2rem, 72rem);
     margin-inline: auto;
     padding-block: 2rem 4rem;
   }
   .ed-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     color: var(--ink-muted);
+    text-decoration: none;
   }
   .ed-preview {
     padding: 0.75rem 1rem;
@@ -138,33 +156,75 @@ const d = ev ? new Date(ev.startsAt) : new Date()
     background: var(--gold-soft, var(--surface-2));
     font-weight: 600;
   }
-  .ed-head {
-    display: flex;
-    gap: 1.25rem;
-    align-items: flex-start;
-  }
-  .ed-date {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 5rem;
-    padding-block: 0.75rem;
+  .ed-banner {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: clamp(13rem, 28vw, 22rem);
     border-radius: var(--radius-xl);
-    background: var(--primary-soft);
+    background: var(--surface-2);
+  }
+  .ed-banner :global(.ed-cover) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ed-kind {
+    position: absolute;
+    inset-block-end: 1rem;
+    inset-inline-start: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem 0.375rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    backdrop-filter: blur(6px);
     color: var(--primary);
-    line-height: 1.1;
-  }
-  .ed-date-d {
-    font-family: var(--font-display);
-    font-size: var(--text-4xl);
-  }
-  .ed-date-m {
-    text-transform: uppercase;
     font-weight: 600;
+    box-shadow: var(--elevation-1);
   }
-  .ed-titles {
+  .ed-kind[data-tone='gold'] {
+    color: var(--gold-deep, var(--ink));
+  }
+  .ed-kind[data-tone='clay'] {
+    color: var(--clay);
+  }
+  .ed-kind[data-tone='info'] {
+    color: var(--info, var(--primary));
+  }
+  .ed-kind[data-tone='success'] {
+    color: var(--success, var(--primary));
+  }
+  .ed-layout {
     display: grid;
-    gap: 0.375rem;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (min-width: 64rem) {
+    .ed-layout {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      gap: 2rem;
+    }
+    .ed-side {
+      position: sticky;
+      inset-block-start: 6rem;
+    }
+  }
+  /* On small screens the recap comes first: it is what most visitors came for. */
+  @media (max-width: 63.99rem) {
+    .ed-side {
+      order: -1;
+    }
+  }
+  .ed-main {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+  .ed-head {
+    display: grid;
+    gap: 0.5rem;
   }
   .ed-title {
     font-family: var(--font-display);
@@ -174,12 +234,6 @@ const d = ev ? new Date(ev.startsAt) : new Date()
   .ed-title[data-cancelled] {
     text-decoration: line-through;
     opacity: 0.7;
-  }
-  .ed-when {
-    font-size: var(--text-xl);
-  }
-  .ed-where {
-    color: var(--ink-muted);
   }
   .ed-flag {
     justify-self: start;
@@ -193,12 +247,73 @@ const d = ev ? new Date(ev.startsAt) : new Date()
     background: var(--gold-soft, var(--surface-2));
     color: var(--ink);
   }
-  .ed :global(.ed-cover) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 10;
+  .ed-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
     border-radius: var(--radius-xl);
-    object-fit: cover;
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .ed-card-t {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .ed-card-sub {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .ed-facts {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .ed-facts li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+  .ed-facts li :global(svg) {
+    flex: none;
+    color: var(--primary);
+  }
+  .ed-actions {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .ed-action {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    text-decoration: none;
+    transition: background-color var(--duration-micro) var(--ease-out);
+  }
+  .ed-action > span {
+    flex: 1;
+  }
+  .ed-action:hover {
+    background: var(--primary-soft);
+  }
+  .ed-action :global(svg) {
+    flex: none;
+  }
+  .ed-action-primary {
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: none;
+  }
+  .ed-action-primary:hover {
+    background: color-mix(in oklab, var(--primary) 88%, var(--ink));
   }
   .ed-body {
     font-size: var(--text-lg, 1.125rem);
@@ -236,12 +351,6 @@ const d = ev ? new Date(ev.startsAt) : new Date()
   .ed-dates li[data-cancelled] {
     text-decoration: line-through;
     opacity: 0.7;
-  }
-  .ed-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-block-start: 0.75rem;
   }
   .ed-missing {
     display: grid;

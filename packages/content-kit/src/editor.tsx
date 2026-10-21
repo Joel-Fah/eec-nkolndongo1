@@ -116,6 +116,9 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
   const [href, setHref] = useState('')
   const [hrefError, setHrefError] = useState(false)
   const last = useRef<string>('')
+  const wrap = useRef<HTMLDivElement>(null)
+  const [full, setFull] = useState(false)
+  const [holdHeight, setHoldHeight] = useState(0)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -198,8 +201,69 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       link: s.editor?.isActive('link') ?? false,
       canUndo: s.editor?.can().undo() ?? false,
       canRedo: s.editor?.can().redo() ?? false,
+      text: s.editor?.getText({ blockSeparator: ' ' }) ?? '',
     }),
   })
+  /**
+   * Full screen without losing anything: the same editor, restyled in place (nothing is remounted, so the cursor, the
+   * undo history and the text stay). Entering reveals from the editor's own rectangle to the whole screen; leaving
+   * fades back. Reduced motion: no animation. Esc leaves.
+   */
+  const toggleFull = () => {
+    const el = wrap.current
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const first = el.getBoundingClientRect()
+    if (!full) setHoldHeight(first.height)
+    setFull((f) => !f)
+    requestAnimationFrame(() => {
+      if (reduce) return
+      if (!full) {
+        const r = Math.round(parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0)
+        el.animate(
+          [
+            {
+              clipPath: `inset(${first.top}px ${window.innerWidth - first.right}px ${window.innerHeight - first.bottom}px ${first.left}px round ${r}px)`,
+            },
+            { clipPath: 'inset(0px 0px 0px 0px round 0px)' },
+          ],
+          { duration: 360, easing: 'cubic-bezier(.22,1,.36,1)' },
+        )
+      } else {
+        el.animate(
+          [
+            { opacity: 0, transform: 'scale(1.015)' },
+            { opacity: 1, transform: 'none' },
+          ],
+          { duration: 240, easing: 'cubic-bezier(.22,1,.36,1)' },
+        )
+      }
+    })
+    queueMicrotask(() => editor?.commands.focus())
+  }
+  useEffect(() => {
+    if (!full) return
+    const root = document.documentElement
+    root.setAttribute('data-rte-full', '')
+    const onKey = (e: KeyboardEvent) => {
+      if (
+        e.key === 'Escape' &&
+        !document.querySelector('[data-popup-open], [role="menu"], [role="dialog"]')
+      )
+        toggleFull()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      root.removeAttribute('data-rte-full')
+      window.removeEventListener('keydown', onKey)
+    }
+    // biome-ignore lint/correctness/useExhaustiveDependencies: toggleFull is stable enough for one listener per mode
+  }, [full])
+
+  const plain = (state?.text ?? '').replace(/\s+/g, ' ').trim()
+  const words = plain ? plain.split(' ').length : 0
+  const chars = plain.length
+  const noSpace = plain.replace(/\s/g, '').length
   if (!editor) return <div className="rte rte-loading" aria-hidden="true" />
 
   const run = (fn: () => void) => () => {
@@ -298,290 +362,311 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
   }
 
   return (
-    <div className="rte">
-      <div className="rte-bar" role="toolbar" aria-label={t('content.editor.toolbar')}>
-        <span className="rte-group">
-          {btn(
-            'undo',
-            t('content.editor.undo'),
-            false,
-            () => editor.chain().undo().run(),
-            !state?.canUndo,
-            'Mod+Z',
-          )}
-          {btn(
-            'redo',
-            t('content.editor.redo'),
-            false,
-            () => editor.chain().redo().run(),
-            !state?.canRedo,
-            'Mod+Shift+Z',
-          )}
-        </span>
-        <span className="rte-group">
-          {menu(t('content.editor.headings'), state?.h3 ? 'heading3' : 'heading', [
-            {
-              icon: 'paragraph',
-              label: t('content.editor.paragraph'),
-              active: !state?.h2 && !state?.h3,
-              shortcut: 'Mod+Alt+0',
-              action: () => editor.chain().setParagraph().run(),
-            },
-            {
-              icon: 'heading',
-              label: t('content.editor.heading'),
-              active: state?.h2 ?? false,
-              shortcut: 'Mod+Alt+2',
-              action: () => editor.chain().toggleHeading({ level: 2 }).run(),
-            },
-            {
-              icon: 'heading3',
-              label: t('content.editor.heading3'),
-              active: state?.h3 ?? false,
-              shortcut: 'Mod+Alt+3',
-              action: () => editor.chain().toggleHeading({ level: 3 }).run(),
-            },
-          ])}
-          {btn(
-            'bold',
-            t('content.editor.bold'),
-            state?.bold ?? false,
-            () => editor.chain().toggleBold().run(),
-            false,
-            'Mod+B',
-          )}
-          {btn(
-            'italic',
-            t('content.editor.italic'),
-            state?.italic ?? false,
-            () => editor.chain().toggleItalic().run(),
-            false,
-            'Mod+I',
-          )}
-          {btn(
-            'underline',
-            t('content.editor.underline'),
-            state?.underline ?? false,
-            () => editor.chain().toggleUnderline().run(),
-            false,
-            'Mod+U',
-          )}
-          {btn(
-            'strike',
-            t('content.editor.strike'),
-            state?.strike ?? false,
-            () => editor.chain().toggleStrike().run(),
-            false,
-            'Mod+Shift+S',
-          )}
-          {btn(
-            'highlight',
-            t('content.editor.highlight'),
-            state?.highlight ?? false,
-            () => editor.chain().toggleHighlight().run(),
-            false,
-            'Mod+Shift+H',
-          )}
-          {btn(
-            'subscript',
-            t('content.editor.subscript'),
-            state?.sub ?? false,
-            () => editor.chain().toggleSubscript().run(),
-            false,
-            'Mod+,',
-          )}
-          {btn(
-            'superscript',
-            t('content.editor.superscript'),
-            state?.sup ?? false,
-            () => editor.chain().toggleSuperscript().run(),
-            false,
-            'Mod+.',
-          )}
-        </span>
-        <span className="rte-group">
-          {menu(
-            t('content.editor.alignments'),
-            state?.center
-              ? 'alignCenter'
-              : state?.right
-                ? 'alignRight'
-                : state?.justify
-                  ? 'alignJustify'
-                  : 'alignLeft',
-            [
+    <>
+      {full && <div className="rte-hold" style={{ height: holdHeight }} aria-hidden="true" />}
+      <div className="rte" data-full={full ? '' : undefined} ref={wrap}>
+        <div className="rte-bar" role="toolbar" aria-label={t('content.editor.toolbar')}>
+          <span className="rte-group">
+            {btn(
+              'undo',
+              t('content.editor.undo'),
+              false,
+              () => editor.chain().undo().run(),
+              !state?.canUndo,
+              'Mod+Z',
+            )}
+            {btn(
+              'redo',
+              t('content.editor.redo'),
+              false,
+              () => editor.chain().redo().run(),
+              !state?.canRedo,
+              'Mod+Shift+Z',
+            )}
+          </span>
+          <span className="rte-group">
+            {menu(t('content.editor.headings'), state?.h3 ? 'heading3' : 'heading', [
               {
-                icon: 'alignLeft',
-                label: t('content.editor.align_left'),
-                active: state?.left ?? false,
-                shortcut: 'Mod+Shift+L',
-                action: () => editor.chain().setTextAlign('left').run(),
+                icon: 'paragraph',
+                label: t('content.editor.paragraph'),
+                active: !state?.h2 && !state?.h3,
+                shortcut: 'Mod+Alt+0',
+                action: () => editor.chain().setParagraph().run(),
               },
               {
-                icon: 'alignCenter',
-                label: t('content.editor.align_center'),
-                active: state?.center ?? false,
-                shortcut: 'Mod+Shift+E',
-                action: () => editor.chain().setTextAlign('center').run(),
+                icon: 'heading',
+                label: t('content.editor.heading'),
+                active: state?.h2 ?? false,
+                shortcut: 'Mod+Alt+2',
+                action: () => editor.chain().toggleHeading({ level: 2 }).run(),
               },
               {
-                icon: 'alignRight',
-                label: t('content.editor.align_right'),
-                active: state?.right ?? false,
-                shortcut: 'Mod+Shift+R',
-                action: () => editor.chain().setTextAlign('right').run(),
+                icon: 'heading3',
+                label: t('content.editor.heading3'),
+                active: state?.h3 ?? false,
+                shortcut: 'Mod+Alt+3',
+                action: () => editor.chain().toggleHeading({ level: 3 }).run(),
               },
-              {
-                icon: 'alignJustify',
-                label: t('content.editor.align_justify'),
-                active: state?.justify ?? false,
-                shortcut: 'Mod+Shift+J',
-                action: () => editor.chain().setTextAlign('justify').run(),
-              },
-            ],
-          )}
-          {btn(
-            'listBullet',
-            t('content.editor.bullets'),
-            state?.bullet ?? false,
-            () => editor.chain().toggleBulletList().run(),
-            false,
-            'Mod+Shift+8',
-          )}
-          {btn(
-            'listNumber',
-            t('content.editor.numbers'),
-            state?.ordered ?? false,
-            () => editor.chain().toggleOrderedList().run(),
-            false,
-            'Mod+Shift+7',
-          )}
-          {btn(
-            'tasks',
-            t('content.editor.tasks'),
-            state?.task ?? false,
-            () => editor.chain().toggleTaskList().run(),
-            false,
-            'Mod+Shift+9',
-          )}
-          {btn(
-            'indentLess',
-            t('content.editor.indent_less'),
-            false,
-            () => shiftIndent(editor, -1),
-            false,
-            'Shift+Tab',
-          )}
-          {btn(
-            'indentMore',
-            t('content.editor.indent_more'),
-            false,
-            () => shiftIndent(editor, 1),
-            false,
-            'Tab',
-          )}
-          {btn(
-            'quote',
-            t('content.editor.quote'),
-            state?.quote ?? false,
-            () => editor.chain().toggleBlockquote().run(),
-            false,
-            'Mod+Shift+B',
-          )}
-        </span>
-        <span className="rte-group">
-          <ShortcutTip label={t('content.editor.link')}>
-            <button
-              type="button"
-              className="rte-btn"
-              data-icon="link"
-              aria-pressed={state?.link ?? false}
-              aria-label={t('content.editor.link')}
-              onClick={() => {
-                setHref((editor.getAttributes('link').href as string | undefined) ?? '')
-                setHrefError(false)
-                setLinkOpen((o) => !o)
-              }}
-            >
-              <Glyph name="link" />
-            </button>
-          </ShortcutTip>
-          {btn(
-            'table',
-            t('content.editor.table'),
-            state?.inTable ?? false,
-            () => editor.chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
-            state?.inTable ?? false,
-          )}
-          {btn('photo', t('content.editor.photo'), false, () => setPicking(true))}
-        </span>
-      </div>
-      {state?.inTable && (
-        <div
-          className="rte-bar rte-bar-table"
-          role="toolbar"
-          aria-label={t('content.editor.group_table')}
-        >
-          {btn('rowAdd', t('content.editor.row_add'), false, () =>
-            editor.chain().addRowAfter().run(),
-          )}
-          {btn('colAdd', t('content.editor.col_add'), false, () =>
-            editor.chain().addColumnAfter().run(),
-          )}
-          {btn('rowDel', t('content.editor.row_del'), false, () =>
-            editor.chain().deleteRow().run(),
-          )}
-          {btn('colDel', t('content.editor.col_del'), false, () =>
-            editor.chain().deleteColumn().run(),
-          )}
-          {btn('trash', t('content.editor.table_del'), false, () =>
-            editor.chain().deleteTable().run(),
-          )}
+            ])}
+            {btn(
+              'bold',
+              t('content.editor.bold'),
+              state?.bold ?? false,
+              () => editor.chain().toggleBold().run(),
+              false,
+              'Mod+B',
+            )}
+            {btn(
+              'italic',
+              t('content.editor.italic'),
+              state?.italic ?? false,
+              () => editor.chain().toggleItalic().run(),
+              false,
+              'Mod+I',
+            )}
+            {btn(
+              'underline',
+              t('content.editor.underline'),
+              state?.underline ?? false,
+              () => editor.chain().toggleUnderline().run(),
+              false,
+              'Mod+U',
+            )}
+            {btn(
+              'strike',
+              t('content.editor.strike'),
+              state?.strike ?? false,
+              () => editor.chain().toggleStrike().run(),
+              false,
+              'Mod+Shift+S',
+            )}
+            {btn(
+              'highlight',
+              t('content.editor.highlight'),
+              state?.highlight ?? false,
+              () => editor.chain().toggleHighlight().run(),
+              false,
+              'Mod+Shift+H',
+            )}
+            {btn(
+              'subscript',
+              t('content.editor.subscript'),
+              state?.sub ?? false,
+              () => editor.chain().toggleSubscript().run(),
+              false,
+              'Mod+,',
+            )}
+            {btn(
+              'superscript',
+              t('content.editor.superscript'),
+              state?.sup ?? false,
+              () => editor.chain().toggleSuperscript().run(),
+              false,
+              'Mod+.',
+            )}
+          </span>
+          <span className="rte-group">
+            {menu(
+              t('content.editor.alignments'),
+              state?.center
+                ? 'alignCenter'
+                : state?.right
+                  ? 'alignRight'
+                  : state?.justify
+                    ? 'alignJustify'
+                    : 'alignLeft',
+              [
+                {
+                  icon: 'alignLeft',
+                  label: t('content.editor.align_left'),
+                  active: state?.left ?? false,
+                  shortcut: 'Mod+Shift+L',
+                  action: () => editor.chain().setTextAlign('left').run(),
+                },
+                {
+                  icon: 'alignCenter',
+                  label: t('content.editor.align_center'),
+                  active: state?.center ?? false,
+                  shortcut: 'Mod+Shift+E',
+                  action: () => editor.chain().setTextAlign('center').run(),
+                },
+                {
+                  icon: 'alignRight',
+                  label: t('content.editor.align_right'),
+                  active: state?.right ?? false,
+                  shortcut: 'Mod+Shift+R',
+                  action: () => editor.chain().setTextAlign('right').run(),
+                },
+                {
+                  icon: 'alignJustify',
+                  label: t('content.editor.align_justify'),
+                  active: state?.justify ?? false,
+                  shortcut: 'Mod+Shift+J',
+                  action: () => editor.chain().setTextAlign('justify').run(),
+                },
+              ],
+            )}
+            {btn(
+              'listBullet',
+              t('content.editor.bullets'),
+              state?.bullet ?? false,
+              () => editor.chain().toggleBulletList().run(),
+              false,
+              'Mod+Shift+8',
+            )}
+            {btn(
+              'listNumber',
+              t('content.editor.numbers'),
+              state?.ordered ?? false,
+              () => editor.chain().toggleOrderedList().run(),
+              false,
+              'Mod+Shift+7',
+            )}
+            {btn(
+              'tasks',
+              t('content.editor.tasks'),
+              state?.task ?? false,
+              () => editor.chain().toggleTaskList().run(),
+              false,
+              'Mod+Shift+9',
+            )}
+            {btn(
+              'indentLess',
+              t('content.editor.indent_less'),
+              false,
+              () => shiftIndent(editor, -1),
+              false,
+              'Shift+Tab',
+            )}
+            {btn(
+              'indentMore',
+              t('content.editor.indent_more'),
+              false,
+              () => shiftIndent(editor, 1),
+              false,
+              'Tab',
+            )}
+            {btn(
+              'quote',
+              t('content.editor.quote'),
+              state?.quote ?? false,
+              () => editor.chain().toggleBlockquote().run(),
+              false,
+              'Mod+Shift+B',
+            )}
+          </span>
+          <span className="rte-group">
+            <ShortcutTip label={t('content.editor.link')}>
+              <button
+                type="button"
+                className="rte-btn"
+                data-icon="link"
+                aria-pressed={state?.link ?? false}
+                aria-label={t('content.editor.link')}
+                onClick={() => {
+                  setHref((editor.getAttributes('link').href as string | undefined) ?? '')
+                  setHrefError(false)
+                  setLinkOpen((o) => !o)
+                }}
+              >
+                <Glyph name="link" />
+              </button>
+            </ShortcutTip>
+            {btn(
+              'table',
+              t('content.editor.table'),
+              state?.inTable ?? false,
+              () => editor.chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+              state?.inTable ?? false,
+            )}
+            {btn('photo', t('content.editor.photo'), false, () => setPicking(true))}
+          </span>
+          <span className="rte-gap" aria-hidden="true" />
+          <span className="rte-group">
+            {btn(
+              full ? 'minimize' : 'maximize',
+              t(full ? 'content.editor.exit_full' : 'content.editor.full'),
+              full,
+              toggleFull,
+              false,
+              full ? 'Esc' : undefined,
+            )}
+          </span>
         </div>
-      )}
-      {linkOpen && (
-        <form
-          className="rte-link"
-          onSubmit={(e) => {
-            e.preventDefault()
-            applyLink()
-          }}
-        >
-          <label className="grid flex-1 gap-1 text-sm">
-            <span>{t('content.editor.link_label')}</span>
-            <input
-              className="input"
-              value={href}
-              placeholder="https://"
-              inputMode="url"
-              onChange={(e) => setHref(e.target.value)}
-              aria-invalid={hrefError}
-            />
-          </label>
-          <button type="submit" className="btn btn-primary btn-sm">
-            {t('content.editor.link_apply')}
-          </button>
-          {state?.link && (
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                editor.chain().focus().extendMarkRange('link').unsetLink().run()
-                setLinkOpen(false)
-              }}
-            >
-              {t('content.editor.link_remove')}
+        {state?.inTable && (
+          <div
+            className="rte-bar rte-bar-table"
+            role="toolbar"
+            aria-label={t('content.editor.group_table')}
+          >
+            {btn('rowAdd', t('content.editor.row_add'), false, () =>
+              editor.chain().addRowAfter().run(),
+            )}
+            {btn('colAdd', t('content.editor.col_add'), false, () =>
+              editor.chain().addColumnAfter().run(),
+            )}
+            {btn('rowDel', t('content.editor.row_del'), false, () =>
+              editor.chain().deleteRow().run(),
+            )}
+            {btn('colDel', t('content.editor.col_del'), false, () =>
+              editor.chain().deleteColumn().run(),
+            )}
+            {btn('trash', t('content.editor.table_del'), false, () =>
+              editor.chain().deleteTable().run(),
+            )}
+          </div>
+        )}
+        {linkOpen && (
+          <form
+            className="rte-link"
+            onSubmit={(e) => {
+              e.preventDefault()
+              applyLink()
+            }}
+          >
+            <label className="grid flex-1 gap-1 text-sm">
+              <span>{t('content.editor.link_label')}</span>
+              <input
+                className="input"
+                value={href}
+                placeholder="https://"
+                inputMode="url"
+                onChange={(e) => setHref(e.target.value)}
+                aria-invalid={hrefError}
+              />
+            </label>
+            <button type="submit" className="btn btn-primary btn-sm">
+              {t('content.editor.link_apply')}
             </button>
-          )}
-          {hrefError && (
-            <p role="alert" className="w-full text-sm text-danger">
-              {t('content.editor.link_invalid')}
-            </p>
-          )}
-        </form>
-      )}
-      <EditorContent editor={editor} />
-      <MediaPicker open={picking} onClose={() => setPicking(false)} onPick={insertPhoto} />
-    </div>
+            {state?.link && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  editor.chain().focus().extendMarkRange('link').unsetLink().run()
+                  setLinkOpen(false)
+                }}
+              >
+                {t('content.editor.link_remove')}
+              </button>
+            )}
+            {hrefError && (
+              <p role="alert" className="w-full text-sm text-danger">
+                {t('content.editor.link_invalid')}
+              </p>
+            )}
+          </form>
+        )}
+        <div className="rte-scroll">
+          <EditorContent editor={editor} />
+        </div>
+        <div className="rte-count" aria-live="off">
+          <span>{t('content.editor.count_words', { n: String(words) })}</span>
+          <span>{t('content.editor.count_chars', { n: String(chars) })}</span>
+          <span>{t('content.editor.count_nospace', { n: String(noSpace) })}</span>
+        </div>
+        <MediaPicker open={picking} onClose={() => setPicking(false)} onPick={insertPhoto} />
+      </div>
+    </>
   )
 }

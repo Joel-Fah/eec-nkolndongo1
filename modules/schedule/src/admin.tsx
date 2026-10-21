@@ -228,13 +228,14 @@ export default function SchedulePage() {
     },
   })
 
-  const actions = (s: Slot) => (
+  const chip = (s: Slot) =>
+    s.validated ? (
+      <Badge tone="success">{t(k('approved'))}</Badge>
+    ) : (
+      <Badge tone="warning">{t(k('pending'))}</Badge>
+    )
+  const buttons = (s: Slot) => (
     <span className="flex flex-wrap items-center gap-2">
-      {s.validated ? (
-        <Badge tone="success">{t(k('approved'))}</Badge>
-      ) : (
-        <Badge tone="warning">{t(k('pending'))}</Badge>
-      )}
       {canValidate && (
         <Button
           size="sm"
@@ -254,6 +255,12 @@ export default function SchedulePage() {
           {t(k('delete'))}
         </Button>
       )}
+    </span>
+  )
+  const actions = (s: Slot) => (
+    <span className="flex flex-wrap items-center gap-2">
+      {chip(s)}
+      {buttons(s)}
     </span>
   )
   const label = (s: Slot) => (locale === 'en' && s.labelEn ? s.labelEn : s.labelFr)
@@ -287,31 +294,36 @@ export default function SchedulePage() {
         <ul className="slot-grid">
           {slots.map((s) => (
             <li key={s.id} className="slot-card">
-              <span
-                className="kind-tile"
-                data-tone={
-                  s.kind === 'culte'
-                    ? 'primary'
-                    : s.kind === 'priere'
-                      ? 'success'
-                      : s.kind === 'etude_biblique'
-                        ? 'info'
-                        : 'clay'
-                }
-                aria-hidden="true"
-              >
-                <Icon name={KIND_ICON[s.kind]} size={20} />
-              </span>
-              <div className="grid gap-0.5">
-                <strong>{label(s)}</strong>
-                <span className="text-sm text-ink-muted">
-                  {dayName(s.weekday)} · {s.startTime}
-                  {s.endTime ? `–${s.endTime}` : ''}
+              <div className="slot-card-head">
+                <span
+                  className="kind-tile"
+                  data-tone={
+                    s.kind === 'culte'
+                      ? 'primary'
+                      : s.kind === 'priere'
+                        ? 'success'
+                        : s.kind === 'etude_biblique'
+                          ? 'info'
+                          : 'clay'
+                  }
+                  aria-hidden="true"
+                >
+                  <Icon name={KIND_ICON[s.kind]} size={20} />
                 </span>
+                <div className="slot-card-title">
+                  <strong>{label(s)}</strong>
+                  <span className="text-sm text-ink-muted">
+                    {dayName(s.weekday)} · {s.startTime}
+                    {s.endTime ? `–${s.endTime}` : ''}
+                  </span>
+                </div>
+                <span className="slot-card-status">{chip(s)}</span>
+              </div>
+              <div className="slot-card-body">
                 {rhythmLabel(s) && <span className="text-sm text-ink-muted">{rhythmLabel(s)}</span>}
                 {s.placeFr && <span className="text-sm text-ink-muted">{s.placeFr}</span>}
               </div>
-              <div className="slot-card-actions">{actions(s)}</div>
+              <div className="slot-card-foot">{buttons(s)}</div>
             </li>
           ))}
         </ul>

@@ -74,7 +74,29 @@ export const BOOKS = [
   { id: 'rev', fr: 'Apocalypse', en: 'Revelation' },
 ] as const
 
-export type BibleRef = { book: BookId; chapter: number; from?: number | null; to?: number | null }
+/** A verse number, with an optional part letter: 16, « 1b ». Up to three digits. */
+export type VerseNo = number | string
+export type BibleRef = { book: BookId; chapter: number; from?: VerseNo | null; to?: VerseNo | null }
+
+const VERSE = /^(\d{1,3})([a-z])?$/i
+/** Digits and the letter of a verse number (« 1b » → [1, 'b']). */
+const parts = (v: VerseNo): [number, string] => {
+  const m = VERSE.exec(String(v))
+  return m ? [Number(m[1]), (m[2] ?? '').toLowerCase()] : [0, '']
+}
+/** Orders verse numbers: 1 < 1a < 1b < 2. */
+export function compareVerses(a: VerseNo, b: VerseNo): number {
+  const [na, la] = parts(a)
+  const [nb, lb] = parts(b)
+  return na - nb || la.localeCompare(lb)
+}
+/** « 16 », « 1b »; anything else (empty, 4 digits, two letters) → null. */
+export function cleanVerse(v: unknown): VerseNo | null {
+  if (typeof v !== 'string' && typeof v !== 'number') return null
+  const m = VERSE.exec(String(v).trim())
+  if (!m || Number(m[1]) < 1) return null
+  return m[2] ? `${Number(m[1])}${m[2].toLowerCase()}` : Number(m[1])
+}
 
 export const isBookId = (v: unknown): v is BookId => BOOKS.some((b) => b.id === v)
 
@@ -85,7 +107,8 @@ export function formatRef(ref: BibleRef, locale: 'fr' | 'en'): string {
   const name = book[locale]
   const colon = locale === 'fr' ? ' : ' : ':'
   if (!ref.from) return `${name} ${ref.chapter}`
-  const verses = ref.to && ref.to > ref.from ? `${ref.from}–${ref.to}` : `${ref.from}`
+  const verses =
+    ref.to && compareVerses(ref.to, ref.from) > 0 ? `${ref.from}–${ref.to}` : `${ref.from}`
   return `${name} ${ref.chapter}${colon}${verses}`
 }
 
@@ -94,13 +117,15 @@ export function cleanRef(raw: unknown): BibleRef | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
   if (!isBookId(r.book)) return null
-  const int = (v: unknown, max: number) =>
-    Number.isInteger(v) && (v as number) >= 1 && (v as number) <= max ? (v as number) : null
-  const chapter = int(r.chapter, 150)
+  const chapter =
+    Number.isInteger(r.chapter) && (r.chapter as number) >= 1 && (r.chapter as number) <= 150
+      ? (r.chapter as number)
+      : null
   if (!chapter) return null
-  const from = r.from == null ? null : int(r.from, 176)
-  const to = r.to == null ? null : int(r.to, 176)
-  if (r.from != null && !from) return null
-  if (r.to != null && (!to || !from || to < from)) return null
+  const blank = (v: unknown) => v == null || v === ''
+  const from = blank(r.from) ? null : cleanVerse(r.from)
+  const to = blank(r.to) ? null : cleanVerse(r.to)
+  if (!blank(r.from) && from === null) return null
+  if (!blank(r.to) && (to === null || from === null || compareVerses(to, from) < 0)) return null
   return { book: r.book, chapter, from, to }
 }

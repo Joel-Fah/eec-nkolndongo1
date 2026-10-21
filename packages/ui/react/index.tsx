@@ -411,11 +411,13 @@ export function ShortcutTip({
 /* ── Tabs, accordion ──────────────────────────────────────────────────── */
 export function TabsBox({
   tabs,
+  onTabChange,
 }: {
   tabs: { id: string; label: ReactNode; content: ReactNode }[]
+  onTabChange?: (id: string) => void
 }) {
   return (
-    <Tabs.Root defaultValue={tabs[0]?.id}>
+    <Tabs.Root defaultValue={tabs[0]?.id} onValueChange={(v) => onTabChange?.(String(v))}>
       <Tabs.List className="tabs-list">
         <Tabs.Indicator className="tabs-indicator" />
         {tabs.map((t) => (

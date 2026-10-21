@@ -3,13 +3,13 @@
  * be judged with realistic lengths and photos. No parish facts: no names, dates, times or places. `--clear` removes them.
  * Refuses to run on any branch but `dev`.
  */
-import { cleanDoc, zonedToUtc } from '@eec/core'
+import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { mediaFiles } from '@eec/db/schema'
 import { eventsItems } from '@eec/module-events/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
-import { scheduleSlots } from '@eec/module-schedule/schema'
+import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
 import { and, eq, like } from 'drizzle-orm'
 
 assertBranch(['dev'])
@@ -18,9 +18,10 @@ const { db, close } = await connectDirect()
 if (process.argv.includes('--clear')) {
   await db.delete(newsPosts).where(like(newsPosts.slug, 'exemple-%'))
   await db.delete(eventsItems).where(like(eventsItems.slug, 'exemple-%'))
+  await db.delete(scheduleExceptions).where(like(scheduleExceptions.noteFr, 'Exemple%'))
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
-  await db.delete(liturgySundays).where(eq(liturgySundays.themeFr, 'Exemple de thème'))
+  await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
   console.log('Example posts and events removed.')
   await close()
   process.exit(0)
@@ -204,6 +205,48 @@ await db.insert(scheduleSlots).values([
     validated: true,
   },
 ])
+// The Holy Supper: every 2nd Sunday of the month, with its preparation on the Wednesday before at 17:00 (it follows the
+// Supper). Next month's Supper is moved to the 3rd Sunday « for a reason », and the preparation follows it.
+const [supper] = await db
+  .insert(scheduleSlots)
+  .values({
+    kind: 'culte',
+    labelFr: 'Exemple — Sainte Cène (2e dimanche)',
+    labelEn: 'Example — Holy Supper (2nd Sunday)',
+    weekday: 0,
+    startTime: '09:00',
+    endTime: '11:30',
+    recurrence: { freq: 'monthly', nth: [2] },
+    validated: true,
+  })
+  .returning()
+if (supper) {
+  await db.insert(scheduleSlots).values({
+    kind: 'priere',
+    labelFr: 'Exemple — Préparation de la Sainte Cène',
+    labelEn: 'Example — Holy Supper preparation',
+    weekday: 3,
+    startTime: '17:00',
+    endTime: '18:30',
+    anchorSlotId: supper.id,
+    offsetDays: -4,
+    validated: true,
+  })
+  const now = new Date()
+  const y = now.getUTCMonth() === 11 ? now.getUTCFullYear() + 1 : now.getUTCFullYear()
+  const m = ((now.getUTCMonth() + 1) % 12) + 1
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const second = nthWeekdayOfMonth(y, m, 2, 0)
+  const third = nthWeekdayOfMonth(y, m, 3, 0)
+  await db.insert(scheduleExceptions).values({
+    date: `${y}-${pad(m)}-${pad(second)}`,
+    slotId: supper.id,
+    kind: 'moved',
+    toDate: `${y}-${pad(m)}-${pad(third)}`,
+    noteFr: 'Exemple : retraite des pasteurs ce dimanche-là',
+  })
+}
+
 // Liturgy: the coming Sunday (theme and readings are examples), and the four verses already used on the sign-in screen
 // (Louis Segond 1910 / World English Bible, public domain: to check against a printed copy, decision 0032).
 const sundayDate = (() => {
@@ -225,6 +268,29 @@ await db
     publishedAt: new Date(),
   })
   .onConflictDoNothing()
+// The next 2nd Sunday of a month is a Holy Supper Sunday, whatever its season.
+{
+  const now = new Date()
+  for (let i = 0; i < 3; i++) {
+    const y = now.getUTCFullYear() + Math.floor((now.getUTCMonth() + i) / 12)
+    const m = ((now.getUTCMonth() + i) % 12) + 1
+    const d = nthWeekdayOfMonth(y, m, 2, 0)
+    const date = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    if (new Date(`${date}T12:00:00Z`) > now) {
+      await db
+        .insert(liturgySundays)
+        .values({
+          date,
+          holySupper: true,
+          themeFr: 'Exemple — Dimanche de la Sainte Cène',
+          state: 'published',
+          publishedAt: new Date(),
+        })
+        .onConflictDoNothing()
+      break
+    }
+  }
+}
 await db.insert(liturgyVerses).values([
   {
     ref: { book: 'mat', chapter: 11, from: 28 },
@@ -245,6 +311,6 @@ await db.insert(liturgyVerses).values([
   },
 ])
 console.log(
-  `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, a Sunday and 3 verses.`,
+  `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
 )
 await close()

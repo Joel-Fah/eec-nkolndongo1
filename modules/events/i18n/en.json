@@ -39,7 +39,7 @@
   "date": "Date",
   "end_before": "The end must come after the start.",
   "repeat": "Repeat",
-  "repeat_none": "Once",
+  "repeat_none": "Does not repeat",
   "repeat_weekly": "Every week",
   "repeat_nth": "Every month, on a weekday (e.g. the 1st Sunday)",
   "repeat_day": "Every month, on a date (e.g. the 15th)",
@@ -164,7 +164,16 @@
     "kind_sortie": "Outing",
     "kind_concert": "Concert",
     "kind_formation": "Training",
-    "kind_autre": "Other"
+    "kind_autre": "Other",
+    "recap": "At a glance",
+    "place_other": "Place to be confirmed",
+    "period": "Period",
+    "period_all": "All dates",
+    "period_week": "This week",
+    "period_month": "This month",
+    "range_from": "From",
+    "range_to": "To",
+    "range_apply": "Show these dates"
   },
   "no_next": "No upcoming date",
   "continues": "continues",
@@ -179,5 +188,12 @@
   "kind_sortie": "Outing",
   "kind_concert": "Concert",
   "kind_formation": "Training",
-  "kind_autre": "Other"
+  "kind_autre": "Other",
+  "period": "Period",
+  "period_all": "All dates",
+  "period_week": "This week",
+  "period_month": "This month",
+  "period_range": "Pick dates",
+  "from": "From",
+  "until_date": "To"
 }

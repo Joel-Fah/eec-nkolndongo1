@@ -84,7 +84,8 @@
     "this_sunday": "Dimanche {date}",
     "unavailable_t": "Cette page ne se charge pas pour l’instant",
     "unavailable_p": "Ce n’est pas de votre fait. Réessayez dans un moment.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "holy_supper": "Sainte Cène"
   },
   "view_grid": "Grille",
   "view_list": "Liste",
@@ -105,5 +106,10 @@
   "name_suffix": "Nom proposé : {name}",
   "edit_week": "Modifier ce dimanche",
   "lang_fr": "Français",
-  "lang_en": "English"
+  "lang_en": "English",
+  "from_short": "De",
+  "to_short": "À",
+  "from_after_to": "Le verset de fin doit venir après celui du début.",
+  "holy_supper": "Sainte Cène",
+  "holy_supper_switch": "Dimanche de la Sainte Cène"
 }

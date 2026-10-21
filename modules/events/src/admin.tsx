@@ -231,6 +231,9 @@ function List({
   const me = useMe().data
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
+  const [period, setPeriod] = useState<'all' | 'week' | 'month' | 'range'>('all')
+  const [rangeFrom, setRangeFrom] = useState('')
+  const [rangeTo, setRangeTo] = useState('')
   const params = new URLSearchParams()
   if (q) params.set('q', q)
   if (status) params.set('status', status)
@@ -241,7 +244,28 @@ function List({
   const counts = list.data?.counts
   // Grouped by the week of the next date (events with no date left go last), earliest week first.
   const groups = useMemo(() => {
-    const items = list.data?.items ?? []
+    const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date())
+    const wk = weekOf(todayKey)
+    const [ty, tm] = todayKey.split('-')
+    const monthFrom = `${ty}-${tm}-01`
+    const monthTo = new Date(Date.UTC(Number(ty), Number(tm), 0)).toISOString().slice(0, 10)
+    const lo =
+      period === 'week'
+        ? wk.from
+        : period === 'month'
+          ? monthFrom
+          : period === 'range'
+            ? rangeFrom
+            : ''
+    const hi =
+      period === 'week' ? wk.to : period === 'month' ? monthTo : period === 'range' ? rangeTo : ''
+    const items = (list.data?.items ?? []).filter((e) => {
+      if (period === 'all' || !e.nextAt) return period === 'all'
+      const d = new Intl.DateTimeFormat('en-CA', { timeZone: e.allDay ? 'UTC' : TZ }).format(
+        new Date(e.nextAt),
+      )
+      return (!lo || d >= lo) && (!hi || d <= hi)
+    })
     const map = new Map<string, Item[]>()
     for (const e of items) {
       const key = e.nextAt
@@ -256,7 +280,7 @@ function List({
     return [...map.entries()].sort(([a], [b]) =>
       a === 'past' ? 1 : b === 'past' ? -1 : a.localeCompare(b),
     )
-  }, [list.data])
+  }, [list.data, period, rangeFrom, rangeTo])
   const when = (e: Item) => {
     const at = e.nextAt ?? e.startsAt
     const day = shortDate(at, locale, e.allDay ? 'UTC' : TZ)
@@ -281,6 +305,42 @@ function List({
             onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
           />
         </div>
+        <div className="media-select">
+          <SelectField
+            label={t(k('period'))}
+            value={period}
+            onValueChange={(v) => v && setPeriod(v as typeof period)}
+            options={[
+              { value: 'all', label: t(k('period_all')) },
+              { value: 'week', label: t(k('period_week')) },
+              { value: 'month', label: t(k('period_month')) },
+              { value: 'range', label: t(k('period_range')) },
+            ]}
+          />
+        </div>
+        {period === 'range' && (
+          <>
+            <label className="grid gap-1">
+              <span className="field-label">{t(k('from'))}</span>
+              <input
+                className="input"
+                type="date"
+                value={rangeFrom}
+                onChange={(e) => setRangeFrom(e.target.value)}
+              />
+            </label>
+            <label className="grid gap-1">
+              <span className="field-label">{t(k('until_date'))}</span>
+              <input
+                className="input"
+                type="date"
+                value={rangeTo}
+                min={rangeFrom || undefined}
+                onChange={(e) => setRangeTo(e.target.value)}
+              />
+            </label>
+          </>
+        )}
         <div className="media-select">
           <SelectField
             label={t(k('filter'))}
@@ -1099,6 +1159,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                 onClick={() => preview.mutate()}
               >
                 {t(k('preview'))}
+                <Icon name="external" size={16} />
               </Button>
               <Button variant="secondary" size="sm" onClick={() => setDialog('versions')}>
                 {t(k('versions'))}
@@ -1116,6 +1177,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
               {live && (
                 <a className="btn btn-ghost btn-sm" href={siteUrl} target="_blank" rel="noreferrer">
                   {t(k('view_site'))}
+                  <Icon name="external" size={16} />
                 </a>
               )}
             </div>
@@ -1123,12 +1185,17 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
           </div>
 
           <div className="admin-panel">
-            <SelectField
-              label={t(k('kind'))}
-              value={draft.kind}
-              onValueChange={(v) => v && set('kind', v as EventKind)}
-              options={EVENT_KINDS.map((x) => ({ value: x, label: t(k(`kind_${x}`)) }))}
-            />
+            <div className="kind-field">
+              <KindTile kind={draft.kind} />
+              <div className="grow">
+                <SelectField
+                  label={t(k('kind'))}
+                  value={draft.kind}
+                  onValueChange={(v) => v && set('kind', v as EventKind)}
+                  options={EVENT_KINDS.map((x) => ({ value: x, label: t(k(`kind_${x}`)) }))}
+                />
+              </div>
+            </div>
             <SelectField
               label={t(k('place'))}
               value={draft.locationKind}

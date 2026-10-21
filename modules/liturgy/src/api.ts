@@ -51,6 +51,7 @@ export const sundayBody = z
     preacherName: z.string().max(120),
     liturgistName: z.string().max(120),
     namesConsent: z.boolean(),
+    holySupper: z.boolean(),
     hymns: z.string().max(300),
     notesFr: z.string().max(500),
     notesEn: z.string().max(500),
@@ -98,6 +99,7 @@ function publicSunday(row: SundayRow | undefined, d: string, locale: Locale) {
     liturgist: row?.namesConsent ? row.liturgistName : '',
     hymns: row?.hymns ?? '',
     notes: (en ? row?.notesEn || row?.notesFr : row?.notesFr) ?? '',
+    holySupper: row?.holySupper ?? false,
     published: !!row,
   }
 }

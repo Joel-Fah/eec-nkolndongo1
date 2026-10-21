@@ -50,11 +50,24 @@ const iso = (d: Date) => d.toISOString().slice(0, 10)
 const first = new Date(Date.UTC(y, m - 1, 1))
 const lead = (first.getUTCDay() + 6) % 7
 const gridStart = new Date(Date.UTC(y, m - 1, 1 - lead))
-const from = view === 'month' ? iso(gridStart) : todayKey
+const period = ['semaine', 'mois', 'dates'].includes(q.get('periode') ?? '')
+  ? (q.get('periode') as string)
+  : ''
+const dateOk = (v: string | null) => (/^\d{4}-\d{2}-\d{2}$/.test(v ?? '') ? (v as string) : '')
+const wk = weekOf(todayKey)
+const monthStart = `${ty}-${String(tm).padStart(2, '0')}-01`
+const monthEnd = new Date(Date.UTC(ty, tm, 0)).toISOString().slice(0, 10)
+const rangeFrom = period === 'dates' ? dateOk(q.get('du')) : ''
+const rangeTo = period === 'dates' ? dateOk(q.get('au')) : ''
+const periodFrom = period === 'semaine' ? wk.from : period === 'mois' ? monthStart : rangeFrom
+const periodTo = period === 'semaine' ? wk.to : period === 'mois' ? monthEnd : rangeTo
+const from = view === 'month' ? iso(gridStart) : periodFrom || todayKey
 const to =
   view === 'month'
     ? iso(new Date(gridStart.getTime() + 42 * 86_400_000))
-    : iso(new Date(Date.now() + 100 * 86_400_000))
+    : periodTo
+      ? iso(new Date(Date.parse(`${periodTo}T00:00:00Z`) + 86_400_000))
+      : iso(new Date(Date.now() + 100 * 86_400_000))
 const params = new URLSearchParams({ locale, from, to })
 if (group) params.set('group', group)
 const result = await publicJson<{ items: EventOcc[] }>(Astro, `/api/events/public?${params}`)
@@ -131,6 +144,13 @@ Astro.response.headers.set(
         <a href={link({ vue: null, mois: null })} aria-current={view === 'list' ? 'true' : undefined}>{label('view_list')}</a>
         <a href={link({ vue: 'mois', mois: ym })} aria-current={view === 'month' ? 'true' : undefined}>{label('view_month')}</a>
       </div>
+      {view === 'list' && (
+        <nav class="ev-groups ev-period" aria-label={label('period')}>
+          <a href={link({ periode: null, du: null, au: null })} aria-current={!period ? 'true' : undefined}>{label('period_all')}</a>
+          <a href={link({ periode: 'semaine', du: null, au: null })} aria-current={period === 'semaine' ? 'true' : undefined}>{label('period_week')}</a>
+          <a href={link({ periode: 'mois', du: null, au: null })} aria-current={period === 'mois' ? 'true' : undefined}>{label('period_month')}</a>
+        </nav>
+      )}
       {
         groups.length > 0 && (
           <nav class="ev-groups" aria-label={label('filter_group')}>
@@ -141,6 +161,15 @@ Astro.response.headers.set(
       }
     </div>
 
+    {view === 'list' && (
+      <form class="ev-range" method="get" action={eventsListHref(locale)}>
+        <input type="hidden" name="periode" value="dates" />
+        {group && <input type="hidden" name="groupe" value={group} />}
+        <label><span>{label('range_from')}</span><input type="date" name="du" value={rangeFrom} /></label>
+        <label><span>{label('range_to')}</span><input type="date" name="au" value={rangeTo} min={rangeFrom || undefined} /></label>
+        <Button type="submit" variant="secondary">{label('range_apply')}</Button>
+      </form>
+    )}
     {
       result.state === 'unavailable' ? (
         <UnavailableState />
@@ -275,6 +304,29 @@ Astro.response.headers.set(
     background: var(--primary-soft);
     color: var(--primary);
     font-weight: 600;
+  }
+  .ev-range {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .ev-range label {
+    display: grid;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .ev-range input[type='date'] {
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1.5px var(--line-strong);
+    font-weight: 400;
   }
   .ev-section {
     display: grid;

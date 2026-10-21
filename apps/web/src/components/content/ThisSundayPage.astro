@@ -22,6 +22,7 @@ type Sunday = {
   liturgist: string
   hymns: string
   notes: string
+  holySupper: boolean
   published: boolean
 }
 const locale = localeOf(Astro.currentLocale)
@@ -72,6 +73,12 @@ Astro.response.headers.set(
       <p class="cs-kicker"><span class="cs-dot" aria-hidden="true"></span>{label('title')}</p>
       <h1 class="cs-title">{s ? s.name : label('title')}</h1>
       {s && <p class="cs-date">{day(s.date)}</p>}
+      {s && (s.season !== 'ordinaire' || s.holySupper) && (
+        <p class="cs-tags">
+          {s.season !== 'ordinaire' && <span class="cs-chip"><span class="cs-dot" aria-hidden="true"></span>{t(`season.${s.season}` as 'season.avent')}</span>}
+          {s.holySupper && <span class="cs-chip cs-chip-supper">{label('holy_supper')}</span>}
+        </p>
+      )}
     </header>
     {
       cur.state === 'unavailable' ? (
@@ -162,6 +169,24 @@ Astro.response.headers.set(
   }
   .cs-date::first-letter {
     text-transform: uppercase;
+  }
+  .cs-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cs-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--season) 22%, var(--surface));
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .cs-chip-supper {
+    background: var(--gold-soft, var(--surface-2));
   }
   .cs-card,
   .cs-empty {

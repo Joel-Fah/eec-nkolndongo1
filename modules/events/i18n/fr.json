@@ -39,7 +39,7 @@
   "date": "Date",
   "end_before": "La fin doit venir après le début.",
   "repeat": "Répétition",
-  "repeat_none": "Une seule fois",
+  "repeat_none": "Ne se répète pas",
   "repeat_weekly": "Chaque semaine",
   "repeat_nth": "Chaque mois, un jour de la semaine (ex. le 1er dimanche)",
   "repeat_day": "Chaque mois, à une date (ex. le 15)",
@@ -164,7 +164,16 @@
     "kind_sortie": "Sortie",
     "kind_concert": "Concert",
     "kind_formation": "Formation",
-    "kind_autre": "Autre"
+    "kind_autre": "Autre",
+    "recap": "En bref",
+    "place_other": "Lieu à préciser",
+    "period": "Période",
+    "period_all": "Toutes les dates",
+    "period_week": "Cette semaine",
+    "period_month": "Ce mois-ci",
+    "range_from": "Du",
+    "range_to": "Au",
+    "range_apply": "Voir ces dates"
   },
   "no_next": "Sans date à venir",
   "continues": "suite",
@@ -179,5 +188,12 @@
   "kind_sortie": "Sortie",
   "kind_concert": "Concert",
   "kind_formation": "Formation",
-  "kind_autre": "Autre"
+  "kind_autre": "Autre",
+  "period": "Période",
+  "period_all": "Toutes les dates",
+  "period_week": "Cette semaine",
+  "period_month": "Ce mois-ci",
+  "period_range": "Choisir des dates",
+  "from": "Du",
+  "until_date": "Au"
 }

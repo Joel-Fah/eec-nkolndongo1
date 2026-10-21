@@ -2,6 +2,7 @@
 /** One news post. `preview`: opened with a signed link by someone without an account — any state, never indexed. */
 import { shortDate } from '@eec/core/dates'
 import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
 import '../../styles/richtext.css'
 import Site from '../../layouts/Site.astro'
 import { type NewsDetail, publicJson } from '../../lib/content-api'
@@ -52,7 +53,7 @@ const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${ur
 
 <Site title={post?.title ?? t('news.site.not_found_t')} description={post?.excerpt} noindex={preview || !post}>
   <article class="nd">
-    <p class="nd-back"><a href={newsListHref(locale)}>← {t('news.site.back')}</a></p>
+    <p class="nd-back"><a href={newsListHref(locale)}><Icon name="chevronLeft" size={20} />{t('news.site.back')}</a></p>
     {preview && <p class="nd-preview" role="note">{t('news.site.preview_banner')}</p>}
     {
       unavailable ? (
@@ -77,7 +78,7 @@ const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${ur
           {post.cover && <Picture class="nd-cover" media={post.cover} sizes="(min-width: 48rem) 46rem, 100vw" eager decorative />}
           <div class="nd-body" set:html={post.html} />
           <p class="nd-share">
-            <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer">{t('news.site.share_whatsapp')}</Button>
+            <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{t('news.site.share_whatsapp')}<Icon name="external" size={16} /></Button>
           </p>
         </>
       )
@@ -94,7 +95,11 @@ const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${ur
     padding-block: 2rem 4rem;
   }
   .nd-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     color: var(--ink-muted);
+    text-decoration: none;
   }
   .nd-preview {
     padding: 0.75rem 1rem;

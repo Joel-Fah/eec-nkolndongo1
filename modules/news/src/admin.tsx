@@ -393,6 +393,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
                 onClick={() => preview.mutate()}
               >
                 {t(k('preview'))}
+                <Icon name="external" size={16} />
               </Button>
               <Button variant="secondary" size="sm" onClick={() => setDialog('versions')}>
                 {t(k('versions'))}
@@ -400,6 +401,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
               {live && (
                 <a className="btn btn-ghost btn-sm" href={siteUrl} target="_blank" rel="noreferrer">
                   {t(k('view_site'))}
+                  <Icon name="external" size={16} />
                 </a>
               )}
             </div>

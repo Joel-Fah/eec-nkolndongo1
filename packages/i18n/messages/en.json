@@ -1717,7 +1717,12 @@
       "group_table": "Table",
       "headings": "Headings",
       "alignments": "Alignment",
-      "paragraph": "Paragraph"
+      "paragraph": "Paragraph",
+      "full": "Full screen",
+      "exit_full": "Exit full screen",
+      "count_words": "{n} words",
+      "count_chars": "{n} characters",
+      "count_nospace": "{n} without spaces"
     },
     "picker": {
       "title": "Choose a photo",

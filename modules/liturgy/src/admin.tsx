@@ -4,7 +4,15 @@
  */
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { GuardedDialog, ViewToggle } from '@eec/content-kit'
-import { type BibleRef, BOOKS, formatRef, SEASONS, shortDate, weekLabel } from '@eec/core'
+import {
+  type BibleRef,
+  BOOKS,
+  compareVerses,
+  formatRef,
+  SEASONS,
+  shortDate,
+  weekLabel,
+} from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
 import {
   Badge,
@@ -17,8 +25,17 @@ import {
   toastManager,
 } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+/** What someone types for a verse: up to three digits and one part letter (1b). Empty means none. */
+const verseInput = (raw: string): string | number | null => {
+  const v = raw
+    .toLowerCase()
+    .replace(/[^0-9a-z]/g, '')
+    .replace(/^(\d{0,3})(\d*)([a-z]?).*$/, '$1$3')
+  if (!/^\d/.test(v)) return null
+  return /^\d+$/.test(v) ? Number(v) : v
+}
 const k = (key: string) => `liturgy.${key}` as MessageKey
 const say = (title: string, tone: 'success' | 'danger' = 'success') =>
   toastManager.add({ title, data: { tone } })
@@ -34,12 +51,17 @@ type Entry = {
   preacherName: string
   liturgistName: string
   namesConsent: boolean
+  holySupper: boolean
   hymns: string
   notesFr: string
   notesEn: string
   state: 'draft' | 'published'
 }
-type Row = { date: string; suggested: { fr: string; en: string }; entry: Entry | null }
+type Row = {
+  date: string
+  suggested: { fr: string; en: string; season: string }
+  entry: Entry | null
+}
 type Form = Omit<Entry, 'id' | 'state'> & { state: 'draft' | 'published' }
 const blankForm = (date: string): Form => ({
   date,
@@ -51,6 +73,7 @@ const blankForm = (date: string): Form => ({
   preacherName: '',
   liturgistName: '',
   namesConsent: false,
+  holySupper: false,
   hymns: '',
   notesFr: '',
   notesEn: '',
@@ -59,14 +82,40 @@ const blankForm = (date: string): Form => ({
 
 export default function LiturgyPage() {
   const { t } = useLocale()
+  const me = useMe().data
+  const [tab, setTab] = useState('sundays')
+  const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [addSignal, setAddSignal] = useState(0)
   return (
     <div className="grid gap-6">
-      <header className="grid max-w-[62ch] gap-2">
-        <h1 className="text-4xl">{t(k('title'))}</h1>
-        <p className="text-ink-muted">{t(k('lead'))}</p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="grid max-w-[62ch] gap-2">
+          <h1 className="text-4xl">{t(k('title'))}</h1>
+          <p className="text-ink-muted">{t(k('lead'))}</p>
+        </div>
+        {tab === 'sundays' && (
+          <div className="flex flex-wrap items-center gap-3">
+            <ViewToggle
+              value={view}
+              onChange={setView}
+              label={t(k('tab_sundays'))}
+              options={[
+                { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
+                { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
+              ]}
+            />
+            {hasPermission(me, 'liturgy:edit') && (
+              <Button onClick={() => setAddSignal((n) => n + 1)}>
+                <Icon name="plus" size={20} />
+                {t(k('add_sunday'))}
+              </Button>
+            )}
+          </div>
+        )}
       </header>
       <div className="admin-panel">
         <TabsBox
+          onTabChange={setTab}
           tabs={[
             {
               id: 'sundays',
@@ -76,7 +125,7 @@ export default function LiturgyPage() {
                   {t(k('tab_sundays'))}
                 </span>
               ),
-              content: <Sundays />,
+              content: <Sundays view={view} addSignal={addSignal} />,
             },
             {
               id: 'year',
@@ -106,17 +155,19 @@ export default function LiturgyPage() {
 }
 
 /* ── Sundays ──────────────────────────────────────────────────────────── */
-function Sundays() {
+function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number }) {
   const { t, locale } = useLocale()
   const me = useMe().data
   const qc = useQueryClient()
   const canEdit = hasPermission(me, 'liturgy:edit')
   const canPublish = hasPermission(me, 'liturgy:publish')
-  const [view, setView] = useState<'grid' | 'list'>('grid')
   const [weeks, setWeeks] = useState(8)
   const [form, setForm] = useState<Form | null>(null)
   const [initial, setInitial] = useState('')
-  const [suggested, setSuggested] = useState({ fr: '', en: '' })
+  const [suggested, setSuggested] = useState({ fr: '', en: '', season: 'ordinaire' })
+  useEffect(() => {
+    if (addSignal > 0) setAdding(true)
+  }, [addSignal])
   const [adding, setAdding] = useState(false)
   const [pick, setPick] = useState('')
   const list = useQuery({
@@ -138,6 +189,7 @@ function Sundays() {
     preacherName: f.preacherName,
     liturgistName: f.liturgistName,
     namesConsent: f.namesConsent,
+    holySupper: f.holySupper,
     hymns: f.hymns,
     notesFr: f.notesFr,
     notesEn: f.notesEn,
@@ -201,7 +253,7 @@ function Sundays() {
     const row = items.find((r) => r.date === pick)
     setAdding(false)
     setPick('')
-    openRow(row ?? { date: pick, suggested: { fr: '', en: '' }, entry: null })
+    openRow(row ?? { date: pick, suggested: { fr: '', en: '', season: 'ordinaire' }, entry: null })
   }
 
   const text = (lang: 'Fr' | 'En', f: Form) => (
@@ -241,20 +293,27 @@ function Sundays() {
     </div>
   )
 
-  const groups = items.map((r) => ({ week: weekLabel(r.date, locale), r }))
-  const card = (r: Row) => (
-    <button
-      type="button"
-      className={view === 'grid' ? 'sunday-card-admin' : 'admin-row news-row'}
-      onClick={() => openRow(r)}
-      data-current={r.date === current ? '' : undefined}
-    >
-      <span className="flex items-center gap-3 text-start">
-        <span className="kind-tile" data-tone={r.entry ? 'primary' : 'clay'} aria-hidden="true">
-          <Icon name="calendarDay" size={20} />
-        </span>
-        <span className="grid">
-          {view === 'grid' && <span className="week-caption">{weekLabel(r.date, locale)}</span>}
+  // Sundays are grouped by month: one Sunday per week makes week headlines pointless here.
+  const months = [...new Set(items.map((r) => r.date.slice(0, 7)))].map((ym) => ({
+    ym,
+    title: new Intl.DateTimeFormat(locale, {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${ym}-01T12:00:00Z`)),
+    rows: items.filter((r) => r.date.startsWith(ym)),
+  }))
+  const card = (r: Row) => {
+    const season = r.suggested.season
+    return (
+      <button
+        type="button"
+        className={view === 'grid' ? 'sunday-card-admin' : 'admin-row news-row'}
+        onClick={() => openRow(r)}
+        data-current={r.date === current ? '' : undefined}
+        data-season={season}
+      >
+        <span className="sunday-main">
           <strong>
             {shortDate(`${r.date}T12:00:00Z`, locale, 'UTC')}
             {r.date === current ? ` · ${t(k('today_marker'))}` : ''}
@@ -263,47 +322,46 @@ function Sundays() {
             {label(r)}
             {r.entry?.themeFr ? ` · ${r.entry.themeFr}` : ''}
           </span>
+          <span className="sunday-tags">
+            {season !== 'ordinaire' && (
+              <span className="season-chip" data-season={season}>
+                <span className="season-chip-dot" aria-hidden="true" />
+                {t(`season.${season}` as MessageKey)}
+              </span>
+            )}
+            {r.entry?.holySupper && (
+              <span className="supper-chip">
+                <Icon name="sparkles" size={16} />
+                {t(k('holy_supper'))}
+              </span>
+            )}
+          </span>
         </span>
-      </span>
-      {status(r)}
-    </button>
-  )
+        {status(r)}
+      </button>
+    )
+  }
 
   return (
     <div className="grid gap-4">
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <ViewToggle
-          value={view}
-          onChange={setView}
-          label={t(k('tab_sundays'))}
-          options={[
-            { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
-            { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
-          ]}
-        />
-        {canEdit && (
-          <Button variant="secondary" onClick={() => setAdding(true)}>
-            <Icon name="plus" size={20} />
-            {t(k('add_sunday'))}
-          </Button>
-        )}
-      </div>
-      {view === 'grid' ? (
-        <div className="sunday-grid">
-          {groups.map(({ r }) => (
-            <div key={r.date}>{card(r)}</div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {groups.map(({ week, r }) => (
-            <section key={r.date} className="grid gap-2" aria-label={week}>
-              <h3 className="week-head">{week}</h3>
-              {card(r)}
-            </section>
-          ))}
-        </div>
-      )}
+      {months.map((m) => (
+        <section key={m.ym} className="grid gap-2" aria-label={m.title}>
+          <h3 className="week-head month-head">{m.title}</h3>
+          {view === 'grid' ? (
+            <div className="sunday-grid">
+              {m.rows.map((r) => (
+                <div key={r.date}>{card(r)}</div>
+              ))}
+            </div>
+          ) : (
+            <ul className="grid gap-2">
+              {m.rows.map((r) => (
+                <li key={r.date}>{card(r)}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
       <div>
         <Button variant="ghost" onClick={() => setWeeks((w) => w + 8)}>
           {t(k('load_more'))}
@@ -377,6 +435,12 @@ function Sundays() {
                   <Icon name="info" size={20} />
                   {t(k('section_details'))}
                 </h3>
+                <SwitchField
+                  label={t(k('holy_supper_switch'))}
+                  checked={form.holySupper}
+                  disabled={!canEdit}
+                  onCheckedChange={(v: boolean) => setForm({ ...form, holySupper: v })}
+                />
                 <TabsBox
                   tabs={[
                     { id: 'fr', label: t(k('lang_fr')), content: text('Fr', form) },
@@ -390,67 +454,92 @@ function Sundays() {
                   <Icon name="bookText" size={20} />
                   {t(k('section_readings'))}
                 </h3>
-                {form.readings.map((r, i) => (
-                  <div key={`${r.book}-${i}`} className="flex flex-wrap items-end gap-2">
-                    <div className="min-w-40 flex-1">
-                      <SelectField
-                        label={t(k('book'))}
-                        value={r.book}
-                        onValueChange={(v) => v && setReading(i, { book: v as BibleRef['book'] })}
-                        options={BOOKS.map((b) => ({
-                          value: b.id,
-                          label: locale === 'en' ? b.en : b.fr,
-                        }))}
-                      />
-                    </div>
-                    <label className="grid w-24 gap-1">
-                      <span className="field-label">{t(k('chapter'))}</span>
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        max={150}
-                        value={r.chapter}
-                        onChange={(e) => setReading(i, { chapter: Number(e.target.value) || 1 })}
-                      />
-                    </label>
-                    <label className="grid w-24 gap-1">
-                      <span className="field-label">{t(k('from'))}</span>
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={r.from ?? ''}
-                        onChange={(e) =>
-                          setReading(i, { from: e.target.value ? Number(e.target.value) : null })
-                        }
-                      />
-                    </label>
-                    <label className="grid w-24 gap-1">
-                      <span className="field-label">{t(k('to'))}</span>
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={r.to ?? ''}
-                        onChange={(e) =>
-                          setReading(i, { to: e.target.value ? Number(e.target.value) : null })
-                        }
-                      />
-                    </label>
-                    <Button
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      onClick={() =>
-                        setForm({ ...form, readings: form.readings.filter((_, j) => j !== i) })
-                      }
+                {form.readings.map((r, i) => {
+                  const bad =
+                    r.from != null && r.to != null && r.to !== '' && compareVerses(r.to, r.from) < 0
+                  return (
+                    <div
+                      key={`${r.book}-${i}`}
+                      className="reading-box"
+                      data-invalid={bad ? '' : undefined}
                     >
-                      {t(k('remove'))}
-                    </Button>
-                    <span className="w-full text-sm text-ink-muted">{formatRef(r, locale)}</span>
-                  </div>
-                ))}
+                      <div className="reading-row">
+                        <div className="reading-book">
+                          <SelectField
+                            label={t(k('book'))}
+                            value={r.book}
+                            onValueChange={(v) =>
+                              v && setReading(i, { book: v as BibleRef['book'] })
+                            }
+                            options={BOOKS.map((b) => ({
+                              value: b.id,
+                              label: locale === 'en' ? b.en : b.fr,
+                            }))}
+                          />
+                        </div>
+                        <label className="reading-num">
+                          <span className="field-label">{t(k('chapter'))}</span>
+                          <input
+                            className="input"
+                            inputMode="numeric"
+                            maxLength={3}
+                            value={r.chapter}
+                            onChange={(e) =>
+                              setReading(i, {
+                                chapter: Math.min(
+                                  150,
+                                  Number(e.target.value.replace(/\D/g, '')) || 1,
+                                ),
+                              })
+                            }
+                          />
+                        </label>
+                        <label className="reading-num">
+                          <span className="field-label">{t(k('from_short'))}</span>
+                          <input
+                            className="input"
+                            maxLength={4}
+                            placeholder="1b"
+                            aria-invalid={bad}
+                            value={r.from ?? ''}
+                            onChange={(e) => setReading(i, { from: verseInput(e.target.value) })}
+                          />
+                        </label>
+                        <label className="reading-num">
+                          <span className="field-label">{t(k('to_short'))}</span>
+                          <input
+                            className="input"
+                            maxLength={4}
+                            placeholder="20"
+                            aria-invalid={bad}
+                            value={r.to ?? ''}
+                            onChange={(e) => setReading(i, { to: verseInput(e.target.value) })}
+                          />
+                        </label>
+                        <Button
+                          type="button"
+                          variant="danger"
+                          size="sm"
+                          onClick={() =>
+                            setForm({ ...form, readings: form.readings.filter((_, j) => j !== i) })
+                          }
+                        >
+                          {t(k('remove'))}
+                        </Button>
+                      </div>
+                      {bad ? (
+                        <p className="field-error" role="alert">
+                          {t(k('from_after_to'))}
+                        </p>
+                      ) : (
+                        <p className="reading-preview">
+                          <Icon name="bookText" size={16} />
+                          {formatRef(r, locale)}
+                        </p>
+                      )}
+                    </div>
+                  )
+                })}
                 {canEdit && form.readings.length < 6 && (
                   <div>
                     <Button
