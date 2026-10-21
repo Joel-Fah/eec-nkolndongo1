@@ -9,9 +9,9 @@ import {
   audit,
   bumpContentVersion,
   cachedJson,
-  contentVersion,
   fail,
   requirePermission,
+  versionFor,
 } from '@eec/api-kit'
 import { and, desc, eq, ilike, notExists, or, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
@@ -118,8 +118,7 @@ async function creditsOf(db: Awaited<ReturnType<AppEnv['Variables']['deps']['db'
 export const mediaApi = new Hono<AppEnv>()
   // Anonymous and edge-cached: the names behind the photos (footer « Photos : Pexels » → credits page).
   .get('/credits', async (c) => {
-    const db = await c.var.deps.db().catch(() => null)
-    const version = db ? await contentVersion(db, 'media').catch(() => 0) : 0
+    const version = await versionFor(c.var.deps.db, 'media')
     return cachedJson(c, {
       key: `media/credits/v${version}`,
       ttl: 300,

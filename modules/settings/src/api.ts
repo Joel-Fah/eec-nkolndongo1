@@ -10,9 +10,9 @@ import {
   audit,
   bumpContentVersion,
   cachedJson,
-  contentVersion,
   fail,
   requirePermission,
+  versionFor,
 } from '@eec/api-kit'
 import { can } from '@eec/auth'
 import type { Db } from '@eec/db'
@@ -96,8 +96,7 @@ export const settingsApi = new Hono<AppEnv>()
 
   // Anonymous and cached: approved values only, for the public site (footer, contact, season).
   .get('/public', async (c) => {
-    const db = await c.var.deps.db().catch(() => null)
-    const version = db ? await contentVersion(db, AREA).catch(() => 0) : 0
+    const version = await versionFor(c.var.deps.db, AREA)
     return cachedJson(c, {
       key: `settings/public/v${version}`,
       ttl: 120,

@@ -10,6 +10,28 @@ import { eq, sql } from 'drizzle-orm'
 const MEMO_MS = 5_000
 const memo = new Map<string, { version: number; at: number }>()
 
+/**
+ * The version for a public read, without opening a database connection when the memo is fresh (a cache hit then
+ * costs no database round trip at all). Returns 0 if the database cannot be reached: the caller then reads the
+ * « version 0 » entry, which is only ever a stale copy or a miss.
+ */
+export async function versionFor(
+  openDb: () => Promise<Db>,
+  area: string,
+  timeoutMs = 1500,
+): Promise<number> {
+  const hit = memo.get(area)
+  if (hit && Date.now() - hit.at < MEMO_MS) return hit.version
+  try {
+    return await Promise.race([
+      openDb().then((db) => contentVersion(db, area)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
+    ])
+  } catch {
+    return hit?.version ?? 0
+  }
+}
+
 export async function contentVersion(db: Db, area: string): Promise<number> {
   const hit = memo.get(area)
   if (hit && Date.now() - hit.at < MEMO_MS) return hit.version
