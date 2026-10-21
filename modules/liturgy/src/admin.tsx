@@ -19,6 +19,7 @@ import {
   Button,
   Icon,
   SelectField,
+  ShortcutTip,
   SwitchField,
   TabsBox,
   TextField,
@@ -516,16 +517,23 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
                             onChange={(e) => setReading(i, { to: verseInput(e.target.value) })}
                           />
                         </label>
-                        <Button
-                          type="button"
-                          variant="danger"
-                          size="sm"
-                          onClick={() =>
-                            setForm({ ...form, readings: form.readings.filter((_, j) => j !== i) })
-                          }
-                        >
-                          {t(k('remove'))}
-                        </Button>
+                        <ShortcutTip label={t(k('remove'))}>
+                          <Button
+                            type="button"
+                            variant="danger"
+                            iconOnly
+                            className="reading-remove"
+                            aria-label={t(k('remove'))}
+                            onClick={() =>
+                              setForm({
+                                ...form,
+                                readings: form.readings.filter((_, j) => j !== i),
+                              })
+                            }
+                          >
+                            <Icon name="trash" size={20} />
+                          </Button>
+                        </ShortcutTip>
                       </div>
                       {bad ? (
                         <p className="field-error" role="alert">

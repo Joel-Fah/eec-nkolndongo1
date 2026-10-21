@@ -75,6 +75,12 @@ admin login with a random photo and the logo always with the parish name; menu s
 illustration by default; new Storyset illustrations for news, sermons, meditations, events, home.
 Google sign-in: members can link Google to an existing password account; staff are still refused.
 
+## Round 5 UI (2026-10-21, Joël's feedback before B approval)
+- Home « Ce dimanche » smaller with time tile; cherry blossom keeps its white flowers (recoloured to our palette; its background layer had been dropped). Immersive « Ce dimanche » page.
+- Events page: filters and List/Month change results without reloading; sticky week index. Liturgical dial: arc scales on selection.
+- Editor: max height inline, rounded tables, fullscreen header/labels/popovers; liturgy grid + icon remove; schedule sorted by time.
+- Next: Checkpoint B approved after these → start 03b (C: departments, guides, pages, council; D: search, contact, giving, legal).
+
 ## Checkpoint B — done, waiting for Joël's review (2026-10-20)
 - Module system: `modules/` workspace, registry (+ API mounts, admin menu, permission seed, i18n merge),
   feature flags (switched-off module → API 404, menu hidden), boundary test. Shared kits: `@eec/api-kit`,

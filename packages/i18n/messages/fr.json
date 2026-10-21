@@ -675,6 +675,42 @@
         "use": "@eec/content-kit : useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
         "a11y": "Annonces d’état en aria-live, fenêtres avec piège de focus et Échap, les problèmes avant publication sont listés en clair.",
         "demo": "Visible dans l’administration, sur chaque actualité."
+      },
+      "generatedbanner": {
+        "name": "Bannière générée",
+        "desc": "Un motif abstrait dessiné aux couleurs du type d’événement, utilisé quand l’événement n’a pas d’image. Il porte l’icône du type et reste décoratif.",
+        "use": "<GeneratedBanner kind=\"culte\" /> en tête de la page d’un événement sans photo.",
+        "a11y": "Décoratif : aria-hidden, aucune information portée uniquement par la couleur."
+      },
+      "guardeddialog": {
+        "name": "Dialogue protégé",
+        "desc": "Un dialogue de formulaire qui demande confirmation avant d’abandonner des modifications (Échap, clic à côté, bouton Fermer).",
+        "use": "<GuardedDialog dirty> de @eec/content-kit autour des formulaires de l’administration.",
+        "a11y": "Focus piégé, Échap fonctionne, la confirmation reçoit le focus."
+      },
+      "viewtoggle": {
+        "name": "Bascule de vue",
+        "desc": "Deux ou trois boutons à icône et libellé pour passer d’une vue à l’autre (liste / grille, liste / mois). Sur le site public, le changement se fait sans recharger la page.",
+        "use": "<ViewToggle> dans l’administration ; liens data-ev-nav sur la page des événements.",
+        "a11y": "aria-current sur la vue active ; sans JavaScript, ce sont de simples liens."
+      },
+      "shortcuttip": {
+        "name": "Info-bulle de raccourci",
+        "desc": "Au survol ou au focus d’un bouton, une bulle indique son nom et son raccourci clavier en touches stylisées (Kbd).",
+        "use": "<ShortcutTip label=\"Gras\" keys=\"Ctrl B\"> autour d’un bouton.",
+        "a11y": "Apparaît aussi au focus clavier ; le bouton garde son aria-label."
+      },
+      "fullscreeneditor": {
+        "name": "Éditeur plein écran",
+        "desc": "L’éditeur de texte passe en plein écran sans perdre le contenu : barre d’outils fixe avec libellés, titre du document avec retour, compteurs de mots et de caractères.",
+        "use": "Bouton plein écran de l’éditeur ; la flèche retour ou Échap en sortent.",
+        "a11y": "Les menus et fenêtres s’ouvrent au-dessus du plein écran ; reduced-motion supprime l’animation."
+      },
+      "weektoc": {
+        "name": "Index des semaines",
+        "desc": "Sur la page des événements, un index collant liste les semaines affichées et met en évidence celle qui est à l’écran. Masqué sur mobile.",
+        "use": "Apparaît à partir de trois semaines ; liens d’ancre #ev-<date>.",
+        "a11y": "Navigation étiquetée, aria-current sur la semaine visible."
       }
     },
     "rules": {
@@ -1722,7 +1758,8 @@
       "exit_full": "Quitter le plein écran",
       "count_words": "{n} mots",
       "count_chars": "{n} caractères",
-      "count_nospace": "{n} sans espaces"
+      "count_nospace": "{n} sans espaces",
+      "untitled": "Sans titre"
     },
     "picker": {
       "title": "Choisir une photo",

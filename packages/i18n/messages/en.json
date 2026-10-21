@@ -675,6 +675,42 @@
         "use": "@eec/content-kit: useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
         "a11y": "Status announced with aria-live, dialogs with focus trap and Esc, problems before publishing listed in plain words.",
         "demo": "Visible in the admin, on every news post."
+      },
+      "generatedbanner": {
+        "name": "Banner generated",
+        "desc": "An abstract pattern in the event type’s colours, used when an event has no image. It carries the type icon and stays decorative.",
+        "use": "<GeneratedBanner kind=\"culte\" /> at the top of an event page without a photo.",
+        "a11y": "Decorative: aria-hidden, no information carried by colour alone."
+      },
+      "guardeddialog": {
+        "name": "Guarded dialog",
+        "desc": "A form dialog that asks for confirmation before discarding changes (Esc, outside click, Close button).",
+        "use": "<GuardedDialog dirty> from @eec/content-kit around admin forms.",
+        "a11y": "Focus trapped, Esc works, the confirmation receives focus."
+      },
+      "viewtoggle": {
+        "name": "View toggle",
+        "desc": "Two or three icon-and-label buttons to switch views (list / grid, list / month). On the public site the change happens without reloading the page.",
+        "use": "<ViewToggle> in the admin; data-ev-nav links on the events page.",
+        "a11y": "aria-current on the active view; without JavaScript they are plain links."
+      },
+      "shortcuttip": {
+        "name": "Shortcut tooltip",
+        "desc": "On hover or focus of a button, a bubble shows its name and keyboard shortcut as styled keys (Kbd).",
+        "use": "<ShortcutTip label=\"Bold\" keys=\"Ctrl B\"> around a button.",
+        "a11y": "Also shown on keyboard focus; the button keeps its aria-label."
+      },
+      "fullscreeneditor": {
+        "name": "Full-screen editor",
+        "desc": "The text editor goes full screen without losing content: fixed toolbar with labels, document title with a back button, word and character counts.",
+        "use": "The editor’s full-screen button; the back arrow or Esc leaves it.",
+        "a11y": "Menus and dialogs open above the full-screen layer; reduced motion removes the animation."
+      },
+      "weektoc": {
+        "name": "Week index",
+        "desc": "On the events page a sticky index lists the weeks shown and highlights the one on screen. Hidden on mobile.",
+        "use": "Appears from three weeks; anchor links #ev-<date>.",
+        "a11y": "Labelled navigation, aria-current on the visible week."
       }
     },
     "rules": {
@@ -1722,7 +1758,8 @@
       "exit_full": "Exit full screen",
       "count_words": "{n} words",
       "count_chars": "{n} characters",
-      "count_nospace": "{n} without spaces"
+      "count_nospace": "{n} without spaces",
+      "untitled": "Untitled"
     },
     "picker": {
       "title": "Choose a photo",

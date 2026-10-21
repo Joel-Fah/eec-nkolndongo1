@@ -786,6 +786,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
             key={lang}
             value={(lang === 'Fr' ? draft.descriptionFr : draft.descriptionEn) ?? EMPTY_DOC}
             label={t(k('desc_label'))}
+            docTitle={lang === 'Fr' ? draft.titleFr : draft.titleEn}
+            docFallback={t(k('untitled_full'))}
             placeholder={t(k('desc_ph'))}
             onChange={(doc) => set(`description${lang}`, doc)}
           />

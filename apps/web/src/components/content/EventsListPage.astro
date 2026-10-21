@@ -108,6 +108,15 @@ const thisWeek = weekOf(todayKey).from
 const sections = [...new Set(upcoming.map((o) => weekOf(keyOf(o)).from))].sort().map((from) => ({
   id: from,
   title: weekLabel(from, locale),
+  short: (() => {
+    const w = weekOf(from)
+    const a = new Date(`${w.from}T12:00:00Z`)
+    const b = new Date(`${w.to}T12:00:00Z`)
+    const mo = (d: Date) => fmt(locale, { month: 'short', timeZone: 'UTC' }).format(d)
+    return a.getUTCMonth() === b.getUTCMonth()
+      ? `${a.getUTCDate()}–${b.getUTCDate()} ${mo(a)}`
+      : `${a.getUTCDate()} ${mo(a)} – ${b.getUTCDate()} ${mo(b)}`
+  })(),
   current: from === thisWeek,
   items: upcoming.filter((o) => weekOf(keyOf(o)).from === from),
 }))
@@ -139,30 +148,31 @@ Astro.response.headers.set(
   <link slot="head" rel="alternate" type="text/calendar" title={t('events.site.subscribe')} href={feedHref(locale, group)} />
   <PageHero id="evenements" />
   <section class="ev">
+    <div id="ev-app" class="ev-app" data-ev-app>
     <div class="ev-bar">
       <div class="ev-seg" role="group" aria-label={t(labelKey('evenements'))}>
-        <a href={link({ vue: null, mois: null })} aria-current={view === 'list' ? 'true' : undefined}>{label('view_list')}</a>
-        <a href={link({ vue: 'mois', mois: ym })} aria-current={view === 'month' ? 'true' : undefined}>{label('view_month')}</a>
+        <a data-ev-nav href={link({ vue: null, mois: null })} aria-current={view === 'list' ? 'true' : undefined}><Icon name="layoutList" size={20} />{label('view_list')}</a>
+        <a data-ev-nav href={link({ vue: 'mois', mois: ym })} aria-current={view === 'month' ? 'true' : undefined}><Icon name="calendar" size={20} />{label('view_month')}</a>
       </div>
       {view === 'list' && (
         <nav class="ev-groups ev-period" aria-label={label('period')}>
-          <a href={link({ periode: null, du: null, au: null })} aria-current={!period ? 'true' : undefined}>{label('period_all')}</a>
-          <a href={link({ periode: 'semaine', du: null, au: null })} aria-current={period === 'semaine' ? 'true' : undefined}>{label('period_week')}</a>
-          <a href={link({ periode: 'mois', du: null, au: null })} aria-current={period === 'mois' ? 'true' : undefined}>{label('period_month')}</a>
+          <a data-ev-nav href={link({ periode: null, du: null, au: null })} aria-current={!period ? 'true' : undefined}>{label('period_all')}</a>
+          <a data-ev-nav href={link({ periode: 'semaine', du: null, au: null })} aria-current={period === 'semaine' ? 'true' : undefined}>{label('period_week')}</a>
+          <a data-ev-nav href={link({ periode: 'mois', du: null, au: null })} aria-current={period === 'mois' ? 'true' : undefined}>{label('period_month')}</a>
         </nav>
       )}
       {
         groups.length > 0 && (
           <nav class="ev-groups" aria-label={label('filter_group')}>
-            <a href={link({ groupe: null })} aria-current={!group ? 'true' : undefined}>{label('all_groups')}</a>
-            {groups.map(([key, name]) => <a href={link({ groupe: key })} aria-current={group === key ? 'true' : undefined}>{name}</a>)}
+            <a data-ev-nav href={link({ groupe: null })} aria-current={!group ? 'true' : undefined}>{label('all_groups')}</a>
+            {groups.map(([key, name]) => <a data-ev-nav href={link({ groupe: key })} aria-current={group === key ? 'true' : undefined}>{name}</a>)}
           </nav>
         )
       }
     </div>
 
     {view === 'list' && (
-      <form class="ev-range" method="get" action={eventsListHref(locale)}>
+      <form class="ev-range" data-ev-form method="get" action={eventsListHref(locale)}>
         <input type="hidden" name="periode" value="dates" />
         {group && <input type="hidden" name="groupe" value={group} />}
         <label><span>{label('range_from')}</span><input type="date" name="du" value={rangeFrom} /></label>
@@ -176,9 +186,9 @@ Astro.response.headers.set(
       ) : view === 'month' ? (
         <div class="ev-month">
           <div class="ev-month-head">
-            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(-1) })} rel="prev">← <span class="ev-sr">{label('prev_month')}</span></a>
+            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(-1) })} rel="prev"><Icon name="chevronLeft" size={20} /><span class="ev-sr">{label('prev_month')}</span></a>
             <h2 class="ev-month-title">{monthLabel}</h2>
-            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(1) })} rel="next"><span class="ev-sr">{label('next_month')}</span> →</a>
+            <a class="ev-step" href={link({ vue: 'mois', mois: shiftMonth(1) })} rel="next"><span class="ev-sr">{label('next_month')}</span><span class="ev-flip"><Icon name="chevronLeft" size={20} /></span></a>
           </div>
           <div class="ev-grid">
             {weekdays.map((w, i) => <span class="ev-wd" data-sunday={i === 6 ? '' : undefined} aria-hidden="true">{w}</span>)}
@@ -225,7 +235,17 @@ Astro.response.headers.set(
           <Button href={feedHref(locale, group)} variant="secondary">{label('subscribe')}</Button>
         </div>
       ) : (
-        <>
+        <div class="ev-layout">
+          {sections.length >= 3 && (
+            <nav class="ev-toc" aria-label={label('toc')}>
+              <ol>
+                {sections.map((s) => (
+                  <li><a href={`#ev-${s.id}`} data-ev-toc={s.id} aria-current={s.current ? 'true' : undefined}>{s.short}</a></li>
+                ))}
+              </ol>
+            </nav>
+          )}
+          <div class="ev-sections">
           {
             sections.map((s) => (
               <section aria-labelledby={`ev-${s.id}`} class="ev-section">
@@ -255,11 +275,19 @@ Astro.response.headers.set(
             ))
           }
           <p class="ev-feed"><a href={feedHref(locale, group)}>{label('subscribe')}</a> · <span class="ev-feed-help">{label('subscribe_help')}</span></p>
-        </>
+          </div>
+        </div>
       )
     }
+    </div>
   </section>
 </Site>
+
+<script>
+  import { initEventsNav } from '../../scripts/events-nav'
+  initEventsNav()
+  document.addEventListener('astro:page-load', initEventsNav)
+</script>
 
 <style>
   .ev {
@@ -327,6 +355,69 @@ Astro.response.headers.set(
     background: var(--surface);
     box-shadow: inset 0 0 0 1.5px var(--line-strong);
     font-weight: 400;
+  }
+  .ev-layout {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (min-width: 64rem) {
+    .ev-layout:has(.ev-toc) {
+      grid-template-columns: 11rem minmax(0, 1fr);
+    }
+  }
+  .ev-sections {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+  /* A table of contents that follows the reader: one entry per week, the one in view highlighted. */
+  .ev-toc {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .ev-toc {
+      display: block;
+      position: sticky;
+      inset-block-start: 6rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-lg);
+      background: var(--surface-2);
+    }
+  }
+  .ev-toc ol {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .ev-toc a {
+    display: block;
+    padding: 0.375rem 0.625rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .ev-toc a:hover {
+    background: var(--surface);
+  }
+  .ev-toc a[aria-current] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .ev-seg a {
+    gap: 0.5rem;
+  }
+  .ev-flip {
+    display: inline-flex;
+    transform: scaleX(-1);
+  }
+  .ev-h {
+    scroll-margin-block-start: 6rem;
+  }
+  .ev-app[data-busy] {
+    opacity: 0.6;
+    transition: opacity 0.15s;
   }
   .ev-section {
     display: grid;

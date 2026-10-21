@@ -173,7 +173,8 @@
     "period_month": "This month",
     "range_from": "From",
     "range_to": "To",
-    "range_apply": "Show these dates"
+    "range_apply": "Show these dates",
+    "toc": "The weeks"
   },
   "no_next": "No upcoming date",
   "continues": "continues",
@@ -195,5 +196,6 @@
   "period_month": "This month",
   "period_range": "Pick dates",
   "from": "From",
-  "until_date": "To"
+  "until_date": "To",
+  "untitled_full": "Untitled event"
 }

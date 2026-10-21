@@ -79,6 +79,10 @@ type Props = {
   placeholder: string
   /** Label for assistive technology, e.g. « Texte de l’actualité ». */
   label: string
+  /** Shown at the top in full screen, so the writer keeps track of what is being edited. */
+  docTitle?: string
+  /** Used when there is no title yet (« Actualité sans titre »). */
+  docFallback?: string
 }
 
 const Glyph = ({ name }: { name: IconName }) => (
@@ -109,7 +113,14 @@ function shiftIndent(editor: Editor, delta: 1 | -1) {
     .run()
 }
 
-export default function RichTextEditor({ value, onChange, placeholder, label }: Props) {
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+  label,
+  docTitle,
+  docFallback,
+}: Props) {
   const { t } = useLocale()
   const [picking, setPicking] = useState(false)
   const [linkOpen, setLinkOpen] = useState(false)
@@ -289,6 +300,7 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
         onClick={run(action)}
       >
         <Glyph name={name} />
+        <span className="rte-btn-label">{label}</span>
       </button>
     </ShortcutTip>
   )
@@ -308,6 +320,7 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
       <ShortcutTip label={label}>
         <Menu.Trigger className="rte-btn rte-menu" aria-label={label} data-icon={current}>
           <Glyph name={current} />
+          <span className="rte-btn-label">{label}</span>
           <span className="eec-chevron" aria-hidden="true" />
         </Menu.Trigger>
       </ShortcutTip>
@@ -365,6 +378,23 @@ export default function RichTextEditor({ value, onChange, placeholder, label }: 
     <>
       {full && <div className="rte-hold" style={{ height: holdHeight }} aria-hidden="true" />}
       <div className="rte" data-full={full ? '' : undefined} ref={wrap}>
+        {full && (
+          <div className="rte-fullhead">
+            <ShortcutTip label={t('content.editor.exit_full')} shortcut="Esc">
+              <button
+                type="button"
+                className="rte-back"
+                aria-label={t('content.editor.exit_full')}
+                onClick={toggleFull}
+              >
+                <Glyph name="chevronLeft" />
+              </button>
+            </ShortcutTip>
+            <h2 className="rte-fulltitle" data-empty={docTitle?.trim() ? undefined : ''}>
+              {docTitle?.trim() || docFallback || t('content.editor.untitled')}
+            </h2>
+          </div>
+        )}
         <div className="rte-bar" role="toolbar" aria-label={t('content.editor.toolbar')}>
           <span className="rte-group">
             {btn(

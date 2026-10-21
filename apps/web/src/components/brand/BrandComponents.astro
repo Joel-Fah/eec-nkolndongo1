@@ -70,6 +70,12 @@ type Id =
   | 'langfallback'
   | 'editor'
   | 'publishflow'
+  | 'generatedbanner'
+  | 'guardeddialog'
+  | 'viewtoggle'
+  | 'shortcuttip'
+  | 'fullscreeneditor'
+  | 'weektoc'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -204,6 +210,18 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('preloader')}>
       <div class="preloader-demo text-primary"><Mark variant="lockup-short-line" class="eec-preloader-lockup w-full max-w-md" /></div>
     </DocBlock>
+
+    <DocBlock {...doc('generatedbanner')}><p class="text-sm text-ink-muted">{t('brand.components.generatedbanner.use')}</p></DocBlock>
+
+    <DocBlock {...doc('guardeddialog')}><p class="text-sm text-ink-muted">{t('brand.components.guardeddialog.use')}</p></DocBlock>
+
+    <DocBlock {...doc('viewtoggle')}><p class="text-sm text-ink-muted">{t('brand.components.viewtoggle.use')}</p></DocBlock>
+
+    <DocBlock {...doc('shortcuttip')}><p class="text-sm text-ink-muted">{t('brand.components.shortcuttip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('fullscreeneditor')}><p class="text-sm text-ink-muted">{t('brand.components.fullscreeneditor.use')}</p></DocBlock>
+
+    <DocBlock {...doc('weektoc')}><p class="text-sm text-ink-muted">{t('brand.components.weektoc.use')}</p></DocBlock>
 
     <DocBlock {...doc('picture')}><p class="text-sm text-ink-muted">{t('brand.components.picture.demo')}</p></DocBlock>
 

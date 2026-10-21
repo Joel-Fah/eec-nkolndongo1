@@ -83,5 +83,6 @@
     "latest_t": "Latest news",
     "latest_all": "All news",
     "group": "Group: {name}"
-  }
+  },
+  "untitled_full": "Untitled news post"
 }

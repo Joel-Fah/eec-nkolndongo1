@@ -173,7 +173,8 @@
     "period_month": "Ce mois-ci",
     "range_from": "Du",
     "range_to": "Au",
-    "range_apply": "Voir ces dates"
+    "range_apply": "Voir ces dates",
+    "toc": "Les semaines"
   },
   "no_next": "Sans date à venir",
   "continues": "suite",
@@ -195,5 +196,6 @@
   "period_month": "Ce mois-ci",
   "period_range": "Choisir des dates",
   "from": "Du",
-  "until_date": "Au"
+  "until_date": "Au",
+  "untitled_full": "Événement sans titre"
 }

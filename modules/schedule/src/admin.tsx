@@ -143,7 +143,11 @@ export default function SchedulePage() {
     new Intl.DateTimeFormat(locale, { weekday: style, timeZone: 'UTC' }).format(
       new Date(Date.UTC(2026, 0, 4 + wd)),
     )
-  const slots = list.data?.slots ?? []
+  // Chronological over the week (Monday first, then by start time): a preparation on Wednesday comes before the Supper on Sunday.
+  const slots = [...(list.data?.slots ?? [])].sort(
+    (a, b) =>
+      ((a.weekday + 6) % 7) - ((b.weekday + 6) % 7) || a.startTime.localeCompare(b.startTime),
+  )
   const open = (f: Form) => {
     setInitial(JSON.stringify(f))
     setEditing(f)

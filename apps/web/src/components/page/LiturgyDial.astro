@@ -109,11 +109,27 @@ const months = Array.from({ length: 12 }, (_, m) => ({
     stroke-width: 22;
     stroke-linecap: butt;
     opacity: 0.45;
-    transition: opacity var(--duration-ui) var(--ease-out), stroke-width var(--duration-ui) var(--ease-out);
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    transition:
+      opacity var(--duration-ui) var(--ease-out),
+      stroke-width var(--duration-ui) var(--ease-out),
+      transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+  /* The chosen period swells outwards from the centre, with a small spring; the others settle back. */
   .dial-arc[data-selected] {
     opacity: 1;
     stroke-width: 26;
+    transform: scale(1.07);
+  }
+  .dial-panel-swap {
+    animation: dial-swap 0.4s var(--ease-out);
+  }
+  @keyframes dial-swap {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
   }
   .dial-month {
     font-size: 7px;
@@ -201,6 +217,12 @@ const months = Array.from({ length: 12 }, (_, m) => ({
   @media (prefers-reduced-motion: reduce) {
     .dial-arc {
       transition: none;
+    }
+    .dial-arc[data-selected] {
+      transform: none;
+    }
+    .dial-panel-swap {
+      animation: none;
     }
   }
 </style>

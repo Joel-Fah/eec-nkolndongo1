@@ -65,8 +65,6 @@ export async function showSunday() {
             return li
           }),
         )
-        const block = root.querySelector<HTMLElement>('[data-sunday-readings-block]')
-        if (block) block.hidden = s.readings.length === 0
       }
       const at = n?.next && n.next.startsAt.slice(0, 10) >= s.date ? n.next.startsAt : ''
       set(

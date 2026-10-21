@@ -56,6 +56,9 @@ export function initDial() {
     }
     const season = chip.dataset.season ?? ''
     panel.setAttribute('data-season', season)
+    panel.classList.remove('dial-panel-swap')
+    void panel.offsetWidth
+    panel.classList.add('dial-panel-swap')
     title.textContent = chip.dataset.title ?? ''
     if (name) name.textContent = chip.dataset.title ?? ''
     text.textContent = chip.dataset.text ?? ''

@@ -323,6 +323,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
               key={lang}
               value={body}
               label={t(k('body_label'))}
+              docTitle={lang === 'Fr' ? draft.titleFr : draft.titleEn}
+              docFallback={t(k('untitled_full'))}
               placeholder={t(k('body_ph'))}
               onChange={(doc) => set(`body${lang}`, doc)}
             />

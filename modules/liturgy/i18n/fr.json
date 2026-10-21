@@ -87,7 +87,8 @@
     "retry": "Réessayer",
     "holy_supper": "Sainte Cène",
     "service": "Culte à",
-    "see_program": "Voir le programme"
+    "see_program": "Voir le programme",
+    "service_label": "Culte"
   },
   "view_grid": "Grille",
   "view_list": "Liste",

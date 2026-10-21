@@ -87,7 +87,8 @@
     "retry": "Try again",
     "holy_supper": "Holy Supper",
     "service": "Service at",
-    "see_program": "See the programme"
+    "see_program": "See the programme",
+    "service_label": "Service"
   },
   "view_grid": "Grid",
   "view_list": "List",
