@@ -13,8 +13,10 @@ interface Props {
   id: string
   /** The page has its own hero (components/page/PageHero.astro). */
   hideHeader?: boolean
+  /** Block numbers (from 0) not to show, when a live section replaces them. */
+  omit?: number[]
 }
-const { id, hideHeader = false } = Astro.props
+const { id, hideHeader = false, omit = [] } = Astro.props
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const page = content[id]
@@ -43,6 +45,7 @@ const colsClass = {
 
   {
     page.blocks.map((block, index) => {
+      if (omit.includes(index)) return null
       const n = String(index + 1).padStart(2, '0')
       if (block.t === 'text') {
         return (

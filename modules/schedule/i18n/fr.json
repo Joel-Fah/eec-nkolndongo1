@@ -56,5 +56,19 @@
   "exc_label": "Nom du rassemblement",
   "exc_remove": "Retirer",
   "exc_added": "Changement ajouté",
-  "exc_removed": "Changement retiré"
+  "exc_removed": "Changement retiré",
+  "site": {
+    "title": "Les horaires de la semaine",
+    "week": "La semaine",
+    "next14": "Changements dans les 14 prochains jours",
+    "cancelled": "Annulé",
+    "changed": "Horaire modifié",
+    "extra": "En plus",
+    "add_ics": "Ajouter à mon calendrier",
+    "all_day_off": "Rien de prévu",
+    "today": "Aujourd’hui",
+    "tomorrow": "Demain",
+    "next_service": "Prochain culte",
+    "now": "En cours"
+  }
 }

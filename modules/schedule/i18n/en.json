@@ -56,5 +56,19 @@
   "exc_label": "Name of the gathering",
   "exc_remove": "Remove",
   "exc_added": "Change added",
-  "exc_removed": "Change removed"
+  "exc_removed": "Change removed",
+  "site": {
+    "title": "This week’s times",
+    "week": "The week",
+    "next14": "Changes in the next 14 days",
+    "cancelled": "Cancelled",
+    "changed": "Time changed",
+    "extra": "Extra",
+    "add_ics": "Add to my calendar",
+    "all_day_off": "Nothing planned",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "next_service": "Next service",
+    "now": "Happening now"
+  }
 }

@@ -1,0 +1,207 @@
+---
+/**
+ * Cultes et horaires: with approved slots, a calm week (Monday to Sunday) with each slot's time, place and a
+ * calendar link, plus the changes of the next 14 days. With none approved, the static « bientôt » text stays
+ * (nothing unvalidated is ever shown). Data: cached public API.
+ */
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { type PublicSlot, type PublicSlotException, publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const label = (key: string) => t(`schedule.site.${key}` as 'schedule.site.title')
+const result = await publicJson<{ slots: PublicSlot[]; exceptions: PublicSlotException[] }>(
+  Astro,
+  '/api/schedule/public',
+)
+const slots = result.state === 'ok' ? result.data.slots : []
+const exceptions = result.state === 'ok' ? result.data.exceptions : []
+const name = (s: { labelFr?: string; labelEn?: string }) =>
+  locale === 'en' && s.labelEn ? s.labelEn : (s.labelFr ?? '')
+const note = (e: PublicSlotException) => (locale === 'en' ? e.noteEn || e.noteFr : e.noteFr) ?? ''
+const dayName = (wd: number) =>
+  new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2026, 0, 4 + wd)),
+  )
+const order = [1, 2, 3, 4, 5, 6, 0]
+const todayDow = new Date(
+  `${new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())}T00:00:00Z`,
+).getUTCDay()
+const horizon = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10)
+const soon = exceptions.filter((e) => e.date <= horizon)
+const dateText = (d: string) =>
+  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeZone: 'UTC' }).format(
+    new Date(`${d}T00:00:00Z`),
+  )
+const hasSlots = slots.length > 0
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('cultes'))} description={t('pages.cultes.lead')}>
+  <PageHero id="cultes" />
+  {
+    result.state === 'unavailable' ? (
+      <section class="sc"><UnavailableState /></section>
+    ) : hasSlots ? (
+      <section class="sc" aria-labelledby="sc-title">
+        <h2 id="sc-title" class="sc-h">{label('title')}</h2>
+        {
+          soon.length > 0 && (
+            <div class="sc-changes" role="note">
+              <h3 class="sc-sub">{label('next14')}</h3>
+              <ul>
+                {
+                  soon.map((e) => {
+                    const target = slots.find((s) => s.id === e.slotId)
+                    return (
+                      <li data-kind={e.kind}>
+                        <strong>{dateText(e.date)}</strong>
+                        {' — '}
+                        {e.kind === 'cancelled' ? label('cancelled') : e.kind === 'changed' ? `${label('changed')}${e.start ? ` (${e.start})` : ''}` : `${label('extra')}${e.start ? ` ${e.start}` : ''}`}
+                        {target ? ` · ${name(target)}` : e.kind === 'extra' ? ` · ${name(e)}` : ''}
+                        {note(e) ? ` · ${note(e)}` : ''}
+                      </li>
+                    )
+                  })
+                }
+              </ul>
+            </div>
+          )
+        }
+        <div class="sc-week">
+          {
+            order.map((wd) => {
+              const day = slots.filter((s) => s.weekday === wd)
+              return (
+                <section class="sc-day" data-today={wd === todayDow ? '' : undefined} data-empty={day.length === 0 ? '' : undefined} aria-label={dayName(wd)}>
+                  <h3 class="sc-dayname">{dayName(wd)}{wd === todayDow ? <span class="sc-today"> · {label('today')}</span> : null}</h3>
+                  {
+                    day.length === 0 ? (
+                      <p class="sc-none">{label('all_day_off')}</p>
+                    ) : (
+                      <ul>
+                        {
+                          day.map((s) => (
+                            <li class="sc-slot">
+                              <span class="sc-time">{s.start}{s.end ? `–${s.end}` : ''}</span>
+                              <span class="sc-label">{name(s)}</span>
+                              {(locale === 'en' ? s.placeEn : s.placeFr) && <span class="sc-place">{locale === 'en' ? s.placeEn : s.placeFr}</span>}
+                              <a class="sc-ics" href={`/api/schedule/public/slot/${s.id}/slot.ics?locale=${locale}`} download>{label('add_ics')}</a>
+                            </li>
+                          ))
+                        }
+                      </ul>
+                    )
+                  }
+                </section>
+              )
+            })
+          }
+        </div>
+        <Illustration name="music" class="sc-art" />
+      </section>
+    ) : null
+  }
+  <PageView id="cultes" hideHeader omit={hasSlots ? [1] : []} />
+</Site>
+
+<style>
+  .sc {
+    display: grid;
+    gap: 1.25rem;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 1rem;
+  }
+  .sc-h {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+  }
+  .sc-sub {
+    font-weight: 600;
+    margin-block-end: 0.5rem;
+  }
+  .sc-changes {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--gold-soft, var(--surface-2));
+  }
+  .sc-changes ul {
+    display: grid;
+    gap: 0.375rem;
+  }
+  .sc-changes li[data-kind='cancelled'] strong {
+    text-decoration: line-through;
+  }
+  .sc-week {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  }
+  .sc-day {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .sc-day[data-empty] {
+    background: var(--surface-2);
+    box-shadow: none;
+  }
+  .sc-day[data-today] {
+    box-shadow: inset 0 0 0 2px var(--primary), var(--elevation-1);
+  }
+  .sc-dayname {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    text-transform: capitalize;
+  }
+  .sc-today {
+    font-family: inherit;
+    font-size: var(--text-sm);
+    color: var(--primary);
+    text-transform: none;
+  }
+  .sc-none {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  .sc-day ul {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .sc-slot {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .sc-time {
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .sc-place {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  .sc-ics {
+    justify-self: start;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .sc :global(.sc-art) {
+    width: min(100%, 18rem);
+    height: auto;
+    justify-self: center;
+  }
+</style>

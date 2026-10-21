@@ -81,3 +81,26 @@ export type EventDetail = EventOcc & {
   recurring: boolean
   upcoming: Pick<EventOcc, 'date' | 'startsAt' | 'endsAt' | 'cancelled' | 'moved' | 'note'>[]
 }
+
+export type PublicSlot = {
+  id: string
+  kind: string
+  labelFr: string
+  labelEn: string
+  weekday: number
+  start: string
+  end: string | null
+  placeFr?: string
+  placeEn?: string
+}
+export type PublicSlotException = {
+  date: string
+  slotId: string | null
+  kind: 'cancelled' | 'changed' | 'extra'
+  noteFr?: string
+  noteEn?: string
+  start?: string
+  end?: string | null
+  labelFr?: string
+  labelEn?: string
+}
