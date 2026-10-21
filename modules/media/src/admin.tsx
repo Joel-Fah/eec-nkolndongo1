@@ -601,7 +601,6 @@ function StockPicker({ onPick }: { onPick: (p: StockPhoto) => void }) {
     }
   }
   // The first view: today's popular photos.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once when the tab opens
   useEffect(() => {
     load('', 1)
   }, [])
@@ -609,7 +608,7 @@ function StockPicker({ onPick }: { onPick: (p: StockPhoto) => void }) {
     <div className="grid gap-4">
       <form
         className="media-stock-search"
-        role="search"
+        aria-label={t(k('stock.search'))}
         onSubmit={(e) => {
           e.preventDefault()
           setTerm(q.trim())
