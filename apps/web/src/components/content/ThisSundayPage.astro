@@ -72,16 +72,13 @@ Astro.response.headers.set(
 <Site title={t(labelKey('dimanche'))} description={t('liturgy.site.lead')}>
   <article class="cs" data-season={s?.season}>
     <Illustration name="cherry-blossom" class="cs-art" />
-    <div class="cs-wrap">
+    <section class="cs-first">
       <header class="cs-head">
-        <p class="cs-kicker"><span class="cs-dot" aria-hidden="true"></span>{label('title')}</p>
-        {s && <p class="cs-date">{day(s.date)}</p>}
+        <p class="cs-kicker"><span class="cs-dot" aria-hidden="true"></span>{label('title')}{s && <span class="cs-date">{day(s.date)}</span>}</p>
         <div class="cs-titlerow">
-          {s && s.published && (
-            <p class="cs-timetile">
-              <Icon name="clock" size={24} />
-              <strong>{serviceTime || '—'}</strong>
-              <span>{serviceTime ? label('service_label') : label('service_soon')}</span>
+          {s?.published && serviceTime && (
+            <p class="flip-time cs-time" role="img" aria-label={serviceTime}>
+              {serviceTime.split(':').flatMap((v, i) => i === 0 ? [<span class="flip-card" aria-hidden="true">{v}</span>, <span class="flip-colon" aria-hidden="true">:</span>] : [<span class="flip-card" aria-hidden="true">{v}</span>])}
             </p>
           )}
           <h1 class="cs-title">{s ? s.name : label('title')}</h1>
@@ -103,23 +100,23 @@ Astro.response.headers.set(
             <p>{label('not_ready_p')}</p>
           </div>
         ) : (
-          <div class="cs-grid">
+          <div class="cs-details">
             {s.readings.length > 0 && (
-              <section class="cs-panel cs-readings-panel">
+              <div>
                 <h2 class="cs-label">{label('readings')}</h2>
-                <ul class="cs-readings">{s.readings.map((r) => <li>{r.label}</li>)}</ul>
-              </section>
+                <ul class="cs-readings" role="list">{s.readings.map((r) => <li>{r.label}</li>)}</ul>
+              </div>
             )}
             {(s.preacher || s.liturgist || s.hymns || s.notes) && (
-              <section class="cs-panel cs-facts">
-                {s.preacher && <p><span class="cs-label">{label('preacher')}</span>{s.preacher}</p>}
-                {s.liturgist && <p><span class="cs-label">{label('liturgist')}</span>{s.liturgist}</p>}
-                {s.hymns && <p><span class="cs-label">{label('hymns')}</span>{s.hymns}</p>}
-                {s.notes && <p><span class="cs-label">{label('notes')}</span>{s.notes}</p>}
-              </section>
+              <dl class="cs-facts">
+                {s.preacher && <div><dt class="cs-label">{label('preacher')}</dt><dd>{s.preacher}</dd></div>}
+                {s.liturgist && <div><dt class="cs-label">{label('liturgist')}</dt><dd>{s.liturgist}</dd></div>}
+                {s.hymns && <div><dt class="cs-label">{label('hymns')}</dt><dd>{s.hymns}</dd></div>}
+                {s.notes && <div><dt class="cs-label">{label('notes')}</dt><dd>{s.notes}</dd></div>}
+              </dl>
             )}
             {v && (
-              <figure class="cs-panel cs-verse">
+              <figure class="cs-verse">
                 <blockquote>{v.text}</blockquote>
                 <figcaption>{v.ref} · {v.translation}</figcaption>
               </figure>
@@ -127,68 +124,82 @@ Astro.response.headers.set(
           </div>
         )
       }
-      {
-        (before.length > 0 || after.length > 0) && (
-          <div class="cs-others">
-            {after.length > 0 && (
-              <section class="cs-panel">
-                <h2 class="cs-h">{label('next')}</h2>
-                <ul>{after.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
-              </section>
-            )}
-            {before.length > 0 && (
-              <section class="cs-panel">
-                <h2 class="cs-h">{label('previous')}</h2>
-                <ul>{before.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
-              </section>
-            )}
-          </div>
-        )
-      }
-      <p><Button href={locale === 'fr' ? '/fr/agenda/annee-liturgique/' : '/en/calendar/liturgical-year/'} variant="secondary">{t('nav.items.liturgie.label')}</Button></p>
-    </div>
+    </section>
+    {
+      (before.length > 0 || after.length > 0) && (
+        <div class="cs-others">
+          {after.length > 0 && (
+            <section class="cs-panel">
+              <h2 class="cs-h">{label('next')}</h2>
+              <ul>{after.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
+            </section>
+          )}
+          {before.length > 0 && (
+            <section class="cs-panel">
+              <h2 class="cs-h">{label('previous')}</h2>
+              <ul>{before.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
+            </section>
+          )}
+        </div>
+      )
+    }
+    <p class="cs-more"><Button href={locale === 'fr' ? '/fr/agenda/annee-liturgique/' : '/en/calendar/liturgical-year/'} variant="secondary">{t('nav.items.liturgie.label')}</Button></p>
   </article>
 </Site>
 
 <style>
-  /* An immersive page: the season tints the whole viewport, the blossom is a large backdrop, content uses the width. */
+  /* The first screen holds the essentials and runs up behind the floating navigation. */
   .cs {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    min-height: calc(100svh - 4rem);
-    padding-block: clamp(2rem, 6vw, 5rem);
+    margin-block-start: -5.5rem;
     background: color-mix(in oklab, var(--season) 14%, var(--bg));
   }
   .cs-art {
     position: absolute;
-    inset-block: -8% -8%;
-    inset-inline-end: -6%;
+    inset-block-start: -10%;
+    inset-inline-end: -4%;
     z-index: -1;
     width: auto;
-    height: 116%;
+    height: min(110svh, 60rem);
     aspect-ratio: 1;
     transform: scaleX(-1);
-    opacity: 0.9;
     pointer-events: none;
   }
-  .cs-wrap {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    width: min(100% - 2rem, 80rem);
+  .cs-first,
+  .cs-others,
+  .cs-more {
+    width: min(100% - 2rem, 72rem);
     margin-inline: auto;
+  }
+  .cs-first {
+    display: grid;
+    align-content: center;
+    gap: 1.25rem;
+    min-height: 100svh;
+    padding-block: 7rem 2.5rem;
   }
   .cs-head {
     display: grid;
-    gap: 0.75rem;
-    max-width: 52rem;
+    gap: 0.625rem;
+    max-width: 40rem;
   }
   .cs-kicker {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
+    gap: 0.25rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--ink-muted);
+  }
+  .cs-date {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
   }
   .cs-dot {
     width: 0.75rem;
@@ -200,38 +211,15 @@ Astro.response.headers.set(
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem 1.5rem;
+    gap: 0.75rem 1rem;
+  }
+  .cs-time {
+    --flip-size: 1.5rem;
   }
   .cs-title {
     font-family: var(--font-display);
-    font-size: clamp(var(--text-4xl), 7vw, 5.5rem);
-    line-height: 1.04;
-  }
-  .cs-timetile {
-    display: grid;
-    justify-items: center;
-    gap: 0.125rem;
-    min-width: 6rem;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    box-shadow: var(--elevation-1);
-    color: var(--primary);
-  }
-  .cs-timetile strong {
-    font-size: var(--text-2xl);
-    line-height: 1;
-  }
-  .cs-timetile span {
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-  }
-  .cs-date {
-    font-size: var(--text-xl);
-    color: var(--ink-muted);
-  }
-  .cs-date::first-letter {
-    text-transform: uppercase;
+    font-size: clamp(var(--text-2xl), 4.5vw, 3rem);
+    line-height: 1.08;
   }
   .cs-tags {
     display: flex;
@@ -253,73 +241,90 @@ Astro.response.headers.set(
   }
   .cs-theme {
     font-family: var(--font-display);
-    font-size: var(--text-2xl);
+    font-size: var(--text-lg, 1.125rem);
+    font-style: italic;
+  }
+  .cs-details {
+    display: grid;
+    gap: 1rem;
     max-width: 40rem;
   }
-  .cs-grid,
+  .cs-label {
+    margin-block-end: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .cs-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cs-readings li {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 500;
+  }
+  .cs-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+  }
+  .cs-verse {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 85%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .cs-verse blockquote {
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    font-style: italic;
+  }
+  .cs-verse figcaption {
+    margin-block-start: 0.375rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .cs-empty {
+    max-width: 32rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
   .cs-others {
     display: grid;
     gap: 1rem;
+    padding-block-end: 1.5rem;
   }
-  @media (min-width: 56rem) {
-    .cs-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .cs-verse {
-      grid-column: 1 / -1;
-    }
+  @media (min-width: 48rem) {
     .cs-others {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  .cs-panel,
-  .cs-empty {
+  .cs-panel {
     display: grid;
     align-content: start;
-    gap: 1rem;
-    padding: clamp(1.25rem, 2.5vw, 2rem);
-    border-radius: var(--radius-xl);
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
     background: color-mix(in oklab, var(--surface) 88%, transparent);
-    backdrop-filter: blur(6px);
-    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 30%, transparent);
-  }
-  .cs-empty {
-    max-width: 40rem;
-  }
-  .cs-label {
-    display: block;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--ink-muted);
-  }
-  .cs-readings {
-    display: grid;
-    gap: 0.5rem;
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-  }
-  .cs-facts {
-    font-size: var(--text-lg, 1.125rem);
-  }
-  .cs-verse blockquote {
-    font-family: var(--font-display);
-    font-size: clamp(var(--text-xl), 3vw, var(--text-3xl));
-    font-style: italic;
-    max-width: 52rem;
-  }
-  .cs-verse figcaption {
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--season) 30%, transparent);
   }
   .cs-h {
     font-family: var(--font-display);
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
   }
   .cs-others ul {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.625rem;
   }
   .cs-others li {
     display: grid;
@@ -327,5 +332,14 @@ Astro.response.headers.set(
   }
   .cs-others strong {
     text-transform: capitalize;
+  }
+  .cs-more {
+    padding-block-end: 3rem;
+  }
+  @media (max-width: 40rem) {
+    .cs-art {
+      inset-inline-end: -30%;
+      opacity: 0.55;
+    }
   }
 </style>

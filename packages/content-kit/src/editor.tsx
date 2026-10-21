@@ -4,6 +4,7 @@
  * defined in `@eec/core` (`cleanDoc` runs again on the server); the toolbar offers only what that schema allows.
  */
 import { Menu } from '@base-ui/react/menu'
+import { Popover } from '@base-ui/react/popover'
 import { useLocale } from '@eec/admin-kit'
 import { type Doc, safeHref } from '@eec/core'
 import type { IconName } from '@eec/ui/icons'
@@ -111,6 +112,117 @@ function shiftIndent(editor: Editor, delta: 1 | -1) {
       return true
     })
     .run()
+}
+
+const PICK_GRID = 8
+const PICK_MAX_ROWS = 30
+const PICK_MAX_COLS = 10
+const clampTo = (n: number, max: number) => Math.min(max, Math.max(1, Math.round(n) || 1))
+
+/** Insert-a-table popover: hover a grid to preview the size and click to choose, or type rows and columns. */
+function TablePicker({
+  disabled,
+  onPick,
+}: {
+  disabled: boolean
+  onPick: (rows: number, cols: number) => void
+}) {
+  const { t } = useLocale()
+  const [open, setOpen] = useState(false)
+  const [hover, setHover] = useState<[number, number]>([0, 0])
+  const [rows, setRows] = useState(3)
+  const [cols, setCols] = useState(3)
+  const choose = (r: number, c: number) => {
+    setOpen(false)
+    onPick(clampTo(r, PICK_MAX_ROWS), clampTo(c, PICK_MAX_COLS))
+  }
+  const shown: [number, number] = hover[0] ? hover : [rows, cols]
+  return (
+    <Popover.Root
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o)
+        if (!o) setHover([0, 0])
+      }}
+    >
+      <ShortcutTip label={t('content.editor.table')}>
+        <Popover.Trigger
+          className="rte-btn"
+          data-icon="table"
+          disabled={disabled}
+          aria-label={t('content.editor.table')}
+        >
+          <Glyph name="table" />
+          <span className="rte-btn-label">{t('content.editor.table')}</span>
+        </Popover.Trigger>
+      </ShortcutTip>
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={6} align="start" className="eec-positioner">
+          <Popover.Popup className="eec-popover eec-popup rte-tablepick">
+            <div
+              className="rte-pickgrid"
+              style={{ gridTemplateColumns: `repeat(${PICK_GRID}, 1fr)` }}
+              onMouseLeave={() => setHover([0, 0])}
+              aria-hidden="true"
+            >
+              {Array.from({ length: PICK_GRID * PICK_GRID }, (_, i) => {
+                const r = Math.floor(i / PICK_GRID) + 1
+                const c = (i % PICK_GRID) + 1
+                return (
+                  <button
+                    // biome-ignore lint/suspicious/noArrayIndexKey: a fixed grid
+                    key={i}
+                    type="button"
+                    tabIndex={-1}
+                    className="rte-pickcell"
+                    data-on={r <= shown[0] && c <= shown[1] ? '' : undefined}
+                    onMouseEnter={() => setHover([r, c])}
+                    onClick={() => choose(r, c)}
+                  />
+                )
+              })}
+            </div>
+            <p className="rte-pickdim" aria-live="polite">
+              {t('content.editor.table_dim', { rows: String(shown[0]), cols: String(shown[1]) })}
+            </p>
+            <form
+              className="rte-pickform"
+              onSubmit={(e) => {
+                e.preventDefault()
+                choose(rows, cols)
+              }}
+            >
+              <label>
+                <span>{t('content.editor.table_rows')}</span>
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  max={PICK_MAX_ROWS}
+                  value={rows}
+                  onChange={(e) => setRows(clampTo(Number(e.target.value), PICK_MAX_ROWS))}
+                />
+              </label>
+              <label>
+                <span>{t('content.editor.table_cols')}</span>
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  max={PICK_MAX_COLS}
+                  value={cols}
+                  onChange={(e) => setCols(clampTo(Number(e.target.value), PICK_MAX_COLS))}
+                />
+              </label>
+              <button type="submit" className="btn btn-primary">
+                {t('content.editor.table_insert')}
+              </button>
+            </form>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  )
 }
 
 export default function RichTextEditor({
@@ -600,15 +712,15 @@ export default function RichTextEditor({
                 }}
               >
                 <Glyph name="link" />
+                <span className="rte-btn-label">{t('content.editor.link')}</span>
               </button>
             </ShortcutTip>
-            {btn(
-              'table',
-              t('content.editor.table'),
-              state?.inTable ?? false,
-              () => editor.chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
-              state?.inTable ?? false,
-            )}
+            <TablePicker
+              disabled={state?.inTable ?? false}
+              onPick={(rows, cols) =>
+                editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run()
+              }
+            />
             {btn('photo', t('content.editor.photo'), false, () => setPicking(true))}
           </span>
           <span className="rte-gap" aria-hidden="true" />

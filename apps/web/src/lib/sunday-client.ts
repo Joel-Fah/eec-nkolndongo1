@@ -67,16 +67,36 @@ export async function showSunday() {
         )
       }
       const at = n?.next && n.next.startsAt.slice(0, 10) >= s.date ? n.next.startsAt : ''
-      set(
-        '[data-sunday-time]',
-        at
-          ? new Intl.DateTimeFormat(locale, {
+      const clock = root.querySelector<HTMLElement>('[data-sunday-time]')
+      if (clock) {
+        const parts = at
+          ? new Intl.DateTimeFormat('fr-FR', {
               hour: '2-digit',
               minute: '2-digit',
+              hourCycle: 'h23',
               timeZone: 'Africa/Douala',
-            }).format(new Date(at))
-          : '',
-      )
+            })
+              .format(new Date(at))
+              .split(':')
+          : []
+        clock.setAttribute('aria-label', parts.join(':'))
+        clock.replaceChildren(
+          ...parts.flatMap((v, i) => {
+            const card = document.createElement('span')
+            card.className = 'flip-card'
+            card.setAttribute('aria-hidden', 'true')
+            card.textContent = v
+            if (i === 0) {
+              const c = document.createElement('span')
+              c.className = 'flip-colon'
+              c.setAttribute('aria-hidden', 'true')
+              c.textContent = ':'
+              return [card, c]
+            }
+            return [card]
+          }),
+        )
+      }
       const timeBlock = root.querySelector<HTMLElement>('[data-sunday-time-block]')
       if (timeBlock) timeBlock.hidden = !at
       const link = root.querySelector<HTMLAnchorElement>('[data-sunday-link]')

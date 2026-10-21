@@ -1759,7 +1759,11 @@
       "count_words": "{n} words",
       "count_chars": "{n} characters",
       "count_nospace": "{n} without spaces",
-      "untitled": "Untitled"
+      "untitled": "Untitled",
+      "table_rows": "Rows",
+      "table_cols": "Columns",
+      "table_insert": "Insert",
+      "table_dim": "{rows} × {cols}"
     },
     "picker": {
       "title": "Choose a photo",
