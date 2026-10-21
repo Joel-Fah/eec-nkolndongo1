@@ -48,8 +48,26 @@ export async function showSunday() {
       set('[data-sunday-name]', s.name)
       set('[data-sunday-date]', shortDate(`${s.date}T12:00:00Z`, locale, 'UTC'))
       set('[data-sunday-theme]', s.theme)
+      // Tags: the season (unless Ordinary Time) and the Holy Supper.
+      const seasonLabel =
+        s.season === 'ordinaire' ? '' : (root.getAttribute(`data-season_${s.season}`) ?? '')
+      set('[data-sunday-season]', seasonLabel)
       set('[data-sunday-tag]', s.holySupper ? (root.dataset.supper ?? '') : '')
-      set('[data-sunday-readings]', s.readings.map((r) => r.label).join(' · '))
+      const tags = root.querySelector<HTMLElement>('[data-sunday-tags]')
+      if (tags) tags.hidden = !seasonLabel && !s.holySupper
+      // Readings: one chip each.
+      const list = root.querySelector<HTMLElement>('[data-sunday-readings]')
+      if (list) {
+        list.replaceChildren(
+          ...s.readings.map((r) => {
+            const li = document.createElement('li')
+            li.textContent = r.label
+            return li
+          }),
+        )
+        const block = root.querySelector<HTMLElement>('[data-sunday-readings-block]')
+        if (block) block.hidden = s.readings.length === 0
+      }
       const at = n?.next && n.next.startsAt.slice(0, 10) >= s.date ? n.next.startsAt : ''
       set(
         '[data-sunday-time]',
@@ -61,6 +79,8 @@ export async function showSunday() {
             }).format(new Date(at))
           : '',
       )
+      const timeBlock = root.querySelector<HTMLElement>('[data-sunday-time-block]')
+      if (timeBlock) timeBlock.hidden = !at
       const link = root.querySelector<HTMLAnchorElement>('[data-sunday-link]')
       if (link) link.href = base
       root.hidden = false

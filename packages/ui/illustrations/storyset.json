@@ -162,5 +162,12 @@
     "recolour": false,
     "use": "Admin dashboard welcome, dark mode (original colours)",
     "noBackdrop": true
+  },
+  {
+    "name": "cherry-blossom",
+    "url": "https://stories.freepiklabs.com/storage/65770/Cherry-blossom_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Home → Ce dimanche card backdrop (flipped, cropped on the right edge)",
+    "precision": 1
   }
 ]

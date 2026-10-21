@@ -85,7 +85,9 @@
     "unavailable_t": "Cette page ne se charge pas pour l’instant",
     "unavailable_p": "Ce n’est pas de votre fait. Réessayez dans un moment.",
     "retry": "Réessayer",
-    "holy_supper": "Sainte Cène"
+    "holy_supper": "Sainte Cène",
+    "service": "Culte à",
+    "see_program": "Voir le programme"
   },
   "view_grid": "Grille",
   "view_list": "Liste",

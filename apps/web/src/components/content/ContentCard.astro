@@ -22,12 +22,14 @@ const date = shortDate(item.publishedAt, locale)
 <article class:list={['cc', featured && 'cc-featured']}>
   {
     item.cover && (
-      <Picture
+      <div class="cc-photo-wrap">
+        <Picture
         class="cc-photo"
         media={item.cover}
         sizes={featured ? '(min-width: 64rem) 40rem, 100vw' : '(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw'}
         decorative
-      />
+        />
+      </div>
     )
   }
   <div class="cc-body">
@@ -48,6 +50,7 @@ const date = shortDate(item.publishedAt, locale)
     display: grid;
     grid-template-rows: auto 1fr;
     overflow: hidden;
+    padding: 0.625rem;
     border-radius: var(--radius-xl);
     background: var(--surface);
     box-shadow: var(--elevation-1);
@@ -59,16 +62,24 @@ const date = shortDate(item.publishedAt, locale)
     transform: translateY(-0.25rem);
     box-shadow: var(--elevation-2);
   }
+  .cc-photo-wrap {
+    overflow: hidden;
+    border-radius: calc(var(--radius-xl) - 0.625rem);
+  }
   .cc :global(.cc-photo) {
+    transition: transform var(--duration-story, 0.9s) var(--ease-out);
     aspect-ratio: 16 / 10;
     width: 100%;
     object-fit: cover;
+  }
+  .cc:hover :global(.cc-photo) {
+    transform: scale(1.06);
   }
   .cc-body {
     display: grid;
     align-content: start;
     gap: 0.5rem;
-    padding: 1.25rem;
+    padding: 0.875rem 0.75rem 0.75rem;
   }
   .cc-meta {
     display: flex;
@@ -129,6 +140,9 @@ const date = shortDate(item.publishedAt, locale)
     .cc:hover {
       transform: none;
       transition: none;
+    }
+    .cc:hover :global(.cc-photo) {
+      transform: none;
     }
   }
 </style>

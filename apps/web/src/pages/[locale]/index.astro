@@ -125,16 +125,33 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
       </a>
     </div>
   </section>
-  <section class="home-section" aria-labelledby="sunday-title" data-sunday data-supper={t('liturgy.site.holy_supper')} data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
-    <a class="sunday-card" data-sunday-link href={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')}>
-      <p class="sunday-kicker"><span class="sunday-dot" aria-hidden="true"></span><span id="sunday-title">{t('liturgy.site.title')}</span></p>
-      <strong class="sunday-name" data-sunday-name></strong>
-      <span class="sunday-date" data-sunday-date></span>
-      <span class="sunday-theme" data-sunday-theme hidden></span>
-      <span class="sunday-tag" data-sunday-tag hidden></span>
-      <span class="sunday-readings" data-sunday-readings hidden></span>
-      <span class="sunday-time" data-sunday-time hidden></span>
-    </a>
+  <section class="home-section sunday" aria-labelledby="sunday-title" data-sunday data-supper={t('liturgy.site.holy_supper')} data-season_avent={t('season.avent')} data-season_noel={t('season.noel')} data-season_epiphanie={t('season.epiphanie')} data-season_careme={t('season.careme')} data-season_semaine-sainte={t('season.semaine-sainte')} data-season_paques={t('season.paques')} data-season_pentecote={t('season.pentecote')} data-season_moissons={t('season.moissons')} data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
+    <div class="sunday-card">
+      <Illustration name="cherry-blossom" class="sunday-art" />
+      <div class="sunday-body">
+        <header class="sunday-head">
+          <p class="sunday-kicker"><span class="sunday-dot" aria-hidden="true"></span><span id="sunday-title">{t('liturgy.site.title')}</span></p>
+          <p class="sunday-date" data-sunday-date></p>
+        </header>
+        <h2 class="sunday-name" data-sunday-name></h2>
+        <p class="sunday-tags" data-sunday-tags hidden>
+          <span class="sunday-chip sunday-chip-season" data-sunday-season hidden></span>
+          <span class="sunday-chip sunday-chip-supper" data-sunday-tag hidden></span>
+        </p>
+        <p class="sunday-theme" data-sunday-theme hidden></p>
+        <div class="sunday-readings-block" data-sunday-readings-block hidden>
+          <p class="sunday-label">{t('liturgy.site.readings')}</p>
+          <ul class="sunday-readings" data-sunday-readings role="list"></ul>
+        </div>
+        <footer class="sunday-foot">
+          <p class="sunday-time" data-sunday-time-block hidden>
+            <Icon name="clock" size={20} />
+            <span class="sunday-time-text"><span class="sunday-time-label">{t('liturgy.site.service')}</span><strong data-sunday-time></strong></span>
+          </p>
+          <Button href={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} data-sunday-link>{t('liturgy.site.see_program')}<Icon name="arrowRight" size={20} /></Button>
+        </footer>
+      </div>
+    </div>
   </section>
 
   <section class="home-section" aria-labelledby="upcoming-title" data-upcoming data-locale={locale} data-base={eventsListHref(locale)} hidden>
@@ -378,60 +395,6 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     color: var(--ink-muted);
     font-size: var(--text-sm);
   }
-  .sunday-card {
-    display: grid;
-    gap: 0.375rem;
-    padding: 1.5rem;
-    border-radius: var(--radius-xl);
-    background: var(--surface);
-    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 40%, transparent);
-    text-decoration: none;
-  }
-  .sunday-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--ink-muted);
-  }
-  .sunday-dot {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    background: var(--season);
-  }
-  .sunday-name {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    line-height: 1.15;
-  }
-  .sunday-date,
-  .sunday-readings {
-    color: var(--ink-muted);
-    text-transform: capitalize;
-  }
-  .sunday-theme {
-    font-size: var(--text-lg, 1.125rem);
-  }
-  .sunday-time {
-    justify-self: start;
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--primary-soft);
-    color: var(--primary);
-    font-weight: 600;
-  }
-  .sunday-tag {
-    justify-self: start;
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--gold-soft, var(--primary-soft));
-    font-size: var(--text-sm);
-    font-weight: 600;
-  }
 </style>
 
 <style is:global>
@@ -445,10 +408,14 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     gap: 1.25rem;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   }
+  /* The card's background wraps the photo: a frame all round, a rounded photo (radius = card radius − frame), and a
+     gentle zoom inside the photo on hover. */
   .ln-card {
     display: grid;
+    align-content: start;
+    gap: 0.25rem;
     height: 100%;
-    overflow: hidden;
+    padding: 0.625rem;
     border-radius: var(--radius-xl);
     background: var(--surface);
     box-shadow: var(--elevation-1);
@@ -458,16 +425,28 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   .ln-card:hover {
     transform: translateY(-0.25rem);
   }
-  .ln-card img {
-    width: 100%;
+  .ln-photo {
+    display: block;
+    overflow: hidden;
     aspect-ratio: 16 / 10;
+    border-radius: calc(var(--radius-xl) - 0.625rem);
+    background: var(--surface-2);
+  }
+  .ln-photo img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    transition: transform var(--duration-story, 0.9s) var(--ease-out);
+  }
+  .ln-card:hover .ln-photo img,
+  .ln-card:focus-visible .ln-photo img {
+    transform: scale(1.07);
   }
   .ln-body {
     display: grid;
     align-content: start;
     gap: 0.375rem;
-    padding: 1rem 1.25rem 1.25rem;
+    padding: 0.5rem 0.75rem 0.75rem;
   }
   .ln-body time,
   .ln-excerpt {
@@ -487,6 +466,11 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   @media (prefers-reduced-motion: reduce) {
     .ln-card:hover {
       transform: none;
+    }
+    .ln-photo img,
+    .ln-card:hover .ln-photo img {
+      transform: none;
+      transition: none;
     }
   }
   .up-list {
@@ -519,23 +503,60 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     color: var(--ink-muted);
     font-size: var(--text-sm);
   }
+
+  /* « Ce dimanche »: season-tinted card, the cherry blossom (flipped, cropped on the right edge) behind the text. */
   .sunday-card {
-    display: grid;
-    gap: 0.375rem;
-    padding: 1.5rem;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     border-radius: var(--radius-xl);
-    background: var(--surface);
-    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 40%, transparent);
-    text-decoration: none;
+    background: color-mix(in oklab, var(--season) 12%, var(--surface));
+    box-shadow: var(--elevation-1), inset 0 0 0 1.5px color-mix(in oklab, var(--season) 35%, transparent);
+  }
+  .sunday-card .sunday-art {
+    position: absolute;
+    inset-block: -25% -25%;
+    inset-inline-end: -5%;
+    z-index: -1;
+    width: auto;
+    height: 150%;
+    aspect-ratio: 1;
+    transform: scaleX(-1);
+    pointer-events: none;
+  }
+  .sunday-card .sunday-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  /* The text side stays calm: a soft veil from the card's colour over the left part of the picture. */
+  .sunday-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, color-mix(in oklab, var(--season) 12%, var(--surface)) 38%, transparent 78%);
+  }
+  .sunday-body {
+    display: grid;
+    gap: 1rem;
+    max-width: 36rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .sunday-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
   }
   .sunday-kicker {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 700;
     font-size: var(--text-sm);
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     color: var(--ink-muted);
   }
   .sunday-dot {
@@ -544,33 +565,100 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     border-radius: 50%;
     background: var(--season);
   }
-  .sunday-name {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    line-height: 1.15;
-  }
-  .sunday-date,
-  .sunday-readings {
-    color: var(--ink-muted);
-    text-transform: capitalize;
-  }
-  .sunday-theme {
-    font-size: var(--text-lg, 1.125rem);
-  }
-  .sunday-time {
-    justify-self: start;
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--primary-soft);
-    color: var(--primary);
-    font-weight: 600;
-  }
-  .sunday-tag {
-    justify-self: start;
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--gold-soft, var(--primary-soft));
+  .sunday-date {
     font-size: var(--text-sm);
     font-weight: 600;
+    color: var(--ink);
+    padding-inline-start: 0.75rem;
+    box-shadow: -1.5px 0 0 var(--line-strong);
+  }
+  .sunday-name {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-3xl, 2rem), 5vw, var(--text-4xl));
+    line-height: 1.05;
+  }
+  .sunday-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .sunday-chip {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .sunday-chip-season {
+    background: color-mix(in oklab, var(--season) 30%, var(--surface));
+  }
+  .sunday-chip-supper {
+    background: var(--gold-soft, var(--primary-soft));
+  }
+  .sunday-theme {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-style: italic;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .sunday-label {
+    margin-block-end: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .sunday-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .sunday-readings li {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 500;
+  }
+  .sunday-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-block-start: 0.5rem;
+  }
+  .sunday-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: var(--primary);
+  }
+  .sunday-time-text {
+    display: grid;
+    line-height: 1.15;
+  }
+  .sunday-time-label {
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .sunday-time strong {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    color: var(--ink);
+  }
+  @media (max-width: 40rem) {
+    .sunday-card::before {
+      background: linear-gradient(180deg, color-mix(in oklab, var(--season) 12%, var(--surface)) 55%, transparent 100%);
+    }
+    .sunday-card .sunday-art {
+      inset-block: auto -18%;
+      inset-inline-end: -12%;
+      height: 70%;
+    }
   }
 </style>

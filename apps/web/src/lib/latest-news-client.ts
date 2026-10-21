@@ -44,7 +44,10 @@ export async function showLatestNews() {
         img.alt = ''
         img.loading = 'lazy'
         img.decoding = 'async'
-        a.append(img)
+        const photo = document.createElement('span')
+        photo.className = 'ln-photo'
+        photo.append(img)
+        a.append(photo)
       }
       const body = document.createElement('span')
       body.className = 'ln-body'

@@ -85,7 +85,9 @@
     "unavailable_t": "This page is not loading right now",
     "unavailable_p": "This is not your fault. Please try again in a moment.",
     "retry": "Try again",
-    "holy_supper": "Holy Supper"
+    "holy_supper": "Holy Supper",
+    "service": "Service at",
+    "see_program": "See the programme"
   },
   "view_grid": "Grid",
   "view_list": "List",
