@@ -124,10 +124,7 @@ export const mediaApi = new Hono<AppEnv>()
       key: `media/credits/v${version}`,
       ttl: 300,
       keep: 60 * 60 * 24 * 7,
-      load: async () => {
-        if (!db) throw new Error('database unavailable')
-        return creditsOf(db)
-      },
+      load: (fresh) => creditsOf(fresh),
     })
   })
   .get('/', requirePermission('media:read'), async (c) => {

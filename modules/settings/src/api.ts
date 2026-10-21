@@ -102,10 +102,7 @@ export const settingsApi = new Hono<AppEnv>()
       key: `settings/public/v${version}`,
       ttl: 120,
       keep: 60 * 60 * 24 * 7,
-      load: async () => {
-        if (!db) throw new Error('database unavailable')
-        return { version, ...publicValues(await readSections(db)) }
-      },
+      load: async (fresh) => ({ version, ...publicValues(await readSections(fresh)) }),
     })
   })
 
