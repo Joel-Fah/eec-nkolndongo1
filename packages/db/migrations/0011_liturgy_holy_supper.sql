@@ -1,0 +1,1 @@
+ALTER TABLE "liturgy_sundays" ADD COLUMN "holy_supper" boolean DEFAULT false NOT NULL;
