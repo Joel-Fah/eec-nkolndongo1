@@ -14,6 +14,19 @@ const from = join(root, 'apps/admin/dist')
 const to = join(root, 'apps/web/dist/client', prefix)
 await rm(to, { recursive: true, force: true })
 await cp(from, to, { recursive: true })
+// The Worker must know the same admin address and launch state as the build: set them in the built config
+// (the source wrangler.jsonc keeps the development defaults).
+const configFile = join(root, 'apps/web/dist/server/wrangler.json')
+const config = JSON.parse(await readFile(configFile, 'utf8'))
+config.vars = {
+  ...config.vars,
+  ADMIN_PATH: prefix.replace(/^\//, ''),
+  SITE_INDEXABLE: envLocal('SITE_INDEXABLE') === '1' ? '1' : '0',
+}
+await writeFile(configFile, JSON.stringify(config))
+console.log(
+  `Worker vars: ADMIN_PATH=${config.vars.ADMIN_PATH} SITE_INDEXABLE=${config.vars.SITE_INDEXABLE}`,
+)
 console.log(
   `admin copied to apps/web/dist/client${prefix}/ — deploy with: wrangler deploy --config apps/web/dist/server/wrangler.json`,
 )
