@@ -56,9 +56,7 @@ async function guide(request: Request, env: Bindings, ctx: ExecutionContext) {
  */
 async function adminShell(request: Request, env: Bindings) {
   const assets = (env as unknown as { ASSETS: { fetch: (r: Request) => Promise<Response> } }).ASSETS
-  return assets.fetch(
-    new Request(new URL(`${adminPrefix(env.ADMIN_PATH)}/index.html`, request.url), request),
-  )
+  return assets.fetch(new Request(new URL(`${adminPrefix(env.ADMIN_PATH)}/`, request.url), request))
 }
 
 export default {
