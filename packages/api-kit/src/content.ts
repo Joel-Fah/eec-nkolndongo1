@@ -8,6 +8,8 @@ import { schema } from '@eec/db'
 import { eq, sql } from 'drizzle-orm'
 
 const MEMO_MS = 5_000
+const DOWN_MS = 3_000
+let down = 0
 const memo = new Map<string, { version: number; at: number }>()
 
 /**
@@ -22,12 +24,17 @@ export async function versionFor(
 ): Promise<number> {
   const hit = memo.get(area)
   if (hit && Date.now() - hit.at < MEMO_MS) return hit.version
+  if (down && Date.now() - down < DOWN_MS) return hit?.version ?? 0
   try {
-    return await Promise.race([
+    const v = await Promise.race([
       openDb().then((db) => contentVersion(db, area)),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
     ])
+    down = 0
+    return v
   } catch {
+    // Remember the failure briefly: a down database costs one wait, not one per request.
+    down = Date.now()
     return hit?.version ?? 0
   }
 }

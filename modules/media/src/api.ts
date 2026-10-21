@@ -118,7 +118,7 @@ async function creditsOf(db: Awaited<ReturnType<AppEnv['Variables']['deps']['db'
 export const mediaApi = new Hono<AppEnv>()
   // Anonymous and edge-cached: the names behind the photos (footer « Photos : Pexels » → credits page).
   .get('/credits', async (c) => {
-    const version = await versionFor(c.var.deps.db, 'media')
+    const version = await versionFor(c.var.deps.db, 'media', c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `media/credits/v${version}`,
       ttl: 300,

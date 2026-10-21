@@ -12,6 +12,32 @@ export async function readFlags(db: Db): Promise<Map<string, boolean>> {
   return new Map(rows.map((r) => [r.moduleId, r.enabled]))
 }
 
+const FLAGS_MEMO_MS = 10_000
+let memo: { flags: Map<string, boolean>; at: number } | undefined
+let down = 0
+
+/**
+ * The flags for the request path: remembered for a few seconds per Worker instance, so a public request does not
+ * open a database connection just to learn that a module is on (decision 0027). If the database is slow or down
+ * the last known flags are used, else the manifest defaults: a flag lookup never turns a page into a 500.
+ */
+export async function flagsFor(openDb: () => Promise<Db>, timeoutMs = 1500) {
+  if (memo && Date.now() - memo.at < FLAGS_MEMO_MS) return memo.flags
+  if (down && Date.now() - down < 3000) return memo?.flags ?? new Map<string, boolean>()
+  try {
+    const flags = await Promise.race([
+      openDb().then(readFlags),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeoutMs)),
+    ])
+    memo = { flags, at: Date.now() }
+    down = 0
+    return flags
+  } catch {
+    down = Date.now()
+    return memo?.flags ?? new Map<string, boolean>()
+  }
+}
+
 export const flagRoutes = new Hono<AppEnv>()
   .get('/', requirePermission('settings:read'), async (c) => {
     const flags = await readFlags(await c.var.deps.db())
@@ -43,6 +69,7 @@ export const flagRoutes = new Hono<AppEnv>()
           target: schema.settingsFlags.moduleId,
           set: { enabled, updatedBy: actor?.userId ?? null },
         })
+      memo = undefined
       await audit(c, {
         action: enabled ? 'module.enable' : 'module.disable',
         entityType: 'module',

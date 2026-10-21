@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 import { withDeps } from './deps.ts'
 import { auditRoutes } from './routes/audit.ts'
 import { authRoutes } from './routes/auth.ts'
-import { flagRoutes, readFlags } from './routes/flags.ts'
+import { flagRoutes, flagsFor } from './routes/flags.ts'
 import { groupRoutes } from './routes/groups.ts'
 import { invitationRoutes } from './routes/invitations.ts'
 import { meRoutes } from './routes/me.ts'
@@ -37,7 +37,7 @@ export function createApp() {
     if (!router) continue
     if (m.toggleable)
       app.use(`/${m.id}/*`, async (c, next) => {
-        const flags = await readFlags(await c.var.deps.db())
+        const flags = await flagsFor(c.var.deps.db, c.var.deps.timeoutMs)
         if (!isModuleEnabled(m, flags)) return c.json({ error: { code: 'not_found' } }, 404)
         await next()
       })

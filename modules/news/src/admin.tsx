@@ -230,7 +230,6 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
     setDraft((d) => (d && d.slug !== r.slug ? { ...d, slug: r.slug } : d))
     qc.invalidateQueries({ queryKey: ['news'] })
   })
-  // biome-ignore lint/correctness/useExhaustiveDependencies: load once per post
   useEffect(() => {
     load().catch(() => {
       say(t(k('error')), 'danger')

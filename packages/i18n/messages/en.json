@@ -637,6 +637,40 @@
         "use": "lib/shapes.ts: a ratio (ar) and a path (defs) per shape; clip-path: url(#id) with clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Decorative: the content and alternative text are those of the cut image; no information is carried by the shape.",
         "demo": "Every available shape."
+      },
+      "contentcard": {
+        "name": "Content card",
+        "desc": "The card for any list of content (news today; events and guides next): photo, date, title, summary. The whole card is one link; the first post can be featured, shown large. It lifts gently on hover.",
+        "use": "<ContentCard item href featured? />. Photos come from the media library through <Picture>. The group and the « Featured » pin show when present.",
+        "a11y": "One link per card (the title) with an extended hit area, visible focus around the whole card, no motion with reduced motion.",
+        "demo_title": "An example title",
+        "demo_text": "An example summary in one sentence, for the list."
+      },
+      "unavailable": {
+        "name": "Content unavailable",
+        "desc": "What a visitor sees when the database is slow or unreachable: plain words and a « Try again » button. Never an error page (decision 0027).",
+        "use": "<UnavailableState /> in place of the list or text. The page answers 503 and is not cached.",
+        "a11y": "role=status, jargon-free message, 44 px button."
+      },
+      "langfallback": {
+        "name": "Language note",
+        "desc": "When a text does not exist in English yet, the French version is shown with this note above the title.",
+        "use": "<LangFallbackNote /> when the API returns fallback = true.",
+        "a11y": "role=note, contrast checked in both themes."
+      },
+      "editor": {
+        "name": "Text editor (admin)",
+        "desc": "A simple editor for writers: bold, italic, section heading, lists, quote, link, library photo, undo/redo. It produces only what the site can display; it loads only when someone writes (never on the public site).",
+        "use": "Lazy import of @eec/content-kit/editor. The text is a small JSON document (@eec/core richtext), cleaned again on the server.",
+        "a11y": "Labelled toolbar, 44 px buttons with pressed state, text area announced as such, links refused unless https, mailto or tel.",
+        "demo": "Open a news post in the admin to try it."
+      },
+      "publishflow": {
+        "name": "Draft, publish, versions",
+        "desc": "The flow shared by all content: autosave (« Saved »), a Publish button (now or on a date, with an optional end date), a secret 3-day preview link, restorable earlier versions, archiving. Status labels are the same everywhere.",
+        "use": "@eec/content-kit: useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
+        "a11y": "Status announced with aria-live, dialogs with focus trap and Esc, problems before publishing listed in plain words.",
+        "demo": "Visible in the admin, on every news post."
       }
     },
     "rules": {

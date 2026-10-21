@@ -96,7 +96,7 @@ export const settingsApi = new Hono<AppEnv>()
 
   // Anonymous and cached: approved values only, for the public site (footer, contact, season).
   .get('/public', async (c) => {
-    const version = await versionFor(c.var.deps.db, AREA)
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `settings/public/v${version}`,
       ttl: 120,

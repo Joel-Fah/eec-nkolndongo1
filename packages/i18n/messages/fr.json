@@ -637,6 +637,40 @@
         "use": "lib/shapes.ts : un rapport (ar) et un tracé (defs) par forme ; clip-path: url(#id) avec clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Décoratives : le contenu et le texte alternatif sont ceux de l’image découpée ; aucune information n’est portée par la forme.",
         "demo": "Toutes les formes disponibles."
+      },
+      "contentcard": {
+        "name": "Carte de contenu",
+        "desc": "La carte de toute liste de contenus (nouvelles aujourd’hui ; événements et guides ensuite) : photo, date, titre, résumé. Toute la carte est un seul lien ; la première nouvelle peut être « à la une », en grand. Elle se soulève doucement au survol.",
+        "use": "<ContentCard item href featured? />. Les photos viennent de la médiathèque via <Picture>. Le groupe et l’épingle « À la une » s’affichent quand ils existent.",
+        "a11y": "Un seul lien par carte (titre), zone cliquable étendue, focus visible autour de la carte entière, pas de mouvement avec « réduire les animations ».",
+        "demo_title": "Un titre d’exemple",
+        "demo_text": "Un résumé d’exemple en une phrase, pour la liste."
+      },
+      "unavailable": {
+        "name": "Contenu indisponible",
+        "desc": "Ce que voit un visiteur quand la base de données est lente ou injoignable : des mots simples, un bouton « Réessayer ». Jamais une page d’erreur (décision 0027).",
+        "use": "<UnavailableState /> à la place de la liste ou du texte. La page répond 503 et n’est pas mise en cache.",
+        "a11y": "role=status, message sans jargon, bouton de 44 px."
+      },
+      "langfallback": {
+        "name": "Note de langue",
+        "desc": "Quand un texte n’existe pas encore en anglais, la version française s’affiche, avec cette note au-dessus du titre.",
+        "use": "<LangFallbackNote /> quand l’API renvoie fallback = true.",
+        "a11y": "role=note, contraste vérifié dans les deux thèmes."
+      },
+      "editor": {
+        "name": "Éditeur de texte (administration)",
+        "desc": "Un éditeur simple pour les rédacteurs : gras, italique, titre de section, listes, citation, lien, photo de la médiathèque, annuler/rétablir. Il ne produit que ce que le site sait afficher ; il est chargé seulement quand on écrit (jamais sur le site public).",
+        "use": "Import différé de @eec/content-kit/editor. Le texte est un petit document JSON (@eec/core richtext), nettoyé à nouveau côté serveur.",
+        "a11y": "Barre d’outils étiquetée, boutons de 44 px avec état pressé, zone de texte annoncée comme telle, liens refusés s’ils ne sont pas en https, mailto ou tel.",
+        "demo": "Ouvrez une actualité dans l’administration pour l’essayer."
+      },
+      "publishflow": {
+        "name": "Brouillon, publication, versions",
+        "desc": "Le parcours commun à tous les contenus : enregistrement automatique (« Enregistré »), bouton Publier (maintenant ou à une date, avec une date de retrait facultative), aperçu par lien secret de 3 jours, versions précédentes restaurables, archivage. Les étiquettes d’état sont les mêmes partout.",
+        "use": "@eec/content-kit : useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
+        "a11y": "Annonces d’état en aria-live, fenêtres avec piège de focus et Échap, les problèmes avant publication sont listés en clair.",
+        "demo": "Visible dans l’administration, sur chaque actualité."
       }
     },
     "rules": {

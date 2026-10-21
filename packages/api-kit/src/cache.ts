@@ -27,6 +27,8 @@ export type CacheDeps = {
   requestDb: () => Promise<Db>
   /** Keeps a promise alive after the response (ctx.waitUntil); awaited inline where there is none. */
   background: (p: Promise<unknown>) => Promise<unknown> | undefined
+  /** The database time-box (default 1.5 s). */
+  timeoutMs?: number
 }
 
 export type CachedOptions<T> = {
@@ -91,8 +93,14 @@ export async function cachedResponse<T>(
     return respond(body, 'stale')
   }
   try {
-    const db = await timeout(deps.requestDb(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS)
-    return respond(await timeout(refresh(db), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS), 'miss')
+    const db = await timeout(
+      deps.requestDb(),
+      opts.timeoutMs ?? deps.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+    )
+    return respond(
+      await timeout(refresh(db), opts.timeoutMs ?? deps.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+      'miss',
+    )
   } catch {
     // Cold or down and nothing stale to serve: say so plainly (callers show a friendly state).
     return new Response(JSON.stringify({ error: { code: 'unavailable' } }), {
@@ -113,6 +121,7 @@ export function cachedJson<T>(c: Context<AppEnv>, opts: CachedOptions<T>) {
       cache: (globalThis as { caches?: { default?: Cache } }).caches?.default,
       withFreshDb: (fn) => c.var.deps.withDb(fn),
       requestDb: () => c.var.deps.db(),
+      timeoutMs: c.var.deps.timeoutMs,
       background: (p) => {
         try {
           c.executionCtx.waitUntil(p)

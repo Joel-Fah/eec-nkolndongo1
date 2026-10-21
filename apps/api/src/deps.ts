@@ -62,7 +62,13 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
     }
   }
 
-  c.set('deps', { db, withDb, auth: getAuth, actor: getActor })
+  c.set('deps', {
+    db,
+    withDb,
+    timeoutMs: c.env.HYPERDRIVE ? 1500 : 8000,
+    auth: getAuth,
+    actor: getActor,
+  })
   try {
     await next()
   } finally {

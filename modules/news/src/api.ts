@@ -301,7 +301,7 @@ export const newsApi = new Hono<AppEnv>()
     const locale = localeOf(c.req.query('locale'))
     const page = Math.max(1, Math.min(Number(c.req.query('page')) || 1, 200))
     const limit = Math.min(Math.max(Number(c.req.query('limit')) || PAGE, 1), 24)
-    const version = await versionFor(c.var.deps.db, AREA)
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `news/list/${locale}/${page}/${limit}/v${version}`,
       ttl: 60,
@@ -311,7 +311,7 @@ export const newsApi = new Hono<AppEnv>()
   })
   .get('/public/feed.xml', async (c) => {
     const locale = localeOf(c.req.query('locale'))
-    const version = await versionFor(c.var.deps.db, AREA)
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `news/feed/${locale}/v${version}`,
       ttl: 300,
@@ -325,7 +325,7 @@ export const newsApi = new Hono<AppEnv>()
     const locale = localeOf(c.req.query('locale'))
     const slug = c.req.param('slug')
     if (!/^[a-z0-9-]{1,120}$/.test(slug)) return fail(c, 404, 'not_found')
-    const version = await versionFor(c.var.deps.db, AREA)
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `news/item/${locale}/${slug}/v${version}`,
       ttl: 60,
