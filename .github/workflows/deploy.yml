@@ -26,7 +26,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: production
+    # Shows « Deployed to production » with a link on the repository page and on pull requests.
+    environment:
+      name: production
+      url: https://eec-nkolndongo1.joelfah2003.workers.dev
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

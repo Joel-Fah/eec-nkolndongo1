@@ -17,6 +17,9 @@ _Last updated: 2026-10-20_
 - **Not done yet**: the first production deploy (needs Joël present, a Cloudflare token + Neon `main` branch + Hyperdrive),
   Worker CPU measurement on a deployed preview, the Pexels curation into the library (needs Joël's review of thumbnails),
   a second copy of the media files. See `docs/phases/PHASE_02_REPORT.md`.
+- **Live (2026-10-21):** first production deploy done on `eec-nkolndongo1.joelfah2003.workers.dev` (noindex), admin at a custom
+  path, super admin created. **To do later:** R2 second copy of the media files (enable R2, bucket `eec-media-copy`, four
+  `MEDIA_COPY_*` GitHub secrets: nothing to copy yet), a safe preview workflow (dev database), Worker CPU reading, Pexels import.
 - **Open points**: Bible texts (PDV/ETR) to verify against licensed wording; testimonials empty on purpose; real parish photos.
 
 ## In progress — public UI revamp (asked by Joël, 2026-10-19)
