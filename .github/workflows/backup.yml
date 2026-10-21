@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
+    env:
+      MEDIA_COPY_BUCKET: ${{ secrets.MEDIA_COPY_BUCKET }}
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -36,3 +38,17 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+      # A second copy of the media files in R2 (only copies what is new; never deletes). Skipped until the R2 secrets exist.
+      - name: Media second copy (R2)
+        if: ${{ env.MEDIA_COPY_BUCKET != '' }}
+        run: pnpm media:sync
+        env:
+          MEDIA_COPY_BUCKET: ${{ secrets.MEDIA_COPY_BUCKET }}
+          MEDIA_COPY_ENDPOINT: ${{ secrets.MEDIA_COPY_ENDPOINT }}
+          MEDIA_COPY_ACCESS_KEY_ID: ${{ secrets.MEDIA_COPY_ACCESS_KEY_ID }}
+          MEDIA_COPY_SECRET_ACCESS_KEY: ${{ secrets.MEDIA_COPY_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ secrets.AWS_ENDPOINT_URL_S3 }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          MEDIA_BUCKET: eec-media

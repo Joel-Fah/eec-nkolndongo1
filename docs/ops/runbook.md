@@ -42,6 +42,18 @@ migrations are not rolled back by this: write a new forward migration.
   3. It must end with « restore verified ». Open the site against that branch to look. Delete the branch.
 - Lost the private key = the backups cannot be read. Keep it in two places offline.
 
+## Telling dev from production in your terminal
+- A normal terminal only ever has the **dev** values (`.env.local`). Production values live in `.env.production.local`
+  and are loaded only inside `bash scripts/ops/prod-shell.sh`: a shell with a red **PROD** prompt, closed with `exit`.
+- Commands that change data (`db:migrate`, `db:seed`) ask you to **type the branch name** when it is not `dev`.
+  `clean:test-data` and the spike refuse anything but `dev`. CI deploys without the prompt (it is the intended path).
+- Check before acting: `echo $NEON_BRANCH` (dev / production).
+
+## Media second copy (R2)
+`pnpm media:sync` copies the media files to a Cloudflare R2 bucket (only new ones, never deletes). The weekly `backup`
+workflow runs it once these GitHub secrets exist: `MEDIA_COPY_ENDPOINT` (`https://<account id>.r2.cloudflarestorage.com`),
+`MEDIA_COPY_BUCKET`, `MEDIA_COPY_ACCESS_KEY_ID`, `MEDIA_COPY_SECRET_ACCESS_KEY` (an R2 API token with object read/write).
+
 ## Daily retention
 A Cloudflare Cron Trigger (03:17 UTC) runs `apps/api/src/retention.ts`: expired sessions and links, outbox > 90 days,
 audit > 24 months, accounts whose deletion was requested > 30 days ago. Each run writes a row in `retention_runs`.

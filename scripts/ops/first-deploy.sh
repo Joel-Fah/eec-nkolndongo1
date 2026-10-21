@@ -25,6 +25,7 @@ case "$(host DATABASE_URL_UNPOOLED)" in *-pooler*) echo "The database string is 
 read -r -p "Type DEPLOY to continue: " answer
 [ "$answer" = "DEPLOY" ] || { echo "Cancelled."; exit 1; }
 export SITE_INDEXABLE="${SITE_INDEXABLE:-0}"
+export EEC_CONFIRMED=1 # the DEPLOY confirmation above covers the database commands below
 
 echo "── 1/5 build"
 pnpm install --frozen-lockfile

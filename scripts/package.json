@@ -12,7 +12,8 @@
     "dev:gateway": "node dev-gateway.ts",
     "illos:fetch": "node illos-fetch.ts",
     "backup": "node backup/backup.ts",
-    "restore": "node backup/restore.ts"
+    "restore": "node backup/restore.ts",
+    "media:sync": "node backup/media-sync.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",

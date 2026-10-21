@@ -24,7 +24,8 @@
     "dev:turbo": "turbo run dev",
     "backup": "pnpm --filter @eec/scripts backup",
     "restore": "pnpm --filter @eec/scripts restore",
-    "build:site": "turbo run build && node scripts/assemble-site.ts"
+    "build:site": "turbo run build && node scripts/assemble-site.ts",
+    "media:sync": "pnpm --filter @eec/scripts media:sync"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

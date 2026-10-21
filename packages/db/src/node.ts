@@ -22,3 +22,24 @@ export function assertBranch(allowed: string[]) {
   }
   return branch
 }
+
+/**
+ * A guard for commands that change data: on any branch other than `dev`, a person at a keyboard must type the branch
+ * name first. CI (no keyboard) is not asked: its deploy workflow is the intended path to production.
+ */
+export async function confirmNotDev(action: string) {
+  const branch = process.env.NEON_BRANCH ?? 'unknown'
+  if (branch === 'dev') return
+  // CI has no keyboard; the first-deploy script has already asked the person to type DEPLOY (EEC_CONFIRMED).
+  if (!process.stdin.isTTY || process.env.CI || process.env.EEC_CONFIRMED) return
+  const { createInterface } = await import('node:readline/promises')
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  const host = new URL(directUrl()).host
+  console.log(`\n⚠  ${action} on the "${branch}" database (${host}).`)
+  const answer = await rl.question(`Type ${branch} to continue: `)
+  rl.close()
+  if (answer.trim() !== branch) {
+    console.log('Cancelled.')
+    process.exit(1)
+  }
+}
