@@ -1,8 +1,22 @@
 # STATUS
 
-_Last updated: 2026-10-20_
+_Last updated: 2026-10-21_
 
-## Current phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep) ready for review
+## Current phase: 03a — Parish Life · Checkpoint A (content kit + News) ready for review
+Branch `feat/phase-03a-content-time`. Production stays paused (dev only), nothing deployed. Plan: `docs/phases/PHASE_03_INSTRUCTIONS.md`.
+- **Checkpoint 0 done:** `cachedJson` refresh bug fixed (own connection), cache hits no longer open a DB connection (version and
+  module flags memoised), cold reads time-boxed (503, never 500), CPU figures in decision 0027, public-domain Bible verses
+  (LSG 1910 / WEB, decision 0032), CI `--env-file-if-exists` fix.
+- **Content kit:** `@eec/core` rich text (clean + render, hostile-input tests) and lifecycle; `@eec/api-kit` preview links
+  (signed, 3 days); `@eec/content-kit` (TipTap editor loaded lazily, media picker, publish dialog, revisions, autosave,
+  cover field, status badge); `content_revisions` / `content_redirects` (migration 0006); media tables moved to `@eec/db`.
+- **News module:** admin list + editor (FR/EN tabs, autosave, schedule, unpublish, archive, delete, versions, preview link,
+  group-scoped rights), public list/detail/preview pages (on demand, cached JSON), RSS, home « Dernières nouvelles »,
+  dev-only example seed (`pnpm news:seed-dev [-- --clear]`). Entries added to the living guide.
+- **Next:** Checkpoint B (events, schedule, liturgy, home cards). **Open:** real CPU reading on production, TipTap chunk is
+  125 KB gz (admin only), news permissions are not added to existing roles in a database already seeded (grant in Rôles).
+
+## Previous phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep)
 
 ## Checkpoint C — built (2026-10-20), waiting for Joël's review
 - **Media library** (`modules/media`, decision 0020): S3-compatible store (Neon Object Storage, bucket `eec-media`), photos
