@@ -32,6 +32,7 @@ const AREA = 'settings'
 const NAMES: Record<SectionId, { fr: string; en: string }> = {
   parish: { fr: 'Paroisse', en: 'Parish' },
   season: { fr: 'Saison liturgique', en: 'Liturgical season' },
+  giving: { fr: 'Donner', en: 'Giving' },
 }
 const ids = Object.keys(sections) as SectionId[]
 

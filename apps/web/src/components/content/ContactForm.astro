@@ -1,0 +1,145 @@
+---
+/**
+ * The contact form (module contact). No third party: a hidden honeypot, the time the form was shown, a rate limit in the
+ * API. Consent is an unticked box. Needs JavaScript (a note says how to reach us otherwise).
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Choice from '@eec/ui/astro/Choice.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import { localeOf, useT } from '../../lib/i18n'
+
+interface Props {
+  subject?: string
+  category?: string
+}
+const { subject = '', category = '' } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`contact.site.${key}` as 'contact.site.form_t')
+const cats = ['renseignement', 'vie_pratique', 'departements', 'priere', 'autre']
+const options = cats.map((c) => ({ value: c, label: t(`contact.cat_${c}` as 'contact.cat_autre') }))
+const current = cats.includes(category) ? category : 'renseignement'
+---
+
+<section class="cf" id="contact" aria-labelledby="cf-title">
+  <h2 id="cf-title" class="cf-title">{s('form_t')}</h2>
+  <p class="cf-lead">{s('form_p')}</p>
+  <noscript><p class="cf-note">{s('nojs')}</p></noscript>
+  <form
+    class="cf-form"
+    data-contact-form
+    data-nojs
+    novalidate
+    data-sending={s('sending')}
+    data-err={s('err')}
+    data-err-fast={s('err_fast')}
+    data-err-rate={s('err_rate')}
+    data-err-reach={s('err_reach')}
+    data-err-consent={s('err_consent')}
+  >
+    <Field id="cf-name" name="name" label={s('name')} placeholder={s('name_ph')} autocomplete="name" required />
+    <div class="cf-two">
+      <Field id="cf-email" name="email" type="email" label={s('email')} placeholder={s('email_ph')} autocomplete="email" icon="mail" />
+      <Field id="cf-phone" name="phone" type="tel" label={s('phone')} placeholder={s('phone_ph')} autocomplete="tel" icon="phone" />
+    </div>
+    <p class="cf-help">{s('reach_help')}</p>
+    <Field id="cf-category" name="category" kind="select" label={s('category')} placeholder="" options={options} value={current} />
+    <p class="cf-help" data-prayer-help hidden>{s('prayer_help')}</p>
+    <Field id="cf-message" name="message" kind="textarea" rows={6} label={s('message')} placeholder={s('message_ph')} required />
+    <input type="hidden" name="subject" value={subject} />
+    <!-- Honeypot: invisible and unreachable for people; a bot fills it and is quietly ignored. -->
+    <div class="cf-trap" aria-hidden="true">
+      <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+    </div>
+    <Choice id="cf-consent" name="consent" label={s('consent')} />
+    <p class="cf-help">{s('consent_help')}</p>
+    <div class="cf-actions">
+      <Button type="submit">{s('send')}</Button>
+      <p class="cf-status" data-status role="status"></p>
+    </div>
+  </form>
+  <div class="cf-done" data-contact-done hidden>
+    <h3 tabindex="-1">{s('sent_t')}</h3>
+    <p>{s('sent_p')}</p>
+    <Button variant="secondary" data-again>{s('again')}</Button>
+  </div>
+</section>
+
+<script>
+  import { initContactForm } from '../../scripts/contact-form'
+  initContactForm()
+  document.addEventListener('astro:page-load', initContactForm)
+</script>
+
+<style>
+  .cf {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    scroll-margin-block-start: 6rem;
+  }
+  .cf-title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl, 2rem);
+  }
+  .cf-lead,
+  .cf-help,
+  .cf-note {
+    color: var(--ink-muted);
+  }
+  .cf-help {
+    font-size: var(--text-sm);
+  }
+  .cf-form {
+    display: grid;
+    gap: 1rem;
+  }
+  .cf-two {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .cf-two {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .cf-trap {
+    position: absolute;
+    inset-inline-start: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .cf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .cf-status {
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  .cf-form[data-nojs] .cf-actions {
+    display: none;
+  }
+  .cf-done {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+  }
+  .cf-done[hidden],
+  .cf-form[hidden] {
+    display: none;
+  }
+  .cf-done h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+</style>

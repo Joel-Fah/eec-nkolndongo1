@@ -74,6 +74,38 @@ export const PAGE_SLOTS: Record<string, PageDef> = {
       },
     ],
   },
+  trouver: {
+    label: { fr: 'Nous trouver', en: 'Find us' },
+    path: { fr: 'fr/decouvrir/nous-trouver/', en: 'en/discover/find-us/' },
+    slots: [
+      {
+        key: 'landmarks',
+        type: 'text',
+        max: 300,
+        label: { fr: 'Repères pour venir', en: 'Landmarks' },
+        help: {
+          fr: 'Par exemple « près de… ». À valider avant de publier : c’est une information factuelle.',
+          en: 'For example “near…”. Validate before publishing: it is a factual detail.',
+        },
+      },
+    ],
+  },
+  give: {
+    label: { fr: 'Donner', en: 'Give' },
+    path: { fr: 'fr/donner/', en: 'en/give/' },
+    slots: [
+      {
+        key: 'usage',
+        type: 'rich',
+        max: 0,
+        label: { fr: 'Comment nous utilisons vos dons', en: 'How we use your gifts' },
+        help: {
+          fr: 'Un court texte de transparence. À valider avant de publier.',
+          en: 'A short transparency text. Validate before publishing.',
+        },
+      },
+    ],
+  },
 }
 
 /** The roles on the Pastors and Council page, in the order they appear. */

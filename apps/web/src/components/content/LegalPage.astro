@@ -1,0 +1,108 @@
+---
+/**
+ * Privacy policy, legal notice and credits: the latest published version of the document (module legal), with its
+ * version and date; the credits also list the Pexels photographers from the media library. Before anything is
+ * published the built-in text stays.
+ */
+import '../../styles/richtext.css'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { heroes } from '../../lib/heroes'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import { content } from '../../lib/pages'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import LangFallbackNote from './LangFallbackNote.astro'
+
+interface Props {
+  id: 'privacy' | 'legal' | 'credits'
+}
+const { id } = Astro.props
+const key = id === 'legal' ? 'mentions' : id
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (k: string, vars?: Record<string, string>) =>
+  t(`legal.site.${k}` as 'legal.site.fonts', vars)
+type Doc = { label: string; publishedAt: string; summary: string; fallback: boolean; html: string }
+const result = await publicJson<Record<string, Doc | null | string[]>>(
+  Astro,
+  `/api/legal/public?locale=${locale}`,
+)
+const doc = result.state === 'ok' ? (result.data[key] as Doc | null) : null
+const pexels = result.state === 'ok' ? ((result.data.pexels as string[]) ?? []) : []
+const date = doc
+  ? new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(doc.publishedAt))
+  : ''
+const page = content[id]
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=60, stale-while-revalidate=300' : 'no-store',
+)
+---
+
+<Site title={t(labelKey(id))} description={page ? t(page.lead) : undefined}>
+  {heroes[id] && <PageHero id={id} />}
+  {
+    doc ? (
+      <article class="lg">
+        {!heroes[id] && <h1 class="lg-title">{t(labelKey(id))}</h1>}
+        <p class="lg-meta">{s('version', { label: doc.label, date })}</p>
+        {doc.fallback && <LangFallbackNote />}
+        <div class="lg-body" set:html={doc.html} />
+        {id === 'credits' && (
+          <section class="lg-credits">
+            {pexels.length > 0 && (
+              <>
+                <h2>{s('pexels')}</h2>
+                <ul>{pexels.map((p) => <li>{p}</li>)}</ul>
+              </>
+            )}
+            <p>{s('storyset')}</p>
+            <p>{s('fonts')}</p>
+          </section>
+        )}
+      </article>
+    ) : (
+      <PageView id={id} hideHeader={!!heroes[id]} />
+    )
+  }
+</Site>
+
+<style>
+  .lg {
+    display: grid;
+    gap: 1rem;
+    width: min(100% - 2rem, 46rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .lg-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+  }
+  .lg-meta {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .lg-body {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.75;
+  }
+  .lg-body :global(> * + *) {
+    margin-block-start: 1em;
+  }
+  .lg-credits {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .lg-credits h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .lg-credits ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+</style>

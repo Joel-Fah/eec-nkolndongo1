@@ -1661,7 +1661,10 @@
     "panel_devices": "My devices",
     "devices_current": "this device",
     "devices_others": "Sign me out of other devices",
-    "devices_unknown": "Device"
+    "devices_unknown": "Device",
+    "policy_changed_t": "The privacy policy has changed",
+    "policy_read": "Read the new policy",
+    "policy_accept": "I accept the new policy"
   },
   "hero": {
     "stats": {

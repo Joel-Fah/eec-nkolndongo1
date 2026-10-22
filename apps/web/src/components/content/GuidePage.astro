@@ -109,7 +109,7 @@ Astro.response.headers.set(
             }
           </ol>
           <p class="gd-done" role="status">{s('complete')}</p>
-          <p class="gd-ask"><Button href={askHref(locale)} variant="secondary">{s('ask')}</Button></p>
+          <p class="gd-ask"><Button href={askHref(locale, guide.title)} variant="secondary">{s('ask')}</Button></p>
         </>
       )
     }

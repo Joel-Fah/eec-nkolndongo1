@@ -70,6 +70,8 @@ export const systemRoles = [
       'departments:read',
       'departments:update',
       'departments:publish',
+      'contact:read',
+      'contact:handle',
     ],
   },
   {

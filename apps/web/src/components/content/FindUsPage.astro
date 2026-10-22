@@ -1,0 +1,149 @@
+---
+/**
+ * « Nous trouver »: the approved address and coordinates, « Itinéraire » links (a geo: link for Android maps apps, Google
+ * Maps, OpenStreetMap — no embedded map, so no third-party load and no data cost), landmarks, how to reach us, and the
+ * contact form. Only approved (validated) settings are shown.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import type { StoryData } from '../../lib/story-routes'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import ContactForm from './ContactForm.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`settings.site.${key}` as 'settings.site.copy')
+const [settings, story] = await Promise.all([
+  publicJson<{ parish?: Record<string, string> }>(Astro, '/api/settings/public'),
+  publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
+])
+const p = settings.state === 'ok' ? (settings.data.parish ?? {}) : {}
+const landmarks = story.state === 'ok' ? story.data.slots.trouver?.landmarks?.text : ''
+const lat = p.mapLat && p.mapLng ? Number(p.mapLat) : null
+const lng = p.mapLat && p.mapLng ? Number(p.mapLng) : null
+const hasPoint = lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng)
+const name = p.shortName || p.nameFr || ''
+const q = hasPoint ? `${lat},${lng}` : p.address ? encodeURIComponent(p.address) : ''
+const geo = hasPoint
+  ? `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(name)})`
+  : q
+    ? `geo:0,0?q=${q}`
+    : ''
+const google = hasPoint
+  ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+  : q
+    ? `https://www.google.com/maps/search/?api=1&query=${q}`
+    : ''
+const osm = hasPoint
+  ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`
+  : ''
+const phones = (p.phones ?? '')
+  .split(/[,;/]/)
+  .map((x) => x.trim())
+  .filter(Boolean)
+const wa = p.whatsapp
+  ? p.whatsapp.startsWith('https://')
+    ? p.whatsapp
+    : `https://wa.me/${p.whatsapp.replace(/[^\d]/g, '')}`
+  : ''
+const known = !!(p.address || hasPoint || phones.length || p.email || wa || landmarks)
+const subject = (Astro.url.searchParams.get('sujet') ?? '').slice(0, 120)
+const category = Astro.url.searchParams.get('categorie') ?? ''
+Astro.response.headers.set(
+  'cache-control',
+  settings.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('trouver'))} description={t('pages.trouver.lead')}>
+  <PageHero id="trouver" />
+  {
+    known && (
+      <section class="fu">
+        <div class="fu-cards">
+          {(p.address || landmarks || geo) && (
+            <div class="fu-card">
+              <h2><Icon name="location" size={20} />{s('address')}</h2>
+              {p.address && <p class="fu-addr">{p.address}{p.bp ? ` · ${p.bp}` : ''}</p>}
+              {landmarks && <p class="fu-land"><strong>{s('landmarks')} :</strong> {landmarks}</p>}
+              {geo && (
+                <div class="fu-actions">
+                  <Button href={geo} class="fu-android"><Icon name="location" size={20} />{s('dir_android')}</Button>
+                  {google && <Button href={google} variant="secondary" target="_blank" rel="noopener noreferrer">{s('dir_google')}<Icon name="external" size={16} /></Button>}
+                  {osm && <Button href={osm} variant="secondary" target="_blank" rel="noopener noreferrer">{s('dir_osm')}<Icon name="external" size={16} /></Button>}
+                </div>
+              )}
+            </div>
+          )}
+          {(phones.length > 0 || p.email || wa) && (
+            <div class="fu-card">
+              <h2><Icon name="phone" size={20} />{s('reach')}</h2>
+              <div class="fu-actions">
+                {phones.map((ph) => <Button href={`tel:${ph.replace(/[^\d+]/g, '')}`} variant="secondary"><Icon name="phone" size={20} />{ph}</Button>)}
+                {p.email && <Button href={`mailto:${p.email}`} variant="secondary"><Icon name="mail" size={20} />{p.email}</Button>}
+                {wa && <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('whatsapp')}<Icon name="external" size={16} /></Button>}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+  {!known && <PageView id="trouver" hideHeader />}
+  <div class="fu-form"><ContactForm subject={subject} category={category} /></div>
+</Site>
+
+<style>
+  .fu,
+  .fu-form {
+    width: min(100% - 2rem, 56rem);
+    margin-inline: auto;
+  }
+  .fu {
+    padding-block: 2rem 0;
+  }
+  .fu-form {
+    padding-block: 2rem 4rem;
+  }
+  .fu-cards {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .fu-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .fu-card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .fu-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .fu-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  /* The geo: link only makes sense on a phone (Android opens its maps app); the web links serve everywhere. */
+  @media (hover: hover) and (pointer: fine) {
+    .fu-android {
+      display: none;
+    }
+  }
+</style>

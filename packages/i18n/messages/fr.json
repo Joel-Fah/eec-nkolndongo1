@@ -1661,7 +1661,10 @@
     "panel_devices": "Mes appareils",
     "devices_current": "cet appareil",
     "devices_others": "Me déconnecter des autres appareils",
-    "devices_unknown": "Appareil"
+    "devices_unknown": "Appareil",
+    "policy_changed_t": "La politique de confidentialité a changé",
+    "policy_read": "Lire la nouvelle politique",
+    "policy_accept": "J’accepte la nouvelle politique"
   },
   "hero": {
     "stats": {

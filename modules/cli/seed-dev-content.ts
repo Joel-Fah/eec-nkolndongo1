@@ -3,6 +3,7 @@
  * be judged with realistic lengths and photos. No parish facts: no names, dates, times or places. `--clear` removes them.
  * Refuses to run on any branch but `dev`.
  */
+import { bumpContentVersion } from '@eec/api-kit'
 import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { groups, mediaFiles } from '@eec/db/schema'
@@ -12,8 +13,9 @@ import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
+import { settings } from '@eec/module-settings/schema'
 import { councilMembers, historyMilestones, pageSlots } from '@eec/module-story/schema'
-import { and, eq, like } from 'drizzle-orm'
+import { and, eq, inArray, like } from 'drizzle-orm'
 
 assertBranch(['dev'])
 const { db, close } = await connectDirect()
@@ -25,6 +27,7 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
+  await db.delete(settings).where(inArray(settings.section, ['giving']))
   await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
   await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
   await db.delete(pageSlots).where(like(pageSlots.valueFr, 'Exemple —%'))
@@ -487,7 +490,53 @@ await db.insert(councilMembers).values([
   },
   { name: 'Exemple — Autre personne sans consentement', roleKey: 'diacres', sortOrder: 0 },
 ])
+// Giving (settings): obviously fictional, approved so the page can be judged in dev. Never run on another branch.
+const ex = (value: string) => ({ value, validated: true })
+await db
+  .insert(settings)
+  .values({
+    section: 'giving',
+    values: {
+      momoName: ex('Exemple — marchand MoMo'),
+      momoNumber: ex('6 00 00 00 00'),
+      momoCode: ex('*126*14*000000#'),
+      omName: ex('Exemple — marchand Orange'),
+      omNumber: ex('6 11 11 11 11'),
+      omCode: ex('#150*14*000000#'),
+      purposeDime: ex('Texte d’exemple sur la dîme.'),
+      purposeOffrande: ex('Texte d’exemple sur l’offrande.'),
+      purposeMoissons: ex('Texte d’exemple sur la Fête des Moissons.'),
+    },
+  })
+  .onConflictDoUpdate({
+    target: settings.section,
+    set: {
+      values: {
+        momoName: ex('Exemple — marchand MoMo'),
+        momoNumber: ex('6 00 00 00 00'),
+        momoCode: ex('*126*14*000000#'),
+        omName: ex('Exemple — marchand Orange'),
+        omNumber: ex('6 11 11 11 11'),
+        omCode: ex('#150*14*000000#'),
+        purposeDime: ex('Texte d’exemple sur la dîme.'),
+        purposeOffrande: ex('Texte d’exemple sur l’offrande.'),
+        purposeMoissons: ex('Texte d’exemple sur la Fête des Moissons.'),
+      },
+    },
+  })
 console.log(
   `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
 )
+// Public caches are keyed by content version: bump so the seeded data shows at once.
+for (const area of [
+  'settings',
+  'news',
+  'events',
+  'schedule',
+  'liturgy',
+  'departments',
+  'guides',
+  'story',
+])
+  await bumpContentVersion(db, area)
 await close()

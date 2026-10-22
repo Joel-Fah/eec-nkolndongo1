@@ -6,9 +6,18 @@
 import { SEASONS, type Season } from '@eec/core'
 import { z } from 'zod'
 
-export type FieldKind = 'text' | 'textarea' | 'email' | 'tel' | 'url' | 'date' | 'number' | 'season'
+export type FieldKind =
+  | 'text'
+  | 'textarea'
+  | 'email'
+  | 'tel'
+  | 'url'
+  | 'date'
+  | 'number'
+  | 'season'
+  | 'ussd'
 export type FieldDef = { key: string; kind: FieldKind; max?: number }
-export type SectionId = 'parish' | 'season'
+export type SectionId = 'parish' | 'season' | 'giving'
 
 export const sections: Record<SectionId, FieldDef[]> = {
   parish: [
@@ -31,6 +40,22 @@ export const sections: Record<SectionId, FieldDef[]> = {
     { key: 'override', kind: 'season' },
     { key: 'overrideUntil', kind: 'date' },
   ],
+  // Donner: nothing is shown on the public page until each value is approved (no payment integration, no amounts).
+  giving: [
+    { key: 'momoName', kind: 'text', max: 80 },
+    { key: 'momoNumber', kind: 'tel', max: 40 },
+    { key: 'momoCode', kind: 'ussd' },
+    { key: 'omName', kind: 'text', max: 80 },
+    { key: 'omNumber', kind: 'tel', max: 40 },
+    { key: 'omCode', kind: 'ussd' },
+    { key: 'bankName', kind: 'text', max: 80 },
+    { key: 'bankHolder', kind: 'text', max: 80 },
+    { key: 'bankAccount', kind: 'text', max: 60 },
+    { key: 'purposeDime', kind: 'textarea', max: 300 },
+    { key: 'purposeOffrande', kind: 'textarea', max: 300 },
+    { key: 'purposeProjets', kind: 'textarea', max: 300 },
+    { key: 'purposeMoissons', kind: 'textarea', max: 300 },
+  ],
 }
 
 export type FieldValue = { value: string; validated: boolean }
@@ -50,6 +75,9 @@ const valueSchema = (f: FieldDef) => {
       return z.union([empty, z.string().regex(/^-?\d{1,3}(\.\d{1,7})?$/)])
     case 'season':
       return z.union([empty, z.enum(SEASONS)])
+    // A USSD merchant code such as *126*14*123456# (digits and stars, ending with #).
+    case 'ussd':
+      return z.union([empty, z.string().regex(/^\*[0-9*]{2,30}#$/)])
     default:
       return z
         .string()
@@ -70,6 +98,7 @@ export const sectionSchema = (id: SectionId) =>
 export const seeds: Record<SectionId, SectionValues> = {
   parish: Object.fromEntries(sections.parish.map((f) => [f.key, { value: '', validated: false }])),
   season: Object.fromEntries(sections.season.map((f) => [f.key, { value: '', validated: false }])),
+  giving: Object.fromEntries(sections.giving.map((f) => [f.key, { value: '', validated: false }])),
 }
 Object.assign(seeds.parish, {
   nameFr: { value: 'Paroisse de Nkolndongo 1', validated: false },

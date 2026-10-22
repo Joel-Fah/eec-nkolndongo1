@@ -5,7 +5,8 @@
     "parish": "Parish",
     "season": "Liturgical season",
     "features": "Features",
-    "system": "System"
+    "system": "System",
+    "giving": "Giving"
   },
   "status": {
     "validated": "Approved",
@@ -99,6 +100,71 @@
       "label": "Until",
       "ph": "YYYY-MM-DD",
       "help": "After this date the automatic calculation resumes."
+    },
+    "momoName": {
+      "label": "MTN MoMo merchant name",
+      "ph": "Paroisse EEC Nkolndongo 1",
+      "help": "The name shown when sending money."
+    },
+    "momoNumber": {
+      "label": "MTN MoMo number",
+      "ph": "6 00 00 00 00",
+      "help": "The MoMo merchant number."
+    },
+    "momoCode": {
+      "label": "MTN merchant code (USSD)",
+      "ph": "*126*14*123456#",
+      "help": "Optional. A tap-to-dial link is created on phones."
+    },
+    "omName": {
+      "label": "Orange Money merchant name",
+      "ph": "Paroisse EEC Nkolndongo 1",
+      "help": "The name shown when sending money."
+    },
+    "omNumber": {
+      "label": "Orange Money number",
+      "ph": "6 00 00 00 00",
+      "help": "The Orange Money merchant number."
+    },
+    "omCode": {
+      "label": "Orange merchant code (USSD)",
+      "ph": "#150*14*123456#",
+      "help": "Optional. A tap-to-dial link is created on phones."
+    },
+    "bankName": {
+      "label": "Bank",
+      "ph": "Bank name",
+      "help": "Optional."
+    },
+    "bankHolder": {
+      "label": "Account holder",
+      "ph": "Holder’s name",
+      "help": "Optional."
+    },
+    "bankAccount": {
+      "label": "Account number",
+      "ph": "Account reference",
+      "help": "Optional. Never a card number."
+    },
+    "purposeDime": {
+      "label": "Tithe",
+      "ph": "A sentence about the tithe",
+      "help": "A short text, as it should appear."
+    },
+    "purposeOffrande": {
+      "label": "Offering",
+      "ph": "A sentence about the offering",
+      "help": ""
+    },
+    "purposeProjets": {
+      "label": "Projects",
+      "ph": "A sentence about the projects",
+      "help": ""
+    },
+    "purposeMoissons": {
+      "label": "Harvest Festival",
+      "ph": "A sentence about the Harvest Festival",
+      "help": "Highlighted during the Harvest Festival dates (Liturgical season tab)."
     }
   },
   "season_none": "None (automatic)",
@@ -120,5 +186,38 @@
     "open": "Open",
     "retention": "Data retention",
     "retention_text": "Expired sessions and links removed daily; outbox: 90 days; deleted accounts: 30-day grace; activity log: 24 months."
+  },
+  "site": {
+    "copy": "Copy the number",
+    "copied": "Copied",
+    "dial": "Dial the code",
+    "number": "Number",
+    "code": "Merchant code",
+    "merchant": "Merchant",
+    "bank": "Bank transfer",
+    "holder": "Account holder",
+    "account": "Account",
+    "purposes": "What your gifts are for",
+    "usage": "How we use your gifts",
+    "moissons_t": "Harvest Festival",
+    "soon_t": "Ways to give are coming soon",
+    "soon_p": "We are finalising the details with the parish. Meanwhile, the secretariat is happy to answer.",
+    "soon_cta": "Contact the secretariat",
+    "thanks": "Thank you: every gift, small or large, supports the life of the parish.",
+    "momo": "MTN Mobile Money",
+    "om": "Orange Money",
+    "directions": "Directions",
+    "dir_android": "Open in my maps app",
+    "dir_google": "Google Maps",
+    "dir_osm": "OpenStreetMap",
+    "address": "Address",
+    "landmarks": "Landmarks",
+    "reach": "Get in touch",
+    "phones": "Phone",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "purpose_dime": "Tithe",
+    "purpose_offrande": "Offering",
+    "purpose_projets": "Projects"
   }
 }

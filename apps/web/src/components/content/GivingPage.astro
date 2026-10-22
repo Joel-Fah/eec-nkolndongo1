@@ -1,0 +1,219 @@
+---
+/**
+ * « Donner »: gratitude first. Only approved giving values are shown (settings → Donner, per field). Before any is
+ * approved, the earlier warm « bientôt » text stays, with the secretariat contact. No payment integration, no amounts,
+ * no donor data. During the Fête des Moissons dates a highlighted block appears.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import '../../styles/richtext.css'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
+import type { StoryData } from '../../lib/story-routes'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`settings.site.${key}` as 'settings.site.copy')
+const [settings, story] = await Promise.all([
+  publicJson<{ giving?: Record<string, string>; season?: Record<string, string> }>(
+    Astro,
+    '/api/settings/public',
+  ),
+  publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
+])
+const g = settings.state === 'ok' ? (settings.data.giving ?? {}) : {}
+const season = settings.state === 'ok' ? (settings.data.season ?? {}) : {}
+const usage = story.state === 'ok' ? story.data.slots.give?.usage : undefined
+const today = new Date().toISOString().slice(0, 10)
+const inMoissons = !!(
+  season.moissonsStart &&
+  season.moissonsEnd &&
+  today >= season.moissonsStart &&
+  today <= season.moissonsEnd
+)
+const dial = (code: string) => `tel:${code.replace(/#/g, '%23')}`
+const methods = [
+  { id: 'momo', label: s('momo'), name: g.momoName, number: g.momoNumber, code: g.momoCode },
+  { id: 'om', label: s('om'), name: g.omName, number: g.omNumber, code: g.omCode },
+].filter((m) => m.number || m.code)
+const bank = g.bankAccount
+  ? { name: g.bankName, holder: g.bankHolder, account: g.bankAccount }
+  : null
+const purposes = [
+  { id: 'dime', title: s('purpose_dime'), text: g.purposeDime },
+  { id: 'offrande', title: s('purpose_offrande'), text: g.purposeOffrande },
+  { id: 'projets', title: s('purpose_projets'), text: g.purposeProjets },
+].filter((p) => p.text)
+const moissons = g.purposeMoissons
+const ready = methods.length > 0 || !!bank
+const trouver = href(locale, pages.find((p) => p.id === 'trouver')?.path[locale] ?? '')
+Astro.response.headers.set(
+  'cache-control',
+  settings.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('give'))} description={t('pages.give.lead')}>
+  <PageHero id="give" />
+  {
+    ready ? (
+      <section class="gv">
+        <p class="gv-thanks">{s('thanks')}</p>
+        {inMoissons && moissons && (
+          <div class="gv-moissons">
+            <h2>{s('moissons_t')}</h2>
+            <p>{moissons}</p>
+          </div>
+        )}
+        <div class="gv-grid">
+          {methods.map((m) => (
+            <article class="gv-card">
+              <h2>{m.label}</h2>
+              {m.name && <p class="gv-line"><span>{s('merchant')}</span><strong>{m.name}</strong></p>}
+              {m.number && (
+                <p class="gv-line">
+                  <span>{s('number')}</span><strong>{m.number}</strong>
+                </p>
+              )}
+              <div class="gv-actions">
+                {m.number && (
+                  <button type="button" class="btn btn-primary" data-copy={m.number.replace(/\s+/g, '')} data-copied={s('copied')}>
+                    <Icon name="copy" size={20} /><span data-copy-label>{s('copy')}</span>
+                  </button>
+                )}
+                {m.code && (
+                  <>
+                    <p class="gv-line"><span>{s('code')}</span><strong>{m.code}</strong></p>
+                    <a class="btn btn-primary gv-dial" href={dial(m.code)}><Icon name="phone" size={20} />{s('dial')}</a>
+                  </>
+                )}
+              </div>
+            </article>
+          ))}
+          {bank && (
+            <article class="gv-card">
+              <h2>{s('bank')}</h2>
+              {bank.name && <p class="gv-line"><span>{bank.name}</span></p>}
+              {bank.holder && <p class="gv-line"><span>{s('holder')}</span><strong>{bank.holder}</strong></p>}
+              <p class="gv-line"><span>{s('account')}</span><strong>{bank.account}</strong></p>
+              <div class="gv-actions">
+                <button type="button" class="btn btn-primary" data-copy={bank.account} data-copied={s('copied')}>
+                  <Icon name="copy" size={20} /><span data-copy-label>{s('copy')}</span>
+                </button>
+              </div>
+            </article>
+          )}
+        </div>
+        {purposes.length > 0 && (
+          <section class="gv-purposes">
+            <h2>{s('purposes')}</h2>
+            <ul>{purposes.map((p) => <li><strong>{p.title}</strong><span>{p.text}</span></li>)}</ul>
+          </section>
+        )}
+        {usage && (
+          <section class="gv-usage">
+            <h2>{s('usage')}</h2>
+            <div set:html={usage.html} />
+          </section>
+        )}
+      </section>
+    ) : (
+      <>
+        <PageView id="give" hideHeader />
+        <section class="gv gv-soon">
+          <h2>{s('soon_t')}</h2>
+          <p>{s('soon_p')}</p>
+          <Button href={trouver}>{s('soon_cta')}</Button>
+        </section>
+      </>
+    )
+  }
+</Site>
+
+<script>
+  import { initCopy } from '../../scripts/copy-number'
+  initCopy()
+  document.addEventListener('astro:page-load', initCopy)
+</script>
+
+<style>
+  .gv {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 56rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .gv-thanks {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .gv-moissons {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--gold-soft, var(--surface-2));
+    box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--gold) 50%, transparent);
+  }
+  .gv-moissons h2,
+  .gv-card h2,
+  .gv-purposes h2,
+  .gv-usage h2,
+  .gv-soon h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .gv-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+  .gv-card {
+    display: grid;
+    align-content: start;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .gv-line {
+    display: grid;
+  }
+  .gv-line span {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .gv-line strong {
+    font-size: var(--text-lg, 1.125rem);
+    word-break: break-word;
+  }
+  .gv-actions {
+    display: grid;
+    gap: 0.5rem;
+  }
+  /* A tap-to-dial link is for phones; on a computer the code is simply shown. */
+  @media (hover: hover) and (pointer: fine) {
+    .gv-dial {
+      display: none;
+    }
+  }
+  .gv-purposes ul {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .gv-purposes li {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .gv-usage :global(> div > * + *) {
+    margin-block-start: 0.75em;
+  }
+  .gv-soon {
+    justify-items: start;
+    padding-block-start: 0;
+  }
+</style>

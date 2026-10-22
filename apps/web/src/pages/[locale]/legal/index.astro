@@ -1,0 +1,12 @@
+---
+import LegalPage from '../../../components/content/LegalPage.astro'
+import { localeOf } from '../../../lib/i18n'
+import { href, pages } from '../../../lib/nav'
+
+export const prerender = false
+const locale = localeOf(Astro.currentLocale)
+const mine = pages.find((p) => p.id === 'legal')?.path[locale] ?? ''
+if (Astro.url.pathname !== href(locale, mine)) return Astro.rewrite('/404')
+---
+
+<LegalPage id="legal" />
