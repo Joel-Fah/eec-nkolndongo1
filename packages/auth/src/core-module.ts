@@ -36,6 +36,7 @@ export const coreModule = defineModule({
     p('audit-export', 'Exporter le journal d’activité', 'Export the activity log', true),
     p('system-outbox', 'Gérer la boîte d’envoi', 'Manage the outbox'),
     p('system-health', 'Voir la santé du site', 'See the site health'),
+    p('visits-read', 'Voir les visites du site', 'See the site visits'),
     p('system-design', 'Voir le guide de design', 'View the design guide'),
     p('validation-read', 'Voir ce qui attend une validation', 'See what is waiting for validation'),
     p(

@@ -35,6 +35,7 @@
   "exports": {
     ".": "./src/app.ts",
     "./retention": "./src/retention.ts",
-    "./health": "./src/health.ts"
+    "./health": "./src/health.ts",
+    "./visits": "./src/visits.ts"
   }
 }

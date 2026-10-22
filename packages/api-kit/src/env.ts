@@ -21,6 +21,18 @@ export type Env = {
   PEXELS_API_KEY?: string
   /** « 1 » once the site is launched: until then every page asks search engines to stay away. */
   SITE_INDEXABLE?: string
+  /**
+   * Visit counts without tracking (decision 0038): a Workers Analytics Engine dataset. Absent = no counting, nothing else
+   * changes. Added to the built Worker only when Joël has enabled Analytics Engine in the Cloudflare dashboard.
+   */
+  VISITS?: {
+    writeDataPoint: (point: { indexes?: string[]; blobs?: string[]; doubles?: number[] }) => void
+  }
+  /** To read the counts back in the admin: the account id and an API token with « Account Analytics: Read ». */
+  CF_ACCOUNT_ID?: string
+  /** The dataset's name, to query it. */
+  VISITS_DATASET?: string
+  CF_ANALYTICS_TOKEN?: string
   /** The single origin (decision 0017), e.g. https://eec-nkolndongo1.workers.dev */
   APP_ORIGIN: string
 }

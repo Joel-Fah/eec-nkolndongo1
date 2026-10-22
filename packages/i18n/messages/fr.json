@@ -1952,7 +1952,17 @@
     "month": "Mois",
     "total": "au total",
     "insight_health": "La santé du site demande de l’attention.",
-    "insight_health_do": "Voir la santé"
+    "insight_health_do": "Voir la santé",
+    "visits_title": "Visites",
+    "visits_lead": "{n} pages vues ces 30 derniers jours, comptées sans aucun suivi : ni cookie, ni adresse IP, ni identifiant.",
+    "visits_off": "Le compteur de visites n’est pas encore activé. Il se met en place une fois, avec Joël (voir le guide de lancement). En attendant, aucune visite n’est comptée.",
+    "visits_chart": "Pages vues par jour",
+    "visits_day": "Jour",
+    "visits_device": "Téléphone ou ordinateur",
+    "visits_mobile": "Téléphone",
+    "visits_desktop": "Ordinateur",
+    "visits_top": "Pages les plus lues",
+    "visits_gap": "Seules les pages servies à la demande sont comptées : la page d’accueil et les pages fixes ne le sont pas."
   },
   "content": {
     "status": {

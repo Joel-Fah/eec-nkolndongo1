@@ -12,6 +12,7 @@ import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
 import { runHealth } from '@eec/api/health'
 import { runRetention } from '@eec/api/retention'
+import { recordVisit } from '@eec/api/visits'
 import { type Env, securityHeaders } from '@eec/api-kit'
 import { adminPrefix } from '@eec/core'
 
@@ -79,7 +80,9 @@ export default {
     )
   },
   async fetch(request: Request, env: Bindings, ctx: ExecutionContext) {
-    return withSecurityHeaders(await route(request, env, ctx), env, request)
+    const res = await route(request, env, ctx)
+    recordVisit(env, request, res)
+    return withSecurityHeaders(res, env, request)
   },
 }
 

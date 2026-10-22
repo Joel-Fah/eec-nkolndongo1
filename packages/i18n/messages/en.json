@@ -1952,7 +1952,17 @@
     "month": "Month",
     "total": "in all",
     "insight_health": "The site health needs attention.",
-    "insight_health_do": "See health"
+    "insight_health_do": "See health",
+    "visits_title": "Visits",
+    "visits_lead": "{n} page views in the last 30 days, counted without any tracking: no cookie, no IP address, no identifier.",
+    "visits_off": "The visit counter is not switched on yet. It is set up once, with Joël (see the launch guide). Until then no visit is counted.",
+    "visits_chart": "Page views per day",
+    "visits_day": "Day",
+    "visits_device": "Phone or computer",
+    "visits_mobile": "Phone",
+    "visits_desktop": "Computer",
+    "visits_top": "Most read pages",
+    "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not."
   },
   "content": {
     "status": {

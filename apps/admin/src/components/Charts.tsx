@@ -19,6 +19,16 @@ const TONE: Record<Tone, string> = {
 
 /** « 2026-01 » → « janvier 2026 » (full, for tables) or « janv. » (short, for the axis). */
 export function monthName(ym: string, locale: string, style: 'long' | 'short' = 'long') {
+  // « 2026-01-15 » (a day, for the visits chart) → « 15 oct. » / « 15 octobre 2026 ».
+  if (ym.length === 10) {
+    const day = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: style,
+      ...(style === 'long' ? { year: 'numeric' as const } : {}),
+      timeZone: 'UTC',
+    }).format(new Date(`${ym}T00:00:00Z`))
+    return day
+  }
   const d = new Date(`${ym}-01T00:00:00Z`)
   const f = new Intl.DateTimeFormat(locale, {
     month: style,
@@ -144,7 +154,10 @@ export function AreaChart({
         )
       })}
       {months.map((m, i) =>
-        i % 2 === (months.length % 2 === 0 ? 1 : 0) || i === months.length - 1 ? (
+        // Twelve months: every other label. A month of days: every fifth.
+        (months.length > 14
+          ? i % 5 === 0 && i < months.length - 2
+          : i % 2 === (months.length % 2 === 0 ? 1 : 0)) || i === months.length - 1 ? (
           <text key={m} className="chart-x" x={x(i)} y={H - 6} textAnchor="middle">
             {monthName(m, locale, 'short').replace('.', '')}
           </text>
