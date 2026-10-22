@@ -79,6 +79,16 @@ export const PAGE_SLOTS: Record<string, PageDef> = {
     path: { fr: 'fr/decouvrir/nous-trouver/', en: 'en/discover/find-us/' },
     slots: [
       {
+        key: 'directions',
+        type: 'text',
+        max: 400,
+        label: { fr: 'Comment s’y rendre (en toutes lettres)', en: 'How to get there (in words)' },
+        help: {
+          fr: 'Remplace le texte d’indication par défaut. À valider avant de publier : c’est une information factuelle.',
+          en: 'Replaces the default directions. Validate before publishing: it is factual.',
+        },
+      },
+      {
         key: 'firstvisit',
         type: 'text',
         max: 400,

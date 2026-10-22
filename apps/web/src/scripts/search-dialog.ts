@@ -19,6 +19,8 @@ export function initSearchDialog() {
   const out = dlg.querySelector<HTMLElement>('[data-search-results]')
   if (!input || !out) return
   const hints = dlg.querySelector<HTMLElement>('[data-search-hints]')
+  const spin = dlg.querySelector<HTMLElement>('[data-search-spin]')
+  const countEl = dlg.querySelector<HTMLElement>('[data-search-count]')
   const sugBox = dlg.querySelector<HTMLElement>('[data-search-sug]')
   const d = dlg.dataset
   const locale = d.locale ?? 'fr'
@@ -31,6 +33,13 @@ export function initSearchDialog() {
   }
   const render = (items: Item[], q: string, didYouMean: string[] = []) => {
     out.replaceChildren()
+    if (countEl) {
+      countEl.hidden = items.length === 0
+      countEl.textContent =
+        items.length === 1
+          ? (d.count_one ?? '')
+          : (d.count ?? '').replace('{n}', String(items.length))
+    }
     if (hints) hints.hidden = items.length > 0
     if (!items.length) {
       const p = document.createElement('p')
@@ -95,10 +104,12 @@ export function initSearchDialog() {
     const q = input.value.replace(/\s+/g, ' ').trim()
     if (q.length < 2) {
       out.replaceChildren()
+      if (countEl) countEl.hidden = true
       if (hints) hints.hidden = false
       return
     }
     const mine = ++seq
+    if (spin) spin.hidden = false
     try {
       const r = await fetch(`/api/search?q=${encodeURIComponent(q)}&locale=${locale}`, {
         credentials: 'omit',
@@ -109,11 +120,14 @@ export function initSearchDialog() {
       render(data.items, q, data.didYouMean)
     } catch {
       if (mine !== seq) return
+      if (countEl) countEl.hidden = true
       out.replaceChildren()
       const p = document.createElement('p')
       p.className = 'sd-snip'
       p.textContent = d.unavailable ?? ''
       out.append(p)
+    } finally {
+      if (mine === seq && spin) spin.hidden = true
     }
   }
   const fill = (text: string) => {

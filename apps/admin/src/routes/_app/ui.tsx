@@ -1,6 +1,7 @@
 import { useLocale } from '@eec/admin-kit'
 import { Badge, Button, SwitchField } from '@eec/ui/react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { Icon } from '../../components/Icon'
 import { Illustration } from '../../components/Illustration'
 import { Gate } from '../../components/kit'
@@ -21,6 +22,15 @@ export const Route = createFileRoute('/_app/ui')({
  */
 function DesignBanner() {
   const { t, locale } = useLocale()
+  // An abstract Pexels photo behind everything (fetched by `pnpm pexels:banner`); without it the banner keeps its soft gradient.
+  const base = import.meta.env.BASE_URL
+  const [photo, setPhoto] = useState<{ photographer: string } | null>(null)
+  useEffect(() => {
+    fetch(`${base}design-banner.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => setPhoto(j))
+      .catch(() => {})
+  }, [base])
   const cards: { icon: 'sparkles' | 'bookText' | 'checklist'; text: string; at: string }[] = [
     { icon: 'sparkles', text: t('ui.tease_colour'), at: 'a' },
     { icon: 'bookText', text: t('ui.tease_type'), at: 'b' },
@@ -28,6 +38,8 @@ function DesignBanner() {
   ]
   return (
     <section className="dg" aria-labelledby="dg-title">
+      {photo && <img className="dg-photo" src={`${base}design-banner.webp`} alt="" />}
+      {photo && <p className="dg-credit">{t('ui.photo_credit', { name: photo.photographer })}</p>}
       <div className="dg-art">
         <Illustration name="working-from-anywhere" />
       </div>

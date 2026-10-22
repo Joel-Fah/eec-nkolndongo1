@@ -208,7 +208,7 @@
     "soon_t": "Ways to give are coming soon",
     "soon_p": "We are finalising the details with the parish. Meanwhile, the secretariat is happy to answer.",
     "soon_cta": "Contact the secretariat",
-    "thanks": "Every gift, small or large, supports the life of the parish.",
+    "thanks": "Every gift, small or large, **supports the life** of the parish.",
     "momo": "MTN Mobile Money",
     "om": "Orange Money",
     "directions": "Directions",
@@ -242,6 +242,7 @@
     "step3_p": "No data is recorded on this site.",
     "methods_t": "Ways to give",
     "copy_code": "Copy the code",
-    "bank_name": "Bank"
+    "bank_name": "Bank",
+    "directions_default": "EEC Nkolndongo 1: first entrance on the left as you go up from the INSTIC junction; 100 m after entering, it is on your left."
   }
 }

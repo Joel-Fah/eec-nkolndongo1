@@ -12,11 +12,12 @@ import {
   EmptyState,
   Icon,
   SelectField,
+  ShortcutTip,
   TextField,
   toastManager,
 } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const k = (key: string) => `contact.${key}` as MessageKey
 const notify = (title: string, tone: 'success' | 'error' = 'success') =>
@@ -141,15 +142,48 @@ export default function ContactInbox() {
           <h1 className="text-4xl">{t(k('title'))}</h1>
           <p className="text-ink-muted">{t(k('lead'))}</p>
         </div>
-        <SelectField
-          label={t(k('filter'))}
-          value={status}
-          onValueChange={(v) => v && setStatus(v)}
-          options={['all', 'new', 'progress', 'handled'].map((s) => ({
-            value: s,
-            label: t(k(`status_${s}`)),
-          }))}
-        />
+        <div className="flex flex-wrap items-end gap-3">
+          <SelectField
+            label={t(k('filter'))}
+            value={status}
+            onValueChange={(v) => v && setStatus(v)}
+            options={['all', 'new', 'progress', 'handled'].map((x) => ({
+              value: x,
+              label: t(k(`status_${x}`)),
+            }))}
+          />
+          <SelectField
+            label={t(k('dates'))}
+            value={range}
+            onValueChange={(v) => v && setRange(v)}
+            options={['all', 'today', 'week', 'month', '90', 'custom'].map((r) => ({
+              value: r,
+              label: t(k(`range_${r}`)),
+            }))}
+          />
+          {range === 'custom' && (
+            <>
+              <TextField
+                label={t(k('range_from'))}
+                placeholder=""
+                type="date"
+                value={custom.from}
+                onChange={(e: { target: { value: string } }) =>
+                  setCustom({ ...custom, from: e.target.value })
+                }
+              />
+              <TextField
+                label={t(k('range_to'))}
+                placeholder=""
+                type="date"
+                value={custom.to}
+                onChange={(e: { target: { value: string } }) =>
+                  setCustom({ ...custom, to: e.target.value })
+                }
+              />
+            </>
+          )}
+        </div>
       </header>
       {list.data && items.length === 0 ? (
         <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />
@@ -254,6 +288,15 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
       onClose()
     },
   })
+  // Esc closes the open message (unless the delete confirmation is open or a field has focus).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName
+      if (e.key === 'Escape' && !del && tag !== 'TEXTAREA' && tag !== 'INPUT') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [del, onClose])
   const m = q.data?.message
   const digits = m?.phone.replace(/[^\d]/g, '') ?? ''
   const when = (iso: string) =>
@@ -263,16 +306,88 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
   return (
     <article className="inbox-view">
       <header className="inbox-view-head">
-        <Button variant="ghost" size="sm" className="inbox-back" onClick={onClose}>
-          <Icon name="chevronLeft" size={16} />
-          {t(k('back'))}
-        </Button>
-        <h2 className="text-2xl">{m?.name ?? '…'}</h2>
+        <div className="inbox-view-title">
+          <Button variant="ghost" size="sm" className="inbox-back" onClick={onClose}>
+            <Icon name="chevronLeft" size={16} />
+            {t(k('back'))}
+          </Button>
+          <h2 className="text-2xl">{m?.name ?? '…'}</h2>
+          {m && (
+            <p className="text-sm text-ink-muted">
+              {t(k(`cat_${m.category}`))} · {when(m.createdAt)}
+              {m.subject ? ` · ${m.subject}` : ''}
+            </p>
+          )}
+        </div>
         {m && (
-          <p className="text-sm text-ink-muted">
-            {t(k(`cat_${m.category}`))} · {when(m.createdAt)}
-            {m.subject ? ` · ${m.subject}` : ''}
-          </p>
+          <div className="inbox-actions" role="toolbar" aria-label={t(k('actions'))}>
+            {canHandle && m.status !== 'handled' && (
+              <ShortcutTip label={t(k('mark_handled'))}>
+                <Button
+                  variant="ghost"
+                  iconOnly
+                  aria-label={t(k('mark_handled'))}
+                  onClick={() => patch.mutate({ status: 'handled' })}
+                >
+                  <Icon name="check" size={20} />
+                </Button>
+              </ShortcutTip>
+            )}
+            {canHandle && m.status === 'handled' && (
+              <ShortcutTip label={t(k('reopen'))}>
+                <Button
+                  variant="ghost"
+                  iconOnly
+                  aria-label={t(k('reopen'))}
+                  onClick={() => patch.mutate({ status: 'progress' })}
+                >
+                  <Icon name="undo" size={20} />
+                </Button>
+              </ShortcutTip>
+            )}
+            {canHandle && !q.data?.assignee && (
+              <ShortcutTip label={t(k('take'))}>
+                <Button
+                  variant="ghost"
+                  iconOnly
+                  aria-label={t(k('take'))}
+                  onClick={() => patch.mutate({ status: 'progress', assign: 'me' })}
+                >
+                  <Icon name="userRoundPlus" size={20} />
+                </Button>
+              </ShortcutTip>
+            )}
+            {canHandle && q.data?.assignee && (
+              <ShortcutTip label={t(k('release'))}>
+                <Button
+                  variant="ghost"
+                  iconOnly
+                  aria-label={t(k('release'))}
+                  onClick={() => patch.mutate({ assign: 'none' })}
+                >
+                  <Icon name="account" size={20} />
+                </Button>
+              </ShortcutTip>
+            )}
+            {canDelete && (
+              <ShortcutTip label={t(k('delete'))}>
+                <Button
+                  variant="ghost"
+                  iconOnly
+                  aria-label={t(k('delete'))}
+                  onClick={() => setDel(true)}
+                >
+                  <Icon name="trash" size={20} />
+                </Button>
+              </ShortcutTip>
+            )}
+            <span className="inbox-sep" aria-hidden="true" />
+            <ShortcutTip label={t(k('close_message'))} shortcut="Esc">
+              <Button variant="ghost" iconOnly aria-label={t(k('close_message'))} onClick={onClose}>
+                <Icon name="close" size={20} />
+              </Button>
+            </ShortcutTip>
+          </div>
         )}
       </header>
       {m && (
@@ -287,7 +402,8 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
             {q.data?.assignee && <Badge>{t(k('assigned'), { name: q.data.assignee })}</Badge>}
           </div>
           <p className="whitespace-pre-wrap rounded-lg bg-surface-2 p-4">{m.message}</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="inbox-reply">
+            <span className="inbox-reply-l">{t(k('reply_by'))}</span>
             {m.email && (
               <a className="btn btn-secondary btn-sm" href={`mailto:${m.email}`}>
                 <Icon name="mail" size={16} />
@@ -319,38 +435,6 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
           <p className="text-sm text-ink-muted">
             {t(k('consent_at'), { date: when(m.consentAt) })}
           </p>
-          {canHandle && (
-            <div className="flex flex-wrap gap-2">
-              {m.status !== 'progress' && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => patch.mutate({ status: 'progress', assign: 'me' })}
-                >
-                  {t(k('take'))}
-                </Button>
-              )}
-              {m.status !== 'handled' && (
-                <Button size="sm" onClick={() => patch.mutate({ status: 'handled' })}>
-                  {t(k('mark_handled'))}
-                </Button>
-              )}
-              {m.status === 'handled' && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => patch.mutate({ status: 'progress' })}
-                >
-                  {t(k('reopen'))}
-                </Button>
-              )}
-              {q.data?.assignee && (
-                <Button variant="ghost" size="sm" onClick={() => patch.mutate({ assign: 'none' })}>
-                  {t(k('release'))}
-                </Button>
-              )}
-            </div>
-          )}
           <section className="grid gap-2">
             <h3 className="text-lg">{t(k('notes'))}</h3>
             {q.data?.notes.length === 0 && (
@@ -390,13 +474,6 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
               </form>
             )}
           </section>
-          {canDelete && (
-            <div>
-              <Button variant="danger" size="sm" onClick={() => setDel(true)}>
-                {t(k('delete'))}
-              </Button>
-            </div>
-          )}
         </div>
       )}
       <ConfirmDialog

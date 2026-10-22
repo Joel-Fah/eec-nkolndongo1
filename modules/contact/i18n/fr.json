@@ -97,5 +97,8 @@
   "range_90": "90 derniers jours",
   "range_custom": "Choisir des dates…",
   "range_from": "Du",
-  "range_to": "Au"
+  "range_to": "Au",
+  "actions": "Actions sur le message",
+  "close_message": "Fermer le message",
+  "reply_by": "Répondre par"
 }

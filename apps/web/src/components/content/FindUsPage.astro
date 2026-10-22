@@ -24,6 +24,7 @@ const [settings, story] = await Promise.all([
   publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
 ])
 const p = settings.state === 'ok' ? (settings.data.parish ?? {}) : {}
+const directions = story.state === 'ok' ? story.data.slots.trouver?.directions?.text : ''
 const landmarks = story.state === 'ok' ? story.data.slots.trouver?.landmarks?.text : ''
 const lat = p.mapLat && p.mapLng ? Number(p.mapLat) : null
 const lng = p.mapLat && p.mapLng ? Number(p.mapLng) : null
@@ -75,6 +76,7 @@ Astro.response.headers.set(
           <article class="fu-card">
             <MapIllustration name={p.shortName || ''} href={google || undefined} label={s('dir_open')} />
             <h2><span class="fu-ico" aria-hidden="true"><Icon name="location" size={20} /></span>{s('where_t')}</h2>
+            <p class="fu-how">{directions || s('directions_default')}</p>
             {p.address && <p class="fu-addr">{p.address}{p.bp ? ` · ${p.bp}` : ''}</p>}
             {landmarks && <p class="fu-land"><strong>{s('landmarks')} :</strong> {landmarks}</p>}
             <div class="fu-actions">
@@ -160,6 +162,10 @@ Astro.response.headers.set(
     border-radius: var(--radius-md);
     background: var(--primary-soft);
     color: var(--primary);
+  }
+  .fu-how {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.5;
   }
   .fu-addr {
     font-size: var(--text-lg, 1.125rem);

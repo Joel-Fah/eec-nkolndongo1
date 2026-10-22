@@ -66,7 +66,7 @@ Astro.response.headers.set(
         <section class="gv-thanks">
           <div>
             <p class="gv-kicker">{s('thanks_k')}</p>
-            <h2 class="gv-big">{s('thanks')}</h2>
+            <h2 class="gv-big">{s('thanks').split('**').map((part, i) => (i % 2 ? <em>{part}</em> : part))}</h2>
           </div>
           <Illustration name="valentines-bouquet" class="gv-art" />
         </section>
@@ -210,7 +210,7 @@ Astro.response.headers.set(
   }
   @media (min-width: 48rem) {
     .gv-thanks {
-      grid-template-columns: 1fr minmax(0, 16rem);
+      grid-template-columns: 1fr minmax(0, 24rem);
     }
   }
   .gv-kicker {
@@ -226,12 +226,17 @@ Astro.response.headers.set(
     line-height: 1.08;
   }
   /* The bouquet stands on the card's lower edge and is cropped downward by it. */
+  .gv-big em {
+    font-weight: 700;
+    font-style: italic;
+    color: var(--primary);
+  }
   .gv-thanks :global(.gv-art) {
-    width: min(100%, 20rem);
+    width: min(100%, 27rem);
     height: auto;
     justify-self: center;
     align-self: end;
-    margin-block-end: -3.5rem;
+    margin-block-end: -4.5rem;
     translate: 0 14%;
   }
   .gv-moissons {

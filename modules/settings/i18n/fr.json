@@ -208,7 +208,7 @@
     "soon_t": "Les moyens de donner arrivent bientôt",
     "soon_p": "Nous finalisons les détails avec la paroisse. En attendant, le secrétariat vous répond volontiers.",
     "soon_cta": "Contacter le secrétariat",
-    "thanks": "Chaque don, petit ou grand, soutient la vie de la paroisse.",
+    "thanks": "Chaque don, petit ou grand, **soutient la vie** de la paroisse.",
     "momo": "MTN Mobile Money",
     "om": "Orange Money",
     "directions": "Itinéraire",
@@ -242,6 +242,7 @@
     "step3_p": "Aucune donnée n’est enregistrée sur ce site.",
     "methods_t": "Les moyens de donner",
     "copy_code": "Copier le code",
-    "bank_name": "Banque"
+    "bank_name": "Banque",
+    "directions_default": "EEC Nkolndongo 1 : première entrée à gauche à la montée du carrefour INSTIC ; 100 m après l’entrée, c’est à votre gauche."
   }
 }

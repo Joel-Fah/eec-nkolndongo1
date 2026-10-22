@@ -52,3 +52,6 @@ apps/admin/public/illustrations/
 # Shared + module messages merged before compiling (packages/i18n/src/merge.ts)
 packages/i18n/messages/merged/
 docs/content/PENDING.md
+
+# Design-guide banner photo (Pexels, fetched on demand by pnpm pexels:banner)
+apps/admin/public/design-banner.*

@@ -97,5 +97,8 @@
   "range_90": "Last 90 days",
   "range_custom": "Pick dates…",
   "range_from": "From",
-  "range_to": "To"
+  "range_to": "To",
+  "actions": "Message actions",
+  "close_message": "Close the message",
+  "reply_by": "Reply by"
 }

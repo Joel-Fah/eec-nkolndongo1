@@ -188,7 +188,9 @@ await db
     },
   ])
   .onConflictDoNothing()
-// Schedule: obviously fictional slots, already approved so the pages can be judged.
+// Schedule: obviously fictional slots, already approved so the pages can be judged. Re-running replaces them (never doubles).
+await db.delete(scheduleExceptions).where(like(scheduleExceptions.noteFr, 'Exemple%'))
+await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
 await db.insert(scheduleSlots).values([
   {
     kind: 'culte',

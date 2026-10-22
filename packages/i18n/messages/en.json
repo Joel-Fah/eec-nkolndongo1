@@ -1418,7 +1418,8 @@
     "tease_button": "Save",
     "tease_badge": "New",
     "tease_switch": "Dark mode",
-    "tease_secondary": "Cancel"
+    "tease_secondary": "Cancel",
+    "photo_credit": "Photo: {name} · Pexels"
   },
   "page": {
     "cta_title": "A question, a memory, a wish to come?",

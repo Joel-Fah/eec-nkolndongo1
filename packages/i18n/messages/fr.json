@@ -1418,7 +1418,8 @@
     "tease_button": "Enregistrer",
     "tease_badge": "Nouveau",
     "tease_switch": "Mode sombre",
-    "tease_secondary": "Annuler"
+    "tease_secondary": "Annuler",
+    "photo_credit": "Photo : {name} · Pexels"
   },
   "page": {
     "cta_title": "Une question, un souvenir, une envie de venir ?",

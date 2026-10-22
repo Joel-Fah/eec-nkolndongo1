@@ -1104,3 +1104,42 @@ html[data-rte-full] .eec-popover {
   color: var(--ink-muted);
   text-align: center;
 }
+
+/* Message pane, Gmail-style: the title on the left, the actions as icon buttons at the far right of the same line. */
+.inbox-view-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.inbox-view-title {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.inbox-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin-inline-start: auto;
+}
+.inbox-sep {
+  width: 1px;
+  height: 1.5rem;
+  margin-inline: 0.375rem;
+  background: var(--line-strong);
+}
+.inbox-reply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.inbox-reply-l {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
