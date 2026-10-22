@@ -1844,16 +1844,15 @@ html[data-nav-open] {
 }
 .fold > summary::after {
   content: "";
-  width: 0.5rem;
+  width: 0.75rem;
   height: 0.5rem;
   margin-inline-start: 0.125rem;
-  border-inline-end: 2px solid currentColor;
-  border-block-end: 2px solid currentColor;
-  transform: rotate(45deg) translate(-2px, -2px);
+  background: currentColor;
+  clip-path: polygon(8% 0, 50% 52%, 92% 0, 100% 14%, 50% 100%, 0 14%);
   transition: transform var(--duration-ui) var(--ease-out);
 }
 .fold[open] > summary::after {
-  transform: rotate(225deg);
+  transform: rotate(180deg);
 }
 .fold::details-content {
   block-size: 0;
