@@ -5,11 +5,13 @@
  */
 export type SlotDef = {
   key: string
-  type: 'text' | 'rich'
+  /** `number`: a figure (digits only), the same in both languages, shown with an optional suffix such as « + ». */
+  type: 'text' | 'rich' | 'number'
   /** Longest text, in characters (plain text slots). */
   max: number
   label: { fr: string; en: string }
   help: { fr: string; en: string }
+  suffix?: string
 }
 export type PageDef = {
   label: { fr: string; en: string }
@@ -18,7 +20,68 @@ export type PageDef = {
   slots: SlotDef[]
 }
 
+const figure = (key: string, fr: string, en: string, suffix?: string): SlotDef => ({
+  key,
+  type: 'number',
+  max: 6,
+  suffix,
+  label: { fr, en },
+  help: {
+    fr: 'Un chiffre, seulement quand il est validé. Tant qu’il n’est pas publié, il reste caché sur le site.',
+    en: 'A figure, only once validated. Until it is published it stays hidden on the site.',
+  },
+})
+
 export const PAGE_SLOTS: Record<string, PageDef> = {
+  home: {
+    label: { fr: 'Accueil', en: 'Home' },
+    path: { fr: 'fr/', en: 'en/' },
+    slots: [
+      {
+        key: 'lead',
+        type: 'text',
+        max: 220,
+        label: { fr: 'Phrase d’accueil (sous le titre)', en: 'Welcome line (under the title)' },
+        help: {
+          fr: 'Remplace la phrase d’accueil par défaut. Pas de fait à valider ici, mais relisez le ton.',
+          en: 'Replaces the default welcome line. No fact to validate here, but check the tone.',
+        },
+      },
+      {
+        key: 'invite_title',
+        type: 'text',
+        max: 80,
+        label: { fr: 'Carte d’invitation : titre', en: 'Invitation card: title' },
+        help: {
+          fr: 'La grande carte au-dessus du pied de page, sur toutes les pages.',
+          en: 'The large card above the footer, on every page.',
+        },
+      },
+      {
+        key: 'invite_text',
+        type: 'text',
+        max: 240,
+        label: { fr: 'Carte d’invitation : texte', en: 'Invitation card: text' },
+        help: {
+          fr: 'Une ou deux phrases. Ne citez pas d’horaire ici : il vient des horaires validés.',
+          en: 'One or two sentences. Do not quote a time here: it comes from the validated schedule.',
+        },
+      },
+      figure(
+        'fig_years',
+        'Chiffre : années de vie paroissiale',
+        'Figure: years of parish life',
+        '+',
+      ),
+      figure('fig_groups', 'Chiffre : groupes et chorales', 'Figure: groups and choirs'),
+      figure(
+        'fig_sundays',
+        'Chiffre : dimanches de culte par an',
+        'Figure: Sunday services a year',
+      ),
+      figure('fig_members', 'Chiffre : membres en lien avec nous', 'Figure: members in touch', '+'),
+    ],
+  },
   histoire: {
     label: { fr: 'Notre histoire', en: 'Our story' },
     path: { fr: 'fr/decouvrir/notre-histoire/', en: 'en/discover/our-story/' },

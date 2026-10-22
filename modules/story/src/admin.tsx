@@ -206,6 +206,22 @@ function SlotForm({
           onChange={(doc: Doc) => setV((x) => ({ ...x, [`body${lang}`]: doc }))}
         />
       </Suspense>
+    ) : slot.type === 'number' ? (
+      <TextField
+        label={slot.label[locale]}
+        placeholder=""
+        inputMode="numeric"
+        maxLength={slot.max}
+        value={v.valueFr}
+        disabled={!canEdit}
+        onChange={(e: { target: { value: string } }) =>
+          setV((x) => ({
+            ...x,
+            valueFr: e.target.value.replace(/\D/g, ''),
+            valueEn: e.target.value.replace(/\D/g, ''),
+          }))
+        }
+      />
     ) : (
       <TextField
         label={slot.label[locale]}
@@ -227,12 +243,16 @@ function SlotForm({
         <Badge>{t(k(`status_${status}`))}</Badge>
       </div>
       <p className="text-sm text-ink-muted">{slot.help[locale]}</p>
-      <TabsBox
-        tabs={[
-          { id: 'fr', label: t(k('lang_fr')), content: field('Fr') },
-          { id: 'en', label: t(k('lang_en')), content: field('En') },
-        ]}
-      />
+      {slot.type === 'number' ? (
+        field('Fr')
+      ) : (
+        <TabsBox
+          tabs={[
+            { id: 'fr', label: t(k('lang_fr')), content: field('Fr') },
+            { id: 'en', label: t(k('lang_en')), content: field('En') },
+          ]}
+        />
+      )}
       {slot.type === 'text' && v.valueFr.trim() && (
         <div className="rounded-lg bg-surface p-4">
           <span className="field-label">{t(k('preview'))}</span>

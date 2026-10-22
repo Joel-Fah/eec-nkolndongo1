@@ -15,6 +15,10 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+.home-stats[hidden],
+.home-stat[hidden] {
+  display: none;
+}
 .home-stat {
   display: flex;
   flex-direction: column-reverse;

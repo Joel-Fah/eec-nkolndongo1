@@ -10,7 +10,6 @@ import { eventsListHref } from '../../lib/events-routes'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages as navPages, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
-import { visibleStats } from '../../lib/stats'
 import '../../styles/patterns.css'
 
 export const getStaticPaths = localePaths
@@ -20,7 +19,7 @@ const t = useT(locale)
 const season = getSeason()
 const seasonLabel = t(`season.${season}` as 'season.avent')
 const pathOf = (id: string) => href(locale, pages.find((p) => p.id === id)?.path[locale] ?? '')
-const figures = visibleStats()
+const figureIds = ['years', 'groups', 'sundays', 'members'] as const
 const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welcome'] as const
 ---
 
@@ -36,7 +35,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
         <span class="home-title-line">{t('home.title_a')}</span>
         <span class="home-title-line">{t('home.title_b')} <span class="home-title-mark">{t('home.title_c')}<svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 17C58 7 122 5 176 9s84 6 120 2" /></svg></span></span>
       </h1>
-      <p class="home-lead">{t('home.lead')}</p>
+      <p class="home-lead" data-slot="home.lead">{t('home.lead')}</p>
       <div class="flex flex-wrap justify-center gap-3">
         <Button href={pathOf('cultes')} size="lg" data-magnetic>{t('home.cta_visit')}<Icon name="arrowRight" /></Button>
         <Button href={pathOf('histoire')} size="lg" variant="secondary">{t('home.cta_discover')}</Button>
@@ -45,21 +44,16 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 
     <HeroStream />
 
-    {
-      figures.length > 0 && (
-        <dl class="home-stats">
-          {figures.map((s) => (
-            <div class="home-stat">
-              <dt>{t(`home.stats.${s.id}` as 'home.stats.years')}</dt>
-              <dd>
-                <span class="home-stat-value" data-count={s.shown}>{s.shown}</span>{s.suffix}
-                {s.isExample && <span class="home-stat-example">{t('home.stats.example')}</span>}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      )
-    }
+    <dl class="home-stats" data-home-figures hidden>
+      {
+        figureIds.map((id) => (
+          <div class="home-stat" data-fig={id} hidden>
+            <dt>{t(`home.stats.${id}` as 'home.stats.years')}</dt>
+            <dd><span class="home-stat-value">0</span><span data-fig-suffix></span></dd>
+          </div>
+        ))
+      }
+    </dl>
   </section>
 
   <section class="home-section" aria-labelledby="start-title">
@@ -207,6 +201,8 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   }
   run()
   document.addEventListener('astro:after-swap', run)
+  // The figures arrive from the slots after the page is up: count them up once they are filled.
+  window.addEventListener('eec:figures', run)
 </script>
 
 <style is:global>

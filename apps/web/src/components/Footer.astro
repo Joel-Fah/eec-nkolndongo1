@@ -33,8 +33,8 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 <aside class="site-cta" aria-labelledby="site-cta-title">
   <div class="site-cta-card">
     <div class="grid gap-2">
-      <h2 id="site-cta-title" class="text-3xl">{t('footer.invite_title')}</h2>
-      <p class="max-w-[48ch] text-ink-muted">{t('footer.invite_text')}</p>
+      <h2 id="site-cta-title" class="text-3xl" data-slot="home.invite_title">{t('footer.invite_title')}</h2>
+      <p class="max-w-[48ch] text-ink-muted" data-slot="home.invite_text">{t('footer.invite_text')}</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <Button href={href(locale, pathOf('trouver'))} size="lg"><Icon name="location" />{t('footer.invite_find')}</Button>
@@ -100,9 +100,12 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 </div>
 
 <script>
+  import { applyHomeSlots } from '../lib/home-slots-client'
   import { applyPublicSettings } from '../lib/settings-client'
   applyPublicSettings()
+  applyHomeSlots()
   document.addEventListener('astro:page-load', applyPublicSettings)
+  document.addEventListener('astro:page-load', applyHomeSlots)
 
   // The playground loads (and starts) only when the footer is about to be seen.
   let stop: (() => void) | undefined

@@ -93,7 +93,9 @@ async function publicData(db: Db, locale: Locale) {
     const out =
       def.type === 'rich'
         ? { text: plainText(body), html: renderHtml(cleanDoc(body)) }
-        : { text: value, html: '' }
+        : def.type === 'number'
+          ? { text: /^\d{1,6}$/.test(r.valueFr.trim()) ? r.valueFr.trim() : '', html: '' }
+          : { text: value, html: '' }
     if (!out.text.trim()) continue
     const forPage = slots[r.pageKey] ?? {}
     forPage[r.slotKey] = out
@@ -197,6 +199,13 @@ export const storyApi = new Hono<AppEnv>()
       ((p.valueFr?.length ?? 0) > def.max || (p.valueEn?.length ?? 0) > def.max)
     )
       return fail(c, 400, 'invalid')
+    // A figure is digits only, the same in both languages.
+    if (def.type === 'number') {
+      const n = (p.valueFr ?? '').trim()
+      if (n !== '' && !/^\d{1,6}$/.test(n)) return fail(c, 400, 'invalid')
+      p.valueFr = n
+      p.valueEn = n
+    }
     const db = await c.var.deps.db()
     const actor = await c.var.deps.actor()
     const publisher = await mayPublish(c)
