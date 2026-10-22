@@ -30,6 +30,17 @@ export const GUIDES: Guide[] = [
     screens: ['/m/news'],
   },
   {
+    slug: 'sermons',
+    icon: 'headphones',
+    summary: {
+      fr: 'Un titre suffit ; vidéo YouTube et liens (audio sur Drive) en option.',
+      en: 'A title is enough; YouTube video and links (audio on Drive) optional.',
+    },
+    title: { fr: 'Ajouter une prédication', en: 'Add a sermon' },
+    permission: 'sermons:edit',
+    screens: ['/m/sermons'],
+  },
+  {
     slug: 'programmer-actualite',
     icon: 'calendar',
     summary: {

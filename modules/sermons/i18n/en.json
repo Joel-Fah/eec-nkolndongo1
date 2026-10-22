@@ -141,6 +141,7 @@
     "opens_in": "Opens on {host}",
     "share_whatsapp": "Share on WhatsApp",
     "series_page": "All sermons in the series",
-    "fallback": "This sermon is not translated yet: here is the French version."
+    "fallback": "This sermon is not translated yet: here is the French version.",
+    "latest_t": "Latest sermon"
   }
 }

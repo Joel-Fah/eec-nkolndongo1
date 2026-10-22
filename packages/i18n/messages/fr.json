@@ -907,6 +907,24 @@
         "desc": "La page Aide en cartes : une icône par guide dans une pastille teintée, le titre en Erode et une ligne de résumé ; les guides qui correspondent à vos droits viennent en premier.",
         "use": ".help-grid-card, .help-grid-icon ; trois colonnes sur grand écran.",
         "a11y": "Chaque carte est un lien avec son titre ; l’icône est décorative."
+      },
+      "sermoncard": {
+        "name": "Carte de prédication",
+        "desc": "Une carte pour une prédication : une image (la photo choisie, sinon une bannière dessinée), la date, la série, le titre en Erode, les passages, le prédicateur (seulement avec son accord) et des étiquettes « Vidéo » / « Écouter ». Toute la carte est un seul lien.",
+        "use": "Public → Prédications ; .sc ; filtres série, prédicateur, livre, année dans un formulaire GET (sans JavaScript, avec : seuls les résultats changent).",
+        "a11y": "Le titre est le lien (étendu à la carte) ; les étiquettes ont une icône et un texte ; mouvement réduit : pas de soulèvement."
+      },
+      "videofacade": {
+        "name": "Vidéo « façade »",
+        "desc": "Un bouton « Lire la vidéo » posé sur notre propre image. Rien n’est demandé à YouTube avant l’appui ; ensuite seul le lecteur renforcé pour la vie privée (youtube-nocookie.com) se charge, sur place.",
+        "use": "<div data-sermon-video data-id> + scripts/sermon-video.ts ; la politique de sécurité n’autorise que youtube-nocookie.com en cadre.",
+        "a11y": "Un vrai bouton, au clavier ; le cadre porte un titre ; la note dit d’où vient la vidéo."
+      },
+      "outboundlinks": {
+        "name": "Liens à ouvrir",
+        "desc": "Des liens « Écouter ou télécharger » : une icône, le nom donné par l’équipe et, dessous, le site où le lien mène (« S’ouvre sur drive.google.com »). Le lien s’ouvre dans un nouvel onglet ; la page ne charge rien de ce site.",
+        "use": ".sd-link ; adresses https uniquement, jamais obligatoires ; décision 0034.",
+        "a11y": "Le nom du lien est visible et l’hôte aussi ; rel=\"noopener noreferrer\" ; cible 56 px de haut."
       }
     },
     "rules": {

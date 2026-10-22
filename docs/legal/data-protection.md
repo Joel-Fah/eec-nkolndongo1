@@ -73,6 +73,14 @@
 - **Contact form**: the minimum fill time now relies on a token signed by the server when the form is shown (it carries
   only the time and a signature, no identifier), instead of a time sent by the browser.
 
+## Added in Phase 04b (2026-10)
+- **Sermons** (module `sermons`, decision 0034): text, passages, a YouTube address and up to 4 links typed by staff. **The preacher's
+  name is public only with a recorded consent** (who confirmed and when; unticking clears it; « reprendre depuis un dimanche » never
+  copies the consent, decision 0031). A name without consent is never sent to the public API and cannot be used as a filter. The
+  site **hosts no audio and loads nothing from the links**; the YouTube video loads only when a visitor presses play, from
+  youtube-nocookie.com (YouTube then sees that visitor, under its own policy: stated in the privacy policy). The audit log records
+  which fields changed, never the name or a link.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

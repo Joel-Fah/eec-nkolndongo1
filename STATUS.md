@@ -12,7 +12,8 @@ access test, separate preview Worker on dev data).
 **Deferred on purpose (Joël, 2026-10-22: production work not now):** the production audit/seed/role grants, real-phone readings
 (CPU, LCP, CLS, egress), TalkBack + keyboard + tap-to-dial + `.ics` device pass, and the R2 / launch-address answers. They gate the
 PR merge (merging deploys) and Checkpoint B's audio decision (0034), not the dev work.
-**Next:** Joël's review of A → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
+**Checkpoint B (sermons, links only, decision 0034) built on dev:** see `docs/phases/PHASE_04_REPORT.md`.
+**Next:** Joël's review of A and B → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
 video-only first; audio after 0034).
 
 ## Previous phase: 03 — Parish Life (merged into main, deployed 2026-10-22)

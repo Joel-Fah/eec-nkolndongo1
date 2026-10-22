@@ -141,6 +141,7 @@
     "opens_in": "S’ouvre sur {host}",
     "share_whatsapp": "Partager sur WhatsApp",
     "series_page": "Toutes les prédications de la série",
-    "fallback": "Cette prédication n’est pas encore traduite : voici la version française."
+    "fallback": "Cette prédication n’est pas encore traduite : voici la version française.",
+    "latest_t": "Dernière prédication"
   }
 }

@@ -12,6 +12,7 @@ import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages as navPages, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
 import { organization } from '../../lib/seo'
+import { sermonsListHref } from '../../lib/sermons-routes'
 import '../../styles/patterns.css'
 
 export const getStaticPaths = localePaths
@@ -164,17 +165,36 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     <ul class="ln-list" data-latest-list role="list"></ul>
     <p class="ln-all"><a data-latest-all href={newsListHref(locale)}>{t('news.site.latest_all')}</a></p>
   </section>
+  <section class="home-section" aria-labelledby="sermon-title" data-latest-sermon data-locale={locale} data-base={sermonsListHref(locale)} data-more={t('sermons.site.back')} hidden>
+    <div class="home-section-head">
+      <h2 id="sermon-title" class="text-4xl">{t('sermons.site.latest_t')}</h2>
+    </div>
+    <a class="ls-card" href={sermonsListHref(locale)} data-latest-sermon-card>
+      <span class="ls-icon" aria-hidden="true"><Icon name="headphones" size={24} /></span>
+      <span class="ls-body">
+        <span class="ls-meta"><span data-s-date></span> <span data-s-series></span></span>
+        <strong class="ls-title" data-s-title></strong>
+        <span class="ls-refs" data-s-refs></span>
+        <span class="ls-sum" data-s-sum></span>
+      </span>
+      <span class="ls-go" aria-hidden="true"><Icon name="arrowRight" size={20} /></span>
+    </a>
+    <p class="ln-all"><a data-latest-sermon-all href={sermonsListHref(locale)}>{t('sermons.site.back')}</a></p>
+  </section>
 </Site>
 
 <script>
   import { showLatestNews } from '../../lib/latest-news-client'
+  import { showLatestSermon } from '../../lib/latest-sermon-client'
   import { showSunday } from '../../lib/sunday-client'
   import { showUpcoming } from '../../lib/upcoming-client'
   showSunday()
   document.addEventListener('astro:page-load', showSunday)
   showLatestNews()
+  showLatestSermon()
   showUpcoming()
   document.addEventListener('astro:page-load', showLatestNews)
+  document.addEventListener('astro:page-load', showLatestSermon)
   document.addEventListener('astro:page-load', showUpcoming)
 </script>
 
@@ -396,9 +416,64 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 
 <style is:global>
   [data-latest-news][hidden],
+  [data-latest-sermon][hidden],
   [data-upcoming][hidden],
   [data-sunday][hidden] {
     display: none;
+  }
+  .ls-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    text-decoration: none;
+    transition: transform var(--duration-ui) var(--ease-out), box-shadow var(--duration-ui) var(--ease-out);
+  }
+  .ls-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-2);
+  }
+  .ls-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .ls-body {
+    display: grid;
+    flex: 1;
+    gap: 0.25rem;
+  }
+  .ls-meta,
+  .ls-refs {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .ls-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+    font-weight: 500;
+  }
+  .ls-sum {
+    color: var(--ink-muted);
+  }
+  .ls-go {
+    color: var(--primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ls-card:hover {
+      transform: none;
+    }
   }
   .ln-list {
     display: grid;

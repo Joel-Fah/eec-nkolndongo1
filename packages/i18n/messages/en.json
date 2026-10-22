@@ -907,6 +907,24 @@
         "desc": "The Help page as cards: one icon per guide in a tinted tile, the title in Erode and a summary line; guides matching your rights come first.",
         "use": ".help-grid-card, .help-grid-icon; three columns on large screens.",
         "a11y": "Each card is a link with its title; the icon is decorative."
+      },
+      "sermoncard": {
+        "name": "Sermon card",
+        "desc": "A card for a sermon: an image (the chosen photo, else a drawn banner), the date, series, title in Erode, passages, the preacher (only with consent) and “Video” / “Listen” tags. The whole card is one link.",
+        "use": "Public → Sermons; .sc; series, preacher, book and year filters in a GET form (no JavaScript needed; with it, only the results change).",
+        "a11y": "The title is the link (stretched over the card); tags have an icon and text; reduced motion: no lift."
+      },
+      "videofacade": {
+        "name": "Video “facade”",
+        "desc": "A “Play the video” button on our own image. Nothing is requested from YouTube before the press; then only the privacy-enhanced player (youtube-nocookie.com) loads, in place.",
+        "use": "<div data-sermon-video data-id> + scripts/sermon-video.ts; the security policy only allows youtube-nocookie.com as a frame.",
+        "a11y": "A real button, keyboard operable; the frame has a title; the note says where the video comes from."
+      },
+      "outboundlinks": {
+        "name": "Outbound links",
+        "desc": "“Listen or download” links: an icon, the name the team gave and, below, the site the link leads to (“Opens on drive.google.com”). The link opens in a new tab; the page loads nothing from that site.",
+        "use": ".sd-link; https addresses only, never required; decision 0034.",
+        "a11y": "The link name is visible and so is the host; rel=\"noopener noreferrer\"; 56 px tall target."
       }
     },
     "rules": {

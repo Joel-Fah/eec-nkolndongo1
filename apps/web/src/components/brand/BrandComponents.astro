@@ -108,6 +108,9 @@ type Id =
   | 'healthstrip'
   | 'prioritychip'
   | 'helpgrid'
+  | 'sermoncard'
+  | 'videofacade'
+  | 'outboundlinks'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -321,6 +324,12 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('prioritychip')}><p class="text-sm text-ink-muted">{t('brand.components.prioritychip.use')}</p></DocBlock>
 
     <DocBlock {...doc('helpgrid')}><p class="text-sm text-ink-muted">{t('brand.components.helpgrid.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sermoncard')}><p class="text-sm text-ink-muted">{t('brand.components.sermoncard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('videofacade')}><p class="text-sm text-ink-muted">{t('brand.components.videofacade.use')}</p></DocBlock>
+
+    <DocBlock {...doc('outboundlinks')}><p class="text-sm text-ink-muted">{t('brand.components.outboundlinks.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

@@ -52,3 +52,19 @@ Weights (production build, lab profile): JS 15–16.4 KB gz, first load 158–20
 - À valider: priority chips (high / keep an eye / not urgent) with icon + words + colour, list sorted by priority.
 - **Checkpoint B re-scoped (decision 0034):** no audio hosting and no processing on the site; a sermon holds a YouTube link and/or a
   Google Drive link. No podcast feed until a host with direct file URLs exists (R2 or Internet Archive).
+
+## Checkpoint B — sermons (built on dev, 2026-10-22) — re-scoped by decision 0034
+**Scope change (Joël):** no audio hosting and no processing on the site; a sermon holds optional links (any https address, none
+required) and an optional YouTube video. Therefore **not built, by decision**: audio upload, the in-browser encoder (0036), the
+persistent mini-player with Media Session, the podcast RSS. All parked in 0034 for the day a host with direct file URLs exists.
+- **Module `sermons`** (migration 0021, additive): `sermons`, `sermon_series`; content-kit lifecycle (draft / schedule / publish /
+  archive, revisions, preview links), permissions `sermons:*`, preacher name public only with a recorded consent (0031), Bible
+  passages as references only (0032), `transcript` (optional rich text), link validation (https only, ≤ 4), YouTube id parsing.
+- **Admin:** list + series tab, editor with autosave, « reprendre depuis un dimanche » (date, readings, name; never the consent),
+  help guide « Ajouter une prédication ».
+- **Public:** the listening room (cards, filters series / preacher / book / year without reloads, pagination), the sermon page
+  (YouTube facade: nothing requested from YouTube before play, links with their host, notes, written text, WhatsApp share,
+  breadcrumbs JSON-LD), search results, sitemap, home « Dernière prédication » (static page + tiny script).
+- **Tests:** 7 unit tests (links, YouTube parsing, input); route-table and boundaries tests green; `pnpm check` 81/81.
+- **Not done / to decide:** a series has no page of its own (the list is filtered by `?series=`); « Quick-create from a Sunday »
+  is a picker inside the editor, not a button on the Sunday; page weights and CPU for the new pages are not measured yet.
