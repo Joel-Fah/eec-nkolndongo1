@@ -3,6 +3,8 @@
  * to the full results page (the form's normal GET, so it works even if this script does not). Text is set with
  * textContent only. Nothing is stored; the dialog is just a faster way into the same page.
  */
+import { matchesAll } from '../lib/fuzzy'
+
 type Item = { type: string; key: string; title: string; snippet: string }
 type Sug = {
   guides: { key: string; title: string }[]
@@ -27,7 +29,19 @@ export function initSearchDialog() {
   let timer: number | undefined
   let seq = 0
 
+  const pageList = (() => {
+    try {
+      return JSON.parse(d.pages ?? '[]') as { t: string; x: string; h: string }[]
+    } catch {
+      return []
+    }
+  })()
+  const pageHits = (q: string): Item[] =>
+    pageList
+      .filter((p) => matchesAll(`${p.t} ${p.x}`, q))
+      .map((p) => ({ type: 'pages', key: p.h, title: p.t, snippet: '' }))
   const link = (it: Item) => {
+    if (it.type === 'pages') return it.key
     const base = d[it.type] ?? ''
     return `${base}${it.key}/`
   }
@@ -37,8 +51,8 @@ export function initSearchDialog() {
       countEl.hidden = items.length === 0
       countEl.textContent =
         items.length === 1
-          ? (d.count_one ?? '')
-          : (d.count ?? '').replace('{n}', String(items.length))
+          ? (d.resone ?? '')
+          : (d.rescount ?? '').replace('{n}', String(items.length))
     }
     if (hints) hints.hidden = items.length > 0
     if (!items.length) {
@@ -110,6 +124,9 @@ export function initSearchDialog() {
     }
     const mine = ++seq
     if (spin) spin.hidden = false
+    // Pages of the site are matched here, at once; the content (news, events, guides, groups) comes from the API.
+    const pg = pageHits(q)
+    if (pg.length) render(pg, q)
     try {
       const r = await fetch(`/api/search?q=${encodeURIComponent(q)}&locale=${locale}`, {
         credentials: 'omit',
@@ -117,9 +134,10 @@ export function initSearchDialog() {
       if (mine !== seq) return
       if (!r.ok) throw new Error(String(r.status))
       const data = (await r.json()) as { items: Item[]; didYouMean?: string[] }
-      render(data.items, q, data.didYouMean)
+      render([...pg, ...data.items], q, data.didYouMean)
     } catch {
       if (mine !== seq) return
+      if (pg.length) return
       if (countEl) countEl.hidden = true
       out.replaceChildren()
       const p = document.createElement('p')

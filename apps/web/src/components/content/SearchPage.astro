@@ -20,6 +20,7 @@ import {
   highlight,
   hitHref,
   matchPages,
+  pageEntries,
   quickActions,
   SEARCH_TYPES,
   searchHref,
@@ -41,17 +42,16 @@ const api = q
 const unavailable = api?.state === 'unavailable'
 const apiHits = api?.state === 'ok' ? api.data.items : []
 const didYouMean = api?.state === 'ok' ? (api.data.didYouMean ?? []) : []
-const pageEntries = pages
-  .filter((p) => !['account', 'search', 'privacy', 'legal', 'credits'].includes(p.id))
-  .map((p) => {
-    const lead = content[p.id]?.lead
-    return {
-      path: p.path[locale],
-      title: t(labelKey(p.id)),
-      text: `${t(descKey(p.id))}${lead ? ` ${t(lead)}` : ''}`.trim(),
-    }
-  })
-const hits: Hit[] = [...apiHits, ...(q ? matchPages(q, pageEntries) : [])]
+const entries = pageEntries(
+  locale,
+  (id) => t(labelKey(id)),
+  (id) => t(descKey(id)),
+  (id) => {
+    const lead = content[id]?.lead
+    return lead ? t(lead) : ''
+  },
+)
+const hits: Hit[] = [...apiHits, ...(q ? matchPages(q, entries) : [])]
 const grouped = SEARCH_TYPES.map((type) => ({
   type,
   items: hits.filter((h) => h.type === type),

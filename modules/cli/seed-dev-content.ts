@@ -193,6 +193,16 @@ await db.delete(scheduleExceptions).where(like(scheduleExceptions.noteFr, 'Exemp
 await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
 await db.insert(scheduleSlots).values([
   {
+    kind: 'culte_enfants',
+    labelFr: 'Exemple — Culte des enfants',
+    labelEn: 'Example — Children’s service',
+    weekday: 0,
+    startTime: '09:30',
+    endTime: '10:30',
+    placeFr: 'Salle d’exemple',
+    validated: true,
+  },
+  {
     kind: 'culte',
     labelFr: 'Exemple — Culte du dimanche',
     labelEn: 'Example — Sunday service',

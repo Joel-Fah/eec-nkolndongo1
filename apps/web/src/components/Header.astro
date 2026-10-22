@@ -7,12 +7,22 @@ import { guidesHref } from '../lib/guides-routes'
 import { localeOf, useT } from '../lib/i18n'
 import { alternates, descKey, href, labelKey, pages, tabKey, tabs } from '../lib/nav'
 import { newsListHref } from '../lib/news-routes'
-import { quickActions, searchHref } from '../lib/search'
+import { content } from '../lib/pages'
+import { pageEntries, quickActions, searchHref } from '../lib/search'
 import SiteLockup from './SiteLockup.astro'
 import ThemeToggle from './ThemeToggle.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
+const searchPages = pageEntries(
+  locale,
+  (id) => t(labelKey(id)),
+  (id) => t(descKey(id)),
+  (id) => {
+    const lead = content[id]?.lead
+    return lead ? t(lead) : ''
+  },
+).map((e) => ({ t: e.title, x: e.text, h: href(locale, e.path) }))
 const searchActions = quickActions(locale, (id) => t(`search.${id}` as 'search.act_give'))
 const other = locale === 'fr' ? 'en' : 'fr'
 const switchHref = alternates(Astro.url.pathname)[other]
@@ -166,8 +176,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       </button>
     </div>
   </dialog>
-  <dialog id="search-dialog" class="dialog search-dialog" aria-label={t('search.dialog_title')} data-search data-locale={locale} data-all={searchHref(locale)} data-loading={t('search.loading')} data-count={t('search.count', { n: '{n}' })} data-count_one={t('search.count_one')} data-empty={t('search.empty_t', { q: '{q}' })} data-more={t('search.all')} data-unavailable={t('search.unavailable')}
-    data-related={t('search.related')} data-sug_event={t('search.sug_event')} data-sug_guides={t('search.sug_guides')} data-sug_groups={t('search.sug_groups')} data-sug_news={t('search.sug_news')} data-did={t('search.did_you_mean')} data-type_news={t('search.type_news')} data-type_events={t('search.type_events')} data-type_guides={t('search.type_guides')} data-type_departments={t('search.type_departments')}
+  <dialog id="search-dialog" class="dialog search-dialog" aria-label={t('search.dialog_title')} data-search data-locale={locale} data-all={searchHref(locale)} data-loading={t('search.loading')} data-rescount={t('search.count', { n: '{n}' })} data-resone={t('search.count_one')} data-empty={t('search.empty_t', { q: '{q}' })} data-more={t('search.all')} data-unavailable={t('search.unavailable')}
+    data-pages={JSON.stringify(searchPages)} data-type_pages={t('search.type_pages')} data-related={t('search.related')} data-sug_event={t('search.sug_event')} data-sug_guides={t('search.sug_guides')} data-sug_groups={t('search.sug_groups')} data-sug_news={t('search.sug_news')} data-did={t('search.did_you_mean')} data-type_news={t('search.type_news')} data-type_events={t('search.type_events')} data-type_guides={t('search.type_guides')} data-type_departments={t('search.type_departments')}
     data-news={newsListHref(locale)} data-events={eventsListHref(locale)} data-guides={guidesHref(locale)} data-departments={departmentsHref(locale)}>
     <form class="search-form" role="search" method="get" action={searchHref(locale)}>
       <label class="search-label" for="search-input">{t('search.dialog_title')}</label>

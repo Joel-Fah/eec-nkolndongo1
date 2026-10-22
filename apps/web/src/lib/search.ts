@@ -1,6 +1,7 @@
 import type { Locale } from '@eec/i18n'
 import { departmentHref } from './departments-routes'
 import { eventHref } from './events-routes'
+import { fold, fuzzyHas } from './fuzzy'
 import { guideHref } from './guides-routes'
 import { href, pages } from './nav'
 import { newsItemHref } from './news-routes'
@@ -41,12 +42,6 @@ const CLASSES: Record<string, string> = {
   u: 'uùúûü',
   y: 'yýÿ',
 }
-const fold = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-
 /** Escapes the text, then wraps each searched word in <mark>, ignoring case and accents (« bapteme » finds « baptême »). */
 export function highlight(text: string, q: string): string {
   const words = fold(q)
@@ -63,31 +58,6 @@ export function highlight(text: string, q: string): string {
     out = out.replace(new RegExp(`(${pattern})(?![^<]*>)`, 'giu'), '<mark>$1</mark>')
   }
   return out
-}
-
-/** Edit distance up to `max` (small words only), used to forgive a typo against the words of a page name. */
-function within(a: string, b: string, max: number): boolean {
-  if (Math.abs(a.length - b.length) > max) return false
-  let prev = Array.from({ length: b.length + 1 }, (_, i) => i)
-  for (let i = 1; i <= a.length; i++) {
-    const cur = [i]
-    for (let j = 1; j <= b.length; j++)
-      cur[j] = Math.min(
-        (prev[j] ?? 0) + 1,
-        (cur[j - 1] ?? 0) + 1,
-        (prev[j - 1] ?? 0) + (a[i - 1] === b[j - 1] ? 0 : 1),
-      )
-    prev = cur
-  }
-  return (prev[b.length] ?? 99) <= max
-}
-/** True when the word is in the text, or one of its words is a typo away from it (one edit; two for long words). */
-export function fuzzyHas(text: string, word: string): boolean {
-  const hay = fold(text)
-  if (hay.includes(word)) return true
-  if (word.length < 4) return false
-  const max = word.length >= 7 ? 2 : 1
-  return hay.split(/[^a-z0-9]+/).some((w) => w.length >= 3 && within(word, w, max))
 }
 
 /** Static pages whose name or description contains every searched word (forgiving typos). */
@@ -133,4 +103,20 @@ export function quickActions(locale: Locale, label: (id: string) => string): Qui
     { id: 'write', icon: 'chat', label: label('act_write'), href: `${path('trouver')}#contact` },
     { id: 'give', icon: 'gift', label: label('act_give'), href: path('give') },
   ]
+}
+
+/** The static pages as search entries (title, description, address), for the results page and the header dialog. */
+export function pageEntries(
+  locale: Locale,
+  label: (id: string) => string,
+  desc: (id: string) => string,
+  lead: (id: string) => string,
+) {
+  return pages
+    .filter((p) => !['account', 'search', 'privacy', 'legal', 'credits'].includes(p.id))
+    .map((p) => ({
+      path: p.path[locale],
+      title: label(p.id),
+      text: `${desc(p.id)} ${lead(p.id)}`.trim(),
+    }))
 }

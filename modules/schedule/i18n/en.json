@@ -74,7 +74,11 @@
     "every_label": "Every {n} weeks",
     "moved": "Moved",
     "moved_from": "Moved from {date}",
-    "follows_note": "Follows the linked time"
+    "follows_note": "Follows the linked time",
+    "count_one": "1 time",
+    "count": "{n} times",
+    "read_more": "See all {n} times",
+    "close": "Close"
   },
   "view_grid": "Grid",
   "view_list": "List",

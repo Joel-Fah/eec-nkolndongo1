@@ -374,6 +374,7 @@ function MessageView({ id, onClose }: { id: string; onClose: () => void }) {
                 <Button
                   variant="ghost"
                   iconOnly
+                  className="inbox-danger"
                   aria-label={t(k('delete'))}
                   onClick={() => setDel(true)}
                 >

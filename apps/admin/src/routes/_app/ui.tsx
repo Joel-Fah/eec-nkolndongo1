@@ -1,9 +1,8 @@
-import { useLocale } from '@eec/admin-kit'
+import { api, useLocale } from '@eec/admin-kit'
 import { Badge, Button, SwitchField } from '@eec/ui/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Icon } from '../../components/Icon'
-import { Illustration } from '../../components/Illustration'
 import { Gate } from '../../components/kit'
 
 // The design guide lives on the public site's internal page (/fr/_brand/); here a banner leads to it.
@@ -22,15 +21,13 @@ export const Route = createFileRoute('/_app/ui')({
  */
 function DesignBanner() {
   const { t, locale } = useLocale()
-  // An abstract Pexels photo behind everything (fetched by `pnpm pexels:banner`); without it the banner keeps its soft gradient.
-  const base = import.meta.env.BASE_URL
-  const [photo, setPhoto] = useState<{ photographer: string } | null>(null)
+  // A random abstract Pexels photo on every visit (nothing is stored); without one the banner keeps its soft gradient.
+  const [photo, setPhoto] = useState<{ src: string; photographer: string } | null>(null)
   useEffect(() => {
-    fetch(`${base}design-banner.json`)
-      .then((r) => (r.ok ? r.json() : null))
+    api<{ src: string; photographer: string }>('/banner')
       .then((j) => setPhoto(j))
       .catch(() => {})
-  }, [base])
+  }, [])
   const cards: { icon: 'sparkles' | 'bookText' | 'checklist'; text: string; at: string }[] = [
     { icon: 'sparkles', text: t('ui.tease_colour'), at: 'a' },
     { icon: 'bookText', text: t('ui.tease_type'), at: 'b' },
@@ -38,11 +35,8 @@ function DesignBanner() {
   ]
   return (
     <section className="dg" aria-labelledby="dg-title">
-      {photo && <img className="dg-photo" src={`${base}design-banner.webp`} alt="" />}
+      {photo && <img className="dg-photo" src={photo.src} alt="" />}
       {photo && <p className="dg-credit">{t('ui.photo_credit', { name: photo.photographer })}</p>}
-      <div className="dg-art">
-        <Illustration name="working-from-anywhere" />
-      </div>
       <div className="dg-float" aria-hidden="true" inert>
         {cards.map((c) => (
           <div key={c.at} className="dg-card" data-at={c.at}>

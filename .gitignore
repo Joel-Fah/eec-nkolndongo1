@@ -53,5 +53,3 @@ apps/admin/public/illustrations/
 packages/i18n/messages/merged/
 docs/content/PENDING.md
 
-# Design-guide banner photo (Pexels, fetched on demand by pnpm pexels:banner)
-apps/admin/public/design-banner.*

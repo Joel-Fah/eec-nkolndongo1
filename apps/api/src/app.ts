@@ -6,6 +6,7 @@ import { Hono } from 'hono'
 import { withDeps } from './deps.ts'
 import { auditRoutes } from './routes/audit.ts'
 import { authRoutes } from './routes/auth.ts'
+import { bannerRoutes } from './routes/banner.ts'
 import { flagRoutes, flagsFor } from './routes/flags.ts'
 import { groupRoutes } from './routes/groups.ts'
 import { invitationRoutes } from './routes/invitations.ts'
@@ -37,6 +38,7 @@ export function createApp() {
   app.route('/search', searchRoutes)
   app.route('/todo', todoRoutes)
   app.route('/trends', trendsRoutes)
+  app.route('/banner', bannerRoutes)
   // Modules from the registry, at /api/<id>. A switched-off module answers 404 (Phase 02 §6.5).
   for (const m of modules) {
     const router = moduleApis[m.id]

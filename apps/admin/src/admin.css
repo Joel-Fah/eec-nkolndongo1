@@ -1609,21 +1609,6 @@ html[data-nav-open] {
     linear-gradient(180deg, var(--surface), var(--surface-2));
   box-shadow: inset 0 0 0 1px var(--line);
 }
-.dg-art {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  z-index: -2;
-  display: grid;
-  justify-items: center;
-  pointer-events: none;
-}
-.dg-art .illo,
-.dg-art img {
-  width: min(100%, 44rem);
-  height: auto;
-  translate: 0 8%;
-}
 .dg-float {
   position: absolute;
   inset: 0;
@@ -1943,4 +1928,11 @@ html[data-nav-open] {
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--elevation-2);
+}
+
+.inbox-actions .inbox-danger {
+  color: var(--danger);
+}
+.inbox-actions .inbox-danger:hover {
+  background: var(--danger-soft);
 }
