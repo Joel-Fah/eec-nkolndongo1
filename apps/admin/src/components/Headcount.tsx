@@ -1,11 +1,12 @@
 import { useLocale } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
 import { useDashboardData } from '../lib/dashboard'
+import { AreaChart, ChartTable, Fold } from './Charts'
 import { TrendBadge } from './TrendBadge'
 
 const k = (key: string) => `members.dash.${key}` as MessageKey
 
-/** The headcount for the dashboard: three numbers with their trend, a bar per group, a 12-month chart (SVG + a table). */
+/** The headcount for the dashboard: three numbers with their trend, a bar per group, a 12-month chart (smooth area with a gradient, and its table). */
 export function Headcount() {
   const { t, locale } = useLocale()
   const { members } = useDashboardData()
@@ -43,26 +44,32 @@ export function Headcount() {
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="stat-card">
               <h3 className="text-lg">{t(k('trend'))}</h3>
-              <Trend data={s.trend} label={t(k('trend'))} />
-              <details className="text-sm">
-                <summary className="cursor-pointer text-ink-muted">{t(k('trend_table'))}</summary>
-                <table className="admin-table mt-2">
-                  <thead>
-                    <tr>
-                      <th scope="col">{t(k('month'))}</th>
-                      <th scope="col">{t(k('new'))}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.trend.map((x) => (
-                      <tr key={x.month}>
-                        <th scope="row">{x.month}</th>
-                        <td>{x.n}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </details>
+              <AreaChart
+                months={s.trend.map((x) => x.month)}
+                series={[
+                  {
+                    key: 'n',
+                    label: t(k('new')),
+                    values: s.trend.map((x) => x.n),
+                    tone: 'primary',
+                  },
+                ]}
+                label={t(k('trend'))}
+              />
+              <Fold summary={t(k('trend_table'))}>
+                <ChartTable
+                  months={s.trend.map((x) => x.month)}
+                  series={[
+                    {
+                      key: 'n',
+                      label: t(k('new')),
+                      values: s.trend.map((x) => x.n),
+                      tone: 'primary',
+                    },
+                  ]}
+                  monthHeader={t(k('month'))}
+                />
+              </Fold>
             </div>
             <div className="stat-card">
               <h3 className="text-lg">{t(k('by_group'))}</h3>
@@ -87,32 +94,5 @@ export function Headcount() {
         </>
       )}
     </section>
-  )
-}
-
-/** A small line chart in SVG: tokens for colour, no library. The table next to it carries the same numbers. */
-function Trend({ data, label }: { data: { month: string; n: number }[]; label: string }) {
-  const w = 480
-  const h = 140
-  const pad = 8
-  const max = Math.max(1, ...data.map((d) => d.n))
-  const x = (i: number) => pad + (i * (w - pad * 2)) / Math.max(1, data.length - 1)
-  const y = (n: number) => h - pad - (n / max) * (h - pad * 2)
-  const line = data
-    .map((d, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(d.n).toFixed(1)}`)
-    .join('')
-  return (
-    <svg className="trend" viewBox={`0 0 ${w} ${h}`} role="img" aria-label={label}>
-      <path
-        className="trend-area"
-        d={`${line}L${x(data.length - 1)} ${h - pad}L${x(0)} ${h - pad}Z`}
-      />
-      <path className="trend-line" d={line} />
-      {data.map((d, i) => (
-        <circle key={d.month} className="trend-dot" cx={x(i)} cy={y(d.n)} r="3.5">
-          <title>{`${d.month}: ${d.n}`}</title>
-        </circle>
-      ))}
-    </svg>
   )
 }

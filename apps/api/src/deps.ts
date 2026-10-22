@@ -3,7 +3,7 @@ import { dbUrl } from '@eec/api-kit'
 import { createAuth, isStaff, loadPrincipal, slideSession } from '@eec/auth'
 import { connect, type Db, schema } from '@eec/db'
 import type { MiddlewareHandler } from 'hono'
-import { POLICY_VERSION } from './routes/members.ts'
+import { policyVersion } from './policy.ts'
 
 /** Opens one database connection per request, on first use, and closes it when the response is done. */
 export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
@@ -28,7 +28,7 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
         c.env.GOOGLE_CLIENT_ID && c.env.GOOGLE_CLIENT_SECRET
           ? { clientId: c.env.GOOGLE_CLIENT_ID, clientSecret: c.env.GOOGLE_CLIENT_SECRET }
           : undefined,
-      policyVersion: POLICY_VERSION,
+      policyVersion: await policyVersion(d),
       // No domain, no email (decision 0019): reset requests wait in the outbox for the secretariat.
       sendResetPassword: async ({ email, url }) => {
         await d

@@ -1,0 +1,372 @@
+---
+/**
+ * Search: server-rendered, works without JavaScript (`?q=`), cached briefly per query by the API. Results are grouped
+ * by type with highlighted excerpts; static pages are matched here from the site's own page list.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { type EventOcc, publicJson } from '../../lib/content-api'
+import { departmentHref } from '../../lib/departments-routes'
+import { eventHref } from '../../lib/events-routes'
+import { guideHref } from '../../lib/guides-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { descKey, href, labelKey, pages } from '../../lib/nav'
+import { newsItemHref } from '../../lib/news-routes'
+import { content } from '../../lib/pages'
+import {
+  type Hit,
+  highlight,
+  hitHref,
+  matchPages,
+  pageEntries,
+  quickActions,
+  SEARCH_TYPES,
+  searchHref,
+} from '../../lib/search'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) => t(`search.${key}` as 'search.title', vars)
+const raw = (Astro.url.searchParams.get('q') ?? '').replace(/\s+/g, ' ').trim().slice(0, 80)
+const q = raw.length >= 2 ? raw : ''
+const tooShort = raw.length === 1
+
+const api = q
+  ? await publicJson<{
+      items: (Omit<Hit, 'type'> & { type: Hit['type'] })[]
+      didYouMean?: string[]
+    }>(Astro, `/api/search?q=${encodeURIComponent(q)}&locale=${locale}`)
+  : null
+const unavailable = api?.state === 'unavailable'
+const apiHits = api?.state === 'ok' ? api.data.items : []
+const didYouMean = api?.state === 'ok' ? (api.data.didYouMean ?? []) : []
+const entries = pageEntries(
+  locale,
+  (id) => t(labelKey(id)),
+  (id) => t(descKey(id)),
+  (id) => {
+    const lead = content[id]?.lead
+    return lead ? t(lead) : ''
+  },
+)
+const hits: Hit[] = [...apiHits, ...(q ? matchPages(q, entries) : [])]
+const grouped = SEARCH_TYPES.map((type) => ({
+  type,
+  items: hits.filter((h) => h.type === type),
+})).filter((g) => g.items.length)
+
+// Suggestions (real things from the site) for the empty state and for « nothing found », and the direct actions.
+type Sug = {
+  guides: { key: string; title: string }[]
+  departments: { key: string; title: string }[]
+  news: { key: string; title: string }[]
+  event: { key: string; title: string } | null
+}
+const sug =
+  hits.length === 0 ? await publicJson<Sug>(Astro, `/api/search/suggest?locale=${locale}`) : null
+const suggest = sug?.state === 'ok' ? sug.data : null
+const actions = quickActions(locale, (id) => s(id))
+const examples = [s('ex1'), s('ex2'), s('ex3'), s('ex4')]
+Astro.response.headers.set('cache-control', 'no-store')
+---
+
+<Site title={s('title')} noindex>
+  <section class="sr">
+    <h1 class="sr-title">{s('title')}</h1>
+    <form class="sr-form" role="search" method="get" action={searchHref(locale)}>
+      <label class="sr-label" for="sr-q">{s('dialog_title')}</label>
+      <div class="sr-field">
+        <Icon name="search" size={20} />
+        <input id="sr-q" class="sr-input" type="search" name="q" value={q || raw} placeholder={s('placeholder')} autocomplete="off" maxlength="80" />
+        <Button type="submit">{s('go')}</Button>
+      </div>
+    </form>
+    {tooShort && <p class="sr-note" role="status">{s('min')}</p>}
+    {
+      unavailable ? (
+        <p class="sr-note" role="status">{s('unavailable')}</p>
+      ) : q && grouped.length > 0 ? (
+        <>
+          <p class="sr-count" role="status">{hits.length === 1 ? s('count_one') : s('count', { n: String(hits.length) })}</p>
+          {
+            grouped.map((g) => (
+              <section class="sr-group">
+                <h2 class="sr-h">{s(`type_${g.type}`)}</h2>
+                <ul class="sr-list">
+                  {g.items.map((h) => (
+                    <li class="sr-item">
+                      <a class="sr-link" href={hitHref(locale, h)} set:html={highlight(h.title, q)} />
+                      {h.snippet && <p class="sr-snip" set:html={highlight(h.snippet, q)} />}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+          <section class="sr-group">
+            <h2 class="sr-h">{s('related')}</h2>
+            <ul class="sr-actions">
+              {actions.slice(0, 4).map((a) => <li><a href={a.href}><Icon name={a.icon} size={20} />{a.label}</a></li>)}
+            </ul>
+          </section>
+        </>
+      ) : (
+        <div class="sr-start">
+          {q && (
+            <div class="sr-none" role="status">
+              <Illustration name="book-lover" class="sr-art" />
+              <h2>{s('empty_t', { q })}</h2>
+              {didYouMean.length > 0 && (
+                <p class="sr-dym">{s('did_you_mean')} {didYouMean.map((d) => <a href={searchHref(locale, d)}>{d}</a>)}</p>
+              )}
+              <p>{s('empty_p')}</p>
+            </div>
+          )}
+          {!q && (
+            <div class="sr-hello">
+              <h2>{s('hints_t')}</h2>
+              <p>{s('hints_p')}</p>
+              <p class="sr-try">
+                <span>{s('try')} :</span>
+                {examples.map((x) => <a class="sr-chip" href={searchHref(locale, x)}>{x}</a>)}
+              </p>
+            </div>
+          )}
+          <section class="sr-group">
+            <h2 class="sr-h">{s('actions_t')}</h2>
+            <ul class="sr-actions">
+              {actions.map((a) => <li><a href={a.href}><Icon name={a.icon} size={20} />{a.label}</a></li>)}
+            </ul>
+          </section>
+          {suggest && (suggest.guides.length > 0 || suggest.departments.length > 0 || suggest.news.length > 0 || suggest.event) && (
+            <div class="sr-sug">
+              {suggest.event && <section><h3>{s('sug_event')}</h3><ul><li><a href={eventHref(locale, suggest.event.key)}>{suggest.event.title}</a></li></ul></section>}
+              {suggest.guides.length > 0 && <section><h3>{s('sug_guides')}</h3><ul>{suggest.guides.map((g) => <li><a href={guideHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
+              {suggest.departments.length > 0 && <section><h3>{s('sug_groups')}</h3><ul>{suggest.departments.map((g) => <li><a href={departmentHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
+              {suggest.news.length > 0 && <section><h3>{s('sug_news')}</h3><ul>{suggest.news.map((g) => <li><a href={newsItemHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
+            </div>
+          )}
+        </div>
+      )
+    }
+  </section>
+</Site>
+
+<style>
+  .sr {
+    display: grid;
+    gap: 1.25rem;
+    width: min(100% - 2rem, 48rem);
+    margin-inline: auto;
+    padding-block: 2.5rem 4rem;
+  }
+  .sr-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+  }
+  .sr-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .sr-field {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.375rem 0.375rem 0.375rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  }
+  .sr-field:focus-within {
+    box-shadow: inset 0 0 0 2px var(--focus, var(--gold));
+  }
+  .sr-input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.75rem;
+    background: none;
+    font-size: var(--text-lg, 1.125rem);
+    outline: none;
+  }
+  .sr-input,
+  .sr-input:focus,
+  .sr-input:focus-visible {
+    box-shadow: none;
+    border: 0;
+    outline: none;
+    appearance: none;
+  }
+  .sr-input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .sr-note,
+  .sr-count {
+    color: var(--ink-muted);
+  }
+  .sr-group {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .sr-h {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .sr-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .sr-item {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .sr-link {
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .sr-snip {
+    color: var(--ink-muted);
+  }
+  .sr :global(mark) {
+    background: var(--gold-soft, var(--primary-soft));
+    color: inherit;
+    border-radius: 0.2em;
+    padding-inline: 0.1em;
+  }
+  .sr-start {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .sr-hello,
+  .sr-none {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+  }
+  .sr-hello h2,
+  .sr-none h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .sr-none {
+    justify-items: center;
+    text-align: center;
+  }
+  .sr-none :global(.sr-art) {
+    width: min(100%, 12rem);
+    height: auto;
+  }
+  .sr-try {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .sr-try > span {
+    font-weight: 600;
+  }
+  .sr-chip,
+  .sr-dym a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .sr-dym {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .sr-actions {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  }
+  .sr-actions a {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--duration-ui) var(--ease-out);
+  }
+  .sr-actions a:hover {
+    background: var(--primary-soft);
+  }
+  .sr-sug {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .sr-sug h3 {
+    margin-block-end: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .sr-sug ul {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .sr-sug a {
+    color: var(--primary);
+  }
+  .sr-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .sr-empty :global(.sr-art) {
+    width: min(100%, 14rem);
+    height: auto;
+  }
+  .sr-empty h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .sr-suggest {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-start: 0.75rem;
+  }
+  .sr-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1rem;
+  }
+  .sr-links a {
+    color: var(--primary);
+  }
+</style>

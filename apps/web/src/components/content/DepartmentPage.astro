@@ -1,0 +1,341 @@
+---
+/**
+ * One group's page: what they do, when they meet (free text and the group's approved times), who is there (a name
+ * only with recorded consent), how to reach them, and the group's latest news and next events.
+ */
+import { shortDate } from '@eec/core/dates'
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import '../../styles/richtext.css'
+import Site from '../../layouts/Site.astro'
+import { type EventOcc, type NewsItem, publicJson } from '../../lib/content-api'
+import { departmentsHref } from '../../lib/departments-routes'
+import { eventHref } from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { newsItemHref } from '../../lib/news-routes'
+import Picture from '../Picture.astro'
+import LangFallbackNote from './LangFallbackNote.astro'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  groupKey: string
+}
+type Media = Parameters<typeof Picture>[0]['media']
+type Page = {
+  key: string
+  name: string
+  tagline: string
+  fallback: boolean
+  html: string
+  meeting: string
+  contact: { whatsapp: string; phone: string }
+  tags: string[]
+  cover: Media | null
+  people: { role: string; name: string | null; photo: Media | null }[]
+}
+type SlotOut = {
+  id: string
+  labelFr: string
+  labelEn: string
+  weekday: number
+  start: string
+  end: string | null
+  placeFr?: string
+  placeEn?: string
+}
+const { groupKey } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`departments.site.${key}` as 'departments.site.all')
+const found = await publicJson<{ page: Page | null }>(
+  Astro,
+  `/api/departments/public/item/${encodeURIComponent(groupKey)}?locale=${locale}`,
+)
+const page = found.state === 'ok' ? found.data.page : null
+const unavailable = found.state === 'unavailable'
+if (!page && !unavailable) Astro.response.status = 404
+Astro.response.headers.set(
+  'cache-control',
+  page ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+
+const day = (d: string) => new Date(Date.UTC(2026, 0, 4 + Number(d)))
+const dayName = (wd: number) =>
+  new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(day(String(wd)))
+const iso = (d: Date) => d.toISOString().slice(0, 10)
+const [times, news, events] = page
+  ? await Promise.all([
+      publicJson<{ slots: SlotOut[] }>(
+        Astro,
+        `/api/schedule/public/group/${encodeURIComponent(groupKey)}`,
+      ),
+      publicJson<{ items: NewsItem[] }>(
+        Astro,
+        `/api/news/public?locale=${locale}&limit=3&group=${encodeURIComponent(groupKey)}`,
+      ),
+      publicJson<{ items: EventOcc[] }>(
+        Astro,
+        `/api/events/public?locale=${locale}&group=${encodeURIComponent(groupKey)}&from=${iso(new Date())}&to=${iso(new Date(Date.now() + 90 * 864e5))}`,
+      ),
+    ])
+  : [null, null, null]
+const slots = times?.state === 'ok' ? times.data.slots : []
+const latest = news?.state === 'ok' ? news.data.items.slice(0, 3) : []
+const upcoming =
+  events?.state === 'ok' ? events.data.items.filter((e) => !e.cancelled).slice(0, 3) : []
+const wa = page?.contact.whatsapp.startsWith('https://') ? page.contact.whatsapp : ''
+const phone = page?.contact.phone.replace(/[^\d+]/g, '') ?? ''
+---
+
+<Site title={page?.name ?? s('not_found_t')} description={page?.tagline} noindex={!page}>
+  <article class="dg">
+    <p class="dg-back"><a href={departmentsHref(locale)}><Icon name="chevronLeft" size={20} />{s('back')}</a></p>
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !page ? (
+        <div class="dg-missing">
+          <h1>{s('not_found_t')}</h1>
+          <p>{s('not_found_p')}</p>
+          <Button href={departmentsHref(locale)}>{s('back')}</Button>
+        </div>
+      ) : (
+        <>
+          <header class="dg-head">
+            <h1 class="dg-title">{page.name}</h1>
+            {page.tagline && <p class="dg-lead">{page.tagline}</p>}
+          </header>
+          {page.fallback && <LangFallbackNote />}
+          {page.cover && <Picture class="dg-cover" media={page.cover} sizes="(min-width: 64rem) 60rem, 100vw" eager decorative />}
+          <div class="dg-cols">
+            <div class="dg-main">
+              {page.html && <div class="dg-body" set:html={page.html} />}
+              {
+                page.people.length > 0 && (
+                  <section class="dg-block">
+                    <h2>{s('people_t')}</h2>
+                    <ul class="dg-people">
+                      {page.people.map((p) => (
+                        <li class="dg-person">
+                          {p.photo && <Picture class="dg-avatar" media={p.photo} sizes="4rem" decorative />}
+                          <span>
+                            {p.name && <strong>{p.name}</strong>}
+                            <span class="dg-role">{p.role || s('role_only')}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )
+              }
+              {
+                latest.length > 0 && (
+                  <section class="dg-block">
+                    <h2>{s('news_t')}</h2>
+                    <ul class="dg-list">
+                      {latest.map((n) => <li><a href={newsItemHref(locale, n.slug)}>{n.title}</a><time datetime={n.publishedAt}>{shortDate(n.publishedAt, locale)}</time></li>)}
+                    </ul>
+                  </section>
+                )
+              }
+            </div>
+            <aside class="dg-side">
+              {
+                (page.meeting || slots.length > 0) && (
+                  <section class="dg-card">
+                    <h2>{s('meeting_t')}</h2>
+                    {page.meeting && <p>{page.meeting}</p>}
+                    {slots.length > 0 && (
+                      <ul class="dg-times">
+                        {slots.map((x) => (
+                          <li>
+                            <strong>{dayName(x.weekday)} {x.start}{x.end ? `–${x.end}` : ''}</strong>
+                            <span>{locale === 'en' ? x.labelEn : x.labelFr}{(locale === 'en' ? x.placeEn : x.placeFr) ? ` · ${locale === 'en' ? x.placeEn : x.placeFr}` : ''}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+                )
+              }
+              {
+                upcoming.length > 0 && (
+                  <section class="dg-card">
+                    <h2>{s('events_t')}</h2>
+                    <ul class="dg-times">
+                      {upcoming.map((e) => <li><a href={eventHref(locale, e.slug)}><strong>{shortDate(e.startsAt, locale)}</strong> · {e.title}</a></li>)}
+                    </ul>
+                  </section>
+                )
+              }
+              {
+                (wa || phone) && (
+                  <section class="dg-card">
+                    <h2>{s('contact_t')}</h2>
+                    <div class="dg-actions">
+                      {wa && <Button href={wa} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('whatsapp')}<Icon name="external" size={16} /></Button>}
+                      {phone && <Button href={`tel:${phone}`} variant="secondary"><Icon name="phone" size={20} />{s('call')}</Button>}
+                    </div>
+                  </section>
+                )
+              }
+            </aside>
+          </div>
+        </>
+      )
+    }
+  </article>
+</Site>
+
+<style>
+  .dg {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 64rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .dg-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .dg-head {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .dg-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .dg-lead {
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .dg :global(.dg-cover) {
+    width: 100%;
+    height: clamp(12rem, 30vw, 22rem);
+    max-width: 100%;
+    border-radius: var(--radius-xl);
+    object-fit: cover;
+  }
+  .dg :global(.dg-cover) {
+    overflow: hidden;
+  }
+  .dg :global(.dg-cover img),
+  .dg :global(.dg-avatar img) {
+    height: 100%;
+    object-fit: cover;
+  }
+  .dg > * {
+    min-width: 0;
+  }
+  .dg-cols {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (min-width: 56rem) {
+    .dg-cols {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+    }
+    .dg-side {
+      position: sticky;
+      inset-block-start: 6rem;
+    }
+  }
+  .dg-main,
+  .dg-side {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+  .dg-body {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.75;
+  }
+  .dg-body :global(> * + *) {
+    margin-block-start: 1em;
+  }
+  .dg-block {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .dg-block h2,
+  .dg-card h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .dg-people {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  }
+  .dg-person {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .dg-person :global(.dg-avatar) {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: none;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  .dg-person > span {
+    display: grid;
+  }
+  .dg-role {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .dg-list {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .dg-list li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+  }
+  .dg-list time {
+    color: var(--ink-muted);
+  }
+  .dg-card {
+    display: grid;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .dg-times {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .dg-times li {
+    display: grid;
+  }
+  .dg-times strong {
+    text-transform: capitalize;
+  }
+  .dg-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .dg-missing {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+</style>

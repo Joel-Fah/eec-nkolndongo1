@@ -5,7 +5,8 @@
     "parish": "Paroisse",
     "season": "Saison liturgique",
     "features": "Fonctionnalités",
-    "system": "Système"
+    "system": "Système",
+    "giving": "Donner"
   },
   "status": {
     "validated": "Validé",
@@ -99,6 +100,76 @@
       "label": "Jusqu’au",
       "ph": "AAAA-MM-JJ",
       "help": "Après cette date, le calcul automatique reprend."
+    },
+    "momoName": {
+      "label": "Nom du marchand MTN MoMo",
+      "ph": "Paroisse EEC Nkolndongo 1",
+      "help": "Le nom affiché quand on envoie l’argent."
+    },
+    "momoNumber": {
+      "label": "Numéro MTN MoMo",
+      "ph": "6 00 00 00 00",
+      "help": "Le numéro marchand MoMo."
+    },
+    "momoCode": {
+      "label": "Code marchand MTN (USSD)",
+      "ph": "*126*14*123456#",
+      "help": "Facultatif. Un lien « appeler » est créé sur téléphone."
+    },
+    "omName": {
+      "label": "Nom du marchand Orange Money",
+      "ph": "Paroisse EEC Nkolndongo 1",
+      "help": "Le nom affiché quand on envoie l’argent."
+    },
+    "omNumber": {
+      "label": "Numéro Orange Money",
+      "ph": "6 00 00 00 00",
+      "help": "Le numéro marchand Orange Money."
+    },
+    "omCode": {
+      "label": "Code marchand Orange (USSD)",
+      "ph": "#150*14*123456#",
+      "help": "Facultatif. Un lien « appeler » est créé sur téléphone."
+    },
+    "bankName": {
+      "label": "Banque",
+      "ph": "Nom de la banque",
+      "help": "Facultatif."
+    },
+    "bankHolder": {
+      "label": "Titulaire du compte",
+      "ph": "Nom du titulaire",
+      "help": "Facultatif."
+    },
+    "bankAccount": {
+      "label": "Numéro de compte",
+      "ph": "Référence du compte",
+      "help": "Facultatif. Jamais de carte bancaire."
+    },
+    "purposeDime": {
+      "label": "Dîme",
+      "ph": "Une phrase sur la dîme",
+      "help": "Un court texte, tel qu’il doit apparaître."
+    },
+    "purposeOffrande": {
+      "label": "Offrande",
+      "ph": "Une phrase sur l’offrande",
+      "help": ""
+    },
+    "purposeProjets": {
+      "label": "Projets",
+      "ph": "Une phrase sur les projets",
+      "help": ""
+    },
+    "purposeMoissons": {
+      "label": "Fête des Moissons",
+      "ph": "Une phrase sur la Fête des Moissons",
+      "help": "Mis en avant pendant les dates de la Fête des Moissons (onglet Saison liturgique)."
+    },
+    "mapUrl": {
+      "label": "Lien Google Maps",
+      "ph": "https://maps.app.goo.gl/…",
+      "help": "Le lien « Partager » de Google Maps pour la paroisse : il sert au bouton Itinéraire."
     }
   },
   "season_none": "Aucune (calcul automatique)",
@@ -120,5 +191,58 @@
     "open": "Ouvrir",
     "retention": "Conservation des données",
     "retention_text": "Sessions expirées et liens supprimés chaque jour ; boîte d’envoi : 90 jours ; comptes supprimés : 30 jours de délai ; journal d’activité : 24 mois."
+  },
+  "site": {
+    "copy": "Copier le numéro",
+    "copied": "Copié",
+    "dial": "Composer le code",
+    "number": "Numéro",
+    "code": "Code marchand",
+    "merchant": "Marchand",
+    "bank": "Virement bancaire",
+    "holder": "Titulaire",
+    "account": "Compte",
+    "purposes": "À quoi servent vos dons",
+    "usage": "Comment nous utilisons vos dons",
+    "moissons_t": "Fête des Moissons",
+    "soon_t": "Les moyens de donner arrivent bientôt",
+    "soon_p": "Nous finalisons les détails avec la paroisse. En attendant, le secrétariat vous répond volontiers.",
+    "soon_cta": "Contacter le secrétariat",
+    "thanks": "Chaque don, petit ou grand, **soutient la vie** de la paroisse.",
+    "momo": "MTN Mobile Money",
+    "om": "Orange Money",
+    "directions": "Itinéraire",
+    "dir_android": "Ouvrir dans mon application de cartes",
+    "dir_google": "Google Maps",
+    "dir_osm": "OpenStreetMap",
+    "address": "Adresse",
+    "landmarks": "Repères",
+    "reach": "Nous joindre",
+    "phones": "Téléphone",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "purpose_dime": "Dîme",
+    "purpose_offrande": "Offrande",
+    "purpose_projets": "Projets",
+    "first_t": "Pour une première visite",
+    "first_p": "Personne ne vous demandera d’où vous venez. Asseyez-vous, écoutez, chantez si vous en avez envie : vous êtes attendu.",
+    "first_services": "Voir les horaires",
+    "first_sunday": "Ce dimanche",
+    "quick_t": "Nous joindre tout de suite",
+    "write": "Écrire un message",
+    "where_t": "Où nous trouver",
+    "dir_open": "Ouvrir l’itinéraire",
+    "thanks_k": "Merci",
+    "how_t": "Donner en trois gestes",
+    "step1_t": "Choisissez un moyen",
+    "step1_p": "Mobile money ou virement, comme vous préférez.",
+    "step2_t": "Envoyez votre don",
+    "step2_p": "À vous de décider la somme : rien n’est demandé ici.",
+    "step3_t": "C’est tout",
+    "step3_p": "Aucune donnée n’est enregistrée sur ce site.",
+    "methods_t": "Les moyens de donner",
+    "copy_code": "Copier le code",
+    "bank_name": "Banque",
+    "directions_default": "EEC Nkolndongo 1 : première entrée à gauche à la montée du carrefour INSTIC ; 100 m après l’entrée, c’est à votre gauche."
   }
 }

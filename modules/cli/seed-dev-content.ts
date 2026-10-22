@@ -3,14 +3,20 @@
  * be judged with realistic lengths and photos. No parish facts: no names, dates, times or places. `--clear` removes them.
  * Refuses to run on any branch but `dev`.
  */
+import { bumpContentVersion } from '@eec/api-kit'
 import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
-import { mediaFiles } from '@eec/db/schema'
+import { groups, mediaFiles } from '@eec/db/schema'
+import { contactMessages } from '@eec/module-contact/schema'
+import { departmentPages, departmentPeople } from '@eec/module-departments/schema'
 import { eventsItems } from '@eec/module-events/schema'
+import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
-import { and, eq, like } from 'drizzle-orm'
+import { settings } from '@eec/module-settings/schema'
+import { councilMembers, historyMilestones, pageSlots } from '@eec/module-story/schema'
+import { and, eq, inArray, like } from 'drizzle-orm'
 
 assertBranch(['dev'])
 const { db, close } = await connectDirect()
@@ -22,7 +28,14 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
-  console.log('Example posts and events removed.')
+  await db.delete(contactMessages).where(like(contactMessages.name, 'Exemple —%'))
+  await db.delete(settings).where(inArray(settings.section, ['giving']))
+  await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
+  await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
+  await db.delete(pageSlots).where(like(pageSlots.valueFr, 'Exemple —%'))
+  await db.delete(guides).where(like(guides.slug, 'exemple-%'))
+  await db.delete(groups).where(like(groups.key, 'exemple-%')) // their pages and people go with them
+  console.log('Example posts, events and groups removed.')
   await close()
   process.exit(0)
 }
@@ -175,8 +188,20 @@ await db
     },
   ])
   .onConflictDoNothing()
-// Schedule: obviously fictional slots, already approved so the pages can be judged.
+// Schedule: obviously fictional slots, already approved so the pages can be judged. Re-running replaces them (never doubles).
+await db.delete(scheduleExceptions).where(like(scheduleExceptions.noteFr, 'Exemple%'))
+await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
 await db.insert(scheduleSlots).values([
+  {
+    kind: 'culte_enfants',
+    labelFr: 'Exemple — Culte des enfants',
+    labelEn: 'Example — Children’s service',
+    weekday: 0,
+    startTime: '09:30',
+    endTime: '10:30',
+    placeFr: 'Salle d’exemple',
+    validated: true,
+  },
   {
     kind: 'culte',
     labelFr: 'Exemple — Culte du dimanche',
@@ -310,7 +335,290 @@ await db.insert(liturgyVerses).values([
       'For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.',
   },
 ])
+// Departments: three fictional groups with published pages; one person has agreed to be named, one has not.
+const exGroups = [
+  {
+    key: 'exemple-chorale',
+    nameFr: 'Exemple — Chorale',
+    nameEn: 'Example — Choir',
+    kind: 'choir' as const,
+    tags: ['musique', 'priere'],
+    tagline: 'Une phrase d’accroche d’exemple pour la chorale',
+  },
+  {
+    key: 'exemple-jeunes',
+    nameFr: 'Exemple — Jeunes',
+    nameEn: 'Example — Youth',
+    kind: 'department' as const,
+    tags: ['jeunes', 'service', 'etude'],
+    tagline: 'Une phrase d’accroche d’exemple pour les jeunes',
+  },
+  {
+    key: 'exemple-femmes',
+    nameFr: 'Exemple — Femmes',
+    nameEn: 'Example — Women',
+    kind: 'department' as const,
+    tags: ['femmes', 'priere', 'accueil'],
+    tagline: 'Une phrase d’accroche d’exemple pour les femmes',
+  },
+]
+for (const [i, g] of exGroups.entries()) {
+  const [grp] = await db
+    .insert(groups)
+    .values({ key: g.key, nameFr: g.nameFr, nameEn: g.nameEn, kind: g.kind })
+    .onConflictDoUpdate({
+      target: groups.key,
+      set: { nameFr: g.nameFr, nameEn: g.nameEn, kind: g.kind },
+    })
+    .returning()
+  if (!grp) continue
+  const values = {
+    groupId: grp.id,
+    state: 'published',
+    taglineFr: g.tagline,
+    taglineEn: g.tagline.replace('Une phrase d’accroche d’exemple pour', 'An example tagline for'),
+    bodyFr: cleanDoc({ type: 'doc', content: [para(lorem)] }),
+    meetingFr: 'Rencontre d’exemple, jour et lieu d’exemple',
+    tags: g.tags,
+    coverMediaId: photos[i]?.id ?? null,
+    sortOrder: i,
+  }
+  const [page] = await db
+    .insert(departmentPages)
+    .values(values)
+    .onConflictDoUpdate({ target: departmentPages.groupId, set: values })
+    .returning()
+  if (page && i === 0) {
+    await db.delete(departmentPeople).where(eq(departmentPeople.pageId, page.id))
+    await db.insert(departmentPeople).values([
+      {
+        pageId: page.id,
+        name: 'Exemple — Personne qui a consenti',
+        roleFr: 'Responsable',
+        roleEn: 'Leader',
+        publicConsent: true,
+        consentAt: new Date(),
+      },
+      {
+        pageId: page.id,
+        name: 'Exemple — Personne sans consentement',
+        roleFr: 'Trésorière',
+        roleEn: 'Treasurer',
+      },
+    ])
+  }
+  if (i === 0)
+    await db.insert(scheduleSlots).values({
+      kind: 'etude_biblique',
+      labelFr: 'Exemple — Répétition',
+      labelEn: 'Example — Rehearsal',
+      weekday: 6,
+      startTime: '16:00',
+      groupId: grp.id,
+      validated: true,
+    })
+}
+// Guides: the five structures from the brief as empty drafts (wording to be validated), plus one published example.
+const structures = [
+  ['Le baptême d’un enfant', 'child-baptism', 'Baptism of a child'],
+  ['Le baptême d’un adulte et la confirmation', 'adult-baptism', 'Adult baptism and confirmation'],
+  ['Le mariage (bénédiction nuptiale)', 'marriage', 'Marriage (nuptial blessing)'],
+  ['Le deuil et le service funèbre', 'bereavement', 'Bereavement and funeral service'],
+  ['Adhérer à la paroisse', 'joining', 'Joining the parish'],
+] as const
+for (const [i, [fr, slug, en]] of structures.entries())
+  await db
+    .insert(guides)
+    .values({
+      slug: `exemple-${slug}`,
+      titleFr: `Exemple — ${fr}`,
+      titleEn: `Example — ${en}`,
+      sortOrder: i,
+      state: 'draft',
+    })
+    .onConflictDoNothing()
+const [demo] = await db
+  .insert(guides)
+  .values({
+    slug: 'exemple-parcours',
+    state: 'published',
+    icon: 'checklist',
+    titleFr: 'Exemple — Un parcours en quatre étapes',
+    titleEn: 'Example — A four-step guide',
+    introFr:
+      'Un parcours d’exemple pour juger la liste à cocher, l’impression et la barre de progression.',
+    audienceFr: 'Exemple',
+    sortOrder: 9,
+  })
+  .onConflictDoUpdate({ target: guides.slug, set: { state: 'published' } })
+  .returning()
+if (demo) {
+  await db.delete(guideSteps).where(eq(guideSteps.guideId, demo.id))
+  await db.insert(guideSteps).values(
+    ['Prendre contact', 'Rassembler les documents', 'Rencontrer l’équipe', 'Confirmer la date'].map(
+      (title, i) => ({
+        guideId: demo.id,
+        sortOrder: i,
+        titleFr: `Exemple — ${title}`,
+        bodyFr: cleanDoc({ type: 'doc', content: [para(lorem)] }),
+        documentsFr: i === 1 ? 'Un document d’exemple\nUn autre document d’exemple' : '',
+        durationFr: i === 2 ? 'Environ 30 minutes (exemple)' : '',
+        contactFr: i === 0 ? 'Le secrétariat (exemple)' : '',
+      }),
+    ),
+  )
+}
+// Story pages: five fictional milestones (no dates, no facts), council people with and without consent, one slot.
+await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
+await db.insert(historyMilestones).values(
+  [
+    'Les débuts',
+    'Une première étape',
+    'Un temps de croissance',
+    'Un nouveau chapitre',
+    'Aujourd’hui',
+  ].map((title, i) => ({
+    year: `Exemple ${i + 1}`,
+    titleFr: `Exemple — ${title}`,
+    textFr: lorem,
+    mediaId: i % 2 === 0 ? (photos[i]?.id ?? null) : null,
+    sortOrder: i,
+    state: 'published',
+  })),
+)
+await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
+await db.insert(councilMembers).values([
+  {
+    name: 'Exemple — Personne qui a consenti',
+    roleKey: 'pasteur_titulaire',
+    titleFr: 'Titre d’exemple',
+    publicConsent: true,
+    consentAt: new Date(),
+    sortOrder: 0,
+  },
+  {
+    name: 'Exemple — Personne sans consentement',
+    roleKey: 'anciens',
+    titleFr: 'Ancien d’exemple',
+    sortOrder: 0,
+  },
+  { name: 'Exemple — Autre personne sans consentement', roleKey: 'diacres', sortOrder: 0 },
+])
+// Contact messages across weeks and months, to judge the inbox (fictional senders, one prayer request).
+await db.delete(contactMessages).where(like(contactMessages.name, 'Exemple —%'))
+const ago = (days: number) => new Date(Date.now() - days * 86_400_000)
+const sample: [string, string, string, number, string, boolean][] = [
+  [
+    'Exemple — Marie N.',
+    'renseignement',
+    'Bonjour, à quelle heure commence le culte du dimanche ? Je viens pour la première fois.',
+    0.1,
+    'new',
+    false,
+  ],
+  [
+    'Exemple — Paul E.',
+    'vie_pratique',
+    'Nous souhaitons préparer le baptême de notre enfant. Quelles sont les étapes ?',
+    1,
+    'new',
+    false,
+  ],
+  [
+    'Exemple — Sylvie B.',
+    'departements',
+    'J’aimerais rejoindre la chorale. Comment faire ?',
+    2,
+    'progress',
+    false,
+  ],
+  ['Exemple — Un fidèle', 'priere', 'Un sujet de prière d’exemple, confidentiel.', 3, 'new', true],
+  [
+    'Exemple — Jean K.',
+    'autre',
+    'Une question d’exemple sur l’accès à l’église en fauteuil roulant.',
+    9,
+    'handled',
+    false,
+  ],
+  [
+    'Exemple — Aïcha T.',
+    'renseignement',
+    'Pouvez-vous me dire où se trouve exactement l’église ?',
+    16,
+    'handled',
+    false,
+  ],
+  ['Exemple — David M.', 'vie_pratique', 'Comment adhérer à la paroisse ?', 40, 'handled', false],
+  [
+    'Exemple — Grâce L.',
+    'departements',
+    'Y a-t-il un groupe pour les jeunes adultes ?',
+    75,
+    'handled',
+    false,
+  ],
+]
+await db.insert(contactMessages).values(
+  sample.map(([name, category, message, days, status, sensitive]) => ({
+    name,
+    email: 'exemple@example.test',
+    category,
+    message,
+    status,
+    sensitive,
+    createdAt: ago(days),
+    handledAt: status === 'handled' ? ago(days - 0.5) : null,
+    consentAt: ago(days),
+  })),
+)
+// Giving (settings): obviously fictional, approved so the page can be judged in dev. Never run on another branch.
+const ex = (value: string) => ({ value, validated: true })
+await db
+  .insert(settings)
+  .values({
+    section: 'giving',
+    values: {
+      momoName: ex('Exemple — marchand MoMo'),
+      momoNumber: ex('6 00 00 00 00'),
+      momoCode: ex('*126*14*000000#'),
+      omName: ex('Exemple — marchand Orange'),
+      omNumber: ex('6 11 11 11 11'),
+      omCode: ex('#150*14*000000#'),
+      purposeDime: ex('Texte d’exemple sur la dîme.'),
+      purposeOffrande: ex('Texte d’exemple sur l’offrande.'),
+      purposeMoissons: ex('Texte d’exemple sur la Fête des Moissons.'),
+    },
+  })
+  .onConflictDoUpdate({
+    target: settings.section,
+    set: {
+      values: {
+        momoName: ex('Exemple — marchand MoMo'),
+        momoNumber: ex('6 00 00 00 00'),
+        momoCode: ex('*126*14*000000#'),
+        omName: ex('Exemple — marchand Orange'),
+        omNumber: ex('6 11 11 11 11'),
+        omCode: ex('#150*14*000000#'),
+        purposeDime: ex('Texte d’exemple sur la dîme.'),
+        purposeOffrande: ex('Texte d’exemple sur l’offrande.'),
+        purposeMoissons: ex('Texte d’exemple sur la Fête des Moissons.'),
+      },
+    },
+  })
 console.log(
   `Seeded ${titles.length} example posts (exemple-1…), 3 example events, 3 schedule slots, two Sundays (one a Holy Supper), the Holy Supper rhythm with its preparation and a move, and 3 verses.`,
 )
+// Public caches are keyed by content version: bump so the seeded data shows at once.
+for (const area of [
+  'settings',
+  'news',
+  'events',
+  'schedule',
+  'liturgy',
+  'departments',
+  'guides',
+  'story',
+])
+  await bumpContentVersion(db, area)
 await close()

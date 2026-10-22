@@ -16,8 +16,10 @@ interface Props {
   hideHeader?: boolean
   /** Block numbers (from 0) not to show, when a live section replaces them. */
   omit?: number[]
+  /** Published text from the admin replacing the paragraphs of a text block (by block number). */
+  texts?: Record<number, string>
 }
-const { id, hideHeader = false, omit = [] } = Astro.props
+const { id, hideHeader = false, omit = [], texts = {} } = Astro.props
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const page = content[id]
@@ -55,7 +57,7 @@ const colsClass = {
               <span class="pv-num" aria-hidden="true">{n}</span>
               {block.title && <h2 class="text-4xl">{t(block.title)}</h2>}
             </div>
-            <div class="pv-body">{block.paras.map((k) => <p>{t(k)}</p>)}</div>
+            <div class="pv-body">{texts[index] ? <p>{texts[index]}</p> : block.paras.map((k) => <p>{t(k)}</p>)}</div>
           </section>
         )
       }

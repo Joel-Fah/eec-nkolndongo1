@@ -1,9 +1,10 @@
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
+import { DepartmentQuizEditor, GroupPageEditor } from '@eec/modules/admin'
 import { Badge, Button, EmptyState, SelectField, SwitchField, TextField } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, Suspense, useState } from 'react'
 import { Illustration } from '../../components/Illustration'
 import { Gate, notify, PageHeader, Sheet } from '../../components/kit'
 import { bi, type Group } from '../../lib/types'
@@ -28,6 +29,18 @@ function Groups() {
   })
   const [editing, setEditing] = useState<Group | 'new' | null>(null)
   const [viewing, setViewing] = useState<Group | null>(null)
+  const [pageOf, setPageOf] = useState<Group | null>(null)
+  const [quiz, setQuiz] = useState(false)
+  // A group's public page lives with the group: its state shows on the card, and the same screen edits it.
+  const canPages = hasPermission(me, 'departments:read')
+  const pages = useQuery({
+    queryKey: ['departments'],
+    enabled: canPages,
+    queryFn: () =>
+      api<{ items: { groupId: string; state: 'none' | 'draft' | 'published' }[] }>('/departments'),
+  })
+  const pageState = (g: Group) => pages.data?.items.find((x) => x.groupId === g.id)?.state ?? 'none'
+  const hasPage = (g: Group) => canPages && g.kind !== 'other'
   const canManage = hasPermission(me, 'core:groups-manage')
   const list = groups.data?.groups ?? []
   return (
@@ -36,7 +49,14 @@ function Groups() {
         title={t('admin.teams.title')}
         lead={t('admin.teams.lead')}
         actions={
-          canManage && <Button onClick={() => setEditing('new')}>{t('admin.teams.new')}</Button>
+          <>
+            {hasPermission(me, 'departments:quiz') && (
+              <Button variant="secondary" onClick={() => setQuiz(true)}>
+                {t('departments.quiz_edit')}
+              </Button>
+            )}
+            {canManage && <Button onClick={() => setEditing('new')}>{t('admin.teams.new')}</Button>}
+          </>
         }
       />
       {groups.data && list.length === 0 ? (
@@ -55,6 +75,11 @@ function Groups() {
                 <h2 className="text-xl">{bi(g.nameFr, g.nameEn, locale)}</h2>
                 <Badge tone="info">{t(`admin.teams.kinds.${g.kind}` as MessageKey)}</Badge>
                 {!g.isActive && <Badge tone="warning">{t('admin.teams.inactive')}</Badge>}
+                {hasPage(g) && (
+                  <Badge tone={pageState(g) === 'published' ? 'success' : undefined}>
+                    {t(`departments.state_${pageState(g)}` as MessageKey)}
+                  </Badge>
+                )}
               </div>
               <p className="text-sm text-ink-muted">
                 {bi(g.descriptionFr, g.descriptionEn, locale)}
@@ -69,6 +94,11 @@ function Groups() {
                 <Button variant="secondary" size="sm" onClick={() => setViewing(g)}>
                   {t('admin.teams.members_title')}
                 </Button>
+                {hasPage(g) && (
+                  <Button variant="secondary" size="sm" onClick={() => setPageOf(g)}>
+                    {t('admin.teams.public_page')}
+                  </Button>
+                )}
                 {canManage && (
                   <Button variant="ghost" size="sm" onClick={() => setEditing(g)}>
                     {t('admin.common.edit')}
@@ -87,6 +117,24 @@ function Groups() {
         />
       )}
       {viewing && <Members group={viewing} onClose={() => setViewing(null)} />}
+      <Suspense fallback={null}>
+        {pageOf && (
+          <GroupPageEditor
+            item={{
+              groupId: pageOf.id,
+              key: pageOf.key,
+              nameFr: pageOf.nameFr,
+              nameEn: pageOf.nameEn,
+              kind: pageOf.kind,
+              active: pageOf.isActive,
+              state: pageState(pageOf),
+              updatedAt: null,
+            }}
+            onClose={() => setPageOf(null)}
+          />
+        )}
+        {quiz && <DepartmentQuizEditor onClose={() => setQuiz(false)} />}
+      </Suspense>
     </div>
   )
 }

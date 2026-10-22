@@ -66,6 +66,18 @@ workspace package `@eec/module-<id>`. The reference implementation is `modules/s
    deep imports into other modules).
 10. Document new components on `/_brand`; update `docs/product/roadmap.md` and `STATUS.md`.
 
+## The content kit (Phase 03)
+- Rich text: `cleanDoc`/`renderHtml` from `@eec/core`; the editor is `@eec/content-kit/editor` (lazy, admin only).
+- A module with draft → publish → archive: `contentRoutes` from `@eec/api-kit` (revisions, scheduling, preview links, audit,
+  cache-version bump, group-scoped rights). Simpler modules (guides, story, departments) keep a plain `state` column.
+- Public pages read the module's `/public` JSON through `publicJson` and render on demand; wrap loads in `cachedJson` with a
+  content version in the key, and never let a cold database turn a page into a 500 (`<UnavailableState>`).
+- People's names or photos: public only with a recorded consent (who, when) and sent by the server only then (decision 0031).
+- Forms and dialogs: `GuardedDialog` (confirms before discarding), `ViewToggle`, `ShortcutTip`. Public filters: mark the
+  results `data-live-area` and the links `data-live-nav` so they swap without reloading.
+- Cross-module reads (search, « À faire ») go in the registry package or `apps/api`, never as a module importing another's internals.
+- Document every new component in `/_brand` in the same change.
+
 ## Don'ts
 - Don't import another module's internals (only `@eec/module-<id>`), or anything from `apps/*`.
 - Don't add a top-level nav tab (max 5 — see `docs/product/navigation.md`).

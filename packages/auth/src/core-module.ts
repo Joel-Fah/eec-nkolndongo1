@@ -67,6 +67,11 @@ export const systemRoles = [
       'news:read',
       'news:edit',
       'news:publish',
+      'departments:read',
+      'departments:update',
+      'departments:publish',
+      'contact:read',
+      'contact:handle',
     ],
   },
   {
@@ -92,7 +97,13 @@ export const systemRoles = [
     en: 'Group leader',
     descFr: 'Gère un groupe précis (à attribuer avec le groupe).',
     descEn: 'Manages one specific group (grant it with the group).',
-    grants: ['core:groups-read', 'news:read', 'news:edit'],
+    grants: [
+      'core:groups-read',
+      'news:read',
+      'news:edit',
+      'departments:read',
+      'departments:update',
+    ],
   },
   {
     key: 'tresorier',

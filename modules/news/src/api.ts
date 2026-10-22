@@ -145,11 +145,25 @@ const mediaOut = (m: typeof mediaFiles.$inferSelect | undefined) =>
 type Locale = 'fr' | 'en'
 const localeOf = (v: string | undefined): Locale => (v === 'en' ? 'en' : 'fr')
 
-async function publicItems(db: Db, locale: Locale, offset: number, limit: number, ids?: string[]) {
+async function publicItems(
+  db: Db,
+  locale: Locale,
+  offset: number,
+  limit: number,
+  ids?: string[],
+  groupKey?: string | null,
+) {
   const rows = await db
-    .select()
+    .select({ post: newsPosts })
     .from(newsPosts)
-    .where(and(liveNow(), ids ? inArray(newsPosts.id, ids) : undefined))
+    .leftJoin(groups, eq(groups.id, newsPosts.groupId))
+    .where(
+      and(
+        liveNow(),
+        ids ? inArray(newsPosts.id, ids) : undefined,
+        groupKey ? eq(groups.key, groupKey) : undefined,
+      ),
+    )
     .orderBy(
       desc(newsPosts.pinned),
       desc(
@@ -158,7 +172,12 @@ async function publicItems(db: Db, locale: Locale, offset: number, limit: number
     )
     .offset(offset)
     .limit(limit + 1)
-  return rowsToPublic(db, rows.slice(0, limit), locale, rows.length > limit)
+  return rowsToPublic(
+    db,
+    rows.slice(0, limit).map((r) => r.post),
+    locale,
+    rows.length > limit,
+  )
 }
 
 async function rowsToPublic(db: Db, rows: Row[], locale: Locale, more: boolean) {
@@ -268,12 +287,14 @@ export const newsApi = new Hono<AppEnv>()
     const locale = localeOf(c.req.query('locale'))
     const page = Math.max(1, Math.min(Number(c.req.query('page')) || 1, 200))
     const limit = Math.min(Math.max(Number(c.req.query('limit')) || PAGE, 1), 24)
+    const g = c.req.query('group')
+    const group = g && /^[a-z0-9-]{1,60}$/.test(g) ? g : null
     const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
-      key: `news/list/${locale}/${page}/${limit}/v${version}`,
+      key: `news/list/${locale}/${page}/${limit}/${group ?? '-'}/v${version}`,
       ttl: 60,
       keep: 60 * 60 * 24 * 7,
-      load: (db) => publicItems(db, locale, (page - 1) * limit, limit),
+      load: (db) => publicItems(db, locale, (page - 1) * limit, limit, undefined, group),
     })
   })
   .get('/public/feed.xml', async (c) => {

@@ -1,0 +1,386 @@
+---
+/**
+ * The contact form as a short conversation: what do you need (big tiles), say it (with starting phrases), how can we reach
+ * you (WhatsApp/phone or e-mail), then a last look and the consent. One question at a time, a friendly progress, back and
+ * forward, keyboard friendly. No third party: a hidden honeypot, the time the form was shown, a rate limit in the API.
+ * Consent is an unticked box. Needs JavaScript (a note says how to reach us otherwise).
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import type { IconName } from '@eec/ui/icons'
+import { localeOf, useT } from '../../lib/i18n'
+
+interface Props {
+  subject?: string
+  category?: string
+}
+const { subject = '', category = '' } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`contact.site.${key}` as 'contact.site.form_t', vars)
+const cats: { id: string; icon: IconName }[] = [
+  { id: 'renseignement', icon: 'info' },
+  { id: 'vie_pratique', icon: 'checklist' },
+  { id: 'departements', icon: 'department' },
+  { id: 'priere', icon: 'prayer' },
+  { id: 'autre', icon: 'chat' },
+]
+const current = cats.some((c) => c.id === category) ? category : ''
+const starters = [s('starter_1'), s('starter_2'), s('starter_3')]
+const strings = {
+  step: s('step', { n: '{n}', total: '{total}' }),
+  next: s('next'),
+  send: s('send'),
+  sending: s('sending'),
+  err: s('err'),
+  errFast: s('err_fast'),
+  errRate: s('err_rate'),
+  errReach: s('err_reach'),
+  errConsent: s('err_consent'),
+  errName: s('err_name'),
+  errMessage: s('err_message'),
+  errCategory: s('err_category'),
+  count: s('count', { n: '{n}' }),
+}
+---
+
+<section class="cf" id="contact" aria-labelledby="cf-title">
+  <header class="cf-head">
+    <h2 id="cf-title" class="cf-title">{s('form_t')}</h2>
+    <p class="cf-lead">{s('form_p')}</p>
+  </header>
+  <noscript><p class="cf-note">{s('nojs')}</p></noscript>
+  <form class="cf-form" data-contact-form data-nojs novalidate data-i18n={JSON.stringify(strings)}>
+    <div class="cf-progress" aria-hidden="true"><span class="cf-bar"><span class="cf-fill" data-fill></span></span></div>
+    <p class="cf-step-label" data-step-label aria-live="polite"></p>
+
+    <fieldset class="cf-step" data-step="0">
+      <legend class="cf-q" tabindex="-1">{s('q_help')}</legend>
+      <div class="cf-tiles">
+        {cats.map((c) => (
+          <label class="cf-tile">
+            <input type="radio" name="category" value={c.id} checked={c.id === current} />
+            <span class="cf-tile-body">
+              <span class="cf-tile-icon" aria-hidden="true"><Icon name={c.icon} size={24} /></span>
+              <strong>{t(`contact.cat_${c.id}` as 'contact.cat_autre')}</strong>
+              <small>{s(`hint_${c.id}`)}</small>
+            </span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset class="cf-step" data-step="1" hidden>
+      <legend class="cf-q" tabindex="-1">{s('q_say')}</legend>
+      <p class="cf-help" data-prayer-help hidden>{s('prayer_help')}</p>
+      <div class="cf-starters" role="group" aria-label={s('starters')}>
+        {starters.map((x) => <button type="button" class="cf-chip" data-starter={x}>{x}</button>)}
+      </div>
+      <Field id="cf-message" name="message" kind="textarea" rows={6} label={s('message')} placeholder={s('message_ph')} />
+      <p class="cf-count" data-count></p>
+    </fieldset>
+
+    <fieldset class="cf-step" data-step="2" hidden>
+      <legend class="cf-q" tabindex="-1">{s('q_reach')}</legend>
+      <Field id="cf-name" name="name" label={s('name')} placeholder={s('name_ph')} autocomplete="name" icon="account" />
+      <div class="cf-reach" role="radiogroup" aria-label={s('reach_how')}>
+        <label class="cf-tile cf-tile-sm">
+          <input type="radio" name="reach" value="phone" checked />
+          <span class="cf-tile-body"><span class="cf-tile-icon" aria-hidden="true"><Icon name="whatsapp" size={20} /></span><strong>{s('reach_phone')}</strong></span>
+        </label>
+        <label class="cf-tile cf-tile-sm">
+          <input type="radio" name="reach" value="email" />
+          <span class="cf-tile-body"><span class="cf-tile-icon" aria-hidden="true"><Icon name="mail" size={20} /></span><strong>{s('reach_email')}</strong></span>
+        </label>
+      </div>
+      <div data-reach-field="phone"><Field id="cf-phone" name="phone" type="tel" label={s('phone')} placeholder={s('phone_ph')} autocomplete="tel" icon="phone" /></div>
+      <div data-reach-field="email" hidden><Field id="cf-email" name="email" type="email" label={s('email')} placeholder={s('email_ph')} autocomplete="email" icon="mail" /></div>
+    </fieldset>
+
+    <fieldset class="cf-step" data-step="3" hidden>
+      <legend class="cf-q" tabindex="-1">{s('q_ready')}</legend>
+      <ul class="cf-summary">
+        <li><span>{s('sum_topic')}</span><strong data-sum="category"></strong></li>
+        <li><span>{s('sum_message')}</span><strong data-sum="message"></strong></li>
+        <li><span>{s('sum_reply')}</span><strong data-sum="reach"></strong></li>
+      </ul>
+      <input type="hidden" name="subject" value={subject} />
+      <!-- Honeypot: invisible and unreachable for people; a bot fills it and is quietly ignored. -->
+      <div class="cf-trap" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+      <label class="check-row" for="cf-consent">
+        <input id="cf-consent" name="consent" type="checkbox" class="checkbox" />
+        <span>{s('consent')}</span>
+      </label>
+      <p class="cf-help">{s('consent_help')}</p>
+    </fieldset>
+
+    <div class="cf-nav">
+      <Button variant="ghost" data-back hidden><Icon name="arrowLeft" size={20} />{s('back')}</Button>
+      <Button type="button" data-next>{s('next')}<Icon name="arrowRight" size={20} /></Button>
+      <Button type="submit" data-send hidden><Icon name="mailSend" size={20} />{s('send')}</Button>
+      <p class="cf-status" data-status role="status"></p>
+    </div>
+  </form>
+  <div class="cf-done" data-contact-done hidden>
+    <Illustration name="messaging-fun" class="cf-art" />
+    <h3 tabindex="-1">{s('sent_t')}</h3>
+    <p>{s('sent_p')}</p>
+    <Button variant="secondary" data-again>{s('again')}</Button>
+  </div>
+</section>
+
+<script>
+  import { initContactForm } from '../../scripts/contact-form'
+  initContactForm()
+  document.addEventListener('astro:page-load', initContactForm)
+</script>
+
+<style>
+  .cf {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    scroll-margin-block-start: 6rem;
+  }
+  .cf-title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl, 2rem);
+  }
+  .cf-lead,
+  .cf-help,
+  .cf-note {
+    color: var(--ink-muted);
+  }
+  .cf-help {
+    font-size: var(--text-sm);
+  }
+  .cf-form {
+    display: grid;
+    gap: 1rem;
+  }
+  .cf-progress {
+    display: grid;
+  }
+  .cf-bar {
+    display: block;
+    height: 0.375rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs, 0.25rem);
+    background: color-mix(in oklab, var(--ink) 10%, transparent);
+  }
+  .cf-fill {
+    display: block;
+    height: 100%;
+    width: 25%;
+    background: var(--primary);
+    transition: width var(--duration-ui) var(--ease-out);
+  }
+  .cf-step-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  .cf-step {
+    display: grid;
+    gap: 0.875rem;
+    min-width: 0;
+    animation: cf-in var(--duration-ui) var(--ease-out);
+  }
+  .cf-step[hidden] {
+    display: none;
+  }
+  @keyframes cf-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+  .cf-q {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+    padding: 0;
+  }
+  .cf-q:focus {
+    outline: none;
+  }
+  .cf-tiles {
+    display: grid;
+    gap: 0.625rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  }
+  .cf-tile {
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+  .cf-tile input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .cf-tile-body {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 0.875rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1.5px transparent;
+    transition:
+      transform var(--duration-ui) var(--ease-out),
+      background var(--duration-ui) var(--ease-out),
+      box-shadow var(--duration-ui) var(--ease-out);
+  }
+  .cf-tile-body small {
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+    line-height: 1.3;
+  }
+  .cf-tile:hover .cf-tile-body {
+    transform: translateY(-2px);
+  }
+  .cf-tile input:checked + .cf-tile-body {
+    background: var(--primary-soft);
+    box-shadow: inset 0 0 0 2px var(--primary);
+  }
+  .cf-tile input:focus-visible + .cf-tile-body {
+    box-shadow: inset 0 0 0 2px var(--focus, var(--gold));
+  }
+  .cf-tile-icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--primary);
+  }
+  .cf-tile-sm .cf-tile-body {
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: start;
+    gap: 0.625rem;
+    padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  }
+  .cf-tile-sm .cf-tile-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  .cf-reach {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cf-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cf-chip {
+    min-height: 2.5rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--duration-ui) var(--ease-out);
+  }
+  .cf-chip:hover {
+    background: var(--primary-soft);
+  }
+  .cf-count {
+    justify-self: end;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .cf-summary {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .cf-summary li {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+  .cf-summary span {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .cf-summary strong {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .cf-trap {
+    position: absolute;
+    inset-inline-start: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .cf-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .cf-nav [hidden] {
+    display: none;
+  }
+  .cf-status {
+    flex-basis: 100%;
+    font-weight: 600;
+    color: var(--danger, var(--ink-muted));
+  }
+  .cf-form[data-nojs] .cf-nav,
+  .cf-form[data-nojs] .cf-progress,
+  .cf-form[data-nojs] .cf-step-label {
+    display: none;
+  }
+  .cf-form[data-nojs] .cf-step:not([data-step='0']) {
+    display: none;
+  }
+  .cf-done {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .cf-done[hidden],
+  .cf-form[hidden] {
+    display: none;
+  }
+  .cf-done :global(.cf-art) {
+    width: min(100%, 14rem);
+    height: auto;
+  }
+  .cf-done h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cf-step,
+    .cf-tile-body,
+    .cf-fill {
+      animation: none;
+      transition: none;
+    }
+  }
+</style>

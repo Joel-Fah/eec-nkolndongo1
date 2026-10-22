@@ -102,6 +102,8 @@ export const heroes: Record<string, Hero> = {
     cards: [
       info('location', 'footer.visit', 'footer.address', { x: 6, y: 62, r: -2 }),
       info('clock', 'footer.hours_title', 'footer.hours', { x: 62, y: 70, r: 2 }),
+      info('chat', 'hero.trouver_write_t', 'hero.trouver_write_p', { x: 68, y: 34, r: 2 }),
+      info('heart', 'hero.trouver_first_t', 'hero.trouver_first_p', { x: 34, y: 82, r: -1 }),
     ],
   },
   cultes: {

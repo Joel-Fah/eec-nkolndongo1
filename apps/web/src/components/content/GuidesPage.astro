@@ -1,0 +1,120 @@
+---
+/** « Vie pratique »: the published guides as cards. With none published the earlier introduction stays. */
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { guideHref } from '../../lib/guides-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+type Item = {
+  slug: string
+  icon: string
+  title: string
+  intro: string
+  audience: string
+  steps: number
+}
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`guides.site.${key}` as 'guides.site.back', vars)
+const result = await publicJson<{ items: Item[] }>(Astro, `/api/guides/public?locale=${locale}`)
+const items = result.state === 'ok' ? result.data.items : []
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('pratique'))} description={t('pages.pratique.lead')}>
+  <PageHero id="pratique" />
+  {
+    result.state === 'unavailable' ? (
+      <UnavailableState />
+    ) : items.length === 0 ? (
+      <PageView id="pratique" hideHeader />
+    ) : (
+      <section class="gl">
+        <ul class="gl-grid">
+          {
+            items.map((g) => (
+              <li class="gl-card">
+                <span class="gl-icon" aria-hidden="true"><Icon name={g.icon as 'checklist'} size={24} /></span>
+                <h2 class="gl-name"><a class="gl-link" href={guideHref(locale, g.slug)}>{g.title}</a></h2>
+                {g.intro && <p class="gl-intro">{g.intro}</p>}
+                <p class="gl-meta">
+                  {g.audience && <span>{g.audience}</span>}
+                  <span>{s('steps', { n: String(g.steps) })}</span>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    )
+  }
+</Site>
+
+<style>
+  .gl {
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .gl-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+  .gl-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    transition: transform var(--duration-ui) var(--ease-out);
+  }
+  .gl-card:hover {
+    transform: translateY(-2px);
+  }
+  .gl-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .gl-name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .gl-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .gl-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .gl-intro {
+    color: var(--ink-muted);
+  }
+  .gl-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--primary);
+  }
+</style>

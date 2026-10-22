@@ -82,7 +82,8 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
       {hero.giant === 'thanks' && <p class="ph-giant" aria-hidden="true">{t('hero.thanks')}</p>}
       <h1 id="ph-title" class="ph-title">{title}</h1>
       {lead && <p class="ph-lead">{lead}</p>}
-      {hero.layout === 'plain' && (
+      {hero.layout === 'plain' && Astro.slots.has('default') && <div class="ph-insights"><slot /></div>}
+      {hero.layout === 'plain' && !Astro.slots.has('default') && (
         <ul class="ph-plain-cards">
           {cards.map((c) => c.kind === 'info' && <li class="ph-card"><span class="ph-card-icon"><Icon name={c.icon} size={20} /></span><p class="ph-card-title">{t(c.title)}</p><p class="ph-card-text">{t(c.text)}</p></li>)}
         </ul>
@@ -516,6 +517,27 @@ const stagger = ['0', '3.5rem', '1rem', '4.5rem']
     background:
       radial-gradient(color-mix(in oklab, var(--ink) 10%, transparent) 1px, transparent 1.5px) 0 0 / 22px 22px,
       var(--surface-2);
+  }
+  /* Key points set into the banner itself: the cards are cropped by its lower edge, so the banner gives them room. */
+  [data-layout="plain"]:has(.ph-insights) .ph-frame {
+    overflow: hidden;
+    padding-block-end: 0;
+    min-height: min(34rem, 80svh);
+  }
+  [data-layout="plain"]:has(.ph-insights) .ph-frame {
+    display: flex;
+    flex-direction: column;
+  }
+  [data-layout="plain"]:has(.ph-insights) .ph-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block-start: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .ph-insights {
+    margin-block-start: auto;
+    width: 100%;
   }
   .ph-plain-cards {
     display: flex;

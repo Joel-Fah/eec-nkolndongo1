@@ -120,6 +120,10 @@
       "dimanche": {
         "label": "Ce dimanche",
         "desc": "Le thème, les lectures et le culte du dimanche qui vient."
+      },
+      "search": {
+        "label": "Recherche",
+        "desc": "Chercher dans tout le site"
       }
     },
     "main": "Menu principal",
@@ -711,6 +715,132 @@
         "desc": "Sur la page des événements, un index collant liste les semaines affichées et met en évidence celle qui est à l’écran. Masqué sur mobile.",
         "use": "Apparaît à partir de trois semaines ; liens d’ancre #ev-<date>.",
         "a11y": "Navigation étiquetée, aria-current sur la semaine visible."
+      },
+      "fliptime": {
+        "name": "Heure en cartes",
+        "desc": "Une heure en deux cartes douces (heures, minutes), sans trait : utilisée pour l’horaire du culte sur la carte « Ce dimanche » et sa page.",
+        "use": "<p class=\"flip-time\"><span class=\"flip-card\">09</span><span class=\"flip-colon\">:</span><span class=\"flip-card\">00</span></p> ; taille par --flip-size.",
+        "a11y": "Le conteneur porte l’heure complète en aria-label ; les cartes sont aria-hidden."
+      },
+      "tablepicker": {
+        "name": "Choix de la taille d’un tableau",
+        "desc": "Dans l’éditeur, une grille à survoler (8 × 8) prévisualise la taille ; on peut aussi saisir lignes et colonnes (jusqu’à 30 × 10).",
+        "use": "Bouton Tableau de l’éditeur ; clic sur une case ou « Insérer ».",
+        "a11y": "La grille est réservée à la souris ; le clavier passe par les champs lignes et colonnes."
+      },
+      "deptcard": {
+        "name": "Carte de groupe et questionnaire",
+        "desc": "Une carte (photo, nom, phrase d’accroche, public visé) par groupe, filtrable ; le questionnaire « Où est ta place ? » avance question par question avec une barre de progression.",
+        "use": "Page Départements ; la carte entière est un lien. Rien n’est enregistré par le questionnaire.",
+        "a11y": "Filtres en liens (fonctionnent sans JavaScript) ; progression annoncée (progressbar) ; focus sur chaque nouvelle question."
+      },
+      "guidechecklist": {
+        "name": "Parcours à cocher",
+        "desc": "Un guide en étapes dépliables, avec cases à cocher, barre de progression, impression et remise à zéro. Les coches restent dans le navigateur.",
+        "use": "Pages Vie pratique ; impression : toutes les étapes s’ouvrent.",
+        "a11y": "Étapes en <details> (clavier complet) ; case par étape avec libellé ; sans JavaScript, une simple liste."
+      },
+      "historyclimb": {
+        "name": "Gravir la colline",
+        "desc": "La frise de l’histoire : un sentier sinueux se dessine à mesure que l’on défile (GSAP, chargé sur cette page seulement) à travers les étapes, chacune dépliable.",
+        "use": "Page Notre histoire, depuis les étapes publiées en administration.",
+        "a11y": "Sans animation (mouvement réduit, économie de données) : frise simple, sentier déjà tracé, tout reste lisible. Aucun épinglage du défilement."
+      },
+      "councilcard": {
+        "name": "Carte du conseil",
+        "desc": "Une personne (photo, nom, titre, mandat) ou, sans consentement enregistré, le rôle seul.",
+        "use": "Page Pasteurs et Conseil, groupée par rôle.",
+        "a11y": "Aucune donnée personnelle n’est envoyée au navigateur sans consentement."
+      },
+      "liveswap": {
+        "name": "Filtres sans rechargement",
+        "desc": "Sur l’agenda, les départements et les actualités, changer de vue, de filtre ou de page remplace seulement les résultats ; l’adresse et le bouton Retour suivent.",
+        "use": "Zone data-live-area, liens data-live-nav (data-live-scroll pour la pagination).",
+        "a11y": "Sans JavaScript, ce sont de simples liens. Le focus et la position de défilement sont conservés."
+      },
+      "searchdialog": {
+        "name": "Recherche du site",
+        "desc": "La loupe de l’en-tête ouvre un dialogue : en tapant, les premiers résultats apparaissent ; Entrée mène à la page de résultats groupés par type, avec extraits surlignés (sans accents ni majuscules).",
+        "use": "<dialog data-search> avec <input name=\"q\"> ; page /recherche?q=.",
+        "a11y": "Dialogue natif (focus piégé, Échap) ; résultats annoncés (aria-live) ; fonctionne sans JavaScript via le formulaire GET."
+      },
+      "contactform": {
+        "name": "Formulaire de contact",
+        "desc": "Nom, e-mail ou téléphone, sujet, message et consentement non pré-coché. Pièges anti-spam sans service tiers : champ piège caché, délai minimal, limite par adresse.",
+        "use": "<ContactForm subject=\"…\" /> sur la page Nous trouver ; le sujet vient du lien « Poser une question ».",
+        "a11y": "Chaque champ a son libellé ; erreurs annoncées (role=status) ; la demande de prière indique sa confidentialité."
+      },
+      "givingcard": {
+        "name": "Carte pour donner",
+        "desc": "Une carte par moyen (MTN, Orange, banque) : marchand, numéro, bouton « Copier le numéro » et, sur téléphone, un lien pour composer le code marchand. Rien ne s’affiche tant que la valeur n’est pas approuvée.",
+        "use": "Page Donner, depuis Paramètres → Donner ; code USSD : tel: avec # encodé en %23.",
+        "a11y": "Le bouton annonce « Copié » ; le lien d’appel n’apparaît que sur écran tactile."
+      },
+      "directions": {
+        "name": "Liens d’itinéraire",
+        "desc": "Adresse approuvée et trois liens : application de cartes du téléphone (geo:), Google Maps, OpenStreetMap. Aucune carte intégrée : aucune donnée tierce chargée.",
+        "use": "Page Nous trouver, depuis les coordonnées approuvées des paramètres.",
+        "a11y": "Liens clairs avec icône « nouvel onglet » ; le lien geo: est masqué sur ordinateur."
+      },
+      "todopanel": {
+        "name": "À faire",
+        "desc": "Sur l’accueil de l’administration : ce qui attend la personne connectée (nouveaux messages, ses brouillons, publications de la semaine, dimanches sans programme, horaires à approuver, traductions anglaises manquantes), filtré par ses droits.",
+        "use": "<TodoPanel /> ; chaque ligne mène au module concerné.",
+        "a11y": "Liste de liens ; masqué quand rien n’attend."
+      },
+      "policynotice": {
+        "name": "Avis « La politique a changé »",
+        "desc": "Dans Mon espace, un avis discret avec le résumé des changements ; un bouton « J’accepte » n’apparaît que si les finalités ont changé.",
+        "use": "Mon espace → Mes données ; alimenté par la dernière version publiée de la politique.",
+        "a11y": "role=status ; lien vers la nouvelle politique."
+      },
+      "insightcards": {
+        "name": "Cartes de points essentiels",
+        "desc": "Trois ou cinq cartes (sinon aucune) qui résument les points d’un document : légèrement empilées, en éventail sur un arc discret, rognées par le bas ; le survol les écarte. Même famille que les cartes du tableau de bord.",
+        "use": "<InsightCards items=\"…\" /> sur la confidentialité et les mentions légales, à partir des titres du document.",
+        "a11y": "Chaque carte est un lien vers sa section ; l’arrangement est décoratif, le contenu reste lisible."
+      },
+      "inbox": {
+        "name": "Boîte de réception",
+        "desc": "Messages groupés par semaine puis par mois d’un côté, le message ouvert de l’autre (au lieu d’une fenêtre). Sur petit écran, un volet à la fois.",
+        "use": "Administration → Messages ; classes .inbox, .inbox-row, .inbox-view.",
+        "a11y": "Liste en navigation ; ligne active en aria-current ; bouton Retour sur petit écran."
+      },
+      "todocards": {
+        "name": "Cartes « À faire »",
+        "desc": "Des cartes classées par urgence — urgent (rouge), à surveiller (ambre), pour info (bleu) — chacune avec l’icône de l’écran concerné et un compteur.",
+        "use": "<TodoPanel /> sur l’accueil de l’administration.",
+        "a11y": "Le niveau est dit en mots et par une icône, jamais par la couleur seule."
+      },
+      "conversation": {
+        "name": "Formulaire en conversation",
+        "desc": "Un formulaire en quatre petites étapes : le besoin (grandes tuiles), le message (phrases de départ), la façon de répondre, un dernier coup d’œil. Une question à la fois, avec progression et retour.",
+        "use": "<ContactForm /> sur Nous trouver ; scripts/contact-form.ts.",
+        "a11y": "Chaque étape est un fieldset avec légende ; le focus va à la nouvelle question ; erreurs annoncées."
+      },
+      "searchhints": {
+        "name": "Indices et actions de recherche",
+        "desc": "Boîte vide : ce que l’on peut chercher, des mots à essayer, des actions directes et de vraies suggestions du site. Sans résultat : « Vouliez-vous dire… ». La recherche tolère les fautes de frappe.",
+        "use": "Dialogue d’en-tête et page /recherche ; /api/search/suggest.",
+        "a11y": "Les suggestions sont des liens ordinaires ; la liste d’actions est un nav de liens."
+      },
+      "areachart": {
+        "name": "Graphiques en aires douces",
+        "desc": "Courbes lissées (sans dépassement) avec un dégradé sous la ligne, extrémités arrondies, barres arrondies et anneau à bouts ronds ; chaque graphique a le tableau de ses chiffres (mois en toutes lettres et année) dans un volet qui s’ouvre en douceur.",
+        "use": "<AreaChart>, <BarChart>, <Donut>, <ChartCard> dans l’administration ; couleurs par jetons.",
+        "a11y": "Chaque graphique a un nom (role=img) et un tableau équivalent ; les infobulles sont des <title>."
+      },
+      "mapillustration": {
+        "name": "Carte dessinée",
+        "desc": "Une carte illustrée, pas une vraie : courbes de niveau de la colline, ruisseau, routes, blocs et le repère de la paroisse, avec le bouton Google Maps par-dessus. Aucune donnée tierce chargée.",
+        "use": "<MapIllustration name href label /> sur Nous trouver.",
+        "a11y": "Décoratif (aria-hidden) ; l’adresse et le bouton portent l’information."
+      },
+      "designbanner": {
+        "name": "Bandeau du guide de design",
+        "desc": "Dans l’administration, un bandeau plein écran : une illustration, des cartes et des éléments d’interface en suspension à trois profondeurs (proche et flou, lointain et flou, net) et un seul appel à l’action vers le guide.",
+        "use": "Onglet Guide de design de l’administration.",
+        "a11y": "Les éléments flottants sont décoratifs (masqués aux lecteurs d’écran et au pointeur) ; le bouton est un lien ordinaire."
       }
     },
     "rules": {
@@ -1055,7 +1185,7 @@
     },
     "teams": {
       "title": "Groupes",
-      "lead": "Départements, comités et chorales. Les responsables sont les personnes qui ont le rôle « Responsable de groupe » pour ce groupe.",
+      "lead": "Départements, comités et chorales : les personnes, les droits et la page publique de chaque groupe, au même endroit. Les responsables sont les personnes qui ont le rôle « Responsable de groupe » pour ce groupe.",
       "new": "Nouveau groupe",
       "kind": "Type",
       "kinds": {
@@ -1080,7 +1210,8 @@
       "created": "Groupe créé.",
       "saved": "Groupe enregistré.",
       "empty_title": "Aucun groupe pour l’instant",
-      "empty_text": "Créez les départements, comités et chorales de la paroisse."
+      "empty_text": "Créez les départements, comités et chorales de la paroisse.",
+      "public_page": "Page publique"
     },
     "audit": {
       "title": "Journal d’activité",
@@ -1277,7 +1408,18 @@
     "chart_bar": "Histogramme d’exemple sur douze mois",
     "chart_table": "Voir les chiffres des graphiques",
     "chart_month": "Mois",
-    "chart_value": "Valeur"
+    "chart_value": "Valeur",
+    "cta_t": "Le guide de design",
+    "cta_p": "Couleurs, typographie, composants, mouvement : tout est documenté, pour que chaque écran reste cohérent.",
+    "cta": "Ouvrir le guide",
+    "tease_colour": "Couleurs et thèmes clair et sombre",
+    "tease_type": "Erode pour les titres, Switzer pour le texte",
+    "tease_parts": "Boutons, champs, dialogues, cartes",
+    "tease_button": "Enregistrer",
+    "tease_badge": "Nouveau",
+    "tease_switch": "Mode sombre",
+    "tease_secondary": "Annuler",
+    "photo_credit": "Photo : {name} · Pexels"
   },
   "page": {
     "cta_title": "Une question, un souvenir, une envie de venir ?",
@@ -1614,7 +1756,10 @@
     "panel_devices": "Mes appareils",
     "devices_current": "cet appareil",
     "devices_others": "Me déconnecter des autres appareils",
-    "devices_unknown": "Appareil"
+    "devices_unknown": "Appareil",
+    "policy_changed_t": "La politique de confidentialité a changé",
+    "policy_read": "Lire la nouvelle politique",
+    "policy_accept": "J’accepte la nouvelle politique"
   },
   "hero": {
     "stats": {
@@ -1657,7 +1802,11 @@
     "listen": "Écouter",
     "soon": "Bientôt",
     "credits_t": "Merci aux photographes",
-    "credits_p": "Les noms derrière les images de ce site."
+    "credits_p": "Les noms derrière les images de ce site.",
+    "trouver_write_t": "Une question ?",
+    "trouver_write_p": "Écrivez-nous : l’équipe répond.",
+    "trouver_first_t": "Première visite ?",
+    "trouver_first_p": "Venez comme vous êtes."
   },
   "bible": {
     "lsg": "LSG",
@@ -1697,7 +1846,34 @@
     "qa_members": "Voir les membres",
     "qa_settings": "Paramètres",
     "qa_outbox": "Boîte d’envoi",
-    "qa_activity": "Activité récente"
+    "qa_activity": "Activité récente",
+    "todo_title": "À faire",
+    "todo_messages": "{n} nouveau(x) message(s) à lire.",
+    "todo_drafts_news": "{n} brouillon(s) d’actualité à vous.",
+    "todo_drafts_events": "{n} brouillon(s) d’événement à vous.",
+    "todo_drafts_guides": "{n} brouillon(s) de parcours.",
+    "todo_scheduled_news": "{n} actualité(s) programmée(s) cette semaine.",
+    "todo_scheduled_events": "{n} événement(s) programmé(s) cette semaine.",
+    "todo_empty_sundays": "{n} dimanche(s) sans programme dans les 4 semaines : {dates}.",
+    "todo_slots": "{n} horaire(s) à approuver.",
+    "todo_missing_en_news": "{n} actualité(s) publiée(s) sans titre anglais.",
+    "todo_missing_en_events": "{n} événement(s) publié(s) sans titre anglais.",
+    "todo_missing_en_guides": "{n} parcours publié(s) sans titre anglais.",
+    "todo_level_critical": "urgent",
+    "todo_level_attention": "à surveiller",
+    "todo_level_info": "pour info",
+    "trends_title": "Tendances",
+    "chart_messages": "Messages reçus par mois",
+    "chart_publications": "Publications par mois",
+    "chart_media": "Photos ajoutées par mois",
+    "chart_categories": "Messages par sujet (90 jours)",
+    "series_messages": "Messages",
+    "series_news": "Actualités",
+    "series_events": "Événements",
+    "series_media": "Photos",
+    "view_numbers": "Voir les chiffres",
+    "month": "Mois",
+    "total": "au total"
   },
   "content": {
     "status": {
@@ -1814,5 +1990,54 @@
       "stay": "Continuer à remplir",
       "leave": "Abandonner"
     }
+  },
+  "search": {
+    "title": "Recherche",
+    "placeholder": "Un mot, un nom, un sujet…",
+    "go": "Rechercher",
+    "dialog_title": "Rechercher sur le site",
+    "all": "Voir tous les résultats",
+    "results_for": "Résultats pour « {q} »",
+    "count": "{n} résultats",
+    "count_one": "1 résultat",
+    "empty_t": "Rien trouvé pour « {q} »",
+    "empty_p": "Essayez un autre mot, ou parcourez ces pages.",
+    "start_t": "Que cherchez-vous ?",
+    "start_p": "Tapez un mot : une actualité, un rendez-vous, un groupe, un parcours.",
+    "suggest_t": "Pour commencer",
+    "suggest_guides": "Parcours",
+    "suggest_event": "Prochain rendez-vous",
+    "type_news": "Nouvelles",
+    "type_events": "Agenda",
+    "type_guides": "Vie pratique",
+    "type_departments": "Départements",
+    "type_pages": "Pages",
+    "min": "Tapez au moins 2 lettres.",
+    "unavailable": "La recherche ne répond pas pour l’instant. Réessayez dans un moment.",
+    "hint": "Entrée pour voir tous les résultats",
+    "close": "Fermer",
+    "loading": "Recherche…",
+    "hints_t": "Vous pouvez chercher",
+    "hints_p": "Une actualité, un rendez-vous, un groupe, un parcours (baptême, mariage…) ou une page du site. Les fautes de frappe et les accents ne gênent pas.",
+    "try": "Essayez",
+    "ex1": "horaires",
+    "ex2": "baptême",
+    "ex3": "jeunes",
+    "ex4": "prière",
+    "actions_t": "Aller directement à",
+    "act_cultes": "Horaires des cultes",
+    "act_dimanche": "Ce dimanche",
+    "act_evenements": "Agenda",
+    "act_departements": "Groupes et départements",
+    "act_pratique": "Vie pratique",
+    "act_trouver": "Nous trouver",
+    "act_write": "Écrire un message",
+    "act_give": "Donner",
+    "sug_guides": "Parcours",
+    "sug_groups": "Groupes",
+    "sug_news": "Dernières nouvelles",
+    "sug_event": "Prochain rendez-vous",
+    "did_you_mean": "Vouliez-vous dire :",
+    "related": "Actions suggérées"
   }
 }

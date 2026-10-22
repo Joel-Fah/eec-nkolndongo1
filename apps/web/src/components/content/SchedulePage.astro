@@ -5,6 +5,7 @@
  * (nothing unvalidated is ever shown). Data: cached public API.
  */
 import { shortDate } from '@eec/core/dates'
+import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Site from '../../layouts/Site.astro'
 import { type PublicSlot, type PublicSlotException, publicJson } from '../../lib/content-api'
@@ -16,7 +17,8 @@ import UnavailableState from './UnavailableState.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
-const label = (key: string) => t(`schedule.site.${key}` as 'schedule.site.title')
+const label = (key: string, vars?: Record<string, string>) =>
+  t(`schedule.site.${key}` as 'schedule.site.title', vars)
 const result = await publicJson<{ slots: PublicSlot[]; exceptions: PublicSlotException[] }>(
   Astro,
   '/api/schedule/public',
@@ -75,29 +77,38 @@ Astro.response.headers.set(
             </div>
           )
         }
-        <div class="sc-week">
+        <div class="sc-week" data-week data-nojs>
           {
             order.map((wd) => {
               const day = slots.filter((s) => s.weekday === wd)
               return (
-                <section class="sc-day" data-today={wd === todayDow ? '' : undefined} data-empty={day.length === 0 ? '' : undefined} aria-label={dayName(wd)}>
-                  <h3 class="sc-dayname">{dayName(wd)}{wd === todayDow ? <span class="sc-today"> · {label('today')}</span> : null}</h3>
+                <section class="sc-day" data-day={wd} data-today={wd === todayDow ? '' : undefined} data-empty={day.length === 0 ? '' : undefined} aria-label={dayName(wd)}>
+                  {wd === todayDow && <span class="sc-today">{label('today')}</span>}
+                  <h3 class="sc-dayname" data-day-name>
+                    {dayName(wd)}
+                    {day.length > 0 && <span class="sc-count" data-day-count>{day.length === 1 ? label('count_one') : label('count', { n: String(day.length) })}</span>}
+                  </h3>
                   {
                     day.length === 0 ? (
                       <p class="sc-none">{label('all_day_off')}</p>
                     ) : (
-                      <ul>
-                        {
-                          day.map((s) => (
-                            <li class="sc-slot">
-                              <span class="sc-time">{s.start}{s.end ? `–${s.end}` : ''}</span>
-                              <span class="sc-label">{name(s)}</span>
-                              {(locale === 'en' ? s.placeEn : s.placeFr) && <span class="sc-place">{locale === 'en' ? s.placeEn : s.placeFr}</span>}
-                              <a class="sc-ics" href={`/api/schedule/public/slot/${s.id}/slot.ics?locale=${locale}`} download>{label('add_ics')}</a>
-                            </li>
-                          ))
-                        }
-                      </ul>
+                      <>
+                        <ul class="sc-list">
+                          {
+                            day.map((s, i) => (
+                              <li class:list={['sc-slot', i >= 2 && 'sc-extra']}>
+                                <span class="sc-time">{s.start}{s.end ? `–${s.end}` : ''}</span>
+                                <span class="sc-label">{name(s)}</span>
+                                {(locale === 'en' ? s.placeEn : s.placeFr) && <span class="sc-place">{locale === 'en' ? s.placeEn : s.placeFr}</span>}
+                                <a class="sc-ics" href={`/api/schedule/public/slot/${s.id}/slot.ics?locale=${locale}`} download>{label('add_ics')}</a>
+                              </li>
+                            ))
+                          }
+                        </ul>
+                        {day.length > 2 && (
+                          <button type="button" class="sc-more" data-more>{label('read_more', { n: String(day.length) })}<Icon name="arrowRight" size={16} /></button>
+                        )}
+                      </>
                     )
                   }
                 </section>
@@ -105,12 +116,25 @@ Astro.response.headers.set(
             })
           }
         </div>
+        <dialog class="sc-modal" data-day-dialog aria-labelledby="sc-modal-title">
+          <header class="sc-modal-head">
+            <h3 id="sc-modal-title" class="sc-dayname" data-modal-title></h3>
+            <button type="button" class="btn btn-ghost btn-icon" data-day-close aria-label={label('close')}><Icon name="close" size={20} /></button>
+          </header>
+          <ul class="sc-list sc-modal-list" data-modal-list></ul>
+        </dialog>
         <Illustration name="music" class="sc-art" />
       </section>
     ) : null
   }
   <PageView id="cultes" hideHeader omit={hasSlots ? [1] : []} />
 </Site>
+
+<script>
+  import { initDays } from '../../scripts/schedule-days'
+  initDays()
+  document.addEventListener('astro:page-load', initDays)
+</script>
 
 <style>
   .sc {
@@ -143,10 +167,13 @@ Astro.response.headers.set(
   .sc-week {
     display: grid;
     gap: 0.75rem;
+    align-items: stretch;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
   }
   .sc-day {
+    position: relative;
     display: grid;
+    grid-template-rows: auto 1fr auto;
     align-content: start;
     gap: 0.5rem;
     padding: 1rem 1.25rem;
@@ -162,15 +189,101 @@ Astro.response.headers.set(
     box-shadow: inset 0 0 0 2px var(--primary), var(--elevation-1);
   }
   .sc-dayname {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.625rem;
+    padding-inline-end: 5.5rem;
     font-family: var(--font-display);
     font-size: var(--text-xl);
     text-transform: capitalize;
   }
-  .sc-today {
-    font-family: inherit;
-    font-size: var(--text-sm);
+  /* How many times the day holds. */
+  .sc-count {
+    padding: 0.0625rem 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
     color: var(--primary);
+    font-family: var(--font-sans, inherit);
+    font-size: var(--text-xs);
+    font-weight: 700;
     text-transform: none;
+    white-space: nowrap;
+  }
+  /* Today: a clear chip in the top right corner of its card. */
+  .sc-today {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: var(--surface);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  /* Each card shows two times at most; the rest opens in a modal (all shown without script). */
+  .sc-week[data-js] .sc-extra {
+    display: none;
+  }
+  .sc-week[data-nojs] .sc-more {
+    display: none;
+  }
+  .sc-more {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.25rem;
+    color: var(--primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .sc-more:hover {
+    text-decoration: underline;
+  }
+  .sc-modal {
+    width: min(100% - 2rem, 30rem);
+    max-height: min(85svh, 40rem);
+    margin: auto;
+    padding: 1.25rem 1.5rem;
+    overflow: auto;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--elevation-3);
+  }
+  .sc-modal::backdrop {
+    background: color-mix(in oklab, var(--ink) 35%, transparent);
+    backdrop-filter: blur(3px);
+  }
+  .sc-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block-end: 0.75rem;
+  }
+  .sc-modal .sc-dayname {
+    padding-inline-end: 0;
+  }
+  .sc-modal-list {
+    display: grid;
+    gap: 0.875rem;
+  }
+  .sc-modal-list .sc-extra {
+    display: grid;
+  }
+  ::view-transition-group(sc-morph) {
+    animation-duration: 0.45s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-old(sc-morph),
+  ::view-transition-new(sc-morph) {
+    height: 100%;
+    object-fit: cover;
   }
   .sc-none {
     color: var(--ink-muted);
@@ -178,10 +291,12 @@ Astro.response.headers.set(
   }
   .sc-day ul {
     display: grid;
+    align-content: start;
     gap: 0.75rem;
   }
   .sc-slot {
     display: grid;
+    align-content: start;
     gap: 0.125rem;
   }
   .sc-time {

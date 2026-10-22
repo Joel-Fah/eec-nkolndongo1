@@ -45,6 +45,22 @@
 - **Preview links** (news, events): signed, expiring after 3 days, `noindex`, no personal data in the link.
 - Group leaders are scoped: a group-scoped role can edit only its own group's news and events.
 
+## Added in Phase 03b (2026-10)
+- **Contact messages** (module `contact`): name, email **or** phone, category, message, optional subject, status, assignee,
+  internal notes, and the moment the visitor ticked the consent box (never pre-ticked). **No IP address is stored**: a
+  salted hash is used only as a rate-limit key that expires within a day. Retention: 12 months after « handled » (at most 24
+  after receipt).
+- **Prayer requests** (category « Prière »): flagged sensitive, readable only with `contact:read-sensitive`, never exported,
+  3 months after « handled » (at most 6 after receipt). Stated in the privacy policy.
+- **People on department and council pages**: name, role, optional photo and term; **public only with a recorded consent**
+  (who, when); withdrawal removes them at the next cache refresh (decision 0031).
+- **Search**: queries are not stored and carry no user id; a hashed-address counter limits abuse for a day.
+- **Guides**: the visitor's ticks stay in their own browser (`localStorage`); nothing is sent.
+- **Quiz « Où est ta place ? »**: runs in the browser; nothing is sent or stored.
+- **Legal documents**: every published version is kept (the record of what people agreed to); members are informed of a
+  change and asked to accept again only when the purposes changed (decision 0033).
+- **Giving**: no payment integration, no amounts, no donor data; only the parish's approved merchant details are shown.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.
