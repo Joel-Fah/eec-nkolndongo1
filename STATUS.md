@@ -1,12 +1,22 @@
 # STATUS
 
-_Last updated: 2026-10-21_
+## Current phase: 04a — Go-live · Checkpoint A (launch kit) ready for review
+_Last updated: 2026-10-22._ Branch `feat/phase-04a-go-live` (from `main`, which already carries Phase 03: both PRs were merged and
+the `deploy` workflow shipped them, migrations 0006–0018 included, on 2026-10-22). **Dev only for everything new**; nothing of
+04a is deployed. Report in progress: `docs/phases/PHASE_04_REPORT.md`.
+**Built (A):** home texts and four key figures as slots (0039); « Validateur de contenu » role + **À valider** screen with
+comments (0040); **Aide** (11 guides + 4 printable cheat sheets, « ? » on each screen); **Santé** (daily check in the existing
+cron, backup mark, dashboard insight); **visit counts** coded but dormant (0038); share cards, JSON-LD (Church, NewsArticle, Event,
+BreadcrumbList), an on-demand **sitemap**, `docs/ops/launch.md`; Checkpoint 0 carry-overs (signed contact timestamp, prayer-request
+access test, separate preview Worker on dev data).
+**Deferred on purpose (Joël, 2026-10-22: production work not now):** the production audit/seed/role grants, real-phone readings
+(CPU, LCP, CLS, egress), TalkBack + keyboard + tap-to-dial + `.ics` device pass, and the R2 / launch-address answers. They gate the
+PR merge (merging deploys) and Checkpoint B's audio decision (0034), not the dev work.
+**Next:** Joël's review of A → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
+video-only first; audio after 0034).
 
-## Current phase: 03b — Parish Life · Checkpoint D (search, contact, giving, Nous trouver, legal, launch readiness) ready for review
-**Dev only; production untouched.** Built on `feat/phase-03b-people-pages` (from 03a): C (departments in Groups, guides, story pages, council) and D (search, contact form + inbox, giving settings + page, Nous trouver links, versioned legal documents with the member notice, admin « À faire »), plus the launch-readiness pass.
-Full details, measurements and gaps: `docs/phases/PHASE_03_REPORT.md`. `pnpm check` is green; `pnpm e2e` passes 9/9 (by hand).
-**Not done:** TalkBack/keyboard audit, real-phone check of tap-to-dial and `geo:` links, production LCP/CPU readings, home texts as slots.
-**Next:** Joël's review of D → wrap-up PRs (03a then 03b, squash) → launch decisions (content validated, real photos, `SITE_INDEXABLE=1`) → Phase 04.
+## Previous phase: 03 — Parish Life (merged into main, deployed 2026-10-22)
+Full details: `docs/phases/PHASE_03_REPORT.md`.
 
 ## Previous phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep)
 
