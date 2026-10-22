@@ -67,4 +67,4 @@ persistent mini-player with Media Session, the podcast RSS. All parked in 0034 f
   breadcrumbs JSON-LD), search results, sitemap, home « Dernière prédication » (static page + tiny script).
 - **Tests:** 7 unit tests (links, YouTube parsing, input); route-table and boundaries tests green; `pnpm check` 81/81.
 - **Not done / to decide:** a series has no page of its own (the list is filtered by `?series=`); « Quick-create from a Sunday »
-  is a picker inside the editor, not a button on the Sunday; page weights and CPU for the new pages are not measured yet.
+  is a picker inside the editor, not a button on the Sunday; weights (production build, lab profile 4× CPU, slow 4G): list JS 16.1 KB gz / 150 KB first load, sermon page 15 KB / 144 KB, third-party 0; the home 16.6 KB / 209 KB. LCP 2.7–3.2 s on the new pages in this lab run (warm local workerd, dev database): above 2.5 s, to read again on a real phone.
