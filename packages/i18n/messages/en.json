@@ -1044,7 +1044,9 @@
       "audit": "Activity log",
       "outbox": "Outbox",
       "ui": "Design guide",
-      "account": "My account"
+      "account": "My account",
+      "validate": "To validate",
+      "help": "Help"
     },
     "user": {
       "menu": "Account menu",
@@ -1299,7 +1301,46 @@
       "broke_text": "Something went wrong. Please try again in a moment.",
       "retry": "Try again"
     },
-    "loading": "Loading"
+    "loading": "Loading",
+    "validate": {
+      "title": "To validate",
+      "lead": "Information waiting to be checked before it appears on the site: times, address, numbers, figures, texts. Validate what is right, or ask for a correction.",
+      "empty_title": "Nothing to validate",
+      "empty_text": "Everything ready has been checked. New information will appear here.",
+      "count": "{n} to validate",
+      "approve": "Validate",
+      "approved": "Validated. The public site updates within about two minutes.",
+      "approve_error": "Validation failed. Nothing was changed.",
+      "ask": "Ask for a correction",
+      "note": "Leave a note",
+      "write": "Your message",
+      "write_help": "Simply say what is not right and, if you know it, the correct information.",
+      "send": "Send",
+      "sent": "Message saved.",
+      "send_error": "The message could not be saved.",
+      "open": "Open in the admin",
+      "see_public": "See on the site",
+      "current": "Current value",
+      "corrections": "Corrections requested",
+      "resolve": "Mark as handled",
+      "resolved": "Marked as handled.",
+      "by": "by {name}",
+      "cannot": "You can review and comment, but not validate this.",
+      "kind_correction": "Correction",
+      "kind_note": "Note",
+      "cancel": "Cancel"
+    },
+    "help": {
+      "title": "Help",
+      "lead": "Short step-by-step guides for everyday tasks. The ones that match your rights come first.",
+      "guides": "Guides",
+      "memos": "Cheat sheets to print",
+      "memos_help": "One page per role, to keep next to the computer. Open one, then click Print.",
+      "here": "Help for this screen",
+      "back": "All help",
+      "print": "Print",
+      "not_found": "This guide does not exist."
+    }
   },
   "login": {
     "title": "Sign in",

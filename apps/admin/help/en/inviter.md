@@ -1,0 +1,8 @@
+# Invite a colleague
+
+1. Open **Utilisateurs** (users), then **Inviter quelqu'un** (invite someone).
+2. Enter their name and e-mail, and choose their **role** (what they can do). For a group leader, also choose the **group**.
+3. An invitation link is created. It is in the **Boîte d'envoi**: send it to the person (valid for 72 hours).
+4. The person chooses their password through the link.
+
+> Give the smallest role that is enough. You can always widen it.

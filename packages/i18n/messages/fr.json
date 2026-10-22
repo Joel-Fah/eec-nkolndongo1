@@ -1044,7 +1044,9 @@
       "audit": "Journal d’activité",
       "outbox": "Boîte d’envoi",
       "ui": "Guide de design",
-      "account": "Mon compte"
+      "account": "Mon compte",
+      "validate": "À valider",
+      "help": "Aide"
     },
     "user": {
       "menu": "Menu du compte",
@@ -1299,7 +1301,46 @@
       "broke_text": "Quelque chose s’est mal passé. Réessayez dans un instant.",
       "retry": "Réessayer"
     },
-    "loading": "Chargement"
+    "loading": "Chargement",
+    "validate": {
+      "title": "À valider",
+      "lead": "Les informations qui attendent d’être relues avant d’apparaître sur le site : horaires, adresse, numéros, chiffres, textes. Validez ce qui est exact, ou demandez une correction.",
+      "empty_title": "Rien à valider",
+      "empty_text": "Tout ce qui est prêt a été relu. Les nouvelles informations apparaîtront ici.",
+      "count": "{n} à valider",
+      "approve": "Valider",
+      "approved": "Validé. Le site public se met à jour en deux minutes environ.",
+      "approve_error": "La validation a échoué. Rien n’a été modifié.",
+      "ask": "Demander une correction",
+      "note": "Laisser une remarque",
+      "write": "Votre message",
+      "write_help": "Dites simplement ce qui n’est pas exact et, si vous le savez, la bonne information.",
+      "send": "Envoyer",
+      "sent": "Message enregistré.",
+      "send_error": "Le message n’a pas pu être enregistré.",
+      "open": "Ouvrir dans l’administration",
+      "see_public": "Voir sur le site",
+      "current": "Valeur actuelle",
+      "corrections": "Corrections demandées",
+      "resolve": "Marquer comme traité",
+      "resolved": "Marqué comme traité.",
+      "by": "par {name}",
+      "cannot": "Vous pouvez relire et commenter, mais pas valider ceci.",
+      "kind_correction": "Correction",
+      "kind_note": "Remarque",
+      "cancel": "Annuler"
+    },
+    "help": {
+      "title": "Aide",
+      "lead": "De courts guides, pas à pas, pour les tâches de tous les jours. Ceux qui correspondent à vos droits sont en premier.",
+      "guides": "Guides",
+      "memos": "Aide-mémoire à imprimer",
+      "memos_help": "Une page par rôle, à garder à côté de l’ordinateur. Ouvrez-en un puis cliquez sur Imprimer.",
+      "here": "Aide pour cet écran",
+      "back": "Toutes les aides",
+      "print": "Imprimer",
+      "not_found": "Ce guide n’existe pas."
+    }
   },
   "login": {
     "title": "Connexion",

@@ -66,6 +66,24 @@ const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
     order: 40,
   },
   {
+    id: 'validate',
+    group: 'admin',
+    path: '/validate',
+    icon: 'shield',
+    label: 'admin.items.validate',
+    permission: 'core:validation-read',
+    order: 50,
+  },
+  {
+    id: 'help',
+    group: 'settings',
+    path: '/help',
+    icon: 'help',
+    label: 'admin.items.help',
+    permission: '',
+    order: 10,
+  },
+  {
     id: 'outbox',
     group: 'settings',
     path: '/outbox',
@@ -99,7 +117,9 @@ export function navFor(me: Me | null | undefined): NavGroup[] {
           order: n.order,
         })),
   )
-  const visible = [...core, ...fromModules].filter((i) => hasPermission(me, i.permission))
+  const visible = [...core, ...fromModules].filter(
+    (i) => !i.permission || hasPermission(me, i.permission),
+  )
   return ORDER.map((id) => ({
     id,
     label: `admin.groups.${id}` as MessageKey,

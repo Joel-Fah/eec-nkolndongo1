@@ -50,15 +50,12 @@ export function useDashboardData() {
     queryFn: () => api<{ messages: unknown[] }>('/outbox'),
     enabled: hasPermission(me, 'core:system-outbox'),
   })
-  const settings = useQuery({
-    queryKey: ['settings'],
-    queryFn: () =>
-      api<{ sections: Record<string, Record<string, { value: string; validated: boolean }>> }>(
-        '/settings',
-      ),
-    enabled: hasPermission(me, 'settings:read'),
+  const validation = useQuery({
+    queryKey: ['validation-count'],
+    queryFn: () => api<{ n: number; canApprove: number }>('/validation/count'),
+    enabled: hasPermission(me, 'core:validation-read'),
   })
-  return { me, members, media, audit, outbox, settings }
+  return { me, members, media, audit, outbox, validation }
 }
 
 /** Change between two periods: direction and a rounded percentage (null when there is nothing to compare to). */
@@ -76,7 +73,7 @@ export type Insight = {
   text: string
   n?: number
   action: string
-  to: '/outbox' | '/m/$module' | '/groups' | '/'
+  to: '/outbox' | '/validate' | '/m/$module' | '/groups' | '/'
   params?: { module: string }
 }
 
@@ -85,7 +82,7 @@ export type Insight = {
  * act on appears; when nothing needs attention, one reassuring card says so.
  */
 export function useInsights(): Insight[] {
-  const { me, members, media, outbox, settings } = useDashboardData()
+  const { me, members, media, outbox, validation } = useDashboardData()
   const out: Insight[] = []
   const pending = outbox.data?.messages.length ?? 0
   if (pending > 0)
@@ -97,22 +94,15 @@ export function useInsights(): Insight[] {
       action: 'dash.insight_outbox_do',
       to: '/outbox',
     })
-  if (settings.data) {
-    const toApprove = Object.values(settings.data.sections).reduce(
-      (n, sec) => n + Object.values(sec).filter((f) => f.value && !f.validated).length,
-      0,
-    )
-    if (toApprove > 0 && hasPermission(me, 'settings:validate'))
-      out.push({
-        key: 'validate',
-        icon: 'shield',
-        text: 'dash.insight_validate',
-        n: toApprove,
-        action: 'dash.insight_validate_do',
-        to: '/m/$module',
-        params: { module: 'settings' },
-      })
-  }
+  if (validation.data && validation.data.n > 0)
+    out.push({
+      key: 'validate',
+      icon: 'shield',
+      text: 'dash.insight_validate',
+      n: validation.data.n,
+      action: 'dash.insight_validate_do',
+      to: '/validate',
+    })
   if (media.data) {
     if (media.data.withoutAltEn > 0)
       out.push({
@@ -143,7 +133,7 @@ export function useInsights(): Insight[] {
       action: 'dash.insight_groups_do',
       to: '/groups',
     })
-  const loaded = !!(outbox.data || settings.data || media.data || members.data)
+  const loaded = !!(outbox.data || validation.data || media.data || members.data)
   if (loaded && out.length === 0)
     out.push({
       key: 'ok',

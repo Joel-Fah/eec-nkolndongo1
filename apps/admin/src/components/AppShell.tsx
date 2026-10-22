@@ -2,6 +2,7 @@ import { Menu } from '@base-ui/react/menu'
 import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { guideForPath } from '../lib/help'
 import { labelOf, navFor } from '../lib/nav'
 import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
@@ -111,6 +112,17 @@ export function AppShell() {
             <kbd className="admin-kbd">⌘K</kbd>
           </button>
           <div className="admin-topbar-tools">
+            {guideForPath(path) && (
+              <Link
+                className="btn btn-ghost btn-icon"
+                to="/help/$slug"
+                params={{ slug: guideForPath(path)?.slug ?? '' }}
+                aria-label={t('admin.help.here')}
+                title={t('admin.help.here')}
+              >
+                <Icon name="help" size={20} />
+              </Link>
+            )}
             <LocaleSwitch />
             <ThemeButton />
             <Menu.Root>

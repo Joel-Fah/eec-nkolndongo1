@@ -36,6 +36,12 @@ export const coreModule = defineModule({
     p('audit-export', 'Exporter le journal d’activité', 'Export the activity log', true),
     p('system-outbox', 'Gérer la boîte d’envoi', 'Manage the outbox'),
     p('system-design', 'Voir le guide de design', 'View the design guide'),
+    p('validation-read', 'Voir ce qui attend une validation', 'See what is waiting for validation'),
+    p(
+      'validation-comment',
+      'Demander une correction ou laisser une remarque',
+      'Ask for a correction or leave a note',
+    ),
   ],
 })
 
@@ -62,6 +68,7 @@ export const systemRoles = [
       'core:users-reset-link',
       'core:groups-read',
       'core:system-outbox',
+      'core:validation-read',
       'settings:read',
       'settings:edit',
       'news:read',
@@ -81,6 +88,31 @@ export const systemRoles = [
     descFr: 'Écrit et publie les contenus.',
     descEn: 'Writes and publishes content.',
     grants: ['core:groups-read', 'news:read', 'news:edit', 'news:publish'],
+  },
+  {
+    key: 'validateur',
+    fr: 'Validateur de contenu',
+    en: 'Content validator',
+    descFr:
+      'Relit et valide les informations avant qu’elles soient publiques (horaires, adresse, chiffres, textes). Ne publie pas d’actualités et ne change pas les rôles.',
+    descEn:
+      'Reviews and validates information before it goes public (times, address, figures, texts). Cannot publish news or change roles.',
+    grants: [
+      'core:validation-read',
+      'core:validation-comment',
+      'core:groups-read',
+      'settings:read',
+      'settings:validate',
+      'schedule:read',
+      'schedule:validate',
+      'liturgy:read',
+      'story:read',
+      'story:publish',
+      'news:read',
+      'events:read',
+      'guides:read',
+      'departments:read',
+    ],
   },
   {
     key: 'pasteur',
