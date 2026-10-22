@@ -1,0 +1,148 @@
+---
+import { shortDate } from '@eec/core/dates'
+import type { NewsItem } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+/**
+ * A card for any content item in a list (news today; events, guides… later): photo, title, summary, date.
+ * The whole card is one link. Photos come from the media library through <Picture>.
+ */
+import Picture from '../Picture.astro'
+
+interface Props {
+  item: NewsItem
+  href: string
+  featured?: boolean
+}
+const { item, href, featured = false } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const date = shortDate(item.publishedAt, locale)
+---
+
+<article class:list={['cc', featured && 'cc-featured']}>
+  {
+    item.cover && (
+      <div class="cc-photo-wrap">
+        <Picture
+        class="cc-photo"
+        media={item.cover}
+        sizes={featured ? '(min-width: 64rem) 40rem, 100vw' : '(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw'}
+        decorative
+        />
+      </div>
+    )
+  }
+  <div class="cc-body">
+    <p class="cc-meta">
+      {item.pinned && <span class="cc-pin">{t('news.site.pinned')}</span>}
+      <time datetime={item.publishedAt}>{date}</time>
+      {item.group && <span>· {item.group}</span>}
+    </p>
+    <h3 class="cc-title"><a href={href} class="cc-link">{item.title}</a></h3>
+    {item.excerpt && <p class="cc-excerpt">{item.excerpt}</p>}
+    <span class="cc-more" aria-hidden="true">{t('news.site.read_more')} →</span>
+  </div>
+</article>
+
+<style>
+  .cc {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    padding: 0.625rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    transition:
+      transform var(--duration-ui) var(--ease-out),
+      box-shadow var(--duration-ui) var(--ease-out);
+  }
+  .cc:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: var(--elevation-2);
+  }
+  .cc-photo-wrap {
+    overflow: hidden;
+    border-radius: calc(var(--radius-xl) - 0.625rem);
+  }
+  .cc :global(.cc-photo) {
+    transition: transform var(--duration-story, 0.9s) var(--ease-out);
+    aspect-ratio: 16 / 10;
+    width: 100%;
+    object-fit: cover;
+  }
+  .cc:hover :global(.cc-photo) {
+    transform: scale(1.06);
+  }
+  .cc-body {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 0.875rem 0.75rem 0.75rem;
+  }
+  .cc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .cc-pin {
+    padding-inline: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--surface-2));
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cc-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+  }
+  .cc-link {
+    text-decoration: none;
+  }
+  .cc-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .cc-link:focus-visible {
+    outline: none;
+  }
+  .cc:has(.cc-link:focus-visible) {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .cc-excerpt {
+    color: var(--ink-muted);
+  }
+  .cc-more {
+    margin-block-start: 0.25rem;
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .cc-featured {
+    grid-template-rows: none;
+  }
+  @media (min-width: 64rem) {
+    .cc-featured {
+      grid-template-columns: 1.2fr 1fr;
+    }
+    .cc-featured .cc-body {
+      align-content: center;
+      padding: 2rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cc,
+    .cc:hover {
+      transform: none;
+      transition: none;
+    }
+    .cc:hover :global(.cc-photo) {
+      transform: none;
+    }
+  }
+</style>

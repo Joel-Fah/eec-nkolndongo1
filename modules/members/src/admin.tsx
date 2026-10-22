@@ -4,9 +4,9 @@
  */
 import { Dialog } from '@base-ui/react/dialog'
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { shortDate } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
-import { formatDate } from '@eec/i18n'
-import { Badge, Button, SelectField, TextField, toastManager } from '@eec/ui/react'
+import { Avatar, Badge, Button, SelectField, TextField, toastManager } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -35,6 +35,13 @@ type Detail = Row & {
   }[]
 }
 
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((w) => w[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 const k = (key: string) => `members.${key}` as MessageKey
 
 export default function MembersPage() {
@@ -58,7 +65,7 @@ export default function MembersPage() {
     queryFn: () => api<{ items: Row[]; more: boolean }>(`/members/list?${params}&limit=${limit}`),
   })
   const items = list.data?.items ?? []
-  const date = (d: string) => formatDate(new Date(d), locale)
+  const date = (d: string) => shortDate(d, locale)
   const gname = (g: Group) => (locale === 'en' ? (g.nameEn ?? g.nameFr) : g.nameFr)
 
   const exportCsv = async () => {
@@ -155,17 +162,27 @@ export default function MembersPage() {
               </thead>
               <tbody>
                 {items.map((m) => (
-                  <tr key={m.id}>
-                    <th scope="row">
-                      <button type="button" className="link" onClick={() => setOpen(m.id)}>
-                        {m.name}
+                  <tr key={m.id} data-clickable onClick={() => setOpen(m.id)}>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-person admin-person-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setOpen(m.id)
+                        }}
+                      >
+                        <Avatar initials={initialsOf(m.name)} />
+                        <span className="grid text-start">
+                          <span className="font-medium">{m.name}</span>
+                          {m.deletionRequestedAt && (
+                            <Badge tone="warning">
+                              {t(k('deletion'), { date: date(m.deletionRequestedAt) })}
+                            </Badge>
+                          )}
+                        </span>
                       </button>
-                      {m.deletionRequestedAt && (
-                        <Badge tone="warning">
-                          {t(k('deletion'), { date: date(m.deletionRequestedAt) })}
-                        </Badge>
-                      )}
-                    </th>
+                    </td>
                     <td>{m.email}</td>
                     <td>{m.phone ?? '—'}</td>
                     <td>{date(m.joinedAt)}</td>
@@ -202,7 +219,7 @@ function DetailSheet({ id, onClose }: { id: string; onClose: () => void }) {
     queryFn: () => api<Detail>(`/members/detail/${id}`),
   })
   const d = data.data
-  const date = (v: string) => formatDate(new Date(v), locale)
+  const date = (v: string) => shortDate(v, locale)
   return (
     <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>

@@ -1,8 +1,31 @@
 # STATUS
 
-_Last updated: 2026-10-20_
+_Last updated: 2026-10-21_
 
-## Current phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep) ready for review
+## Current phase: 03a — Parish Life · Checkpoint B (events, schedule, liturgy, home) ready for review
+Branch `feat/phase-03a-content-time`. Production stays paused (dev only), nothing deployed. Plan: `docs/phases/PHASE_03_INSTRUCTIONS.md`.
+- **Checkpoint 0 done:** `cachedJson` refresh bug fixed (own connection), cache hits no longer open a DB connection (version and
+  module flags memoised), cold reads time-boxed (503, never 500), CPU figures in decision 0027, public-domain Bible verses
+  (LSG 1910 / WEB, decision 0032), CI `--env-file-if-exists` fix.
+- **Content kit:** `@eec/core` rich text (clean + render, hostile-input tests) and lifecycle; `@eec/api-kit` preview links
+  (signed, 3 days); `@eec/content-kit` (TipTap editor loaded lazily, media picker, publish dialog, revisions, autosave,
+  cover field, status badge); `content_revisions` / `content_redirects` (migration 0006); media tables moved to `@eec/db`.
+- **News module:** admin list + editor (FR/EN tabs, autosave, schedule, unpublish, archive, delete, versions, preview link,
+  group-scoped rights), public list/detail/preview pages (on demand, cached JSON), RSS, home « Dernières nouvelles »,
+  dev-only example seed (`pnpm news:seed-dev [-- --clear]`). Entries added to the living guide.
+- **Checkpoint A follow-ups (Joël's review):** richer editor (alignment, underline, strike, highlight, sub/superscript, task
+  lists, tables, indent, h2/h3), themed loading bar + spinner on navigation, new sidebar icons, visible backdrop dots on
+  illustrations (`pnpm illos:fetch --force` after pulling).
+- **Checkpoint B (built):** `events` (structured recurrence, cancelled/moved dates, admin list + month calendar, public list /
+  month / event page, `.ics` and subscribable feed, decision 0029), `schedule` (approved slots, planned changes,
+  `nextService()`, week view, per-slot `.ics`), `liturgy` (Sundays with consent-gated names, season texts, verses, verse of the
+  day, « Ce dimanche » page, liturgical-year dial), home « Ce dimanche » / « Prochainement » / « Dernières nouvelles » (static
+  home + cached JSON), Agenda menu highlight. Shared `contentRoutes` factory in api-kit (news and events use it).
+  Dev seed: `pnpm content:seed-dev [-- --clear]` (fictional « Exemple — … » data only).
+- **Next:** 03b (departments, guides, story pages, council, search, contact, giving, legal, launch readiness). **Open:** real CPU reading on production, TipTap chunk is
+  125 KB gz (admin only), news permissions are not added to existing roles in a database already seeded (grant in Rôles).
+
+## Previous phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep)
 
 ## Checkpoint C — built (2026-10-20), waiting for Joël's review
 - **Media library** (`modules/media`, decision 0020): S3-compatible store (Neon Object Storage, bucket `eec-media`), photos
@@ -51,6 +74,12 @@ admin shell is Google-Cloud style (fixed sidebar + top bar, rounded join, left-a
 admin login with a random photo and the logo always with the parish name; menu shows the current page's
 illustration by default; new Storyset illustrations for news, sermons, meditations, events, home.
 Google sign-in: members can link Google to an existing password account; staff are still refused.
+
+## Round 5 UI (2026-10-21, Joël's feedback before B approval)
+- Home « Ce dimanche » smaller with time tile; cherry blossom keeps its white flowers (recoloured to our palette; its background layer had been dropped). Immersive « Ce dimanche » page.
+- Events page: filters and List/Month change results without reloading; sticky week index. Liturgical dial: arc scales on selection.
+- Editor: max height inline, rounded tables, fullscreen header/labels/popovers; liturgy grid + icon remove; schedule sorted by time.
+- Next: Checkpoint B approved after these → start 03b (C: departments, guides, pages, council; D: search, contact, giving, legal).
 
 ## Checkpoint B — done, waiting for Joël's review (2026-10-20)
 - Module system: `modules/` workspace, registry (+ API mounts, admin menu, permission seed, i18n merge),

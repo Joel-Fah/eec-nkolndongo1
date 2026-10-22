@@ -9,15 +9,15 @@ import {
   audit,
   bumpContentVersion,
   cachedJson,
-  contentVersion,
   fail,
   requirePermission,
+  versionFor,
 } from '@eec/api-kit'
+import { type MediaVariant, mediaFiles, mediaUsages } from '@eec/db/schema'
 import { and, desc, eq, ilike, notExists, or, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
 import { LIMITS, type MediaKind, mediaKey, sniff } from './rules.ts'
-import { type MediaVariant, mediaFiles, mediaUsages } from './schema.ts'
 import { createStore } from './store.ts'
 
 const QUOTA = 5 * 1024 * 1024 * 1024 // Neon Object Storage, Free plan
@@ -118,16 +118,12 @@ async function creditsOf(db: Awaited<ReturnType<AppEnv['Variables']['deps']['db'
 export const mediaApi = new Hono<AppEnv>()
   // Anonymous and edge-cached: the names behind the photos (footer « Photos : Pexels » → credits page).
   .get('/credits', async (c) => {
-    const db = await c.var.deps.db().catch(() => null)
-    const version = db ? await contentVersion(db, 'media').catch(() => 0) : 0
+    const version = await versionFor(c.var.deps.db, 'media', c.var.deps.timeoutMs)
     return cachedJson(c, {
       key: `media/credits/v${version}`,
       ttl: 300,
       keep: 60 * 60 * 24 * 7,
-      load: async () => {
-        if (!db) throw new Error('database unavailable')
-        return creditsOf(db)
-      },
+      load: (fresh) => creditsOf(fresh),
     })
   })
   .get('/', requirePermission('media:read'), async (c) => {

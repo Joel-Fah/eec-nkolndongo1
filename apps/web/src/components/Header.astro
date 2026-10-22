@@ -1,6 +1,7 @@
 ---
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
+import { eventsListHref } from '../lib/events-routes'
 import { localeOf, useT } from '../lib/i18n'
 import { alternates, descKey, href, labelKey, pages, tabKey, tabs } from '../lib/nav'
 import SiteLockup from './SiteLockup.astro'
@@ -61,6 +62,17 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                               </li>
                             )
                           })}
+                          {
+                            tab.id === 'calendar' && (
+                              <li>
+                                <a class="mega-next" data-next-event data-locale={locale} data-base={eventsListHref(locale)} href={eventsListHref(locale)} hidden>
+                                  <span class="mega-next-kicker">{t('events.site.upcoming_t')}</span>
+                                  <strong data-next-title />
+                                  <span data-next-when class="mega-next-when" />
+                                </a>
+                              </li>
+                            )
+                          }
                         </ul>
                         {/* One illustration per item, cropped by the panel; the hovered/focused item's one shows. */}
                         <aside class="mega-art" aria-hidden="true">
@@ -151,8 +163,10 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 </header>
 
 <script>
+  import { wireNextEvent } from '../lib/upcoming-client'
   import { initHeader } from '../scripts/header'
   document.addEventListener('astro:page-load', initHeader)
+  document.addEventListener('astro:page-load', wireNextEvent)
 </script>
 
 <style is:global>
@@ -344,6 +358,29 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     gap: 0.75rem;
+  }
+  .mega-next {
+    display: grid;
+    gap: 0.125rem;
+    margin-block-start: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--gold-soft, var(--primary-soft));
+    text-decoration: none;
+  }
+  .mega-next[hidden] {
+    display: none;
+  }
+  .mega-next-kicker {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+  .mega-next-when {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
   }
   .mega-list {
     display: grid;

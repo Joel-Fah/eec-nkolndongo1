@@ -1,0 +1,10 @@
+---
+import EventsListPage from '../../../../components/content/EventsListPage.astro'
+import { rightEventsPath } from '../../../../lib/events-routes'
+
+export const prerender = false
+if (!rightEventsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<EventsListPage />

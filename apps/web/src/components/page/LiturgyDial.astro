@@ -1,0 +1,228 @@
+---
+/**
+ * The liturgical year as a dial (pages.md): a ring with one arc per season at its real length this year, today's
+ * mark, and a panel with the selected season's text and the coming Sundays of that season. Pure SVG and a small
+ * vanilla script (scripts/liturgy-dial.ts): drag around the ring, arrow keys, or the previous/next buttons. Without
+ * JavaScript the season cards below stay, and nothing here is needed. Approved season texts come from the cached API.
+ */
+import { civilDateIn, getSeason, seasonRanges } from '@eec/core'
+import { localeOf, useT } from '../../lib/i18n'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const now = new Date()
+const today = civilDateIn(now)
+const current = getSeason(now)
+const utc = (d: { year: number; month: number; day: number }) =>
+  Date.UTC(d.year, d.month - 1, d.day)
+const dayOf = (d: { year: number; month: number; day: number }) =>
+  (utc(d) - Date.UTC(d.year, 0, 1)) / 86_400_000
+const yearLength = dayOf({ year: today.year, month: 12, day: 31 }) + 1
+const ranges = seasonRanges(today.year)
+const R = 78
+const C = 100
+const point = (frac: number) => {
+  const a = frac * Math.PI * 2 - Math.PI / 2
+  return [C + R * Math.cos(a), C + R * Math.sin(a)] as const
+}
+const arcs = ranges.map((r) => {
+  const from = dayOf(r.from) / yearLength
+  const to = (dayOf(r.to) + 1) / yearLength
+  const gap = 0.004
+  const [x1, y1] = point(from + gap)
+  const [x2, y2] = point(to - gap)
+  const large = to - from > 0.5 ? 1 : 0
+  return {
+    season: r.season,
+    d: `M${x1.toFixed(2)} ${y1.toFixed(2)}A${R} ${R} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`,
+    from,
+    to,
+    title: t(`season.${r.season}` as 'season.avent'),
+    text: t(`pages.liturgie.season_${r.season}` as 'pages.liturgie.season_avent'),
+  }
+})
+const [tx, ty] = point((dayOf(today) + 0.5) / yearLength)
+const months = Array.from({ length: 12 }, (_, m) => ({
+  label: new Intl.DateTimeFormat(locale, { month: 'narrow' }).format(
+    new Date(Date.UTC(2026, m, 15)),
+  ),
+  at: point((m + 0.5) / 12),
+}))
+// A season can appear twice in the year (Ordinaire, Noël): the dial lists each arc, selection works per arc.
+---
+
+<div class="dial" data-dial data-locale={locale} data-current={current} hidden>
+  <div class="dial-stage">
+    <svg viewBox="0 0 200 200" class="dial-svg" data-dial-svg aria-hidden="true">
+      {arcs.map((a, i) => <path class="dial-arc" data-season={a.season} data-i={i} data-from={a.from} data-to={a.to} d={a.d} />)}
+      {months.map((m) => <text class="dial-month" x={m.at[0] + (m.at[0] - C) * 0.28} y={m.at[1] + (m.at[1] - C) * 0.28 + 2} text-anchor="middle">{m.label}</text>)}
+      <circle class="dial-today" cx={tx} cy={ty} r="4.5" />
+    </svg>
+    <div class="dial-center">
+      <p class="dial-name" data-dial-name aria-live="polite"></p>
+      <p class="dial-now">{t('pages.liturgie.now', { season: t(`season.${current}` as 'season.avent') })}</p>
+    </div>
+  </div>
+  <div class="dial-controls" role="radiogroup" aria-label={t('liturgy.site.dial_label')}>
+    <button type="button" class="btn btn-secondary btn-icon" data-dial-prev aria-label={t('liturgy.site.prev')}>←</button>
+    {arcs.map((a, i) => <button type="button" role="radio" class="dial-chip" data-season={a.season} data-i={i} data-text={a.text} data-title={a.title} aria-checked="false" tabindex="-1"><span class="dial-dot" aria-hidden="true"></span>{a.title}</button>)}
+    <button type="button" class="btn btn-secondary btn-icon" data-dial-next aria-label={t('liturgy.site.next')}>→</button>
+  </div>
+  <div class="dial-panel" data-dial-panel data-season={current}>
+    <h3 class="dial-panel-title" data-dial-title></h3>
+    <p class="dial-panel-text" data-dial-text></p>
+    <p class="dial-panel-parish" data-dial-parish hidden></p>
+    <h4 class="dial-sundays-title" data-dial-sundays-title hidden>{t('liturgy.site.sundays_of_season')}</h4>
+    <ul class="dial-sundays" data-dial-sundays></ul>
+  </div>
+</div>
+
+<script>
+  import { initDial } from '../../scripts/liturgy-dial'
+  initDial()
+  document.addEventListener('astro:page-load', initDial)
+</script>
+
+<style is:global>
+  .dial {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: center;
+  }
+  .dial[hidden] {
+    display: none;
+  }
+  .dial-stage {
+    position: relative;
+    width: min(100%, 24rem);
+    aspect-ratio: 1;
+    touch-action: none;
+  }
+  .dial-svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  .dial-arc {
+    fill: none;
+    stroke: var(--season);
+    stroke-width: 22;
+    stroke-linecap: butt;
+    opacity: 0.45;
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    transition:
+      opacity var(--duration-ui) var(--ease-out),
+      stroke-width var(--duration-ui) var(--ease-out),
+      transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* The chosen period swells outwards from the centre, with a small spring; the others settle back. */
+  .dial-arc[data-selected] {
+    opacity: 1;
+    stroke-width: 26;
+    transform: scale(1.07);
+  }
+  .dial-panel-swap {
+    animation: dial-swap 0.4s var(--ease-out);
+  }
+  @keyframes dial-swap {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+  .dial-month {
+    font-size: 7px;
+    fill: var(--ink-muted);
+  }
+  .dial-today {
+    fill: var(--ink);
+    stroke: var(--surface);
+    stroke-width: 2;
+  }
+  .dial-center {
+    position: absolute;
+    inset: 24%;
+    display: grid;
+    place-content: center;
+    gap: 0.25rem;
+    text-align: center;
+    pointer-events: none;
+  }
+  .dial-name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.15;
+  }
+  .dial-now {
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .dial-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .dial-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    cursor: pointer;
+  }
+  .dial-chip[aria-checked="true"] {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent);
+  }
+  .dial-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .dial-panel {
+    display: grid;
+    gap: 0.5rem;
+    width: min(100%, 40rem);
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1), inset 0 0 0 2px color-mix(in oklab, var(--season) 40%, transparent);
+  }
+  .dial-panel-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .dial-sundays-title {
+    margin-block-start: 0.5rem;
+    font-weight: 600;
+  }
+  .dial-sundays {
+    display: grid;
+    gap: 0.375rem;
+  }
+  .dial-sundays a {
+    color: var(--primary);
+  }
+  [data-dial-enhanced] ~ .pv-seasons-list,
+  .pv-seasons-list[hidden] {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dial-arc {
+      transition: none;
+    }
+    .dial-arc[data-selected] {
+      transform: none;
+    }
+    .dial-panel-swap {
+      animation: none;
+    }
+  }
+</style>

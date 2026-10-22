@@ -1,0 +1,43 @@
+{
+  "name": "@eec/content-kit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./editor": "./src/editor.tsx",
+    "./content.css": "./src/content.css"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "@eec/admin-kit": "workspace:*",
+    "@eec/core": "workspace:*",
+    "@eec/i18n": "workspace:*",
+    "@eec/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.4",
+    "@tiptap/core": "3.32.0",
+    "@tiptap/extension-highlight": "3.32.0",
+    "@tiptap/extension-list": "3.32.0",
+    "@tiptap/extension-placeholder": "3.32.0",
+    "@tiptap/extension-subscript": "3.32.0",
+    "@tiptap/extension-superscript": "3.32.0",
+    "@tiptap/extension-table": "3.32.0",
+    "@tiptap/extension-text-align": "3.32.0",
+    "@tiptap/pm": "3.32.0",
+    "@tiptap/react": "3.32.0",
+    "@tiptap/starter-kit": "3.32.0",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

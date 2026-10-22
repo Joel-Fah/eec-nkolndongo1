@@ -64,6 +64,9 @@ export const systemRoles = [
       'core:system-outbox',
       'settings:read',
       'settings:edit',
+      'news:read',
+      'news:edit',
+      'news:publish',
     ],
   },
   {
@@ -72,7 +75,16 @@ export const systemRoles = [
     en: 'Editor',
     descFr: 'Écrit et publie les contenus.',
     descEn: 'Writes and publishes content.',
-    grants: ['core:groups-read'],
+    grants: ['core:groups-read', 'news:read', 'news:edit', 'news:publish'],
+  },
+  {
+    key: 'pasteur',
+    fr: 'Pasteur',
+    en: 'Pastor',
+    descFr:
+      'Un pasteur ou une pasteure. Sans droit d’administration : sert à proposer les noms pour la prédication.',
+    descEn: 'A pastor. No admin rights: used to suggest names for preaching.',
+    grants: [] as string[],
   },
   {
     key: 'responsable-groupe',
@@ -80,7 +92,7 @@ export const systemRoles = [
     en: 'Group leader',
     descFr: 'Gère un groupe précis (à attribuer avec le groupe).',
     descEn: 'Manages one specific group (grant it with the group).',
-    grants: ['core:groups-read'],
+    grants: ['core:groups-read', 'news:read', 'news:edit'],
   },
   {
     key: 'tresorier',

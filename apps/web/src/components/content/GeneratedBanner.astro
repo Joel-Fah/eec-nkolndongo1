@@ -1,0 +1,81 @@
+---
+/**
+ * A banner drawn from a seed (the event's address) for items with no photo: soft circles, rings, waves and a dotted
+ * field in our theme colours, never the same twice and always the same for the same seed. Decorative only
+ * (aria-hidden). Colours are tokens, so light/dark and the liturgical season apply by themselves.
+ */
+interface Props {
+  seed: string
+  tone?: 'primary' | 'info' | 'gold' | 'clay' | 'success'
+  class?: string
+}
+const { seed, tone = 'primary', class: className } = Astro.props
+
+// A small deterministic random generator (mulberry32) seeded by a string hash.
+let h = 1779033703
+for (const ch of seed) h = (Math.imul(h ^ ch.charCodeAt(0), 3432918353) << 13) | (h >>> 19)
+const rand = () => {
+  h = Math.imul(h ^ (h >>> 16), 2246822507)
+  h = Math.imul(h ^ (h >>> 13), 3266489909)
+  h ^= h >>> 16
+  return (h >>> 0) / 4294967296
+}
+const between = (a: number, b: number) => a + rand() * (b - a)
+function pick(xs: string[]): string {
+  return xs[Math.floor(rand() * xs.length)] as string
+}
+const W = 1200
+const H = 480
+const palette = ['var(--primary)', 'var(--gold)', 'var(--clay)', 'var(--season)']
+const main = {
+  primary: 'var(--primary)',
+  info: 'var(--info, var(--primary))',
+  gold: 'var(--gold)',
+  clay: 'var(--clay)',
+  success: 'var(--success, var(--primary))',
+}[tone]
+
+const circles = Array.from({ length: 4 }, () => ({
+  cx: between(0, W),
+  cy: between(-40, H + 40),
+  r: between(70, 230),
+  fill: pick([main, ...palette]),
+  o: between(0.1, 0.32),
+}))
+const rings = Array.from({ length: 3 }, () => ({
+  cx: between(100, W - 100),
+  cy: between(40, H - 40),
+  r: between(60, 170),
+  stroke: pick([main, ...palette]),
+  w: between(8, 22),
+  o: between(0.18, 0.4),
+}))
+// A soft wave across the lower part.
+const amp = between(30, 70)
+const y0 = between(H * 0.62, H * 0.78)
+const wave = `M0 ${y0.toFixed(0)} C ${(W * 0.25).toFixed(0)} ${(y0 - amp).toFixed(0)}, ${(W * 0.5).toFixed(0)} ${(y0 + amp).toFixed(0)}, ${(W * 0.75).toFixed(0)} ${y0.toFixed(0)} S ${W} ${(y0 - amp / 2).toFixed(0)}, ${W} ${(y0 - amp / 3).toFixed(0)} V ${H} H 0 Z`
+const dots = { x: between(40, W - 380), y: between(30, H - 220), cols: 9, rows: 6, gap: 26 }
+const arcs = Array.from({ length: 2 }, () => ({
+  x: between(0, W),
+  y: between(0, H),
+  r: between(150, 320),
+  start: between(0, 360),
+}))
+---
+
+<svg class:list={['gen-banner', className]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <rect width={W} height={H} class="gen-bg" style={`fill:color-mix(in oklab, ${main} 14%, var(--surface))`} />
+  {circles.map((c) => <circle cx={c.cx.toFixed(0)} cy={c.cy.toFixed(0)} r={c.r.toFixed(0)} style={`fill:${c.fill};opacity:${c.o.toFixed(2)}`} />)}
+  {rings.map((r) => <circle cx={r.cx.toFixed(0)} cy={r.cy.toFixed(0)} r={r.r.toFixed(0)} style={`fill:none;stroke:${r.stroke};stroke-width:${r.w.toFixed(0)};opacity:${r.o.toFixed(2)}`} />)}
+  {arcs.map((a) => <path d={`M${(a.x + a.r).toFixed(0)} ${a.y.toFixed(0)} A ${a.r.toFixed(0)} ${a.r.toFixed(0)} 0 0 1 ${a.x.toFixed(0)} ${(a.y + a.r).toFixed(0)}`} style={`fill:none;stroke:${main};stroke-width:3;stroke-dasharray:2 14;stroke-linecap:round;opacity:0.5`} transform={`rotate(${a.start.toFixed(0)} ${a.x.toFixed(0)} ${a.y.toFixed(0)})`} />)}
+  {Array.from({ length: dots.rows }, (_, r) => Array.from({ length: dots.cols }, (_, c) => <circle cx={dots.x + c * dots.gap} cy={dots.y + r * dots.gap} r="3" style={`fill:${main};opacity:0.35`} />))}
+  <path d={wave} style={`fill:${main};opacity:0.22`} />
+</svg>
+
+<style>
+  .gen-banner {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

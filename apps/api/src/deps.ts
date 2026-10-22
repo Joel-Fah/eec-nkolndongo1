@@ -1,7 +1,7 @@
 import type { AppEnv, Deps } from '@eec/api-kit'
 import { dbUrl } from '@eec/api-kit'
 import { createAuth, isStaff, loadPrincipal, slideSession } from '@eec/auth'
-import { connect, schema } from '@eec/db'
+import { connect, type Db, schema } from '@eec/db'
 import type { MiddlewareHandler } from 'hono'
 import { POLICY_VERSION } from './routes/members.ts'
 
@@ -52,7 +52,23 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
     return actor ?? null
   }
 
-  c.set('deps', { db, auth: getAuth, actor: getActor })
+  // For work that outlives the response (stale-while-revalidate): the request's connection is closed by then.
+  const withDb = async <R>(fn: (db: Db) => Promise<R>) => {
+    const own = await connect(dbUrl(c.env))
+    try {
+      return await fn(own.db)
+    } finally {
+      await own.close().catch(() => {})
+    }
+  }
+
+  c.set('deps', {
+    db,
+    withDb,
+    timeoutMs: c.env.HYPERDRIVE ? 1500 : 8000,
+    auth: getAuth,
+    actor: getActor,
+  })
   try {
     await next()
   } finally {

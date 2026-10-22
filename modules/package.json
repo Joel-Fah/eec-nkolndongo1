@@ -12,16 +12,23 @@
     "lint": "biome check .",
     "typecheck": "tsc",
     "test": "vitest run boundaries",
-    "db:seed": "node --env-file=../.env.local cli/seed.ts"
+    "db:seed": "node --env-file-if-exists=../.env.local cli/seed.ts",
+    "content:seed-dev": "node --env-file-if-exists=../.env.local cli/seed-dev-content.ts"
   },
   "dependencies": {
     "@eec/api-kit": "workspace:*",
     "@eec/auth": "workspace:*",
+    "@eec/core": "workspace:*",
     "@eec/db": "workspace:*",
+    "@eec/module-liturgy": "workspace:*",
     "@eec/module-media": "workspace:*",
+    "@eec/module-events": "workspace:*",
     "@eec/module-members": "workspace:*",
+    "@eec/module-news": "workspace:*",
+    "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",
     "@eec/modules-kit": "workspace:*",
+    "drizzle-orm": "0.45.4",
     "hono": "4.13.13",
     "react": "catalog:"
   },

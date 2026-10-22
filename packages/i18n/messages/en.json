@@ -116,6 +116,10 @@
       "credits": {
         "label": "Photo credits",
         "desc": "Who took the site’s photos."
+      },
+      "dimanche": {
+        "label": "This Sunday",
+        "desc": "The theme, readings and service of the coming Sunday."
       }
     },
     "main": "Main menu",
@@ -637,6 +641,76 @@
         "use": "lib/shapes.ts: a ratio (ar) and a path (defs) per shape; clip-path: url(#id) with clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Decorative: the content and alternative text are those of the cut image; no information is carried by the shape.",
         "demo": "Every available shape."
+      },
+      "contentcard": {
+        "name": "Content card",
+        "desc": "The card for any list of content (news today; events and guides next): photo, date, title, summary. The whole card is one link; the first post can be featured, shown large. It lifts gently on hover.",
+        "use": "<ContentCard item href featured? />. Photos come from the media library through <Picture>. The group and the « Featured » pin show when present.",
+        "a11y": "One link per card (the title) with an extended hit area, visible focus around the whole card, no motion with reduced motion.",
+        "demo_title": "An example title",
+        "demo_text": "An example summary in one sentence, for the list."
+      },
+      "unavailable": {
+        "name": "Content unavailable",
+        "desc": "What a visitor sees when the database is slow or unreachable: plain words and a « Try again » button. Never an error page (decision 0027).",
+        "use": "<UnavailableState /> in place of the list or text. The page answers 503 and is not cached.",
+        "a11y": "role=status, jargon-free message, 44 px button."
+      },
+      "langfallback": {
+        "name": "Language note",
+        "desc": "When a text does not exist in English yet, the French version is shown with this note above the title.",
+        "use": "<LangFallbackNote /> when the API returns fallback = true.",
+        "a11y": "role=note, contrast checked in both themes."
+      },
+      "editor": {
+        "name": "Text editor (admin)",
+        "desc": "A simple editor for writers: bold, italic, section heading, lists, quote, link, library photo, undo/redo. It produces only what the site can display; it loads only when someone writes (never on the public site).",
+        "use": "Lazy import of @eec/content-kit/editor. The text is a small JSON document (@eec/core richtext), cleaned again on the server.",
+        "a11y": "Labelled toolbar, 44 px buttons with pressed state, text area announced as such, links refused unless https, mailto or tel.",
+        "demo": "Open a news post in the admin to try it."
+      },
+      "publishflow": {
+        "name": "Draft, publish, versions",
+        "desc": "The flow shared by all content: autosave (« Saved »), a Publish button (now or on a date, with an optional end date), a secret 3-day preview link, restorable earlier versions, archiving. Status labels are the same everywhere.",
+        "use": "@eec/content-kit: useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
+        "a11y": "Status announced with aria-live, dialogs with focus trap and Esc, problems before publishing listed in plain words.",
+        "demo": "Visible in the admin, on every news post."
+      },
+      "generatedbanner": {
+        "name": "Banner generated",
+        "desc": "An abstract pattern in the event type’s colours, used when an event has no image. It carries the type icon and stays decorative.",
+        "use": "<GeneratedBanner kind=\"culte\" /> at the top of an event page without a photo.",
+        "a11y": "Decorative: aria-hidden, no information carried by colour alone."
+      },
+      "guardeddialog": {
+        "name": "Guarded dialog",
+        "desc": "A form dialog that asks for confirmation before discarding changes (Esc, outside click, Close button).",
+        "use": "<GuardedDialog dirty> from @eec/content-kit around admin forms.",
+        "a11y": "Focus trapped, Esc works, the confirmation receives focus."
+      },
+      "viewtoggle": {
+        "name": "View toggle",
+        "desc": "Two or three icon-and-label buttons to switch views (list / grid, list / month). On the public site the change happens without reloading the page.",
+        "use": "<ViewToggle> in the admin; data-ev-nav links on the events page.",
+        "a11y": "aria-current on the active view; without JavaScript they are plain links."
+      },
+      "shortcuttip": {
+        "name": "Shortcut tooltip",
+        "desc": "On hover or focus of a button, a bubble shows its name and keyboard shortcut as styled keys (Kbd).",
+        "use": "<ShortcutTip label=\"Bold\" keys=\"Ctrl B\"> around a button.",
+        "a11y": "Also shown on keyboard focus; the button keeps its aria-label."
+      },
+      "fullscreeneditor": {
+        "name": "Full-screen editor",
+        "desc": "The text editor goes full screen without losing content: fixed toolbar with labels, document title with a back button, word and character counts.",
+        "use": "The editor’s full-screen button; the back arrow or Esc leaves it.",
+        "a11y": "Menus and dialogs open above the full-screen layer; reduced motion removes the animation."
+      },
+      "weektoc": {
+        "name": "Week index",
+        "desc": "On the events page a sticky index lists the weeks shown and highlights the one on screen. Hidden on mobile.",
+        "use": "Appears from three weeks; anchor links #ev-<date>.",
+        "a11y": "Labelled navigation, aria-current on the visible week."
       }
     },
     "rules": {
@@ -726,8 +800,8 @@
     "start2_p": "Choir, youth, the Women’s Union, catechism: there is a group to serve, learn and share.",
     "start3_t": "Get to know us",
     "start3_p": "What we believe, what gathers us, and the way to join us.",
-    "verse": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
-    "verse_cite": "Matthew 11:28",
+    "verse": "Come to me, all you who labor and are heavily burdened, and I will give you rest.",
+    "verse_cite": "Matthew 11:28 · WEB",
     "title_a": "A family that sings, prays",
     "title_b": "and moves forward",
     "cta_visit": "Come on Sunday",
@@ -1093,7 +1167,8 @@
       "broke_title": "A hiccup on our side",
       "broke_text": "Something went wrong. Please try again in a moment.",
       "retry": "Try again"
-    }
+    },
+    "loading": "Loading"
   },
   "login": {
     "title": "Sign in",
@@ -1457,13 +1532,13 @@
       "text": "Your account doesn’t have access to this page. If this is a mistake, talk to the secretariat."
     },
     "quotes": {
-      "v1": "Come to me, all of you who are tired and have heavy loads. I will give you rest.",
+      "v1": "Come to me, all you who labor and are heavily burdened, and I will give you rest.",
       "v1_cite": "Matthew 11:28",
-      "v2": "The Lord is my shepherd. I have everything I need.",
+      "v2": "Yahweh is my shepherd: I shall lack nothing.",
       "v2_cite": "Psalm 23:1",
-      "v3": "God loved the world so much that he gave his only Son. God gave his Son so that every person who believes in him may have eternal life and never be lost.",
+      "v3": "For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.",
       "v3_cite": "John 3:16",
-      "v4": "Be strong and brave! Don’t be afraid, because the Lord your God will be with you everywhere you go.",
+      "v4": "Haven’t I commanded you? Be strong and courageous. Don’t be afraid. Don’t be dismayed, for Yahweh your God is with you wherever you go.",
       "v4_cite": "Joshua 1:9"
     }
   },
@@ -1585,8 +1660,8 @@
     "credits_p": "The names behind the images on this site."
   },
   "bible": {
-    "pdv": "Parole de Vie",
-    "etr": "Easy-to-Read Version"
+    "lsg": "LSG",
+    "web": "WEB"
   },
   "dash": {
     "trend_up": "Up by",
@@ -1623,5 +1698,121 @@
     "qa_settings": "Settings",
     "qa_outbox": "Outbox",
     "qa_activity": "Recent activity"
+  },
+  "content": {
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "save": {
+      "dirty": "Changes waiting…",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Not saved. Trying again…"
+    },
+    "editor": {
+      "toolbar": "Formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "heading": "Section heading",
+      "bullets": "Bulleted list",
+      "numbers": "Numbered list",
+      "quote": "Quote",
+      "link": "Link",
+      "photo": "Photo from the library",
+      "undo": "Undo",
+      "redo": "Redo",
+      "link_label": "Link address",
+      "link_apply": "Apply",
+      "link_remove": "Remove link",
+      "link_invalid": "This link is not accepted. Use an https:// address, an email (mailto:) or a phone number (tel:).",
+      "underline": "Underline",
+      "strike": "Strikethrough",
+      "highlight": "Highlight",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "align_left": "Align left",
+      "align_center": "Center",
+      "align_right": "Align right",
+      "align_justify": "Justify",
+      "heading3": "Subheading",
+      "tasks": "Task list",
+      "indent_more": "Increase indent",
+      "indent_less": "Decrease indent",
+      "table": "Insert a table",
+      "row_add": "Add a row below",
+      "col_add": "Add a column to the right",
+      "row_del": "Delete the row",
+      "col_del": "Delete the column",
+      "table_del": "Delete the table",
+      "group_text": "Text",
+      "group_block": "Paragraph",
+      "group_insert": "Insert",
+      "group_table": "Table",
+      "headings": "Headings",
+      "alignments": "Alignment",
+      "paragraph": "Paragraph",
+      "full": "Full screen",
+      "exit_full": "Exit full screen",
+      "count_words": "{n} words",
+      "count_chars": "{n} characters",
+      "count_nospace": "{n} without spaces",
+      "untitled": "Untitled",
+      "table_rows": "Rows",
+      "table_cols": "Columns",
+      "table_insert": "Insert",
+      "table_dim": "{rows} × {cols}"
+    },
+    "picker": {
+      "title": "Choose a photo",
+      "search": "Search for a photo",
+      "search_ph": "Name or description",
+      "empty": "No photo found",
+      "empty_help": "Add photos in the media library, then come back here.",
+      "no_alt": "No description",
+      "cancel": "Cancel"
+    },
+    "cover": {
+      "label": "Main photo",
+      "none": "No photo chosen.",
+      "choose": "Choose a photo",
+      "change": "Change",
+      "remove": "Remove"
+    },
+    "publish": {
+      "title": "Publish",
+      "title_change": "Change the dates",
+      "when": "When?",
+      "now": "Now",
+      "later": "Later, on a day and time I choose",
+      "from": "Visible from",
+      "until": "Take off the site on (optional)",
+      "until_help": "After this date the page is no longer visible, but it stays in your archive.",
+      "confirm_now": "Publish now",
+      "confirm_later": "Schedule",
+      "problem_title": "Add a title.",
+      "problem_body": "Add some text.",
+      "problem_dates": "The end date must come after the publishing date."
+    },
+    "revisions": {
+      "title": "Earlier versions",
+      "lead": "The text is kept at every publication and from time to time while you write. Restoring also keeps the current version.",
+      "empty": "No saved version yet.",
+      "restore": "Restore",
+      "close": "Close",
+      "words": "{n} words",
+      "reason_autosave": "Automatic save",
+      "reason_publish": "Publication",
+      "reason_before-restore": "Before a restore",
+      "reason_save": "Save"
+    },
+    "guard": {
+      "title": "Discard what you typed?",
+      "text": "What you filled in is not saved. If you leave now, you will lose it.",
+      "stay": "Keep filling",
+      "leave": "Discard"
+    }
   }
 }

@@ -1,0 +1,13 @@
+---
+import NewsDetailPage from '../../../../components/content/NewsDetailPage.astro'
+import { rightPath } from '../../../../lib/news-routes'
+
+export const prerender = false
+if (!rightPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+const { slug } = Astro.params
+// Preview links: /<list>/apercu/?t=<signed token>
+const token = slug === 'apercu' ? (Astro.url.searchParams.get('t') ?? '') : undefined
+---
+
+<NewsDetailPage slug={slug} token={token} />

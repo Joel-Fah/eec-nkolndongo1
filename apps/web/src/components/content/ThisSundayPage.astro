@@ -1,0 +1,345 @@
+---
+/**
+ * « Ce dimanche »: the coming Sunday (or today's until 14:00): season colour, name, theme, readings, the service
+ * time (approved schedule only), and the other published Sundays. People's names appear only when the API says they
+ * agreed. Data: cached public API; on a cold database a friendly state, never a 500.
+ */
+import { shortDate } from '@eec/core/dates'
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import UnavailableState from './UnavailableState.astro'
+
+type Sunday = {
+  date: string
+  season: string
+  name: string
+  theme: string
+  readings: { label: string }[]
+  preacher: string
+  liturgist: string
+  hymns: string
+  notes: string
+  holySupper: boolean
+  published: boolean
+}
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const label = (key: string, vars?: Record<string, string>) =>
+  t(`liturgy.site.${key}` as 'liturgy.site.title', vars)
+const [cur, list, next, verse] = await Promise.all([
+  publicJson<Sunday>(Astro, `/api/liturgy/public/sunday?locale=${locale}`),
+  publicJson<{ current: string; items: Sunday[] }>(
+    Astro,
+    `/api/liturgy/public/sundays?locale=${locale}`,
+  ),
+  publicJson<{ next: { startsAt: string; kind: string; when: string } | null }>(
+    Astro,
+    '/api/schedule/public/next',
+  ),
+  publicJson<{ verse: { ref: string; text: string; translation: string } | null }>(
+    Astro,
+    `/api/liturgy/public/verse?locale=${locale}`,
+  ),
+])
+const s = cur.state === 'ok' ? cur.data : null
+const others = list.state === 'ok' ? list.data.items.filter((x) => x.date !== s?.date) : []
+const before = others
+  .filter((x) => x.date < (s?.date ?? ''))
+  .slice(-4)
+  .reverse()
+const after = others.filter((x) => x.date > (s?.date ?? '')).slice(0, 4)
+const day = (d: string) => shortDate(`${d}T12:00:00Z`, locale, 'UTC')
+const serviceTime =
+  next.state === 'ok' && next.data.next && s && next.data.next.startsAt.slice(0, 10) >= s.date
+    ? new Intl.DateTimeFormat(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Africa/Douala',
+      }).format(new Date(next.data.next.startsAt))
+    : ''
+const v = verse.state === 'ok' ? verse.data.verse : null
+Astro.response.headers.set(
+  'cache-control',
+  cur.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('dimanche'))} description={t('liturgy.site.lead')}>
+  <article class="cs" data-season={s?.season}>
+    <Illustration name="cherry-blossom" class="cs-art" />
+    <section class="cs-first">
+      <header class="cs-head">
+        <p class="cs-kicker"><span class="cs-dot" aria-hidden="true"></span>{label('title')}{s && <span class="cs-date">{day(s.date)}</span>}</p>
+        <div class="cs-titlerow">
+          {s?.published && serviceTime && (
+            <p class="flip-time cs-time" role="img" aria-label={serviceTime}>
+              {serviceTime.split(':').flatMap((v, i) => i === 0 ? [<span class="flip-card" aria-hidden="true">{v}</span>, <span class="flip-colon" aria-hidden="true">:</span>] : [<span class="flip-card" aria-hidden="true">{v}</span>])}
+            </p>
+          )}
+          <h1 class="cs-title">{s ? s.name : label('title')}</h1>
+        </div>
+        {s && (s.season !== 'ordinaire' || s.holySupper) && (
+          <p class="cs-tags">
+            {s.season !== 'ordinaire' && <span class="cs-chip"><span class="cs-dot" aria-hidden="true"></span>{t(`season.${s.season}` as 'season.avent')}</span>}
+            {s.holySupper && <span class="cs-chip cs-chip-supper">{label('holy_supper')}</span>}
+          </p>
+        )}
+        {s?.published && s.theme && <p class="cs-theme">{s.theme}</p>}
+      </header>
+      {
+        cur.state === 'unavailable' ? (
+          <UnavailableState />
+        ) : !s || !s.published ? (
+          <div class="cs-empty">
+            <h2>{label('not_ready_t')}</h2>
+            <p>{label('not_ready_p')}</p>
+          </div>
+        ) : (
+          <div class="cs-details">
+            {s.readings.length > 0 && (
+              <div>
+                <h2 class="cs-label">{label('readings')}</h2>
+                <ul class="cs-readings" role="list">{s.readings.map((r) => <li>{r.label}</li>)}</ul>
+              </div>
+            )}
+            {(s.preacher || s.liturgist || s.hymns || s.notes) && (
+              <dl class="cs-facts">
+                {s.preacher && <div><dt class="cs-label">{label('preacher')}</dt><dd>{s.preacher}</dd></div>}
+                {s.liturgist && <div><dt class="cs-label">{label('liturgist')}</dt><dd>{s.liturgist}</dd></div>}
+                {s.hymns && <div><dt class="cs-label">{label('hymns')}</dt><dd>{s.hymns}</dd></div>}
+                {s.notes && <div><dt class="cs-label">{label('notes')}</dt><dd>{s.notes}</dd></div>}
+              </dl>
+            )}
+            {v && (
+              <figure class="cs-verse">
+                <blockquote>{v.text}</blockquote>
+                <figcaption>{v.ref} · {v.translation}</figcaption>
+              </figure>
+            )}
+          </div>
+        )
+      }
+    </section>
+    {
+      (before.length > 0 || after.length > 0) && (
+        <div class="cs-others">
+          {after.length > 0 && (
+            <section class="cs-panel">
+              <h2 class="cs-h">{label('next')}</h2>
+              <ul>{after.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
+            </section>
+          )}
+          {before.length > 0 && (
+            <section class="cs-panel">
+              <h2 class="cs-h">{label('previous')}</h2>
+              <ul>{before.map((x) => <li><strong>{day(x.date)}</strong><span>{x.name}{x.theme ? ` · ${x.theme}` : ''}</span></li>)}</ul>
+            </section>
+          )}
+        </div>
+      )
+    }
+    <p class="cs-more"><Button href={locale === 'fr' ? '/fr/agenda/annee-liturgique/' : '/en/calendar/liturgical-year/'} variant="secondary">{t('nav.items.liturgie.label')}</Button></p>
+  </article>
+</Site>
+
+<style>
+  /* The first screen holds the essentials and runs up behind the floating navigation. */
+  .cs {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin-block-start: -5.5rem;
+    background: color-mix(in oklab, var(--season) 14%, var(--bg));
+  }
+  .cs-art {
+    position: absolute;
+    inset-block-start: -10%;
+    inset-inline-end: -4%;
+    z-index: -1;
+    width: auto;
+    height: min(110svh, 60rem);
+    aspect-ratio: 1;
+    transform: scaleX(-1);
+    pointer-events: none;
+  }
+  .cs-first,
+  .cs-others,
+  .cs-more {
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+  }
+  .cs-first {
+    display: grid;
+    align-content: center;
+    gap: 1.25rem;
+    min-height: 100svh;
+    padding-block: 7rem 2.5rem;
+  }
+  .cs-head {
+    display: grid;
+    gap: 0.625rem;
+    max-width: 40rem;
+  }
+  .cs-kicker {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .cs-date {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+  .cs-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--season);
+  }
+  .cs-titlerow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .cs-time {
+    --flip-size: 1.5rem;
+  }
+  .cs-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 4.5vw, 3rem);
+    line-height: 1.08;
+  }
+  .cs-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cs-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--season) 22%, var(--surface));
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .cs-chip-supper {
+    background: var(--gold-soft, var(--surface-2));
+  }
+  .cs-theme {
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    font-style: italic;
+  }
+  .cs-details {
+    display: grid;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+  .cs-label {
+    margin-block-end: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .cs-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cs-readings li {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 500;
+  }
+  .cs-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+  }
+  .cs-verse {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 85%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .cs-verse blockquote {
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    font-style: italic;
+  }
+  .cs-verse figcaption {
+    margin-block-start: 0.375rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .cs-empty {
+    max-width: 32rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .cs-others {
+    display: grid;
+    gap: 1rem;
+    padding-block-end: 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .cs-others {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .cs-panel {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--season) 30%, transparent);
+  }
+  .cs-h {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .cs-others ul {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .cs-others li {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .cs-others strong {
+    text-transform: capitalize;
+  }
+  .cs-more {
+    padding-block-end: 3rem;
+  }
+  @media (max-width: 40rem) {
+    .cs-art {
+      inset-inline-end: -30%;
+      opacity: 0.55;
+    }
+  }
+</style>

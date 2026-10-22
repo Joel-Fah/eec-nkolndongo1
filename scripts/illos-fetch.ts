@@ -132,10 +132,10 @@ try {
             parent: { children: unknown[] },
           ) => {
             const id = node.attributes.id
-            // `noBackdrop` also drops the grey halftone patch behind the subject (« background-simple »).
+            // The grey halftone patch behind the subject (« background-simple ») is dropped too, unless the entry asks for `backdrop`.
             if (
               (!entry.background && id === 'background-complete') ||
-              (entry.noBackdrop && id === 'background-simple')
+              (!entry.backdrop && id === 'background-simple')
             )
               parent.children = parent.children.filter((child) => child !== node)
           },

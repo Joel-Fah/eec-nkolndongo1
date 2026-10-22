@@ -1,0 +1,103 @@
+---
+import Button from '@eec/ui/astro/Button.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { type NewsItem, publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import { newsItemHref, newsListHref } from '../../lib/news-routes'
+/** The news list (page « Nouvelles »): pinned first, newest first, 12 per page, from the cached public API. */
+import PageHero from '../page/PageHero.astro'
+import ContentCard from './ContentCard.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const page = Math.max(1, Math.min(Number(Astro.url.searchParams.get('page')) || 1, 200))
+const result = await publicJson<{ items: NewsItem[]; more: boolean }>(
+  Astro,
+  `/api/news/public?locale=${locale}&page=${page}`,
+)
+const items = result.state === 'ok' ? result.data.items : []
+const more = result.state === 'ok' && result.data.more
+const [first, ...rest] = items
+const feed = `/api/news/public/feed.xml?locale=${locale}`
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('nouvelles'))} description={t('pages.nouvelles.lead')}>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={t('news.site.latest_t')} href={feed} />
+  <PageHero id="nouvelles" />
+  <section class="nl">
+    {
+      result.state === 'unavailable' ? (
+        <UnavailableState />
+      ) : items.length === 0 ? (
+        <div class="nl-empty">
+          <Illustration name="news" class="nl-art" />
+          <p class="nl-empty-title">{t('news.site.empty_t')}</p>
+          <p>{t('news.site.empty_p')}</p>
+        </div>
+      ) : (
+        <>
+          {page === 1 && first && <ContentCard item={first} href={newsItemHref(locale, first.slug)} featured />}
+          <ul class="nl-grid">
+            {(page === 1 ? rest : items).map((item) => (
+              <li><ContentCard item={item} href={newsItemHref(locale, item.slug)} /></li>
+            ))}
+          </ul>
+          <nav class="nl-pager" aria-label={t('news.site.page_of', { page: String(page), pages: more ? `${page}+` : String(page) })}>
+            {page > 1 && <Button href={`${newsListHref(locale)}?page=${page - 1}`} variant="secondary">← {t('news.site.newer')}</Button>}
+            {more && <Button href={`${newsListHref(locale)}?page=${page + 1}`} variant="secondary">{t('news.site.older')} →</Button>}
+          </nav>
+          <p class="nl-rss"><a href={feed}>{t('news.site.rss')}</a></p>
+        </>
+      )
+    }
+  </section>
+</Site>
+
+<style>
+  .nl {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .nl-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .nl-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .nl-empty :global(.nl-art) {
+    width: min(100%, 16rem);
+    height: auto;
+  }
+  .nl-empty-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .nl-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .nl-rss {
+    text-align: center;
+    font-size: var(--text-sm);
+  }
+</style>

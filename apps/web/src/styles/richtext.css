@@ -1,0 +1,78 @@
+/* Rich text from the editor (packages/core richtext → renderHtml): alignment, indentation, tasks, tables, marks. */
+.rt-center {
+  text-align: center;
+}
+.rt-right {
+  text-align: end;
+}
+.rt-justify {
+  text-align: justify;
+  hyphens: auto;
+}
+.rt-in-1 {
+  margin-inline-start: 1.5rem;
+}
+.rt-in-2 {
+  margin-inline-start: 3rem;
+}
+.rt-in-3 {
+  margin-inline-start: 4.5rem;
+}
+.rt-in-4 {
+  margin-inline-start: 6rem;
+}
+.rt-tasks {
+  list-style: none;
+  padding-inline-start: 0.25rem;
+}
+.rt-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+.rt-task > input {
+  appearance: none;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.225rem 0 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+}
+.rt-task > input:checked {
+  background:
+    var(--primary)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+    center / 80% no-repeat;
+  box-shadow: none;
+}
+.rt-task > div {
+  flex: 1;
+}
+.rt-table {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+}
+.rt-table table {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+}
+.rt-table th,
+.rt-table td {
+  padding: 0.625rem 0.875rem;
+  vertical-align: top;
+  text-align: start;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.rt-table th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+mark {
+  padding-inline: 0.125em;
+  border-radius: 0.25em;
+  background: var(--gold-soft, color-mix(in oklab, var(--gold) 35%, transparent));
+  color: inherit;
+}

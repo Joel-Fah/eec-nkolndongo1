@@ -1,0 +1,10 @@
+---
+import NewsListPage from '../../../../components/content/NewsListPage.astro'
+import { rightPath } from '../../../../lib/news-routes'
+
+export const prerender = false
+if (!rightPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<NewsListPage />

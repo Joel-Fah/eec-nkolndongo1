@@ -345,10 +345,79 @@ export function TooltipTip({ text, children }: { text: string; children: ReactNo
   )
 }
 
-/* ── Tabs, accordion ──────────────────────────────────────────────────── */
-export function TabsBox({ tabs }: { tabs: { id: string; label: string; content: ReactNode }[] }) {
+/** A Hugeicons stroke-rounded icon, decorative (name the control around it with a label). */
+export function Icon({ name, size = 20 }: { name: IconName; size?: 16 | 20 | 24 }) {
   return (
-    <Tabs.Root defaultValue={tabs[0]?.id}>
+    <span
+      className="inline-flex"
+      aria-hidden="true"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: our own icon markup, no user data
+      dangerouslySetInnerHTML={{ __html: iconSvg(name, { size }) }}
+    />
+  )
+}
+
+/** « Mod+Shift+B » → ⌘ ⇧ B on Apple devices, Ctrl Shift B elsewhere. */
+export function shortcutKeys(shortcut: string): string[] {
+  const apple =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)
+  const names: Record<string, [string, string]> = {
+    Mod: ['⌘', 'Ctrl'],
+    Shift: ['⇧', 'Shift'],
+    Alt: ['⌥', 'Alt'],
+    Enter: ['↵', 'Enter'],
+    Tab: ['⇥', 'Tab'],
+  }
+  return shortcut.split('+').map((k) => names[k]?.[apple ? 0 : 1] ?? k.toUpperCase())
+}
+export const Kbd = ({ shortcut, className }: { shortcut: string; className?: string }) => (
+  <span className={cx('eec-kbds', className)}>
+    {shortcutKeys(shortcut).map((k) => (
+      <kbd key={k} className="eec-kbd">
+        {k}
+      </kbd>
+    ))}
+  </span>
+)
+
+/** A tooltip with the action's name and its keyboard shortcut (keys drawn as keycaps). Also names the control for assistive tech. */
+export function ShortcutTip({
+  label,
+  shortcut,
+  children,
+}: {
+  label: string
+  shortcut?: string
+  children: ReactNode
+}) {
+  return (
+    <Tooltip.Provider delay={350} closeDelay={0}>
+      <Tooltip.Root>
+        <Tooltip.Trigger render={children as never} />
+        <Tooltip.Portal>
+          <Tooltip.Positioner sideOffset={8} className="eec-positioner">
+            <Tooltip.Popup className="eec-tooltip eec-tooltip-keys">
+              <span>{label}</span>
+              {shortcut && <Kbd shortcut={shortcut} />}
+            </Tooltip.Popup>
+          </Tooltip.Positioner>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
+  )
+}
+
+/* ── Tabs, accordion ──────────────────────────────────────────────────── */
+export function TabsBox({
+  tabs,
+  onTabChange,
+}: {
+  tabs: { id: string; label: ReactNode; content: ReactNode }[]
+  onTabChange?: (id: string) => void
+}) {
+  return (
+    <Tabs.Root defaultValue={tabs[0]?.id} onValueChange={(v) => onTabChange?.(String(v))}>
       <Tabs.List className="tabs-list">
         <Tabs.Indicator className="tabs-indicator" />
         {tabs.map((t) => (

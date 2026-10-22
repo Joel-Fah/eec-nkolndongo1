@@ -116,6 +116,10 @@
       "credits": {
         "label": "Crédits photos",
         "desc": "Qui a pris les photos du site."
+      },
+      "dimanche": {
+        "label": "Ce dimanche",
+        "desc": "Le thème, les lectures et le culte du dimanche qui vient."
       }
     },
     "main": "Menu principal",
@@ -637,6 +641,76 @@
         "use": "lib/shapes.ts : un rapport (ar) et un tracé (defs) par forme ; clip-path: url(#id) avec clipPathUnits=\"objectBoundingBox\".",
         "a11y": "Décoratives : le contenu et le texte alternatif sont ceux de l’image découpée ; aucune information n’est portée par la forme.",
         "demo": "Toutes les formes disponibles."
+      },
+      "contentcard": {
+        "name": "Carte de contenu",
+        "desc": "La carte de toute liste de contenus (nouvelles aujourd’hui ; événements et guides ensuite) : photo, date, titre, résumé. Toute la carte est un seul lien ; la première nouvelle peut être « à la une », en grand. Elle se soulève doucement au survol.",
+        "use": "<ContentCard item href featured? />. Les photos viennent de la médiathèque via <Picture>. Le groupe et l’épingle « À la une » s’affichent quand ils existent.",
+        "a11y": "Un seul lien par carte (titre), zone cliquable étendue, focus visible autour de la carte entière, pas de mouvement avec « réduire les animations ».",
+        "demo_title": "Un titre d’exemple",
+        "demo_text": "Un résumé d’exemple en une phrase, pour la liste."
+      },
+      "unavailable": {
+        "name": "Contenu indisponible",
+        "desc": "Ce que voit un visiteur quand la base de données est lente ou injoignable : des mots simples, un bouton « Réessayer ». Jamais une page d’erreur (décision 0027).",
+        "use": "<UnavailableState /> à la place de la liste ou du texte. La page répond 503 et n’est pas mise en cache.",
+        "a11y": "role=status, message sans jargon, bouton de 44 px."
+      },
+      "langfallback": {
+        "name": "Note de langue",
+        "desc": "Quand un texte n’existe pas encore en anglais, la version française s’affiche, avec cette note au-dessus du titre.",
+        "use": "<LangFallbackNote /> quand l’API renvoie fallback = true.",
+        "a11y": "role=note, contraste vérifié dans les deux thèmes."
+      },
+      "editor": {
+        "name": "Éditeur de texte (administration)",
+        "desc": "Un éditeur simple pour les rédacteurs : gras, italique, titre de section, listes, citation, lien, photo de la médiathèque, annuler/rétablir. Il ne produit que ce que le site sait afficher ; il est chargé seulement quand on écrit (jamais sur le site public).",
+        "use": "Import différé de @eec/content-kit/editor. Le texte est un petit document JSON (@eec/core richtext), nettoyé à nouveau côté serveur.",
+        "a11y": "Barre d’outils étiquetée, boutons de 44 px avec état pressé, zone de texte annoncée comme telle, liens refusés s’ils ne sont pas en https, mailto ou tel.",
+        "demo": "Ouvrez une actualité dans l’administration pour l’essayer."
+      },
+      "publishflow": {
+        "name": "Brouillon, publication, versions",
+        "desc": "Le parcours commun à tous les contenus : enregistrement automatique (« Enregistré »), bouton Publier (maintenant ou à une date, avec une date de retrait facultative), aperçu par lien secret de 3 jours, versions précédentes restaurables, archivage. Les étiquettes d’état sont les mêmes partout.",
+        "use": "@eec/content-kit : useAutosave, SaveIndicator, PublishDialog, RevisionsDrawer, StatusBadge, CoverField, MediaPicker, ConfirmDialog.",
+        "a11y": "Annonces d’état en aria-live, fenêtres avec piège de focus et Échap, les problèmes avant publication sont listés en clair.",
+        "demo": "Visible dans l’administration, sur chaque actualité."
+      },
+      "generatedbanner": {
+        "name": "Bannière générée",
+        "desc": "Un motif abstrait dessiné aux couleurs du type d’événement, utilisé quand l’événement n’a pas d’image. Il porte l’icône du type et reste décoratif.",
+        "use": "<GeneratedBanner kind=\"culte\" /> en tête de la page d’un événement sans photo.",
+        "a11y": "Décoratif : aria-hidden, aucune information portée uniquement par la couleur."
+      },
+      "guardeddialog": {
+        "name": "Dialogue protégé",
+        "desc": "Un dialogue de formulaire qui demande confirmation avant d’abandonner des modifications (Échap, clic à côté, bouton Fermer).",
+        "use": "<GuardedDialog dirty> de @eec/content-kit autour des formulaires de l’administration.",
+        "a11y": "Focus piégé, Échap fonctionne, la confirmation reçoit le focus."
+      },
+      "viewtoggle": {
+        "name": "Bascule de vue",
+        "desc": "Deux ou trois boutons à icône et libellé pour passer d’une vue à l’autre (liste / grille, liste / mois). Sur le site public, le changement se fait sans recharger la page.",
+        "use": "<ViewToggle> dans l’administration ; liens data-ev-nav sur la page des événements.",
+        "a11y": "aria-current sur la vue active ; sans JavaScript, ce sont de simples liens."
+      },
+      "shortcuttip": {
+        "name": "Info-bulle de raccourci",
+        "desc": "Au survol ou au focus d’un bouton, une bulle indique son nom et son raccourci clavier en touches stylisées (Kbd).",
+        "use": "<ShortcutTip label=\"Gras\" keys=\"Ctrl B\"> autour d’un bouton.",
+        "a11y": "Apparaît aussi au focus clavier ; le bouton garde son aria-label."
+      },
+      "fullscreeneditor": {
+        "name": "Éditeur plein écran",
+        "desc": "L’éditeur de texte passe en plein écran sans perdre le contenu : barre d’outils fixe avec libellés, titre du document avec retour, compteurs de mots et de caractères.",
+        "use": "Bouton plein écran de l’éditeur ; la flèche retour ou Échap en sortent.",
+        "a11y": "Les menus et fenêtres s’ouvrent au-dessus du plein écran ; reduced-motion supprime l’animation."
+      },
+      "weektoc": {
+        "name": "Index des semaines",
+        "desc": "Sur la page des événements, un index collant liste les semaines affichées et met en évidence celle qui est à l’écran. Masqué sur mobile.",
+        "use": "Apparaît à partir de trois semaines ; liens d’ancre #ev-<date>.",
+        "a11y": "Navigation étiquetée, aria-current sur la semaine visible."
       }
     },
     "rules": {
@@ -727,7 +801,7 @@
     "start3_t": "Faire connaissance",
     "start3_p": "Ce que nous croyons, ce qui nous rassemble, et le chemin pour nous rejoindre.",
     "verse": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
-    "verse_cite": "Matthieu 11 : 28",
+    "verse_cite": "Matthieu 11 : 28 · LSG",
     "title_a": "Une famille qui chante, prie",
     "title_b": "et avance",
     "cta_visit": "Venir dimanche",
@@ -1093,7 +1167,8 @@
       "broke_title": "Un souci de notre côté",
       "broke_text": "Quelque chose s’est mal passé. Réessayez dans un instant.",
       "retry": "Réessayer"
-    }
+    },
+    "loading": "Chargement"
   },
   "login": {
     "title": "Connexion",
@@ -1457,13 +1532,13 @@
       "text": "Votre compte n’a pas le droit d’accès à cette page. Si c’est une erreur, parlez-en au secrétariat."
     },
     "quotes": {
-      "v1": "Venez à moi, vous tous qui êtes fatigués et qui portez un lourd fardeau. Je vous donnerai du repos.",
+      "v1": "Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.",
       "v1_cite": "Matthieu 11 : 28",
-      "v2": "Le Seigneur est mon berger, je ne manque de rien.",
+      "v2": "L’Éternel est mon berger : je ne manquerai de rien.",
       "v2_cite": "Psaume 23 : 1",
-      "v3": "Dieu a tellement aimé le monde qu’il a donné son Fils unique. Ainsi, tous ceux qui croient en lui ne seront pas perdus, mais ils auront la vie éternelle.",
+      "v3": "Car Dieu a tant aimé le monde qu’il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu’il ait la vie éternelle.",
       "v3_cite": "Jean 3 : 16",
-      "v4": "Sois courageux et fort ! N’aie pas peur, car le Seigneur ton Dieu est avec toi partout où tu iras.",
+      "v4": "Ne t’ai-je pas donné cet ordre : Fortifie-toi et prends courage ? Ne t’effraie point et ne t’épouvante point, car l’Éternel, ton Dieu, est avec toi dans tout ce que tu entreprendras.",
       "v4_cite": "Josué 1 : 9"
     }
   },
@@ -1585,8 +1660,8 @@
     "credits_p": "Les noms derrière les images de ce site."
   },
   "bible": {
-    "pdv": "Parole de Vie",
-    "etr": "Easy-to-Read Version"
+    "lsg": "LSG",
+    "web": "WEB"
   },
   "dash": {
     "trend_up": "En hausse de",
@@ -1623,5 +1698,121 @@
     "qa_settings": "Paramètres",
     "qa_outbox": "Boîte d’envoi",
     "qa_activity": "Activité récente"
+  },
+  "content": {
+    "status": {
+      "draft": "Brouillon",
+      "scheduled": "Programmé",
+      "published": "Publié",
+      "archived": "Archivé"
+    },
+    "save": {
+      "dirty": "Modifications en attente…",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré",
+      "error": "Pas enregistré. Nouvel essai en cours…"
+    },
+    "editor": {
+      "toolbar": "Mise en forme",
+      "bold": "Gras",
+      "italic": "Italique",
+      "heading": "Titre de section",
+      "bullets": "Liste à puces",
+      "numbers": "Liste numérotée",
+      "quote": "Citation",
+      "link": "Lien",
+      "photo": "Photo de la médiathèque",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "link_label": "Adresse du lien",
+      "link_apply": "Appliquer",
+      "link_remove": "Retirer le lien",
+      "link_invalid": "Ce lien n’est pas accepté. Utilisez une adresse https://, un courriel (mailto:) ou un téléphone (tel:).",
+      "underline": "Souligné",
+      "strike": "Barré",
+      "highlight": "Surligné",
+      "subscript": "Indice",
+      "superscript": "Exposant",
+      "align_left": "Aligner à gauche",
+      "align_center": "Centrer",
+      "align_right": "Aligner à droite",
+      "align_justify": "Justifier",
+      "heading3": "Sous-titre",
+      "tasks": "Liste de tâches",
+      "indent_more": "Augmenter le retrait",
+      "indent_less": "Diminuer le retrait",
+      "table": "Insérer un tableau",
+      "row_add": "Ajouter une ligne dessous",
+      "col_add": "Ajouter une colonne à droite",
+      "row_del": "Supprimer la ligne",
+      "col_del": "Supprimer la colonne",
+      "table_del": "Supprimer le tableau",
+      "group_text": "Texte",
+      "group_block": "Paragraphe",
+      "group_insert": "Insérer",
+      "group_table": "Tableau",
+      "headings": "Titres",
+      "alignments": "Alignement",
+      "paragraph": "Paragraphe",
+      "full": "Plein écran",
+      "exit_full": "Quitter le plein écran",
+      "count_words": "{n} mots",
+      "count_chars": "{n} caractères",
+      "count_nospace": "{n} sans espaces",
+      "untitled": "Sans titre",
+      "table_rows": "Lignes",
+      "table_cols": "Colonnes",
+      "table_insert": "Insérer",
+      "table_dim": "{rows} × {cols}"
+    },
+    "picker": {
+      "title": "Choisir une photo",
+      "search": "Rechercher une photo",
+      "search_ph": "Nom ou description",
+      "empty": "Aucune photo trouvée",
+      "empty_help": "Ajoutez des photos dans la médiathèque, puis revenez ici.",
+      "no_alt": "Sans description",
+      "cancel": "Annuler"
+    },
+    "cover": {
+      "label": "Photo principale",
+      "none": "Aucune photo choisie.",
+      "choose": "Choisir une photo",
+      "change": "Changer",
+      "remove": "Retirer"
+    },
+    "publish": {
+      "title": "Publier",
+      "title_change": "Modifier les dates",
+      "when": "Quand ?",
+      "now": "Maintenant",
+      "later": "Plus tard, à un jour et une heure choisis",
+      "from": "Visible à partir du",
+      "until": "Retirer du site le (facultatif)",
+      "until_help": "Après cette date, la page n’est plus visible, mais elle reste dans vos archives.",
+      "confirm_now": "Publier maintenant",
+      "confirm_later": "Programmer",
+      "problem_title": "Ajoutez un titre.",
+      "problem_body": "Ajoutez du texte.",
+      "problem_dates": "La date de retrait doit venir après la date de publication."
+    },
+    "revisions": {
+      "title": "Versions précédentes",
+      "lead": "Le texte est gardé à chaque publication et de temps en temps pendant que vous écrivez. Restaurer garde aussi la version actuelle.",
+      "empty": "Pas encore de version enregistrée.",
+      "restore": "Restaurer",
+      "close": "Fermer",
+      "words": "{n} mots",
+      "reason_autosave": "Enregistrement automatique",
+      "reason_publish": "Publication",
+      "reason_before-restore": "Avant une restauration",
+      "reason_save": "Enregistrement"
+    },
+    "guard": {
+      "title": "Abandonner la saisie ?",
+      "text": "Ce que vous avez rempli n’est pas enregistré. Si vous quittez maintenant, vous le perdrez.",
+      "stay": "Continuer à remplir",
+      "leave": "Abandonner"
+    }
   }
 }

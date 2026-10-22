@@ -33,7 +33,7 @@ export const membersModule = defineModule({
         group: 'members',
         label: { fr: 'Membres', en: 'Members' },
         path: '/m/members',
-        icon: 'users',
+        icon: 'couple',
         order: 10,
         permission: 'members:read',
       },
