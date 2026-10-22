@@ -78,7 +78,7 @@ const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
     id: 'ui',
     group: 'settings',
     path: '/ui',
-    icon: 'heart',
+    icon: 'canvas',
     label: 'admin.items.ui',
     permission: 'core:system-design',
     order: 90,

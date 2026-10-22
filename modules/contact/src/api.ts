@@ -6,7 +6,7 @@
 import { type AppEnv, audit, clientIp, fail, publicRoute, requirePermission } from '@eec/api-kit'
 import { allow, can, type Principal } from '@eec/auth'
 import { user } from '@eec/db/schema'
-import { and, count, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq, gte, lt } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { contactMessages, contactNotes } from './schema.ts'
@@ -97,6 +97,10 @@ export const contactApi = new Hono<AppEnv>()
     const db = await c.var.deps.db()
     const sensitive = await mayReadSensitive(c)
     const status = c.req.query('status')
+    // A date window (YYYY-MM-DD, both ends included), in UTC.
+    const day = (v: string | undefined) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null)
+    const from = day(c.req.query('from'))
+    const to = day(c.req.query('to'))
     const rows = await db
       .select({ m: contactMessages, assignee: user.name })
       .from(contactMessages)

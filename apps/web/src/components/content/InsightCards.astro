@@ -16,9 +16,18 @@ interface Props {
   items: Item[]
   icons?: IconName[]
   label: string
-  more: string
+  /** When given, each card links to its section; otherwise the cards are plain insights, no links or actions. */
+  more?: string
+  /** Set inside a banner that crops them: no margin or fade of their own. */
+  flush?: boolean
 }
-const { items: all, icons = ['shield', 'lock', 'info', 'users', 'mail'], label, more } = Astro.props
+const {
+  items: all,
+  icons = ['shield', 'lock', 'info', 'users', 'mail'],
+  label,
+  more,
+  flush = false,
+} = Astro.props
 // Three or five: never a lonely pair or four.
 const n = all.length >= 5 ? 5 : all.length >= 3 ? 3 : 0
 const items = all.slice(0, n)
@@ -26,13 +35,13 @@ const items = all.slice(0, n)
 
 {
   n > 0 && (
-    <ul class="lx" aria-label={label} style={`--n:${n}`}>
+    <ul class:list={['lx', flush && 'lx-flush']} aria-label={label} style={`--n:${n}`}>
       {items.map((it, i) => (
         <li class="lx-card" style={`--i:${i}`}>
           <span class="lx-icon" aria-hidden="true"><Icon name={icons[i % icons.length] as IconName} size={20} /></span>
-          <h2 class="lx-title">{it.title}</h2>
+          <p class="lx-title">{it.title}</p>
           {it.text && <p class="lx-text">{it.text}</p>}
-          <a class="lx-link" href={it.href}>{more}<Icon name="arrowRight" size={16} /></a>
+          {more && <a class="lx-link" href={it.href}>{more}<Icon name="arrowRight" size={16} /></a>}
         </li>
       ))}
     </ul>
@@ -50,6 +59,13 @@ const items = all.slice(0, n)
     margin-block: 1rem 2rem;
     -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
     mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  }
+  .lx-flush {
+    --h: 13.5rem;
+    margin-block: 0.5rem 0;
+    padding-block-start: 1.25rem;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
   .lx-card {
     --mid: calc((var(--n) - 1) / 2);

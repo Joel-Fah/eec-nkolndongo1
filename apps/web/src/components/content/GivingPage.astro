@@ -68,7 +68,7 @@ Astro.response.headers.set(
             <p class="gv-kicker">{s('thanks_k')}</p>
             <h2 class="gv-big">{s('thanks')}</h2>
           </div>
-          <Illustration name="reading-book" class="gv-art" />
+          <Illustration name="valentines-bouquet" class="gv-art" />
         </section>
 
         {inMoissons && moissons && (
@@ -203,6 +203,7 @@ Astro.response.headers.set(
     align-items: center;
     gap: 1.5rem;
     padding: clamp(1.5rem, 4vw, 2.5rem);
+    overflow: hidden;
     border-radius: var(--radius-xl);
     background: color-mix(in oklab, var(--season) 14%, var(--surface));
     box-shadow: var(--elevation-1);
@@ -224,10 +225,14 @@ Astro.response.headers.set(
     font-size: clamp(var(--text-3xl, 2rem), 4.5vw, 3.25rem);
     line-height: 1.08;
   }
+  /* The bouquet stands on the card's lower edge and is cropped downward by it. */
   .gv-thanks :global(.gv-art) {
-    width: min(100%, 16rem);
+    width: min(100%, 20rem);
     height: auto;
     justify-self: center;
+    align-self: end;
+    margin-block-end: -3.5rem;
+    translate: 0 14%;
   }
   .gv-moissons {
     display: flex;

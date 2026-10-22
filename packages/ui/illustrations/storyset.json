@@ -169,5 +169,11 @@
     "background": true,
     "use": "Home → Ce dimanche card backdrop (flipped, cropped on the right edge)",
     "precision": 1
+  },
+  {
+    "name": "valentines-bouquet",
+    "url": "https://stories.freepiklabs.com/storage/33386/Valentines-bouquet-with-a-card_Mesa-de-trabajo-1.svg",
+    "background": false,
+    "use": "Give page: the thank-you card"
   }
 ]

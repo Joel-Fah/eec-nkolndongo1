@@ -88,5 +88,14 @@
   "this_week": "This week",
   "last_week": "Last week",
   "pick": "Pick a message to read it here.",
-  "back": "Messages"
+  "back": "Messages",
+  "dates": "Period",
+  "range_all": "All dates",
+  "range_today": "Today",
+  "range_week": "This week",
+  "range_month": "This month",
+  "range_90": "Last 90 days",
+  "range_custom": "Pick dates…",
+  "range_from": "From",
+  "range_to": "To"
 }

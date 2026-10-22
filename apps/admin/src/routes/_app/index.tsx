@@ -6,6 +6,7 @@ import { Icon } from '../../components/Icon'
 import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
 import { TodoPanel } from '../../components/TodoPanel'
+import { TrendsSection } from '../../components/Trends'
 import { WelcomeBanner } from '../../components/WelcomeBanner'
 import { labelOf, navFor } from '../../lib/nav'
 
@@ -40,6 +41,7 @@ function Dashboard() {
           </Card>
         ))}
       </div>
+      <TrendsSection />
     </div>
   )
 }

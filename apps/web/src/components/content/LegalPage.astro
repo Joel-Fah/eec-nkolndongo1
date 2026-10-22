@@ -85,14 +85,18 @@ Astro.response.headers.set(
 ---
 
 <Site title={t(labelKey(id))} description={page ? t(page.lead) : undefined}>
-  {heroes[id] && <PageHero id={id} />}
+  {heroes[id] && cards.length >= 3 && (
+    <PageHero id={id}>
+      <InsightCards items={cards} icons={cardIcons} label={s('points')} flush />
+    </PageHero>
+  )}
+  {heroes[id] && cards.length < 3 && <PageHero id={id} />}
   {
     doc ? (
       <article class="lg">
         {!heroes[id] && <h1 class="lg-title">{t(labelKey(id))}</h1>}
         <p class="lg-meta">{s('version', { label: doc.label, date })}</p>
         {doc.fallback && <LangFallbackNote />}
-        <InsightCards items={cards} icons={cardIcons} label={s("points")} more={s('read')} />
         <div class="lg-body" set:html={html} />
         {id === 'credits' && (
           <section class="lg-credits">
@@ -109,7 +113,6 @@ Astro.response.headers.set(
       </article>
     ) : (
       <>
-        <div class="lg-cards"><InsightCards items={cards} icons={cardIcons} label={s('points')} more={s('read')} /></div>
         <PageView id={id} hideHeader={!!heroes[id]} />
       </>
     )

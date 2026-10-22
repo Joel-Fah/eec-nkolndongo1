@@ -823,6 +823,24 @@
         "desc": "Boîte vide : ce que l’on peut chercher, des mots à essayer, des actions directes et de vraies suggestions du site. Sans résultat : « Vouliez-vous dire… ». La recherche tolère les fautes de frappe.",
         "use": "Dialogue d’en-tête et page /recherche ; /api/search/suggest.",
         "a11y": "Les suggestions sont des liens ordinaires ; la liste d’actions est un nav de liens."
+      },
+      "areachart": {
+        "name": "Graphiques en aires douces",
+        "desc": "Courbes lissées (sans dépassement) avec un dégradé sous la ligne, extrémités arrondies, barres arrondies et anneau à bouts ronds ; chaque graphique a le tableau de ses chiffres (mois en toutes lettres et année) dans un volet qui s’ouvre en douceur.",
+        "use": "<AreaChart>, <BarChart>, <Donut>, <ChartCard> dans l’administration ; couleurs par jetons.",
+        "a11y": "Chaque graphique a un nom (role=img) et un tableau équivalent ; les infobulles sont des <title>."
+      },
+      "mapillustration": {
+        "name": "Carte dessinée",
+        "desc": "Une carte illustrée, pas une vraie : courbes de niveau de la colline, ruisseau, routes, blocs et le repère de la paroisse, avec le bouton Google Maps par-dessus. Aucune donnée tierce chargée.",
+        "use": "<MapIllustration name href label /> sur Nous trouver.",
+        "a11y": "Décoratif (aria-hidden) ; l’adresse et le bouton portent l’information."
+      },
+      "designbanner": {
+        "name": "Bandeau du guide de design",
+        "desc": "Dans l’administration, un bandeau plein écran : une illustration, des cartes et des éléments d’interface en suspension à trois profondeurs (proche et flou, lointain et flou, net) et un seul appel à l’action vers le guide.",
+        "use": "Onglet Guide de design de l’administration.",
+        "a11y": "Les éléments flottants sont décoratifs (masqués aux lecteurs d’écran et au pointeur) ; le bouton est un lien ordinaire."
       }
     },
     "rules": {
@@ -1390,7 +1408,17 @@
     "chart_bar": "Histogramme d’exemple sur douze mois",
     "chart_table": "Voir les chiffres des graphiques",
     "chart_month": "Mois",
-    "chart_value": "Valeur"
+    "chart_value": "Valeur",
+    "cta_t": "Le guide de design",
+    "cta_p": "Couleurs, typographie, composants, mouvement : tout est documenté, pour que chaque écran reste cohérent.",
+    "cta": "Ouvrir le guide",
+    "tease_colour": "Couleurs et thèmes clair et sombre",
+    "tease_type": "Erode pour les titres, Switzer pour le texte",
+    "tease_parts": "Boutons, champs, dialogues, cartes",
+    "tease_button": "Enregistrer",
+    "tease_badge": "Nouveau",
+    "tease_switch": "Mode sombre",
+    "tease_secondary": "Annuler"
   },
   "page": {
     "cta_title": "Une question, un souvenir, une envie de venir ?",
@@ -1832,7 +1860,19 @@
     "todo_missing_en_guides": "{n} parcours publié(s) sans titre anglais.",
     "todo_level_critical": "urgent",
     "todo_level_attention": "à surveiller",
-    "todo_level_info": "pour info"
+    "todo_level_info": "pour info",
+    "trends_title": "Tendances",
+    "chart_messages": "Messages reçus par mois",
+    "chart_publications": "Publications par mois",
+    "chart_media": "Photos ajoutées par mois",
+    "chart_categories": "Messages par sujet (90 jours)",
+    "series_messages": "Messages",
+    "series_news": "Actualités",
+    "series_events": "Événements",
+    "series_media": "Photos",
+    "view_numbers": "Voir les chiffres",
+    "month": "Mois",
+    "total": "au total"
   },
   "content": {
     "status": {

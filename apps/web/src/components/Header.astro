@@ -206,6 +206,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
 
 <style is:global>
   .search-dialog {
+    /* The header (its parent) ignores the pointer so its margins never block the page: undo it here. */
+    pointer-events: auto;
     width: min(100% - 1.5rem, 40rem);
     margin-block-start: 5rem;
     padding: 1rem;

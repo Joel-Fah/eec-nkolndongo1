@@ -15,6 +15,7 @@ import { outboxRoutes } from './routes/outbox.ts'
 import { roleRoutes } from './routes/roles.ts'
 import { searchRoutes } from './routes/search.ts'
 import { todoRoutes } from './routes/todo.ts'
+import { trendsRoutes } from './routes/trends.ts'
 import { userRoutes } from './routes/users.ts'
 
 export function createApp() {
@@ -35,6 +36,7 @@ export function createApp() {
   app.route('/flags', flagRoutes)
   app.route('/search', searchRoutes)
   app.route('/todo', todoRoutes)
+  app.route('/trends', trendsRoutes)
   // Modules from the registry, at /api/<id>. A switched-off module answers 404 (Phase 02 §6.5).
   for (const m of modules) {
     const router = moduleApis[m.id]

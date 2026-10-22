@@ -320,7 +320,7 @@ html[data-nav-open] {
   border-collapse: separate;
   border-spacing: 0;
 }
-.admin-table th {
+.admin-table thead th {
   padding: 0.875rem 1rem;
   font-size: var(--text-sm);
   font-weight: 600;
@@ -328,10 +328,10 @@ html[data-nav-open] {
   color: var(--ink-muted);
   background: var(--surface-2);
 }
-.admin-table th:first-child {
+.admin-table thead th:first-child {
   border-start-start-radius: var(--radius-lg);
 }
-.admin-table th:last-child {
+.admin-table thead th:last-child {
   border-start-end-radius: var(--radius-lg);
 }
 .admin-table td {
@@ -562,7 +562,7 @@ html[data-nav-open] {
   color: var(--on-photo);
 }
 .auth-verse blockquote {
-  max-width: 28rem;
+  max-width: 32rem;
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   font-style: italic;
@@ -1049,6 +1049,21 @@ html[data-nav-open] {
   width: clamp(15rem, 34vw, 25rem);
   pointer-events: none;
 }
+.welcome-art {
+  /* Light theme: a gentle, dark-leaning glow that blends with the tree (no yellow). The dark theme keeps its warm one. */
+  --glow-a: color-mix(in oklab, var(--primary) 30%, transparent);
+  --glow-b: color-mix(in oklab, var(--ink) 12%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .welcome-art {
+    --glow-a: color-mix(in oklab, var(--gold) 70%, transparent);
+    --glow-b: color-mix(in oklab, var(--season) 24%, transparent);
+  }
+}
+:root[data-theme="dark"] .welcome-art {
+  --glow-a: color-mix(in oklab, var(--gold) 70%, transparent);
+  --glow-b: color-mix(in oklab, var(--season) 24%, transparent);
+}
 .welcome-art::before {
   content: "";
   position: absolute;
@@ -1056,16 +1071,8 @@ html[data-nav-open] {
   z-index: -1;
   border-radius: 50%;
   background:
-    radial-gradient(
-      closest-side,
-      color-mix(in oklab, var(--gold) 70%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      closest-side,
-      color-mix(in oklab, var(--season) 24%, transparent),
-      transparent 100%
-    );
+    radial-gradient(closest-side, var(--glow-a), transparent 70%),
+    radial-gradient(closest-side, var(--glow-b), transparent 100%);
   filter: blur(1.5rem);
 }
 .welcome-art img {
@@ -1240,6 +1247,14 @@ html[data-nav-open] {
   transition:
     background-color var(--duration-micro) var(--ease-out),
     transform var(--duration-ui) var(--ease-out);
+}
+.quick-action[data-end="first"] {
+  margin-inline-start: auto;
+}
+@media (max-width: 40rem) {
+  .quick-action[data-end="first"] {
+    margin-inline-start: 0;
+  }
 }
 .quick-action:hover {
   background: var(--primary-soft);
@@ -1572,6 +1587,326 @@ html[data-nav-open] {
 }
 @media (prefers-reduced-motion: reduce) {
   .todo-card {
+    transition: none;
+  }
+}
+
+/* Design Guide tab: a full banner, an illustration at the bottom, pieces floating at three depths, one call to action. */
+.dg {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: calc(100svh - 11rem);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(
+      60% 70% at 50% 100%,
+      color-mix(in oklab, var(--primary) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--surface), var(--surface-2));
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.dg-art {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: -2;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+.dg-art .illo,
+.dg-art img {
+  width: min(100%, 44rem);
+  height: auto;
+  translate: 0 8%;
+}
+.dg-float {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.dg-card,
+.dg-bit {
+  position: absolute;
+  --scale: 1;
+  --blur: 0px;
+  --alpha: 1;
+  transform: scale(var(--scale));
+  filter: blur(var(--blur));
+  opacity: var(--alpha);
+  animation: dg-float 9s ease-in-out infinite alternate;
+}
+.dg-card {
+  display: grid;
+  gap: 0.5rem;
+  width: 13rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow:
+    var(--elevation-2),
+    inset 0 0 0 1px var(--line);
+}
+/* Where each piece sits and how far it is: near = bigger and soft, far = smaller and soft, the rest sharp. */
+.dg [data-at="a"] {
+  inset-block-start: 9%;
+  inset-inline-start: 7%;
+  --scale: 1.18;
+  --blur: 3px;
+  rotate: -4deg;
+}
+.dg [data-at="b"] {
+  inset-block-start: 14%;
+  inset-inline-end: 9%;
+  rotate: 3deg;
+  animation-delay: -3s;
+}
+.dg [data-at="c"] {
+  inset-block-end: 20%;
+  inset-inline-start: 14%;
+  --scale: 0.84;
+  --blur: 2px;
+  --alpha: 0.85;
+  rotate: 2deg;
+  animation-delay: -5s;
+}
+.dg [data-at="d"] {
+  inset-block-start: 11%;
+  inset-inline-start: 38%;
+  --scale: 0.85;
+  --blur: 2px;
+  --alpha: 0.9;
+  animation-delay: -2s;
+}
+.dg [data-at="e"] {
+  inset-block-start: 42%;
+  inset-inline-start: 6%;
+  --scale: 1.5;
+  --blur: 3px;
+  animation-delay: -6s;
+}
+.dg [data-at="f"] {
+  inset-block-end: 24%;
+  inset-inline-end: 12%;
+  animation-delay: -4s;
+}
+.dg [data-at="g"] {
+  inset-block-start: 44%;
+  inset-inline-end: 6%;
+  --scale: 0.9;
+  --blur: 1.5px;
+  animation-delay: -1s;
+}
+@keyframes dg-float {
+  to {
+    translate: 0 -0.5rem;
+  }
+}
+.dg-cta {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  max-width: 32rem;
+  padding: 1.75rem;
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 90%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow:
+    var(--elevation-3),
+    inset 0 0 0 1px var(--line);
+  text-align: center;
+}
+@media (max-width: 48rem) {
+  .dg [data-at="b"],
+  .dg [data-at="c"],
+  .dg [data-at="f"],
+  .dg [data-at="g"] {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dg-card,
+  .dg-bit {
+    animation: none;
+  }
+}
+
+/* Charts: smooth areas with a gradient under the line, rounded bars, a donut with rounded ends. */
+.chart {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+.chart-line {
+  fill: none;
+  stroke-width: 2.75;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.chart-dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.chart-hit {
+  fill: transparent;
+}
+.chart-x,
+.chart-y {
+  fill: var(--ink-muted);
+  font-size: 10px;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-size: var(--text-sm);
+}
+.chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.donut-swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+.donut {
+  display: grid;
+  align-items: center;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+}
+.donut svg {
+  width: 100%;
+  height: auto;
+}
+.donut-track,
+.donut-arc {
+  fill: none;
+  stroke-width: 14;
+  transform: rotate(-90deg);
+  transform-origin: 70px 70px;
+}
+.donut-track {
+  stroke: var(--surface-2);
+}
+.donut-arc {
+  stroke-linecap: round;
+}
+.donut-n {
+  fill: var(--ink);
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+.donut-l {
+  fill: var(--ink-muted);
+  font-size: 9px;
+}
+.donut-legend {
+  display: grid;
+  gap: 0.375rem;
+  font-size: var(--text-sm);
+}
+.donut-legend li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+/* « View the numbers »: opens and closes smoothly (the content's height animates; older browsers just toggle). */
+.fold {
+  interpolate-size: allow-keywords;
+  font-size: var(--text-sm);
+}
+.fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  cursor: pointer;
+  color: var(--ink-muted);
+  list-style: none;
+}
+.fold > summary::-webkit-details-marker {
+  display: none;
+}
+.fold > summary::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-inline-start: 0.125rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform var(--duration-ui) var(--ease-out);
+}
+.fold[open] > summary::after {
+  transform: rotate(225deg);
+}
+.fold::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.32s var(--ease-out),
+    content-visibility 0.32s allow-discrete;
+}
+.fold[open]::details-content {
+  block-size: auto;
+}
+.fold-body {
+  padding-block: 0.5rem 0.25rem;
+}
+.chart-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.chart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.chart-table th,
+.chart-table td {
+  padding: 0.5rem 0.875rem;
+  text-align: start;
+}
+.chart-table thead th {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+}
+.chart-table tbody th {
+  font-weight: 500;
+}
+.chart-table tbody tr:nth-child(even) {
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+}
+.chart-table td {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 40rem) {
+  .donut {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fold::details-content,
+  .fold > summary::after {
     transition: none;
   }
 }

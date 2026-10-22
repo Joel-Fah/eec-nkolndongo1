@@ -94,6 +94,9 @@ type Id =
   | 'todocards'
   | 'conversation'
   | 'searchhints'
+  | 'areachart'
+  | 'mapillustration'
+  | 'designbanner'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -276,6 +279,12 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('conversation')}><p class="text-sm text-ink-muted">{t('brand.components.conversation.use')}</p></DocBlock>
 
     <DocBlock {...doc('searchhints')}><p class="text-sm text-ink-muted">{t('brand.components.searchhints.use')}</p></DocBlock>
+
+    <DocBlock {...doc('areachart')}><p class="text-sm text-ink-muted">{t('brand.components.areachart.use')}</p></DocBlock>
+
+    <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
+
+    <DocBlock {...doc('designbanner')}><p class="text-sm text-ink-muted">{t('brand.components.designbanner.use')}</p></DocBlock>
 
     <DocBlock {...doc('picture')}><p class="text-sm text-ink-muted">{t('brand.components.picture.demo')}</p></DocBlock>
 

@@ -73,13 +73,40 @@ function groupOf(
   }
 }
 
+/** The date window of a preset (local dates), or the two chosen days. */
+function windowOf(
+  range: string,
+  custom: { from: string; to: string },
+): { from?: string; to?: string } {
+  const iso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  const now = new Date()
+  const daysAgo = (n: number) => new Date(now.getFullYear(), now.getMonth(), now.getDate() - n)
+  if (range === 'today') return { from: iso(now), to: iso(now) }
+  if (range === 'week') return { from: iso(daysAgo((now.getDay() + 6) % 7)), to: iso(now) }
+  if (range === 'month')
+    return { from: iso(new Date(now.getFullYear(), now.getMonth(), 1)), to: iso(now) }
+  if (range === '90') return { from: iso(daysAgo(90)), to: iso(now) }
+  if (range === 'custom') return { from: custom.from || undefined, to: custom.to || undefined }
+  return {}
+}
+
 export default function ContactInbox() {
   const { t, locale } = useLocale()
   const [status, setStatus] = useState('all')
+  const [range, setRange] = useState('all')
+  const [custom, setCustom] = useState({ from: '', to: '' })
   const [openId, setOpenId] = useState<string | null>(null)
   const list = useQuery({
-    queryKey: ['contact', status],
-    queryFn: () => api<{ items: Row[] }>(`/contact${status === 'all' ? '' : `?status=${status}`}`),
+    queryKey: ['contact', status, range, custom],
+    queryFn: () => {
+      const q = new URLSearchParams()
+      if (status !== 'all') q.set('status', status)
+      const w = windowOf(range, custom)
+      if (w.from) q.set('from', w.from)
+      if (w.to) q.set('to', w.to)
+      return api<{ items: Row[] }>(`/contact${q.size ? `?${q}` : ''}`)
+    },
   })
   const items = list.data?.items ?? []
   const now = new Date()

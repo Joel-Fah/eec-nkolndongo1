@@ -823,6 +823,24 @@
         "desc": "Empty box: what you can search, words to try, direct actions and real suggestions from the site. No result: “Did you mean…”. Search forgives typos.",
         "use": "Header dialog and the /search page; /api/search/suggest.",
         "a11y": "Suggestions are ordinary links; the actions list is a list of links."
+      },
+      "areachart": {
+        "name": "Smooth area charts",
+        "desc": "Smoothed curves (no overshoot) with a gradient under the line, rounded ends, rounded bars and a round-ended donut; every chart has a table of its numbers (months written out with the year) in a fold that opens smoothly.",
+        "use": "<AreaChart>, <BarChart>, <Donut>, <ChartCard> in the admin; colours by tokens.",
+        "a11y": "Each chart has a name (role=img) and an equivalent table; tooltips are <title>."
+      },
+      "mapillustration": {
+        "name": "Drawn map",
+        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded.",
+        "use": "<MapIllustration name href label /> on Find us.",
+        "a11y": "Decorative (aria-hidden); the address and the button carry the information."
+      },
+      "designbanner": {
+        "name": "Design guide banner",
+        "desc": "In the admin, a full banner: an illustration, cards and UI pieces floating at three depths (near and blurred, far and blurred, sharp) and one call to action to the guide.",
+        "use": "The admin’s Design guide tab.",
+        "a11y": "The floating pieces are decorative (hidden from screen readers and the pointer); the button is an ordinary link."
       }
     },
     "rules": {
@@ -1390,7 +1408,17 @@
     "chart_bar": "Example bar chart over twelve months",
     "chart_table": "See the charts’ numbers",
     "chart_month": "Month",
-    "chart_value": "Value"
+    "chart_value": "Value",
+    "cta_t": "The design guide",
+    "cta_p": "Colours, typography, components, motion: it is all documented, so every screen stays consistent.",
+    "cta": "Open the guide",
+    "tease_colour": "Colours and light and dark themes",
+    "tease_type": "Erode for headings, Switzer for text",
+    "tease_parts": "Buttons, fields, dialogs, cards",
+    "tease_button": "Save",
+    "tease_badge": "New",
+    "tease_switch": "Dark mode",
+    "tease_secondary": "Cancel"
   },
   "page": {
     "cta_title": "A question, a memory, a wish to come?",
@@ -1832,7 +1860,19 @@
     "todo_missing_en_guides": "{n} published guide(s) without an English title.",
     "todo_level_critical": "urgent",
     "todo_level_attention": "needs attention",
-    "todo_level_info": "good to know"
+    "todo_level_info": "good to know",
+    "trends_title": "Trends",
+    "chart_messages": "Messages received per month",
+    "chart_publications": "Publications per month",
+    "chart_media": "Photos added per month",
+    "chart_categories": "Messages by subject (90 days)",
+    "series_messages": "Messages",
+    "series_news": "News",
+    "series_events": "Events",
+    "series_media": "Photos",
+    "view_numbers": "View the numbers",
+    "month": "Month",
+    "total": "in all"
   },
   "content": {
     "status": {
