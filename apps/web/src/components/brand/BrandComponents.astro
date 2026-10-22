@@ -83,6 +83,12 @@ type Id =
   | 'historyclimb'
   | 'councilcard'
   | 'liveswap'
+  | 'searchdialog'
+  | 'contactform'
+  | 'givingcard'
+  | 'directions'
+  | 'todopanel'
+  | 'policynotice'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -243,6 +249,18 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('councilcard')}><p class="text-sm text-ink-muted">{t('brand.components.councilcard.use')}</p></DocBlock>
 
     <DocBlock {...doc('liveswap')}><p class="text-sm text-ink-muted">{t('brand.components.liveswap.use')}</p></DocBlock>
+
+    <DocBlock {...doc('searchdialog')}><p class="text-sm text-ink-muted">{t('brand.components.searchdialog.use')}</p></DocBlock>
+
+    <DocBlock {...doc('contactform')}><p class="text-sm text-ink-muted">{t('brand.components.contactform.use')}</p></DocBlock>
+
+    <DocBlock {...doc('givingcard')}><p class="text-sm text-ink-muted">{t('brand.components.givingcard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('directions')}><p class="text-sm text-ink-muted">{t('brand.components.directions.use')}</p></DocBlock>
+
+    <DocBlock {...doc('todopanel')}><p class="text-sm text-ink-muted">{t('brand.components.todopanel.use')}</p></DocBlock>
+
+    <DocBlock {...doc('policynotice')}><p class="text-sm text-ink-muted">{t('brand.components.policynotice.use')}</p></DocBlock>
 
     <DocBlock {...doc('picture')}><p class="text-sm text-ink-muted">{t('brand.components.picture.demo')}</p></DocBlock>
 

@@ -757,6 +757,42 @@
         "desc": "On the agenda, departments and news, changing view, filter or page replaces only the results; the address and Back button follow.",
         "use": "data-live-area region, data-live-nav links (data-live-scroll for pagination).",
         "a11y": "Without JavaScript they are plain links. Focus and scroll position are kept."
+      },
+      "searchdialog": {
+        "name": "Site search",
+        "desc": "The header magnifier opens a dialog: results appear as you type; Enter goes to the full results page, grouped by type, with highlighted excerpts (accent- and case-insensitive).",
+        "use": "<dialog data-search> with <input name=\"q\">; the /search?q= page.",
+        "a11y": "Native dialog (focus trapped, Esc); results announced (aria-live); works without JavaScript through the GET form."
+      },
+      "contactform": {
+        "name": "Contact form",
+        "desc": "Name, e-mail or phone, subject, message and an unticked consent. Anti-spam without a third party: a hidden trap field, a minimum fill time, a per-address limit.",
+        "use": "<ContactForm subject=\"…\" /> on the Find us page; the subject comes from the “Ask a question” link.",
+        "a11y": "Every field is labelled; errors are announced (role=status); the prayer request says it is confidential."
+      },
+      "givingcard": {
+        "name": "Giving card",
+        "desc": "One card per method (MTN, Orange, bank): merchant, number, a “Copy the number” button and, on phones, a link to dial the merchant code. Nothing shows until the value is approved.",
+        "use": "Give page, from Settings → Giving; USSD code: tel: with # encoded as %23.",
+        "a11y": "The button says “Copied”; the dial link only appears on touch screens."
+      },
+      "directions": {
+        "name": "Directions links",
+        "desc": "Approved address and three links: the phone’s maps app (geo:), Google Maps, OpenStreetMap. No embedded map: no third-party data loaded.",
+        "use": "Find us page, from the approved coordinates in settings.",
+        "a11y": "Clear links with the “new tab” icon; the geo: link is hidden on desktop."
+      },
+      "todopanel": {
+        "name": "To do",
+        "desc": "On the admin home: what is waiting for the signed-in person (new messages, their drafts, this week’s publications, empty Sundays, times to approve, missing English titles), filtered by their rights.",
+        "use": "<TodoPanel />; each line leads to the module concerned.",
+        "a11y": "A list of links; hidden when nothing is waiting."
+      },
+      "policynotice": {
+        "name": "“The policy has changed” notice",
+        "desc": "In My space, a gentle notice with the summary of changes; an “I accept” button only appears when the purposes changed.",
+        "use": "My space → My data; fed by the latest published privacy version.",
+        "a11y": "role=status; link to the new policy."
       }
     },
     "rules": {
@@ -1747,7 +1783,19 @@
     "qa_members": "View members",
     "qa_settings": "Settings",
     "qa_outbox": "Outbox",
-    "qa_activity": "Recent activity"
+    "qa_activity": "Recent activity",
+    "todo_title": "To do",
+    "todo_messages": "{n} new message(s) to read.",
+    "todo_drafts_news": "{n} news draft(s) of yours.",
+    "todo_drafts_events": "{n} event draft(s) of yours.",
+    "todo_drafts_guides": "{n} guide draft(s).",
+    "todo_scheduled_news": "{n} news post(s) scheduled this week.",
+    "todo_scheduled_events": "{n} event(s) scheduled this week.",
+    "todo_empty_sundays": "{n} Sunday(s) with no programme in the next 4 weeks: {dates}.",
+    "todo_slots": "{n} time(s) waiting for approval.",
+    "todo_missing_en_news": "{n} published news post(s) without an English title.",
+    "todo_missing_en_events": "{n} published event(s) without an English title.",
+    "todo_missing_en_guides": "{n} published guide(s) without an English title."
   },
   "content": {
     "status": {

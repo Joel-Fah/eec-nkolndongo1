@@ -1,0 +1,147 @@
+/**
+ * `pnpm content:pending` — every public place still waiting for validated content, for Joël and the content partner.
+ *   1. `À VALIDER` markers in the content tracker (docs/content) and in the built-in French texts (packages/i18n).
+ *   2. Database flags (read-only, whichever database .env.local points to): settings fields with a value that is not
+ *      approved, schedule slots not approved, guides / department pages / story texts / milestones still drafts,
+ *      council people without a recorded consent, giving fields still empty.
+ * Writes docs/content/PENDING.md (generated, overwritten each run) and prints a summary. Reads only; never changes data.
+ */
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import pg from 'pg'
+import { envLocal } from './env-local.ts'
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+const MARK = /À VALIDER/i
+const lines: string[] = []
+const add = (s = '') => lines.push(s)
+
+// 1. Markers in the tracker and in texts.
+const tracker = readFileSync(join(root, 'docs/content/README.md'), 'utf8')
+  .split('\n')
+  .filter((l) => l.startsWith('|') && MARK.test(l))
+const messages = JSON.parse(
+  readFileSync(join(root, 'packages/i18n/messages/fr.json'), 'utf8'),
+) as unknown
+const texts: string[] = []
+const walk = (v: unknown, path: string) => {
+  if (typeof v === 'string') {
+    if (MARK.test(v)) texts.push(`${path}: ${v.slice(0, 110)}`)
+  } else if (v && typeof v === 'object')
+    for (const [k, x] of Object.entries(v)) walk(x, path ? `${path}.${k}` : k)
+}
+walk(messages, '')
+for (const f of readdirSync(join(root, 'modules'), { withFileTypes: true })) {
+  if (!f.isDirectory() || f.name === 'node_modules') continue
+  try {
+    walk(JSON.parse(readFileSync(join(root, 'modules', f.name, 'i18n', 'fr.json'), 'utf8')), f.name)
+  } catch {
+    // a module without texts
+  }
+}
+
+// 2. Database flags.
+type Q = { label: string; sql: string; where: string }
+const queries: Q[] = [
+  {
+    label: 'Settings values entered but not approved',
+    sql: `select section || '.' || k as item from settings, jsonb_each(values) as e(k, v) where v->>'value' <> '' and (v->>'validated')::boolean = false order by 1`,
+    where: 'Paramètres → onglets Paroisse, Donner',
+  },
+  {
+    label: 'Service times not approved',
+    sql: `select label_fr as item from schedule_slots where validated = false order by 1`,
+    where: 'Cultes et horaires',
+  },
+  {
+    label: 'Guides still drafts',
+    sql: `select title_fr as item from guides where state = 'draft' order by 1`,
+    where: 'Vie pratique',
+  },
+  {
+    label: 'Group pages still drafts',
+    sql: `select g.name_fr as item from department_pages p join groups g on g.id = p.group_id where p.state = 'draft' order by 1`,
+    where: 'Groupes → Page publique',
+  },
+  {
+    label: 'Page texts still drafts',
+    sql: `select page_key || '.' || slot_key as item from page_slots where state = 'draft' order by 1`,
+    where: 'Pages du site → Textes',
+  },
+  {
+    label: 'History milestones still drafts',
+    sql: `select coalesce(nullif(title_fr, ''), year) as item from history_milestones where state = 'draft' order by sort_order`,
+    where: 'Pages du site → Histoire',
+  },
+  {
+    label: 'Council people with no consent (role only on the site)',
+    sql: `select name as item from council_members where public_consent = false order by 1`,
+    where: 'Pages du site → Pasteurs et Conseil',
+  },
+  {
+    label: 'Legal documents never published',
+    sql: `select k as item from (values ('privacy'), ('mentions'), ('credits')) v(k) where not exists (select 1 from legal_documents d where d.doc_key = v.k and d.state = 'published')`,
+    where: 'Documents légaux',
+  },
+  {
+    label: 'Giving fields still empty (the page shows « bientôt »)',
+    sql: `select f as item from (values ('momoNumber'), ('omNumber'), ('bankAccount')) v(f) where coalesce((select values->f->>'value' from settings where section = 'giving'), '') = ''`,
+    where: 'Paramètres → Donner',
+  },
+]
+
+const url = envLocal('DATABASE_URL_UNPOOLED')
+const results: { q: Q; items: string[] }[] = []
+let dbNote = ''
+if (url) {
+  const c = new pg.Client({ connectionString: url, connectionTimeoutMillis: 20_000 })
+  try {
+    await c.connect()
+    for (const q of queries)
+      results.push({ q, items: (await c.query<{ item: string }>(q.sql)).rows.map((r) => r.item) })
+    dbNote = `database branch: ${envLocal('NEON_BRANCH') ?? 'unknown'}`
+  } catch (e) {
+    const err = e as { code?: string; errors?: { code?: string }[]; message?: string }
+    dbNote = `database not reachable (${err.code ?? err.errors?.[0]?.code ?? err.message ?? 'unknown'}): only the file markers are listed`
+  } finally {
+    await c.end().catch(() => {})
+  }
+} else dbNote = 'no DATABASE_URL_UNPOOLED: only the file markers are listed'
+
+add('# Content still waiting for validation')
+add()
+add(
+  `_Generated by \`pnpm content:pending\` on ${new Date().toISOString().slice(0, 10)} — ${dbNote}. Do not edit by hand._`,
+)
+add()
+add('Nothing below is shown as a fact on the public site until it is validated and approved.')
+add()
+add(`## In the tracker (${tracker.length})`)
+add()
+for (const l of tracker)
+  add(
+    `- ${l
+      .split('|')
+      .slice(1, 5)
+      .map((x) => x.trim())
+      .join(' — ')}`,
+  )
+add()
+add(`## Built-in texts marked À VALIDER (${texts.length})`)
+add()
+for (const t of texts) add(`- \`${t}\``)
+for (const { q, items } of results) {
+  add()
+  add(`## ${q.label} (${items.length})`)
+  add()
+  add(`Where: ${q.where}`)
+  add()
+  for (const i of items) add(`- ${i}`)
+  if (!items.length) add('- nothing waiting')
+}
+writeFileSync(join(root, 'docs/content/PENDING.md'), `${lines.join('\n')}\n`)
+console.log(`${dbNote}`)
+console.log(`tracker: ${tracker.length} · built-in texts: ${texts.length}`)
+for (const { q, items } of results) console.log(`${String(items.length).padStart(3)}  ${q.label}`)
+console.log('→ docs/content/PENDING.md')

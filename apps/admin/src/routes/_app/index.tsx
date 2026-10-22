@@ -5,6 +5,7 @@ import { Headcount } from '../../components/Headcount'
 import { Icon } from '../../components/Icon'
 import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
+import { TodoPanel } from '../../components/TodoPanel'
 import { WelcomeBanner } from '../../components/WelcomeBanner'
 import { labelOf, navFor } from '../../lib/nav'
 
@@ -19,6 +20,7 @@ function Dashboard() {
     <div className="grid gap-8">
       <WelcomeBanner />
       <QuickActions />
+      <TodoPanel />
       <Headcount />
       <RecentActivity />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

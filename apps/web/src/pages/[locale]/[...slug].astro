@@ -24,6 +24,12 @@ export function getStaticPaths() {
             'histoire',
             'croyances',
             'pasteurs',
+            'search',
+            'give',
+            'trouver',
+            'privacy',
+            'legal',
+            'credits',
           ].includes(page.id),
       )
       .map((page) => ({ params: { locale, slug: page.path[locale] }, props: { id: page.id } })),

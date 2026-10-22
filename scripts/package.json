@@ -8,6 +8,8 @@
     "contrast": "node contrast-check.ts",
     "brand:icons": "node brand-icons.ts",
     "lint": "biome check . && node check-design-rules.ts",
+    "content:pending": "node content-pending.ts",
+    "e2e": "node e2e.ts",
     "dev:vars": "node dev-vars.ts",
     "dev:gateway": "node dev-gateway.ts",
     "illos:fetch": "node illos-fetch.ts",

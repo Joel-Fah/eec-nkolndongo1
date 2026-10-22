@@ -29,8 +29,12 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0024 | Storyset (Cuate) illustrations, recoloured, never committed | Accepted |
 | 0025 | The admin's address is configurable (ADMIN_PATH) | Accepted |
 | 0027 | How content pages are rendered (on demand from cached JSON) | Accepted |
+| 0028 | Rich text: a restricted block schema, cleaned on every save | Accepted |
 | 0029 | Events: structured recurrence, exceptions, own RFC 5545 writer | Accepted |
+| 0030 | Search: Postgres full-text, accent-insensitive, no third party | Accepted |
+| 0031 | Names and photos of people: public only with a recorded consent | Accepted |
 | 0032 | Bible translations: public domain only (LSG 1910, WEB) | Accepted |
+| 0033 | Legal documents are versioned; members told when the policy changes | Accepted |
 | 0026 | Seasonal playground under the footer | Accepted |
 | 0020 | Media storage: S3-compatible, Neon Object Storage first | Accepted |
 | 0022 | Backups: encrypted logical dumps, a tested restore | Accepted |

@@ -51,3 +51,4 @@ apps/admin/public/illustrations/
 
 # Shared + module messages merged before compiling (packages/i18n/src/merge.ts)
 packages/i18n/messages/merged/
+docs/content/PENDING.md

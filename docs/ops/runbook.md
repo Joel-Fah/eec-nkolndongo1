@@ -54,6 +54,17 @@ migrations are not rolled back by this: write a new forward migration.
 workflow runs it once these GitHub secrets exist: `MEDIA_COPY_ENDPOINT` (`https://<account id>.r2.cloudflarestorage.com`),
 `MEDIA_COPY_BUCKET`, `MEDIA_COPY_ACCESS_KEY_ID`, `MEDIA_COPY_SECRET_ACCESS_KEY` (an R2 API token with object read/write).
 
+## End-to-end check (by hand, never in CI)
+`pnpm dev` running, then `pnpm e2e` (needs the dev test account; `E2E_EMAIL` / `E2E_PASSWORD` override it). It publishes
+and schedules a post, checks a recurring event with a cancelled date in the `.ics` feed, sends contact messages (including
+the spam traps and the missing consent) and checks the inbox, and finds the post through search. It runs against a local
+stack only and removes what it creates. A scheduled post takes about 2 minutes (cache time).
+
+## Content still waiting for validation
+`pnpm content:pending` lists every public place waiting for validated content (the `À VALIDER` markers and the database
+flags) and writes `docs/content/PENDING.md` (generated, not committed). Run it against production (when it is lifted) to
+send the list to the content partner.
+
 ## Daily retention
 A Cloudflare Cron Trigger (03:17 UTC) runs `apps/api/src/retention.ts`: expired sessions and links, outbox > 90 days,
 audit > 24 months, accounts whose deletion was requested > 30 days ago. Each run writes a row in `retention_runs`.

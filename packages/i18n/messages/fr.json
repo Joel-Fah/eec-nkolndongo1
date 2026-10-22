@@ -757,6 +757,42 @@
         "desc": "Sur l’agenda, les départements et les actualités, changer de vue, de filtre ou de page remplace seulement les résultats ; l’adresse et le bouton Retour suivent.",
         "use": "Zone data-live-area, liens data-live-nav (data-live-scroll pour la pagination).",
         "a11y": "Sans JavaScript, ce sont de simples liens. Le focus et la position de défilement sont conservés."
+      },
+      "searchdialog": {
+        "name": "Recherche du site",
+        "desc": "La loupe de l’en-tête ouvre un dialogue : en tapant, les premiers résultats apparaissent ; Entrée mène à la page de résultats groupés par type, avec extraits surlignés (sans accents ni majuscules).",
+        "use": "<dialog data-search> avec <input name=\"q\"> ; page /recherche?q=.",
+        "a11y": "Dialogue natif (focus piégé, Échap) ; résultats annoncés (aria-live) ; fonctionne sans JavaScript via le formulaire GET."
+      },
+      "contactform": {
+        "name": "Formulaire de contact",
+        "desc": "Nom, e-mail ou téléphone, sujet, message et consentement non pré-coché. Pièges anti-spam sans service tiers : champ piège caché, délai minimal, limite par adresse.",
+        "use": "<ContactForm subject=\"…\" /> sur la page Nous trouver ; le sujet vient du lien « Poser une question ».",
+        "a11y": "Chaque champ a son libellé ; erreurs annoncées (role=status) ; la demande de prière indique sa confidentialité."
+      },
+      "givingcard": {
+        "name": "Carte pour donner",
+        "desc": "Une carte par moyen (MTN, Orange, banque) : marchand, numéro, bouton « Copier le numéro » et, sur téléphone, un lien pour composer le code marchand. Rien ne s’affiche tant que la valeur n’est pas approuvée.",
+        "use": "Page Donner, depuis Paramètres → Donner ; code USSD : tel: avec # encodé en %23.",
+        "a11y": "Le bouton annonce « Copié » ; le lien d’appel n’apparaît que sur écran tactile."
+      },
+      "directions": {
+        "name": "Liens d’itinéraire",
+        "desc": "Adresse approuvée et trois liens : application de cartes du téléphone (geo:), Google Maps, OpenStreetMap. Aucune carte intégrée : aucune donnée tierce chargée.",
+        "use": "Page Nous trouver, depuis les coordonnées approuvées des paramètres.",
+        "a11y": "Liens clairs avec icône « nouvel onglet » ; le lien geo: est masqué sur ordinateur."
+      },
+      "todopanel": {
+        "name": "À faire",
+        "desc": "Sur l’accueil de l’administration : ce qui attend la personne connectée (nouveaux messages, ses brouillons, publications de la semaine, dimanches sans programme, horaires à approuver, traductions anglaises manquantes), filtré par ses droits.",
+        "use": "<TodoPanel /> ; chaque ligne mène au module concerné.",
+        "a11y": "Liste de liens ; masqué quand rien n’attend."
+      },
+      "policynotice": {
+        "name": "Avis « La politique a changé »",
+        "desc": "Dans Mon espace, un avis discret avec le résumé des changements ; un bouton « J’accepte » n’apparaît que si les finalités ont changé.",
+        "use": "Mon espace → Mes données ; alimenté par la dernière version publiée de la politique.",
+        "a11y": "role=status ; lien vers la nouvelle politique."
       }
     },
     "rules": {
@@ -1747,7 +1783,19 @@
     "qa_members": "Voir les membres",
     "qa_settings": "Paramètres",
     "qa_outbox": "Boîte d’envoi",
-    "qa_activity": "Activité récente"
+    "qa_activity": "Activité récente",
+    "todo_title": "À faire",
+    "todo_messages": "{n} nouveau(x) message(s) à lire.",
+    "todo_drafts_news": "{n} brouillon(s) d’actualité à vous.",
+    "todo_drafts_events": "{n} brouillon(s) d’événement à vous.",
+    "todo_drafts_guides": "{n} brouillon(s) de parcours.",
+    "todo_scheduled_news": "{n} actualité(s) programmée(s) cette semaine.",
+    "todo_scheduled_events": "{n} événement(s) programmé(s) cette semaine.",
+    "todo_empty_sundays": "{n} dimanche(s) sans programme dans les 4 semaines : {dates}.",
+    "todo_slots": "{n} horaire(s) à approuver.",
+    "todo_missing_en_news": "{n} actualité(s) publiée(s) sans titre anglais.",
+    "todo_missing_en_events": "{n} événement(s) publié(s) sans titre anglais.",
+    "todo_missing_en_guides": "{n} parcours publié(s) sans titre anglais."
   },
   "content": {
     "status": {

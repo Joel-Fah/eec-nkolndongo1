@@ -2,28 +2,11 @@
 
 _Last updated: 2026-10-21_
 
-## Current phase: 03a — Parish Life · Checkpoint B (events, schedule, liturgy, home) ready for review
-Branch `feat/phase-03a-content-time`. Production stays paused (dev only), nothing deployed. Plan: `docs/phases/PHASE_03_INSTRUCTIONS.md`.
-- **Checkpoint 0 done:** `cachedJson` refresh bug fixed (own connection), cache hits no longer open a DB connection (version and
-  module flags memoised), cold reads time-boxed (503, never 500), CPU figures in decision 0027, public-domain Bible verses
-  (LSG 1910 / WEB, decision 0032), CI `--env-file-if-exists` fix.
-- **Content kit:** `@eec/core` rich text (clean + render, hostile-input tests) and lifecycle; `@eec/api-kit` preview links
-  (signed, 3 days); `@eec/content-kit` (TipTap editor loaded lazily, media picker, publish dialog, revisions, autosave,
-  cover field, status badge); `content_revisions` / `content_redirects` (migration 0006); media tables moved to `@eec/db`.
-- **News module:** admin list + editor (FR/EN tabs, autosave, schedule, unpublish, archive, delete, versions, preview link,
-  group-scoped rights), public list/detail/preview pages (on demand, cached JSON), RSS, home « Dernières nouvelles »,
-  dev-only example seed (`pnpm news:seed-dev [-- --clear]`). Entries added to the living guide.
-- **Checkpoint A follow-ups (Joël's review):** richer editor (alignment, underline, strike, highlight, sub/superscript, task
-  lists, tables, indent, h2/h3), themed loading bar + spinner on navigation, new sidebar icons, visible backdrop dots on
-  illustrations (`pnpm illos:fetch --force` after pulling).
-- **Checkpoint B (built):** `events` (structured recurrence, cancelled/moved dates, admin list + month calendar, public list /
-  month / event page, `.ics` and subscribable feed, decision 0029), `schedule` (approved slots, planned changes,
-  `nextService()`, week view, per-slot `.ics`), `liturgy` (Sundays with consent-gated names, season texts, verses, verse of the
-  day, « Ce dimanche » page, liturgical-year dial), home « Ce dimanche » / « Prochainement » / « Dernières nouvelles » (static
-  home + cached JSON), Agenda menu highlight. Shared `contentRoutes` factory in api-kit (news and events use it).
-  Dev seed: `pnpm content:seed-dev [-- --clear]` (fictional « Exemple — … » data only).
-- **Next:** 03b (departments, guides, story pages, council, search, contact, giving, legal, launch readiness). **Open:** real CPU reading on production, TipTap chunk is
-  125 KB gz (admin only), news permissions are not added to existing roles in a database already seeded (grant in Rôles).
+## Current phase: 03b — Parish Life · Checkpoint D (search, contact, giving, Nous trouver, legal, launch readiness) ready for review
+**Dev only; production untouched.** Built on `feat/phase-03b-people-pages` (from 03a): C (departments in Groups, guides, story pages, council) and D (search, contact form + inbox, giving settings + page, Nous trouver links, versioned legal documents with the member notice, admin « À faire »), plus the launch-readiness pass.
+Full details, measurements and gaps: `docs/phases/PHASE_03_REPORT.md`. `pnpm check` is green; `pnpm e2e` passes 9/9 (by hand).
+**Not done:** TalkBack/keyboard audit, real-phone check of tap-to-dial and `geo:` links, production LCP/CPU readings, home texts as slots.
+**Next:** Joël's review of D → wrap-up PRs (03a then 03b, squash) → launch decisions (content validated, real photos, `SITE_INDEXABLE=1`) → Phase 04.
 
 ## Previous phase: 02 — Platform Core · Checkpoint C (media, members, deploy prep)
 
