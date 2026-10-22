@@ -91,6 +91,11 @@ export const todoRoutes = new Hono<AppEnv>().get('/', requireSelf(), async (c) =
       sql`select count(*)::int as n from schedule_slots where validated = false`,
     )
   if (may('contact:read')) {
+    out.oldestMessageHours = await num(
+      may('contact:read-sensitive')
+        ? sql`select coalesce(extract(epoch from now() - min(created_at)) / 3600, 0)::int as n from contact_messages where status = 'new'`
+        : sql`select coalesce(extract(epoch from now() - min(created_at)) / 3600, 0)::int as n from contact_messages where status = 'new' and sensitive = false`,
+    )
     out.newMessages = await num(
       may('contact:read-sensitive')
         ? sql`select count(*)::int as n from contact_messages where status = 'new'`

@@ -793,6 +793,36 @@
         "desc": "In My space, a gentle notice with the summary of changes; an “I accept” button only appears when the purposes changed.",
         "use": "My space → My data; fed by the latest published privacy version.",
         "a11y": "role=status; link to the new policy."
+      },
+      "insightcards": {
+        "name": "Key-points cards",
+        "desc": "Three or five cards (otherwise none) summing up a document’s main points: slightly stacked, fanned on a gentle arc, cropped at the bottom; hover spreads them. Same family as the dashboard cards.",
+        "use": "<InsightCards items=\"…\" /> on privacy and the legal notice, built from the document’s headings.",
+        "a11y": "Each card links to its section; the arrangement is decorative, the content stays readable."
+      },
+      "inbox": {
+        "name": "Inbox layout",
+        "desc": "Messages grouped by week then by month on one side, the open message on the other (instead of a modal). On a small screen, one pane at a time.",
+        "use": "Admin → Messages; classes .inbox, .inbox-row, .inbox-view.",
+        "a11y": "List as navigation; active row with aria-current; Back button on small screens."
+      },
+      "todocards": {
+        "name": "To-do cards",
+        "desc": "Cards ranked by urgency — urgent (red), needs attention (amber), good to know (blue) — each with the icon of its screen and a count.",
+        "use": "<TodoPanel /> on the admin home.",
+        "a11y": "The level is said in words and with an icon, never by colour alone."
+      },
+      "conversation": {
+        "name": "Conversational form",
+        "desc": "A form in four short steps: the need (big tiles), the message (starting phrases), how to reply, a last look. One question at a time, with progress and back.",
+        "use": "<ContactForm /> on Find us; scripts/contact-form.ts.",
+        "a11y": "Each step is a fieldset with a legend; focus moves to the new question; errors are announced."
+      },
+      "searchhints": {
+        "name": "Search hints and actions",
+        "desc": "Empty box: what you can search, words to try, direct actions and real suggestions from the site. No result: “Did you mean…”. Search forgives typos.",
+        "use": "Header dialog and the /search page; /api/search/suggest.",
+        "a11y": "Suggestions are ordinary links; the actions list is a list of links."
       }
     },
     "rules": {
@@ -1743,7 +1773,11 @@
     "listen": "Listen",
     "soon": "Soon",
     "credits_t": "Thank you to the photographers",
-    "credits_p": "The names behind the images on this site."
+    "credits_p": "The names behind the images on this site.",
+    "trouver_write_t": "A question?",
+    "trouver_write_p": "Write to us: the team replies.",
+    "trouver_first_t": "First visit?",
+    "trouver_first_p": "Come as you are."
   },
   "bible": {
     "lsg": "LSG",
@@ -1795,7 +1829,10 @@
     "todo_slots": "{n} time(s) waiting for approval.",
     "todo_missing_en_news": "{n} published news post(s) without an English title.",
     "todo_missing_en_events": "{n} published event(s) without an English title.",
-    "todo_missing_en_guides": "{n} published guide(s) without an English title."
+    "todo_missing_en_guides": "{n} published guide(s) without an English title.",
+    "todo_level_critical": "urgent",
+    "todo_level_attention": "needs attention",
+    "todo_level_info": "good to know"
   },
   "content": {
     "status": {
@@ -1938,6 +1975,28 @@
     "unavailable": "Search is not answering right now. Please try again in a moment.",
     "hint": "Press Enter for all results",
     "close": "Close",
-    "loading": "Searching…"
+    "loading": "Searching…",
+    "hints_t": "You can search for",
+    "hints_p": "A news item, an event, a group, a guide (baptism, marriage…) or a page of the site. Typos and accents don’t matter.",
+    "try": "Try",
+    "ex1": "times",
+    "ex2": "baptism",
+    "ex3": "youth",
+    "ex4": "prayer",
+    "actions_t": "Go straight to",
+    "act_cultes": "Service times",
+    "act_dimanche": "This Sunday",
+    "act_evenements": "Calendar",
+    "act_departements": "Groups and departments",
+    "act_pratique": "Practical life",
+    "act_trouver": "Find us",
+    "act_write": "Write a message",
+    "act_give": "Give",
+    "sug_guides": "Guides",
+    "sug_groups": "Groups",
+    "sug_news": "Latest news",
+    "sug_event": "Next event",
+    "did_you_mean": "Did you mean:",
+    "related": "Suggested actions"
   }
 }

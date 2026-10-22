@@ -33,6 +33,7 @@ export const sections: Record<SectionId, FieldDef[]> = {
     { key: 'youtube', kind: 'url', max: 300 },
     { key: 'mapLat', kind: 'number' },
     { key: 'mapLng', kind: 'number' },
+    { key: 'mapUrl', kind: 'url', max: 300 },
   ],
   season: [
     { key: 'moissonsStart', kind: 'date' },
@@ -104,6 +105,8 @@ Object.assign(seeds.parish, {
   nameFr: { value: 'Paroisse de Nkolndongo 1', validated: false },
   address: { value: 'Rue 4.032, Yaoundé 4e', validated: false },
   bp: { value: 'BP 110', validated: false },
+  // Given by Joël (product owner); still to be approved in the settings screen like every public fact.
+  mapUrl: { value: 'https://maps.app.goo.gl/hSM658mXKJw4yrUVA', validated: false },
   email: { value: 'eecnkolndongo@yahoo.fr', validated: false },
 })
 

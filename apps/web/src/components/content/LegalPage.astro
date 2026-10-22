@@ -4,6 +4,7 @@
  * version and date; the credits also list the Pexels photographers from the media library. Before anything is
  * published the built-in text stays.
  */
+import type { IconName } from '@eec/ui/icons'
 import '../../styles/richtext.css'
 import Site from '../../layouts/Site.astro'
 import { publicJson } from '../../lib/content-api'
@@ -13,6 +14,7 @@ import { labelKey } from '../../lib/nav'
 import { content } from '../../lib/pages'
 import PageView from '../PageView.astro'
 import PageHero from '../page/PageHero.astro'
+import InsightCards from './InsightCards.astro'
 import LangFallbackNote from './LangFallbackNote.astro'
 
 interface Props {
@@ -35,6 +37,47 @@ const date = doc
   ? new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(doc.publishedAt))
   : ''
 const page = content[id]
+const cardIcons: IconName[] =
+  id === 'legal'
+    ? ['info', 'shield', 'users', 'mail', 'lock']
+    : ['shield', 'lock', 'info', 'users', 'mail']
+// Anchors on the document's headings, and the main points (heading + first sentence) for the cards.
+const slug = (x: string) =>
+  x
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+const plain = (h: string) =>
+  h
+    .replace(/<[^>]*>/g, '')
+    .replace(/&#(\d+);/g, (_, c) => String.fromCharCode(Number(c)))
+    .replace(/&amp;/g, '&')
+    .trim()
+const firstSentence = (x: string) => (x.match(/^.{20,}?[.!?](\s|$)/)?.[0] ?? x).trim()
+let html = doc?.html ?? ''
+const cards: { title: string; text: string; href: string }[] = []
+if (doc) {
+  html = html.replace(
+    /<h2>(.*?)<\/h2>/g,
+    (_m, inner: string) => `<h2 id="${slug(plain(inner))}">${inner}</h2>`,
+  )
+  for (const m of html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>\s*(?:<p>(.*?)<\/p>)?/g))
+    cards.push({
+      title: plain(m[2] ?? ''),
+      text: firstSentence(plain(m[3] ?? '')),
+      href: `#${m[1]}`,
+    })
+} else if (page) {
+  // The built-in text: each section's title and first line.
+  for (const b of page.blocks) {
+    if ((b.t === 'text' || b.t === 'list') && b.title) {
+      const first = b.t === 'text' ? b.paras[0] : b.items[0]
+      cards.push({ title: t(b.title), text: first ? firstSentence(t(first)) : '', href: '#top' })
+    }
+  }
+}
 Astro.response.headers.set(
   'cache-control',
   result.state === 'ok' ? 'public, max-age=60, stale-while-revalidate=300' : 'no-store',
@@ -49,7 +92,8 @@ Astro.response.headers.set(
         {!heroes[id] && <h1 class="lg-title">{t(labelKey(id))}</h1>}
         <p class="lg-meta">{s('version', { label: doc.label, date })}</p>
         {doc.fallback && <LangFallbackNote />}
-        <div class="lg-body" set:html={doc.html} />
+        <InsightCards items={cards} icons={cardIcons} label={s("points")} more={s('read')} />
+        <div class="lg-body" set:html={html} />
         {id === 'credits' && (
           <section class="lg-credits">
             {pexels.length > 0 && (
@@ -64,7 +108,10 @@ Astro.response.headers.set(
         )}
       </article>
     ) : (
-      <PageView id={id} hideHeader={!!heroes[id]} />
+      <>
+        <div class="lg-cards"><InsightCards items={cards} icons={cardIcons} label={s('points')} more={s('read')} /></div>
+        <PageView id={id} hideHeader={!!heroes[id]} />
+      </>
     )
   }
 </Site>
@@ -76,6 +123,10 @@ Astro.response.headers.set(
     width: min(100% - 2rem, 46rem);
     margin-inline: auto;
     padding-block: 2rem 4rem;
+  }
+  .lg-cards {
+    width: min(100% - 2rem, 64rem);
+    margin-inline: auto;
   }
   .lg-title {
     font-family: var(--font-display);

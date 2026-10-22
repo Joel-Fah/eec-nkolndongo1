@@ -793,6 +793,36 @@
         "desc": "Dans Mon espace, un avis discret avec le résumé des changements ; un bouton « J’accepte » n’apparaît que si les finalités ont changé.",
         "use": "Mon espace → Mes données ; alimenté par la dernière version publiée de la politique.",
         "a11y": "role=status ; lien vers la nouvelle politique."
+      },
+      "insightcards": {
+        "name": "Cartes de points essentiels",
+        "desc": "Trois ou cinq cartes (sinon aucune) qui résument les points d’un document : légèrement empilées, en éventail sur un arc discret, rognées par le bas ; le survol les écarte. Même famille que les cartes du tableau de bord.",
+        "use": "<InsightCards items=\"…\" /> sur la confidentialité et les mentions légales, à partir des titres du document.",
+        "a11y": "Chaque carte est un lien vers sa section ; l’arrangement est décoratif, le contenu reste lisible."
+      },
+      "inbox": {
+        "name": "Boîte de réception",
+        "desc": "Messages groupés par semaine puis par mois d’un côté, le message ouvert de l’autre (au lieu d’une fenêtre). Sur petit écran, un volet à la fois.",
+        "use": "Administration → Messages ; classes .inbox, .inbox-row, .inbox-view.",
+        "a11y": "Liste en navigation ; ligne active en aria-current ; bouton Retour sur petit écran."
+      },
+      "todocards": {
+        "name": "Cartes « À faire »",
+        "desc": "Des cartes classées par urgence — urgent (rouge), à surveiller (ambre), pour info (bleu) — chacune avec l’icône de l’écran concerné et un compteur.",
+        "use": "<TodoPanel /> sur l’accueil de l’administration.",
+        "a11y": "Le niveau est dit en mots et par une icône, jamais par la couleur seule."
+      },
+      "conversation": {
+        "name": "Formulaire en conversation",
+        "desc": "Un formulaire en quatre petites étapes : le besoin (grandes tuiles), le message (phrases de départ), la façon de répondre, un dernier coup d’œil. Une question à la fois, avec progression et retour.",
+        "use": "<ContactForm /> sur Nous trouver ; scripts/contact-form.ts.",
+        "a11y": "Chaque étape est un fieldset avec légende ; le focus va à la nouvelle question ; erreurs annoncées."
+      },
+      "searchhints": {
+        "name": "Indices et actions de recherche",
+        "desc": "Boîte vide : ce que l’on peut chercher, des mots à essayer, des actions directes et de vraies suggestions du site. Sans résultat : « Vouliez-vous dire… ». La recherche tolère les fautes de frappe.",
+        "use": "Dialogue d’en-tête et page /recherche ; /api/search/suggest.",
+        "a11y": "Les suggestions sont des liens ordinaires ; la liste d’actions est un nav de liens."
       }
     },
     "rules": {
@@ -1743,7 +1773,11 @@
     "listen": "Écouter",
     "soon": "Bientôt",
     "credits_t": "Merci aux photographes",
-    "credits_p": "Les noms derrière les images de ce site."
+    "credits_p": "Les noms derrière les images de ce site.",
+    "trouver_write_t": "Une question ?",
+    "trouver_write_p": "Écrivez-nous : l’équipe répond.",
+    "trouver_first_t": "Première visite ?",
+    "trouver_first_p": "Venez comme vous êtes."
   },
   "bible": {
     "lsg": "LSG",
@@ -1795,7 +1829,10 @@
     "todo_slots": "{n} horaire(s) à approuver.",
     "todo_missing_en_news": "{n} actualité(s) publiée(s) sans titre anglais.",
     "todo_missing_en_events": "{n} événement(s) publié(s) sans titre anglais.",
-    "todo_missing_en_guides": "{n} parcours publié(s) sans titre anglais."
+    "todo_missing_en_guides": "{n} parcours publié(s) sans titre anglais.",
+    "todo_level_critical": "urgent",
+    "todo_level_attention": "à surveiller",
+    "todo_level_info": "pour info"
   },
   "content": {
     "status": {
@@ -1938,6 +1975,28 @@
     "unavailable": "La recherche ne répond pas pour l’instant. Réessayez dans un moment.",
     "hint": "Entrée pour voir tous les résultats",
     "close": "Fermer",
-    "loading": "Recherche…"
+    "loading": "Recherche…",
+    "hints_t": "Vous pouvez chercher",
+    "hints_p": "Une actualité, un rendez-vous, un groupe, un parcours (baptême, mariage…) ou une page du site. Les fautes de frappe et les accents ne gênent pas.",
+    "try": "Essayez",
+    "ex1": "horaires",
+    "ex2": "baptême",
+    "ex3": "jeunes",
+    "ex4": "prière",
+    "actions_t": "Aller directement à",
+    "act_cultes": "Horaires des cultes",
+    "act_dimanche": "Ce dimanche",
+    "act_evenements": "Agenda",
+    "act_departements": "Groupes et départements",
+    "act_pratique": "Vie pratique",
+    "act_trouver": "Nous trouver",
+    "act_write": "Écrire un message",
+    "act_give": "Donner",
+    "sug_guides": "Parcours",
+    "sug_groups": "Groupes",
+    "sug_news": "Dernières nouvelles",
+    "sug_event": "Prochain rendez-vous",
+    "did_you_mean": "Vouliez-vous dire :",
+    "related": "Actions suggérées"
   }
 }

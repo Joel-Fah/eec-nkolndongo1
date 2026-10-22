@@ -165,6 +165,11 @@
       "label": "Fête des Moissons",
       "ph": "Une phrase sur la Fête des Moissons",
       "help": "Mis en avant pendant les dates de la Fête des Moissons (onglet Saison liturgique)."
+    },
+    "mapUrl": {
+      "label": "Lien Google Maps",
+      "ph": "https://maps.app.goo.gl/…",
+      "help": "Le lien « Partager » de Google Maps pour la paroisse : il sert au bouton Itinéraire."
     }
   },
   "season_none": "Aucune (calcul automatique)",
@@ -203,7 +208,7 @@
     "soon_t": "Les moyens de donner arrivent bientôt",
     "soon_p": "Nous finalisons les détails avec la paroisse. En attendant, le secrétariat vous répond volontiers.",
     "soon_cta": "Contacter le secrétariat",
-    "thanks": "Merci : chaque don, petit ou grand, soutient la vie de la paroisse.",
+    "thanks": "Chaque don, petit ou grand, soutient la vie de la paroisse.",
     "momo": "MTN Mobile Money",
     "om": "Orange Money",
     "directions": "Itinéraire",
@@ -218,6 +223,25 @@
     "whatsapp": "WhatsApp",
     "purpose_dime": "Dîme",
     "purpose_offrande": "Offrande",
-    "purpose_projets": "Projets"
+    "purpose_projets": "Projets",
+    "first_t": "Pour une première visite",
+    "first_p": "Personne ne vous demandera d’où vous venez. Asseyez-vous, écoutez, chantez si vous en avez envie : vous êtes attendu.",
+    "first_services": "Voir les horaires",
+    "first_sunday": "Ce dimanche",
+    "quick_t": "Nous joindre tout de suite",
+    "write": "Écrire un message",
+    "where_t": "Où nous trouver",
+    "dir_open": "Ouvrir l’itinéraire",
+    "thanks_k": "Merci",
+    "how_t": "Donner en trois gestes",
+    "step1_t": "Choisissez un moyen",
+    "step1_p": "Mobile money ou virement, comme vous préférez.",
+    "step2_t": "Envoyez votre don",
+    "step2_p": "À vous de décider la somme : rien n’est demandé ici.",
+    "step3_t": "C’est tout",
+    "step3_p": "Aucune donnée n’est enregistrée sur ce site.",
+    "methods_t": "Les moyens de donner",
+    "copy_code": "Copier le code",
+    "bank_name": "Banque"
   }
 }

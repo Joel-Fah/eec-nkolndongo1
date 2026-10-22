@@ -8,16 +8,19 @@ import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Site from '../../layouts/Site.astro'
 import { type EventOcc, publicJson } from '../../lib/content-api'
+import { departmentHref } from '../../lib/departments-routes'
 import { eventHref } from '../../lib/events-routes'
 import { guideHref } from '../../lib/guides-routes'
 import { localeOf, useT } from '../../lib/i18n'
 import { descKey, href, labelKey, pages } from '../../lib/nav'
+import { newsItemHref } from '../../lib/news-routes'
 import { content } from '../../lib/pages'
 import {
   type Hit,
   highlight,
   hitHref,
   matchPages,
+  quickActions,
   SEARCH_TYPES,
   searchHref,
 } from '../../lib/search'
@@ -30,13 +33,14 @@ const q = raw.length >= 2 ? raw : ''
 const tooShort = raw.length === 1
 
 const api = q
-  ? await publicJson<{ items: (Omit<Hit, 'type'> & { type: Hit['type'] })[] }>(
-      Astro,
-      `/api/search?q=${encodeURIComponent(q)}&locale=${locale}`,
-    )
+  ? await publicJson<{
+      items: (Omit<Hit, 'type'> & { type: Hit['type'] })[]
+      didYouMean?: string[]
+    }>(Astro, `/api/search?q=${encodeURIComponent(q)}&locale=${locale}`)
   : null
 const unavailable = api?.state === 'unavailable'
 const apiHits = api?.state === 'ok' ? api.data.items : []
+const didYouMean = api?.state === 'ok' ? (api.data.didYouMean ?? []) : []
 const pageEntries = pages
   .filter((p) => !['account', 'search', 'privacy', 'legal', 'credits'].includes(p.id))
   .map((p) => {
@@ -53,18 +57,18 @@ const grouped = SEARCH_TYPES.map((type) => ({
   items: hits.filter((h) => h.type === type),
 })).filter((g) => g.items.length)
 
-// Suggestions for the empty state: a few guides and the next event.
-const [guides, next] = !q
-  ? await Promise.all([
-      publicJson<{ items: { slug: string; title: string }[] }>(
-        Astro,
-        `/api/guides/public?locale=${locale}`,
-      ),
-      publicJson<{ items: EventOcc[] }>(Astro, `/api/events/public/next?locale=${locale}`),
-    ])
-  : [null, null]
-const suggestGuides = guides?.state === 'ok' ? guides.data.items.slice(0, 3) : []
-const nextEvent = next?.state === 'ok' ? next.data.items?.[0] : undefined
+// Suggestions (real things from the site) for the empty state and for « nothing found », and the direct actions.
+type Sug = {
+  guides: { key: string; title: string }[]
+  departments: { key: string; title: string }[]
+  news: { key: string; title: string }[]
+  event: { key: string; title: string } | null
+}
+const sug =
+  hits.length === 0 ? await publicJson<Sug>(Astro, `/api/search/suggest?locale=${locale}`) : null
+const suggest = sug?.state === 'ok' ? sug.data : null
+const actions = quickActions(locale, (id) => s(id))
+const examples = [s('ex1'), s('ex2'), s('ex3'), s('ex4')]
 Astro.response.headers.set('cache-control', 'no-store')
 ---
 
@@ -83,48 +87,65 @@ Astro.response.headers.set('cache-control', 'no-store')
     {
       unavailable ? (
         <p class="sr-note" role="status">{s('unavailable')}</p>
-      ) : q ? (
-        grouped.length === 0 ? (
-          <div class="sr-empty">
-            <Illustration name="book-lover" class="sr-art" />
-            <h2>{s('empty_t', { q })}</h2>
-            <p>{s('empty_p')}</p>
-            <ul class="sr-links">
-              {pageEntries.slice(0, 6).map((p) => <li><a href={href(locale, p.path)}>{p.title}</a></li>)}
+      ) : q && grouped.length > 0 ? (
+        <>
+          <p class="sr-count" role="status">{hits.length === 1 ? s('count_one') : s('count', { n: String(hits.length) })}</p>
+          {
+            grouped.map((g) => (
+              <section class="sr-group">
+                <h2 class="sr-h">{s(`type_${g.type}`)}</h2>
+                <ul class="sr-list">
+                  {g.items.map((h) => (
+                    <li class="sr-item">
+                      <a class="sr-link" href={hitHref(locale, h)} set:html={highlight(h.title, q)} />
+                      {h.snippet && <p class="sr-snip" set:html={highlight(h.snippet, q)} />}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+          <section class="sr-group">
+            <h2 class="sr-h">{s('related')}</h2>
+            <ul class="sr-actions">
+              {actions.slice(0, 4).map((a) => <li><a href={a.href}><Icon name={a.icon} size={20} />{a.label}</a></li>)}
             </ul>
-          </div>
-        ) : (
-          <>
-            <p class="sr-count" role="status">{hits.length === 1 ? s('count_one') : s('count', { n: String(hits.length) })}</p>
-            {
-              grouped.map((g) => (
-                <section class="sr-group">
-                  <h2 class="sr-h">{s(`type_${g.type}`)}</h2>
-                  <ul class="sr-list">
-                    {g.items.map((h) => (
-                      <li class="sr-item">
-                        <a class="sr-link" href={hitHref(locale, h)} set:html={highlight(h.title, q)} />
-                        {h.snippet && <p class="sr-snip" set:html={highlight(h.snippet, q)} />}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))
-            }
-          </>
-        )
+          </section>
+        </>
       ) : (
-        <div class="sr-empty">
-          <Illustration name="book-lover" class="sr-art" />
-          <h2>{s('start_t')}</h2>
-          <p>{s('start_p')}</p>
-          {(suggestGuides.length > 0 || nextEvent) && (
-            <div class="sr-suggest">
-              <h3>{s('suggest_t')}</h3>
-              <ul class="sr-links">
-                {suggestGuides.map((g) => <li><a href={guideHref(locale, g.slug)}>{g.title}</a></li>)}
-                {nextEvent && <li><a href={eventHref(locale, nextEvent.slug)}>{s('suggest_event')} : {nextEvent.title}</a></li>}
-              </ul>
+        <div class="sr-start">
+          {q && (
+            <div class="sr-none" role="status">
+              <Illustration name="book-lover" class="sr-art" />
+              <h2>{s('empty_t', { q })}</h2>
+              {didYouMean.length > 0 && (
+                <p class="sr-dym">{s('did_you_mean')} {didYouMean.map((d) => <a href={searchHref(locale, d)}>{d}</a>)}</p>
+              )}
+              <p>{s('empty_p')}</p>
+            </div>
+          )}
+          {!q && (
+            <div class="sr-hello">
+              <h2>{s('hints_t')}</h2>
+              <p>{s('hints_p')}</p>
+              <p class="sr-try">
+                <span>{s('try')} :</span>
+                {examples.map((x) => <a class="sr-chip" href={searchHref(locale, x)}>{x}</a>)}
+              </p>
+            </div>
+          )}
+          <section class="sr-group">
+            <h2 class="sr-h">{s('actions_t')}</h2>
+            <ul class="sr-actions">
+              {actions.map((a) => <li><a href={a.href}><Icon name={a.icon} size={20} />{a.label}</a></li>)}
+            </ul>
+          </section>
+          {suggest && (suggest.guides.length > 0 || suggest.departments.length > 0 || suggest.news.length > 0 || suggest.event) && (
+            <div class="sr-sug">
+              {suggest.event && <section><h3>{s('sug_event')}</h3><ul><li><a href={eventHref(locale, suggest.event.key)}>{suggest.event.title}</a></li></ul></section>}
+              {suggest.guides.length > 0 && <section><h3>{s('sug_guides')}</h3><ul>{suggest.guides.map((g) => <li><a href={guideHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
+              {suggest.departments.length > 0 && <section><h3>{s('sug_groups')}</h3><ul>{suggest.departments.map((g) => <li><a href={departmentHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
+              {suggest.news.length > 0 && <section><h3>{s('sug_news')}</h3><ul>{suggest.news.map((g) => <li><a href={newsItemHref(locale, g.key)}>{g.title}</a></li>)}</ul></section>}
             </div>
           )}
         </div>
@@ -220,6 +241,102 @@ Astro.response.headers.set('cache-control', 'no-store')
     color: inherit;
     border-radius: 0.2em;
     padding-inline: 0.1em;
+  }
+  .sr-start {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .sr-hello,
+  .sr-none {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+  }
+  .sr-hello h2,
+  .sr-none h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .sr-none {
+    justify-items: center;
+    text-align: center;
+  }
+  .sr-none :global(.sr-art) {
+    width: min(100%, 12rem);
+    height: auto;
+  }
+  .sr-try {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .sr-try > span {
+    font-weight: 600;
+  }
+  .sr-chip,
+  .sr-dym a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .sr-dym {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .sr-actions {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  }
+  .sr-actions a {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--duration-ui) var(--ease-out);
+  }
+  .sr-actions a:hover {
+    background: var(--primary-soft);
+  }
+  .sr-sug {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .sr-sug h3 {
+    margin-block-end: 0.375rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+  .sr-sug ul {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .sr-sug a {
+    color: var(--primary);
   }
   .sr-empty {
     display: grid;

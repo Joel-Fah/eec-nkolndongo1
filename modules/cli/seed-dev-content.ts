@@ -7,6 +7,7 @@ import { bumpContentVersion } from '@eec/api-kit'
 import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { groups, mediaFiles } from '@eec/db/schema'
+import { contactMessages } from '@eec/module-contact/schema'
 import { departmentPages, departmentPeople } from '@eec/module-departments/schema'
 import { eventsItems } from '@eec/module-events/schema'
 import { guideSteps, guides } from '@eec/module-guides/schema'
@@ -27,6 +28,7 @@ if (process.argv.includes('--clear')) {
   await db.delete(scheduleSlots).where(like(scheduleSlots.labelFr, 'Exemple —%'))
   await db.delete(liturgyVerses).where(eq(liturgyVerses.translationFr, 'LSG'))
   await db.delete(liturgySundays).where(like(liturgySundays.themeFr, 'Exemple%'))
+  await db.delete(contactMessages).where(like(contactMessages.name, 'Exemple —%'))
   await db.delete(settings).where(inArray(settings.section, ['giving']))
   await db.delete(historyMilestones).where(like(historyMilestones.titleFr, 'Exemple —%'))
   await db.delete(councilMembers).where(like(councilMembers.name, 'Exemple —%'))
@@ -490,6 +492,74 @@ await db.insert(councilMembers).values([
   },
   { name: 'Exemple — Autre personne sans consentement', roleKey: 'diacres', sortOrder: 0 },
 ])
+// Contact messages across weeks and months, to judge the inbox (fictional senders, one prayer request).
+await db.delete(contactMessages).where(like(contactMessages.name, 'Exemple —%'))
+const ago = (days: number) => new Date(Date.now() - days * 86_400_000)
+const sample: [string, string, string, number, string, boolean][] = [
+  [
+    'Exemple — Marie N.',
+    'renseignement',
+    'Bonjour, à quelle heure commence le culte du dimanche ? Je viens pour la première fois.',
+    0.1,
+    'new',
+    false,
+  ],
+  [
+    'Exemple — Paul E.',
+    'vie_pratique',
+    'Nous souhaitons préparer le baptême de notre enfant. Quelles sont les étapes ?',
+    1,
+    'new',
+    false,
+  ],
+  [
+    'Exemple — Sylvie B.',
+    'departements',
+    'J’aimerais rejoindre la chorale. Comment faire ?',
+    2,
+    'progress',
+    false,
+  ],
+  ['Exemple — Un fidèle', 'priere', 'Un sujet de prière d’exemple, confidentiel.', 3, 'new', true],
+  [
+    'Exemple — Jean K.',
+    'autre',
+    'Une question d’exemple sur l’accès à l’église en fauteuil roulant.',
+    9,
+    'handled',
+    false,
+  ],
+  [
+    'Exemple — Aïcha T.',
+    'renseignement',
+    'Pouvez-vous me dire où se trouve exactement l’église ?',
+    16,
+    'handled',
+    false,
+  ],
+  ['Exemple — David M.', 'vie_pratique', 'Comment adhérer à la paroisse ?', 40, 'handled', false],
+  [
+    'Exemple — Grâce L.',
+    'departements',
+    'Y a-t-il un groupe pour les jeunes adultes ?',
+    75,
+    'handled',
+    false,
+  ],
+]
+await db.insert(contactMessages).values(
+  sample.map(([name, category, message, days, status, sensitive]) => ({
+    name,
+    email: 'exemple@example.test',
+    category,
+    message,
+    status,
+    sensitive,
+    createdAt: ago(days),
+    handledAt: status === 'handled' ? ago(days - 0.5) : null,
+    consentAt: ago(days),
+  })),
+)
 // Giving (settings): obviously fictional, approved so the page can be judged in dev. Never run on another branch.
 const ex = (value: string) => ({ value, validated: true })
 await db

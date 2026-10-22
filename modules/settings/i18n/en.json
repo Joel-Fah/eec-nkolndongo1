@@ -165,6 +165,11 @@
       "label": "Harvest Festival",
       "ph": "A sentence about the Harvest Festival",
       "help": "Highlighted during the Harvest Festival dates (Liturgical season tab)."
+    },
+    "mapUrl": {
+      "label": "Google Maps link",
+      "ph": "https://maps.app.goo.gl/…",
+      "help": "The Google Maps “Share” link for the parish: used by the Directions button."
     }
   },
   "season_none": "None (automatic)",
@@ -203,7 +208,7 @@
     "soon_t": "Ways to give are coming soon",
     "soon_p": "We are finalising the details with the parish. Meanwhile, the secretariat is happy to answer.",
     "soon_cta": "Contact the secretariat",
-    "thanks": "Thank you: every gift, small or large, supports the life of the parish.",
+    "thanks": "Every gift, small or large, supports the life of the parish.",
     "momo": "MTN Mobile Money",
     "om": "Orange Money",
     "directions": "Directions",
@@ -218,6 +223,25 @@
     "whatsapp": "WhatsApp",
     "purpose_dime": "Tithe",
     "purpose_offrande": "Offering",
-    "purpose_projets": "Projects"
+    "purpose_projets": "Projects",
+    "first_t": "For a first visit",
+    "first_p": "Nobody will ask where you come from. Sit down, listen, sing if you feel like it: you are expected.",
+    "first_services": "See the times",
+    "first_sunday": "This Sunday",
+    "quick_t": "Reach us right away",
+    "write": "Write a message",
+    "where_t": "Where to find us",
+    "dir_open": "Open directions",
+    "thanks_k": "Thank you",
+    "how_t": "Giving in three steps",
+    "step1_t": "Choose a way",
+    "step1_p": "Mobile money or bank transfer, whichever you prefer.",
+    "step2_t": "Send your gift",
+    "step2_p": "The amount is yours to decide: nothing is asked here.",
+    "step3_t": "That’s all",
+    "step3_p": "No data is recorded on this site.",
+    "methods_t": "Ways to give",
+    "copy_code": "Copy the code",
+    "bank_name": "Bank"
   }
 }
