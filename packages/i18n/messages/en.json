@@ -120,6 +120,10 @@
       "dimanche": {
         "label": "This Sunday",
         "desc": "The theme, readings and service of the coming Sunday."
+      },
+      "search": {
+        "label": "Search",
+        "desc": "Search the whole site"
       }
     },
     "main": "Main menu",
@@ -1857,5 +1861,32 @@
       "stay": "Keep filling",
       "leave": "Discard"
     }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "A word, a name, a topic…",
+    "go": "Search",
+    "dialog_title": "Search the site",
+    "all": "See all results",
+    "results_for": "Results for “{q}”",
+    "count": "{n} results",
+    "count_one": "1 result",
+    "empty_t": "Nothing found for “{q}”",
+    "empty_p": "Try another word, or browse these pages.",
+    "start_t": "What are you looking for?",
+    "start_p": "Type a word: a news item, an event, a group, a guide.",
+    "suggest_t": "To get started",
+    "suggest_guides": "Guides",
+    "suggest_event": "Next event",
+    "type_news": "News",
+    "type_events": "Calendar",
+    "type_guides": "Practical life",
+    "type_departments": "Departments",
+    "type_pages": "Pages",
+    "min": "Type at least 2 letters.",
+    "unavailable": "Search is not answering right now. Please try again in a moment.",
+    "hint": "Press Enter for all results",
+    "close": "Close",
+    "loading": "Searching…"
   }
 }

@@ -6,7 +6,8 @@
   "exports": {
     ".": "./registry.ts",
     "./api": "./api.ts",
-    "./admin": "./admin.ts"
+    "./admin": "./admin.ts",
+    "./search": "./search.ts"
   },
   "scripts": {
     "lint": "biome check .",

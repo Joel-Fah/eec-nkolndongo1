@@ -1,0 +1,11 @@
+---
+import SearchPage from '../../../components/content/SearchPage.astro'
+import { localeOf } from '../../../lib/i18n'
+import { rightSearchPath } from '../../../lib/search'
+
+export const prerender = false
+if (!rightSearchPath(localeOf(Astro.currentLocale), Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<SearchPage />

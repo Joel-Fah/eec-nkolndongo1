@@ -120,6 +120,10 @@
       "dimanche": {
         "label": "Ce dimanche",
         "desc": "Le thème, les lectures et le culte du dimanche qui vient."
+      },
+      "search": {
+        "label": "Recherche",
+        "desc": "Chercher dans tout le site"
       }
     },
     "main": "Menu principal",
@@ -1857,5 +1861,32 @@
       "stay": "Continuer à remplir",
       "leave": "Abandonner"
     }
+  },
+  "search": {
+    "title": "Recherche",
+    "placeholder": "Un mot, un nom, un sujet…",
+    "go": "Rechercher",
+    "dialog_title": "Rechercher sur le site",
+    "all": "Voir tous les résultats",
+    "results_for": "Résultats pour « {q} »",
+    "count": "{n} résultats",
+    "count_one": "1 résultat",
+    "empty_t": "Rien trouvé pour « {q} »",
+    "empty_p": "Essayez un autre mot, ou parcourez ces pages.",
+    "start_t": "Que cherchez-vous ?",
+    "start_p": "Tapez un mot : une actualité, un rendez-vous, un groupe, un parcours.",
+    "suggest_t": "Pour commencer",
+    "suggest_guides": "Parcours",
+    "suggest_event": "Prochain rendez-vous",
+    "type_news": "Nouvelles",
+    "type_events": "Agenda",
+    "type_guides": "Vie pratique",
+    "type_departments": "Départements",
+    "type_pages": "Pages",
+    "min": "Tapez au moins 2 lettres.",
+    "unavailable": "La recherche ne répond pas pour l’instant. Réessayez dans un moment.",
+    "hint": "Entrée pour voir tous les résultats",
+    "close": "Fermer",
+    "loading": "Recherche…"
   }
 }
