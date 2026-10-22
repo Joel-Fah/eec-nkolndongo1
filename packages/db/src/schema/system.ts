@@ -145,3 +145,23 @@ export const contentReviews = pgTable(
   },
   (t) => [index('content_reviews_item_idx').on(t.itemKind, t.itemRef, t.status)],
 )
+
+/** The daily health check (« Santé »): one row per run, the checks as data. Kept 90 days. */
+export const systemHealth = pgTable(
+  'system_health',
+  {
+    id: id(),
+    checkedAt: tz('checked_at').notNull().defaultNow(),
+    /** The worst of the checks: ok | warn | fail. */
+    status: text('status', { enum: ['ok', 'warn', 'fail'] }).notNull(),
+    checks: jsonb('checks').notNull(),
+  },
+  (t) => [index('system_health_at_idx').on(t.checkedAt)],
+)
+
+/** Small facts the Worker cannot learn by itself (for example when the last backup finished). One row per key. */
+export const systemMarks = pgTable('system_marks', {
+  key: text('key').primaryKey(),
+  at: tz('at').notNull().defaultNow(),
+  note: text('note').notNull().default(''),
+})
