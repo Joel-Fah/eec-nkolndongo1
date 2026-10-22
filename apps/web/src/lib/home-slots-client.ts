@@ -1,5 +1,3 @@
-import { PAGE_SLOTS } from '@eec/core'
-
 /**
  * Home texts and key figures as content slots (decision 0039). The home page and the footer stay static; this script
  * asks the edge-cached /api/story/public (published slots only) and replaces the built-in line where a slot is
@@ -45,7 +43,7 @@ export async function applyHomeSlots() {
     if (!value) continue
     value.textContent = text
     value.dataset.count = text
-    if (suffix) suffix.textContent = PAGE_SLOTS.home?.slots.find((s) => s.key === key)?.suffix ?? ''
+    if (suffix) suffix.textContent = item.dataset.suffix ?? ''
     item.hidden = false
     shown++
   }

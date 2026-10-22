@@ -61,6 +61,18 @@
   change and asked to accept again only when the purposes changed (decision 0033).
 - **Giving**: no payment integration, no amounts, no donor data; only the parish's approved merchant details are shown.
 
+## Added in Phase 04a (2026-10)
+- **Visit counts** (decision 0038, **dormant until Joël enables it**): one data point per page view served by the Worker:
+  day, page address, language, phone/desktop. **No cookie, no IP address, no user agent stored, no identifier**; two visits by
+  one person cannot be linked. Skipped when the browser sends « do not track ». Kept 3 months at Cloudflare, shown to staff as
+  aggregates. If Analytics Engine is not available on the free plan, nothing is counted and no other analytics is used.
+- **Health check**: the daily check stores technical measures only (response time, storage used, backup age, outbox count),
+  no personal data. Kept 90 days.
+- **Content reviews** (« À valider », decision 0040): comments between staff about a text or figure, linked to the item, no
+  visitor data. The audit log records that a correction was asked, never its text.
+- **Contact form**: the minimum fill time now relies on a token signed by the server when the form is shown (it carries
+  only the time and a signature, no identifier), instead of a time sent by the browser.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

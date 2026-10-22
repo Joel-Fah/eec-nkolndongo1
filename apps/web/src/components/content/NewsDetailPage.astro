@@ -8,6 +8,8 @@ import Site from '../../layouts/Site.astro'
 import { type NewsDetail, publicJson } from '../../lib/content-api'
 import { localeOf, useT } from '../../lib/i18n'
 import { newsItemHref, newsListHref } from '../../lib/news-routes'
+import { breadcrumbs, newsArticle, organization } from '../../lib/seo'
+import JsonLd from '../JsonLd.astro'
 import Picture from '../Picture.astro'
 import LangFallbackNote from './LangFallbackNote.astro'
 import UnavailableState from './UnavailableState.astro'
@@ -47,11 +49,35 @@ Astro.response.headers.set(
 )
 if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
 const date = post ? shortDate(post.publishedAt, locale) : ''
-const url = post ? new URL(newsItemHref(locale, post.slug), Astro.url).href : ''
+const url = post ? new URL(newsItemHref(locale, post.slug), Astro.site ?? Astro.url).href : ''
+// Share image: the cover (smallest variant at least 1200 px wide), else the brand card; structured data for search engines.
+const coverVariants = post?.cover ? [...post.cover.variants].sort((a, b) => a.width - b.width) : []
+const cover = coverVariants.find((v) => v.width >= 1200) ?? coverVariants.at(-1)
+const shareImage = cover ? new URL(`/media/${cover.key}`, Astro.site ?? Astro.url).href : undefined
+const ld = post
+  ? [
+      organization(Astro.site ?? Astro.url, t('site.name')),
+      newsArticle(Astro.site ?? Astro.url, {
+        url,
+        title: post.title,
+        description: post.excerpt,
+        publishedAt: post.publishedAt,
+        locale,
+        image: shareImage,
+        publisher: t('site.name'),
+      }),
+      breadcrumbs(Astro.site ?? Astro.url, [
+        { name: t('nav.home'), path: `/${locale}/` },
+        { name: t('news.site.back'), path: newsListHref(locale) },
+        { name: post.title, path: newsItemHref(locale, post.slug) },
+      ]),
+    ]
+  : []
 const wa = post ? `https://wa.me/?text=${encodeURIComponent(`${post.title}\n${url}`)}` : ''
 ---
 
-<Site title={post?.title ?? t('news.site.not_found_t')} description={post?.excerpt} noindex={preview || !post}>
+<Site title={post?.title ?? t('news.site.not_found_t')} description={post?.excerpt} noindex={preview || !post} type="article" image={shareImage}>
+  {post && !preview && <JsonLd slot="head" data={ld} />}
   <article class="nd">
     <p class="nd-back"><a href={newsListHref(locale)}><Icon name="chevronLeft" size={20} />{t('news.site.back')}</a></p>
     {preview && <p class="nd-preview" role="note">{t('news.site.preview_banner')}</p>}

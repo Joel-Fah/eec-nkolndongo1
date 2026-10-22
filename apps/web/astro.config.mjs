@@ -2,7 +2,6 @@
 
 import { readFile, rm, writeFile } from 'node:fs/promises'
 import cloudflare from '@astrojs/cloudflare'
-import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 import { headersFile } from '../../packages/api-kit/src/security-headers.ts'
@@ -53,11 +52,6 @@ export default defineConfig({
         },
       },
     },
-    sitemap({
-      // Internal pages (`/_brand`, `/_ui`) never reach the sitemap.
-      filter: (page) => !new URL(page).pathname.split('/').some((part) => part.startsWith('_')),
-      i18n: { defaultLocale: 'fr', locales: { fr: 'fr-CM', en: 'en-GB' } },
-    }),
   ],
   vite: {
     plugins: [tailwindcss()],

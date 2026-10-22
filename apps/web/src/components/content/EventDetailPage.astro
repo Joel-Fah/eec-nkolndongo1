@@ -8,6 +8,8 @@ import Site from '../../layouts/Site.astro'
 import { type EventDetail, publicJson } from '../../lib/content-api'
 import { dayText, eventHref, eventsListHref, fmt, TZ, timeText } from '../../lib/events-routes'
 import { localeOf, useT } from '../../lib/i18n'
+import { breadcrumbs, event as eventLd, organization } from '../../lib/seo'
+import JsonLd from '../JsonLd.astro'
 import Picture from '../Picture.astro'
 import GeneratedBanner from './GeneratedBanner.astro'
 import GoogleCalendarIcon from './GoogleCalendarIcon.astro'
@@ -48,7 +50,37 @@ Astro.response.headers.set(
 )
 if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
 
-const url = ev ? new URL(eventHref(locale, ev.slug), Astro.url).href : ''
+const url = ev ? new URL(eventHref(locale, ev.slug), Astro.site ?? Astro.url).href : ''
+const coverVariants = ev?.cover ? [...ev.cover.variants].sort((a, b) => a.width - b.width) : []
+const cover = coverVariants.find((v) => v.width >= 1200) ?? coverVariants.at(-1)
+const shareImage = cover ? new URL(`/media/${cover.key}`, Astro.site ?? Astro.url).href : undefined
+const ld = ev
+  ? [
+      organization(Astro.site ?? Astro.url, t('site.name')),
+      // Google requires a location for an Event: without one we publish no Event markup (the page itself is unaffected).
+      ...(ev.location
+        ? [
+            eventLd(Astro.site ?? Astro.url, {
+              url,
+              name: ev.title,
+              description: ev.description,
+              startsAt: ev.startsAt,
+              endsAt: ev.endsAt,
+              cancelled: ev.cancelled,
+              locale,
+              location: ev.location,
+              image: shareImage,
+              organizer: t('site.name'),
+            }),
+          ]
+        : []),
+      breadcrumbs(Astro.site ?? Astro.url, [
+        { name: t('nav.home'), path: `/${locale}/` },
+        { name: label('back'), path: eventsListHref(locale) },
+        { name: ev.title, path: eventHref(locale, ev.slug) },
+      ]),
+    ]
+  : []
 const wa = ev ? `https://wa.me/?text=${encodeURIComponent(`${ev.title}\n${url}`)}` : ''
 const icsHref = ev ? `/api/events/public/item/${ev.slug}/event.ics?locale=${locale}` : ''
 // Google Calendar template link (opens their site only when clicked; nothing is loaded from them).
@@ -63,7 +95,8 @@ const kind = EVENT_KIND_STYLE[kindKey]
 const d = ev ? new Date(ev.startsAt) : new Date()
 ---
 
-<Site title={ev?.title ?? label('not_found_t')} description={ev?.description} noindex={preview || !ev}>
+<Site title={ev?.title ?? label('not_found_t')} description={ev?.description} noindex={preview || !ev} image={shareImage}>
+  {ev && !preview && <JsonLd slot="head" data={ld} />}
   <article class="ed">
     <p class="ed-back"><a href={eventsListHref(locale)}><Icon name="chevronLeft" size={20} />{label('back')}</a></p>
     {preview && <p class="ed-preview" role="note">{label('preview_banner')}</p>}

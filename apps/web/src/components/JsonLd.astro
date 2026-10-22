@@ -1,0 +1,16 @@
+---
+/**
+ * Structured data (schema.org) as JSON-LD for search engines. Only facts that are validated reach it. `<` is escaped so
+ * text can never close the script element.
+ */
+interface Props {
+  data: Record<string, unknown> | Record<string, unknown>[]
+}
+const graph = Array.isArray(Astro.props.data) ? Astro.props.data : [Astro.props.data]
+const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(
+  /</g,
+  '\\u003c',
+)
+---
+
+<script type="application/ld+json" set:html={json} />

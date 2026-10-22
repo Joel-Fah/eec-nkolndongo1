@@ -5,11 +5,13 @@ import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import HeroStream from '../../components/home/HeroStream.astro'
 import SeasonStrip from '../../components/home/SeasonStrip.astro'
+import JsonLd from '../../components/JsonLd.astro'
 import Site from '../../layouts/Site.astro'
 import { eventsListHref } from '../../lib/events-routes'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
 import { href, pages as navPages, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
+import { organization } from '../../lib/seo'
 import '../../styles/patterns.css'
 
 export const getStaticPaths = localePaths
@@ -24,6 +26,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 ---
 
 <Site title={t('site.name')} description={t('home.lead')}>
+  <JsonLd slot="head" data={organization(Astro.site ?? Astro.url, t('site.name'))} />
   <section class="home-hero">
     <div class="home-hero-head">
       <a class="home-kicker" href={pathOf('liturgie')}>
@@ -47,7 +50,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     <dl class="home-stats" data-home-figures hidden>
       {
         figureIds.map((id) => (
-          <div class="home-stat" data-fig={id} hidden>
+          <div class="home-stat" data-fig={id} data-suffix={id === 'years' || id === 'members' ? '+' : ''} hidden>
             <dt>{t(`home.stats.${id}` as 'home.stats.years')}</dt>
             <dd><span class="home-stat-value">0</span><span data-fig-suffix></span></dd>
           </div>

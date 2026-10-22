@@ -78,6 +78,23 @@ A Cloudflare Cron Trigger (03:17 UTC) runs `apps/api/src/retention.ts`: expired 
 audit > 24 months, accounts whose deletion was requested > 30 days ago. Each run writes a row in `retention_runs`.
 By hand: `pnpm --filter @eec/api retention`.
 
+## Santé, visit counts, validation (Phase 04a)
+- **Admin → Santé** (`core:system-health`): the daily cron also records a health row (database answer time, bucket reachable,
+  last backup age, outbox backlog, database size, files size; orange from 70 % of a free limit). « Vérifier maintenant » runs it
+  on demand. The backup workflow writes the « last backup » mark (`system_marks`); until its first run after this version
+  the backup shows orange « aucune sauvegarde enregistrée ». Neon egress and Workers requests/day cannot be read by the
+  Worker: read them in the Neon console and the Cloudflare dashboard (monthly).
+- **Visit counts** (decision 0038) are **dormant**. To switch on, once: (1) Cloudflare dashboard → Workers & Pages → Analytics
+  Engine → enable it (note the plan it shows); (2) put `analyticsDataset` (for example `eec_visits`) and `accountId` in
+  `apps/web/deploy.json` and merge; (3) create an API token « Account Analytics: Read » and set it:
+  `wrangler secret put CF_ANALYTICS_TOKEN`. Without (1) do **not** set the dataset: a binding to a service the account has
+  not enabled fails the deploy.
+- **Validator role**: after a deploy that adds permissions, run `pnpm db:seed` in `prod-shell.sh` (idempotent: new permissions
+  and the « Validateur de contenu » role), then grant the role on **Rôles / Utilisateurs** with Joël. The role sees **À valider**.
+- **Share cards** (`apps/web/public/og/*.jpg`): redrawn by `node scripts/og-generate.ts` (needs Chrome and playwright-core) when
+  the parish name or tagline changes; commit the result.
+- **Structured data check**: `node scripts/jsonld-check.ts <base url>`, then Google's Rich Results Test (see `launch.md`).
+
 ## Monitoring and limits to watch (Free plans)
 Workers: 100 000 requests/day, 10 ms CPU per request. Neon: storage and the 5 GB/month egress shared with the media
 bucket (the library shows the space used and warns at 70 %). Check Cloudflare's usage page monthly.

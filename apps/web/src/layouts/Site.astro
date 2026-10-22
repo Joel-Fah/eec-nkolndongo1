@@ -9,12 +9,18 @@ interface Props {
   title: string
   description?: string
   noindex?: boolean
+  image?: string
+  imageAlt?: string
+  type?: 'website' | 'article'
 }
-const { title, description, noindex } = Astro.props
+const { title, description, noindex, image, imageAlt, type } = Astro.props
 ---
 
-<Base title={title} description={description} noindex={noindex} alternates={alternates(Astro.url.pathname)}>
-  <ClientRouter slot="head" />
+<Base title={title} description={description} noindex={noindex} alternates={alternates(Astro.url.pathname)} image={image} imageAlt={imageAlt} type={type}>
+  <Fragment slot="head">
+    <ClientRouter />
+    <slot name="head" />
+  </Fragment>
   <Header />
   <main id="main" class="page" tabindex="-1">
     <slot />
