@@ -887,7 +887,7 @@
       "abstractbanner": {
         "name": "Abstract banner",
         "desc": "A header image drawn on the fly, no photo: waves, rings, dots, blocks, arcs or stripes, in a palette taken from our colours (light and dark follow). Each opening draws another composition; nothing is stored.",
-        "use": "<AbstractBanner seed={n}> (React, admin); six compositions, five palettes; colours by tokens only.",
+        "use": "<AbstractBanner seed> (React, admin); six compositions, five palettes; colours by tokens only.",
         "a11y": "Decorative (aria-hidden); text over it sits on a veil that keeps contrast in both themes."
       },
       "healthstrip": {

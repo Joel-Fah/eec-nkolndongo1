@@ -887,7 +887,7 @@
       "abstractbanner": {
         "name": "Bannière abstraite",
         "desc": "Une image d’en-tête dessinée à la volée, sans photo : vagues, anneaux, points, blocs, arcs ou bandes, dans une palette tirée de nos couleurs (clair et sombre suivent). Chaque ouverture tire une autre composition ; rien n’est stocké.",
-        "use": "<AbstractBanner seed={n}> (React, administration) ; six compositions, cinq palettes ; couleurs uniquement par jetons.",
+        "use": "<AbstractBanner seed> (React, administration) ; six compositions, cinq palettes ; couleurs uniquement par jetons.",
         "a11y": "Décorative (aria-hidden) ; le texte posé dessus reste sur un voile qui garde le contraste dans les deux thèmes."
       },
       "healthstrip": {
