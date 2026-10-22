@@ -4,6 +4,7 @@
  * Refuses to run on any branch but `dev`.
  */
 import { bumpContentVersion } from '@eec/api-kit'
+import type { BibleRef } from '@eec/core'
 import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { groups, mediaFiles } from '@eec/db/schema'
@@ -14,6 +15,7 @@ import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
+import { sermonSeries, sermons } from '@eec/module-sermons/schema'
 import { settings } from '@eec/module-settings/schema'
 import { councilMembers, historyMilestones, pageSlots } from '@eec/module-story/schema'
 import { and, eq, inArray, like } from 'drizzle-orm'
@@ -22,6 +24,8 @@ assertBranch(['dev'])
 const { db, close } = await connectDirect()
 
 if (process.argv.includes('--clear')) {
+  await db.delete(sermons).where(like(sermons.slug, 'exemple-%'))
+  await db.delete(sermonSeries).where(like(sermonSeries.slug, 'exemple-%'))
   await db.delete(newsPosts).where(like(newsPosts.slug, 'exemple-%'))
   await db.delete(eventsItems).where(like(eventsItems.slug, 'exemple-%'))
   await db.delete(scheduleExceptions).where(like(scheduleExceptions.noteFr, 'Exemple%'))
@@ -93,6 +97,82 @@ for (const [i, title] of titles.entries()) {
       excerptFr: i === 1 ? '' : 'Un résumé d’exemple en une phrase, pour la liste.',
       bodyFr: body,
       coverMediaId: i === 4 ? null : (photos[i]?.id ?? null),
+    })
+    .onConflictDoNothing()
+}
+// Sermons: fictional titles and links (example.org), to judge the listening room. No real preacher, no real recording.
+const [exSeries] = await db
+  .insert(sermonSeries)
+  .values({
+    slug: 'exemple-serie',
+    titleFr: 'Exemple — Une série de trois messages',
+    titleEn: 'Example — A series of three messages',
+    descriptionFr: 'Une description d’exemple pour juger la mise en page d’une série.',
+  })
+  .onConflictDoNothing()
+  .returning()
+const seriesId =
+  exSeries?.id ??
+  (await db.select().from(sermonSeries).where(eq(sermonSeries.slug, 'exemple-serie')))[0]?.id
+const sermonRows = [
+  {
+    n: 1,
+    title: 'Exemple — Un message sur la confiance',
+    video: 'dQw4w9WgXcQ',
+    links: [{ label: 'Écouter l’audio', url: 'https://example.org/audio-exemple' }],
+    refs: [{ book: 'psa', chapter: 23 }],
+    consent: true,
+  },
+  {
+    n: 2,
+    title: 'Exemple — Un message avec le texte seulement',
+    video: '',
+    links: [],
+    refs: [{ book: 'mat', chapter: 5, from: 3, to: 12 }],
+    consent: false,
+  },
+  {
+    n: 3,
+    title: 'Exemple — Un message en vidéo',
+    video: 'dQw4w9WgXcQ',
+    links: [],
+    refs: [{ book: 'jhn', chapter: 3, from: 16 }],
+    consent: false,
+  },
+  {
+    n: 4,
+    title: 'Exemple — Un message avec deux liens',
+    video: '',
+    links: [
+      { label: 'Audio', url: 'https://example.org/audio' },
+      { label: 'Notes (PDF)', url: 'https://example.org/notes.pdf' },
+    ],
+    refs: [],
+    consent: true,
+  },
+]
+for (const r of sermonRows) {
+  const day = new Date(Date.now() - r.n * 7 * 86_400_000).toISOString().slice(0, 10)
+  await db
+    .insert(sermons)
+    .values({
+      slug: `exemple-${r.n}`,
+      state: 'published',
+      firstPublishedAt: new Date(),
+      publishAt: new Date(Date.now() - 86_400_000),
+      titleFr: r.title,
+      summaryFr: 'Un résumé d’exemple en une phrase, pour la liste.',
+      bodyFr:
+        r.n === 3
+          ? { type: 'doc', content: [] }
+          : { type: 'doc', content: [para(lorem), para(lorem)] },
+      preachedOn: day,
+      seriesId: r.n <= 3 ? seriesId : null,
+      preacherName: 'Exemple — Prédicateur',
+      preacherConsent: r.consent,
+      refs: r.refs as BibleRef[],
+      youtubeId: r.video,
+      links: r.links,
     })
     .onConflictDoNothing()
 }

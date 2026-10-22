@@ -10,6 +10,7 @@ import { mediaApi } from '@eec/module-media/api'
 import { membersApi } from '@eec/module-members/api'
 import { newsApi } from '@eec/module-news/api'
 import { scheduleApi } from '@eec/module-schedule/api'
+import { sermonsApi } from '@eec/module-sermons/api'
 import { settingsApi } from '@eec/module-settings/api'
 import { storyApi } from '@eec/module-story/api'
 import type { Hono } from 'hono'
@@ -25,6 +26,7 @@ export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   events: eventsApi,
   members: membersApi,
   news: newsApi,
+  sermons: sermonsApi,
   story: storyApi,
   schedule: scheduleApi,
   settings: settingsApi,

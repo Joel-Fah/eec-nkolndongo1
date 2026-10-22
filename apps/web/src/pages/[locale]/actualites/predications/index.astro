@@ -1,0 +1,10 @@
+---
+import SermonsListPage from '../../../../components/content/SermonsListPage.astro'
+import { rightSermonsPath } from '../../../../lib/sermons-routes'
+
+export const prerender = false
+if (!rightSermonsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<SermonsListPage />

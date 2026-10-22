@@ -1,0 +1,13 @@
+---
+import SermonDetailPage from '../../../../components/content/SermonDetailPage.astro'
+import { rightSermonsPath } from '../../../../lib/sermons-routes'
+
+export const prerender = false
+if (!rightSermonsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+const { slug } = Astro.params
+// Preview links: /<list>/apercu/?t=<signed token>
+const token = slug === 'apercu' ? (Astro.url.searchParams.get('t') ?? '') : undefined
+---
+
+<SermonDetailPage slug={slug} token={token} />

@@ -105,3 +105,32 @@ export type PublicSlotException = {
   labelFr?: string
   labelEn?: string
 }
+
+export type SermonItem = {
+  id: string
+  slug: string
+  title: string
+  summary: string
+  fallback: boolean
+  preachedOn: string | null
+  preacher: string
+  series: { slug: string; title: string } | null
+  refs: { book: string; label: string }[]
+  hasVideo: boolean
+  hasLinks: boolean
+  cover: NewsCover | null
+}
+export type SermonDetail = SermonItem & {
+  html: string
+  text: string
+  transcriptHtml: string
+  youtubeId: string
+  links: { label: string; url: string; host: string }[]
+  sundayDate: string | null
+}
+export type SermonFilters = {
+  series: { slug: string; title: string; description: string; count: number }[]
+  preachers: string[]
+  books: { id: string; label: string }[]
+  years: string[]
+}

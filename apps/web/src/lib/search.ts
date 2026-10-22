@@ -5,8 +5,9 @@ import { fold, fuzzyHas } from './fuzzy'
 import { guideHref } from './guides-routes'
 import { href, pages } from './nav'
 import { newsItemHref } from './news-routes'
+import { sermonHref } from './sermons-routes'
 
-export const SEARCH_TYPES = ['news', 'events', 'guides', 'departments', 'pages'] as const
+export const SEARCH_TYPES = ['news', 'events', 'sermons', 'guides', 'departments', 'pages'] as const
 export type SearchType = (typeof SEARCH_TYPES)[number]
 export type Hit = { type: SearchType; key: string; title: string; snippet: string }
 
@@ -22,6 +23,8 @@ export function hitHref(locale: Locale, h: Hit) {
       return newsItemHref(locale, h.key)
     case 'events':
       return eventHref(locale, h.key)
+    case 'sermons':
+      return sermonHref(locale, h.key)
     case 'guides':
       return guideHref(locale, h.key)
     case 'departments':

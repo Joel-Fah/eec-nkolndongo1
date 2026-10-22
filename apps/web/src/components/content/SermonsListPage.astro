@@ -1,0 +1,330 @@
+---
+/**
+ * « Prédications » — the listening room: published sermons, newest first, filtered by series, preacher, Bible book and year
+ * (a plain GET form, so it works without JavaScript; with it, only the results change). Cards link to the sermon page;
+ * nothing audio or video loads here (decision 0034).
+ */
+import { shortDate } from '@eec/core/dates'
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson, type SermonFilters, type SermonItem } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { labelKey } from '../../lib/nav'
+import { sermonHref, sermonsListHref } from '../../lib/sermons-routes'
+import Picture from '../Picture.astro'
+import PageHero from '../page/PageHero.astro'
+import GeneratedBanner from './GeneratedBanner.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`sermons.site.${key}` as 'sermons.site.all', vars)
+const q = Astro.url.searchParams
+const page = Math.max(1, Math.min(Number(q.get('page')) || 1, 200))
+const f = {
+  series: q.get('series') ?? '',
+  preacher: q.get('preacher') ?? '',
+  book: q.get('book') ?? '',
+  year: q.get('year') ?? '',
+}
+const api = new URLSearchParams({ locale, page: String(page) })
+for (const [k, v] of Object.entries(f)) if (v) api.set(k, v)
+const [filtersRes, result] = await Promise.all([
+  publicJson<SermonFilters>(Astro, `/api/sermons/public/filters?locale=${locale}`),
+  publicJson<{ items: SermonItem[]; more: boolean }>(Astro, `/api/sermons/public?${api}`),
+])
+const filters =
+  filtersRes.state === 'ok' ? filtersRes.data : { series: [], preachers: [], books: [], years: [] }
+const items = result.state === 'ok' ? result.data.items : []
+const more = result.state === 'ok' && result.data.more
+const active = Object.values(f).some(Boolean)
+const currentSeries = filters.series.find((x) => x.slug === f.series)
+const pageLink = (n: number) => {
+  const p = new URLSearchParams(q)
+  p.set('page', String(n))
+  return `${sermonsListHref(locale)}?${p}`
+}
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+const hasFilters =
+  filters.series.length + filters.preachers.length + filters.books.length + filters.years.length > 0
+---
+
+<Site title={t(labelKey('predications'))} description={t('pages.predications.lead')}>
+  <PageHero id="predications" />
+  <section class="sl">
+    {
+      hasFilters && (
+        <form class="sl-filters" method="get" action={sermonsListHref(locale)} data-live-form role="search" aria-label={s('filters')}>
+          {filters.series.length > 0 && (
+            <label>
+              <span>{s('series')}</span>
+              <select name="series" data-autosubmit>
+                <option value="">{s('all')}</option>
+                {filters.series.map((x) => <option value={x.slug} selected={f.series === x.slug}>{x.title} ({x.count})</option>)}
+              </select>
+            </label>
+          )}
+          {filters.preachers.length > 0 && (
+            <label>
+              <span>{s('preacher')}</span>
+              <select name="preacher" data-autosubmit>
+                <option value="">{s('all')}</option>
+                {filters.preachers.map((x) => <option value={x} selected={f.preacher === x}>{x}</option>)}
+              </select>
+            </label>
+          )}
+          {filters.books.length > 0 && (
+            <label>
+              <span>{s('book')}</span>
+              <select name="book" data-autosubmit>
+                <option value="">{s('all')}</option>
+                {filters.books.map((x) => <option value={x.id} selected={f.book === x.id}>{x.label}</option>)}
+              </select>
+            </label>
+          )}
+          {filters.years.length > 0 && (
+            <label>
+              <span>{s('year')}</span>
+              <select name="year" data-autosubmit>
+                <option value="">{s('all')}</option>
+                {filters.years.map((x) => <option value={x} selected={f.year === x}>{x}</option>)}
+              </select>
+            </label>
+          )}
+          <button type="submit" class="btn btn-secondary">{s('apply')}</button>
+          {active && <a class="sl-reset" data-live-nav href={sermonsListHref(locale)}>{s('reset')}</a>}
+        </form>
+      )
+    }
+
+    <div class="sl-live" data-live-area>
+      {currentSeries?.description && <p class="sl-series-desc">{currentSeries.description}</p>}
+      {
+        result.state === 'unavailable' ? (
+          <UnavailableState />
+        ) : items.length === 0 ? (
+          <div class="sl-empty">
+            <Illustration name="news" class="sl-art" />
+            <p class="sl-empty-title">{active ? s('empty_filter_t') : s('empty_t')}</p>
+            <p>{active ? s('empty_filter_p') : s('empty_p')}</p>
+          </div>
+        ) : (
+          <>
+            <ul class="sl-grid">
+              {items.map((it) => (
+                <li>
+                  <article class="sc">
+                    <div class="sc-art">
+                      {it.cover ? (
+                        <Picture class="sc-photo" media={it.cover} sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 45vw, 100vw" decorative />
+                      ) : (
+                        <GeneratedBanner seed={it.slug} tone="primary" />
+                      )}
+                      <span class="sc-tags">
+                        {it.hasVideo && <span class="sc-tag"><Icon name="play" size={16} />{s('video_tag')}</span>}
+                        {it.hasLinks && <span class="sc-tag"><Icon name="headphones" size={16} />{s('links_tag')}</span>}
+                      </span>
+                    </div>
+                    <div class="sc-body">
+                      <p class="sc-meta">
+                        {it.preachedOn && <time datetime={it.preachedOn}>{shortDate(`${it.preachedOn}T12:00:00Z`, locale)}</time>}
+                        {it.series && <span>· {it.series.title}</span>}
+                      </p>
+                      <h3 class="sc-title"><a class="sc-link" href={sermonHref(locale, it.slug)}>{it.title}</a></h3>
+                      {it.refs.length > 0 && <p class="sc-refs">{it.refs.map((r) => r.label).join(' · ')}</p>}
+                      {it.preacher && <p class="sc-by">{s('by', { name: it.preacher })}</p>}
+                      {it.summary && <p class="sc-sum">{it.summary}</p>}
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+            <nav class="sl-pager" aria-label={s('page_of', { page: String(page), pages: more ? `${page}+` : String(page) })}>
+              {page > 1 && <Button data-live-nav data-live-scroll href={pageLink(page - 1)} variant="secondary">← {s('newer')}</Button>}
+              {more && <Button data-live-nav data-live-scroll href={pageLink(page + 1)} variant="secondary">{s('older')} →</Button>}
+            </nav>
+          </>
+        )
+      }
+    </div>
+  </section>
+</Site>
+
+<script>
+  import { initLiveNav } from '../../scripts/live-nav'
+  const bind = () => {
+    initLiveNav()
+    // A change in a filter applies it at once (the button stays for people without JavaScript).
+    for (const el of document.querySelectorAll<HTMLSelectElement>('select[data-autosubmit]'))
+      if (!el.dataset.bound) {
+        el.dataset.bound = '1'
+        el.addEventListener('change', () => el.form?.requestSubmit())
+      }
+  }
+  bind()
+  document.addEventListener('astro:page-load', bind)
+</script>
+
+<style>
+  .sl {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .sl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .sl-filters label {
+    display: grid;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .sl-filters select {
+    min-height: 2.75rem;
+    min-width: 11rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .sl-reset {
+    align-self: center;
+    color: var(--primary);
+    text-decoration: underline;
+  }
+  .sl-live {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .sl-series-desc {
+    max-width: 62ch;
+    font-size: var(--text-lg, 1.125rem);
+    color: var(--ink-muted);
+  }
+  .sl-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .sc {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    overflow: hidden;
+    padding: 0.625rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    transition:
+      transform var(--duration-ui) var(--ease-out),
+      box-shadow var(--duration-ui) var(--ease-out);
+  }
+  .sc:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-2);
+  }
+  .sc-art {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .sc-art :global(.sc-photo),
+  .sc-art :global(img),
+  .sc-art :global(svg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sc-tags {
+    position: absolute;
+    inset-block-end: 0.5rem;
+    inset-inline-start: 0.5rem;
+    display: flex;
+    gap: 0.375rem;
+  }
+  .sc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+  .sc-body {
+    display: grid;
+    align-content: start;
+    gap: 0.375rem;
+    padding: 0.875rem 0.625rem 0.5rem;
+  }
+  .sc-meta,
+  .sc-by,
+  .sc-refs {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .sc-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.15;
+  }
+  .sc-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .sc-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .sc-sum {
+    color: var(--ink-muted);
+  }
+  .sl-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .sl-empty :global(.sl-art) {
+    width: min(100%, 16rem);
+    height: auto;
+  }
+  .sl-empty-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .sl-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sc:hover {
+      transform: none;
+    }
+  }
+</style>

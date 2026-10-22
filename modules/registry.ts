@@ -15,6 +15,7 @@ import { mediaModule } from '@eec/module-media'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
 import { scheduleModule } from '@eec/module-schedule'
+import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
 import { storyModule } from '@eec/module-story'
 import type { DefinedModule } from '@eec/modules-kit'
@@ -25,6 +26,7 @@ export const modules: readonly DefinedModule[] = [
   mediaModule,
   membersModule,
   newsModule,
+  sermonsModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

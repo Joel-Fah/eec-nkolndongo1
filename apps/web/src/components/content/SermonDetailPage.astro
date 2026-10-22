@@ -1,0 +1,344 @@
+---
+/**
+ * One sermon: the title, date, preacher (only with a recorded consent), the passages, the video as a facade, links to
+ * listen or download (any https address; shown with its host, opened in a new tab, never loaded by this page), notes and
+ * the written text if there is one. `preview`: a signed link, any state, never indexed.
+ */
+import { shortDate } from '@eec/core/dates'
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import '../../styles/richtext.css'
+import Site from '../../layouts/Site.astro'
+import { publicJson, type SermonDetail } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { breadcrumbs, organization } from '../../lib/seo'
+import { sermonHref, sermonsListHref } from '../../lib/sermons-routes'
+import JsonLd from '../JsonLd.astro'
+import Picture from '../Picture.astro'
+import GeneratedBanner from './GeneratedBanner.astro'
+import LangFallbackNote from './LangFallbackNote.astro'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  slug?: string
+  token?: string
+}
+const { slug, token } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`sermons.site.${key}` as 'sermons.site.all', vars)
+const preview = !!token
+type Item = { found: true; sermon: SermonDetail } | { found: false; redirect: string | null }
+const result = preview
+  ? await publicJson<SermonDetail>(
+      Astro,
+      `/api/sermons/public/preview/${encodeURIComponent(token ?? '')}?locale=${locale}`,
+    )
+  : await publicJson<Item>(
+      Astro,
+      `/api/sermons/public/item/${encodeURIComponent(slug ?? '')}?locale=${locale}`,
+    )
+
+let sermon: SermonDetail | null = null
+if (result.state === 'ok') {
+  const d = result.data as Item | SermonDetail
+  if ('found' in d) {
+    if (d.found) sermon = d.sermon
+    else if (d.redirect) return Astro.redirect(sermonHref(locale, d.redirect), 301)
+  } else sermon = d
+}
+const unavailable = result.state === 'unavailable'
+if (!sermon && !unavailable) Astro.response.status = 404
+Astro.response.headers.set(
+  'cache-control',
+  preview || !sermon ? 'no-store' : 'public, max-age=30, stale-while-revalidate=120',
+)
+if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+const url = sermon ? new URL(sermonHref(locale, sermon.slug), Astro.site ?? Astro.url).href : ''
+const wa = sermon ? `https://wa.me/?text=${encodeURIComponent(`${sermon.title}\n${url}`)}` : ''
+const coverVariants = sermon?.cover
+  ? [...sermon.cover.variants].sort((a, b) => a.width - b.width)
+  : []
+const cover = coverVariants.find((v) => v.width >= 1200) ?? coverVariants.at(-1)
+const shareImage = cover ? new URL(`/media/${cover.key}`, Astro.site ?? Astro.url).href : undefined
+const ld = sermon
+  ? [
+      organization(Astro.site ?? Astro.url, t('site.name')),
+      breadcrumbs(Astro.site ?? Astro.url, [
+        { name: t('nav.home'), path: `/${locale}/` },
+        { name: s('back'), path: sermonsListHref(locale) },
+        { name: sermon.title, path: sermonHref(locale, sermon.slug) },
+      ]),
+    ]
+  : []
+---
+
+<Site title={sermon?.title ?? s('not_found_t')} description={sermon?.summary} noindex={preview || !sermon} type="article" image={shareImage}>
+  {sermon && !preview && <JsonLd slot="head" data={ld} />}
+  <article class="sd">
+    <p class="sd-back"><a href={sermonsListHref(locale)}><Icon name="chevronLeft" size={20} />{s('back')}</a></p>
+    {preview && <p class="sd-preview" role="note">{s('preview_banner')}</p>}
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !sermon ? (
+        <div class="sd-missing">
+          <h1>{s('not_found_t')}</h1>
+          <p>{s('not_found_p')}</p>
+          <Button href={sermonsListHref(locale)}>{s('back')}</Button>
+        </div>
+      ) : (
+        <>
+          <header class="sd-head">
+            <p class="sd-meta">
+              {sermon.preachedOn && <time datetime={sermon.preachedOn}>{s('on', { date: shortDate(`${sermon.preachedOn}T12:00:00Z`, locale) })}</time>}
+              {sermon.preacher && <span> · {s('by', { name: sermon.preacher })}</span>}
+              {sermon.series && <span> · {s('series_label')} : <a href={`${sermonsListHref(locale)}?series=${sermon.series.slug}`}>{sermon.series.title}</a></span>}
+            </p>
+            <h1 class="sd-title">{sermon.title}</h1>
+            {sermon.summary && <p class="sd-lead">{sermon.summary}</p>}
+            {sermon.refs.length > 0 && (
+              <ul class="sd-refs" aria-label={s('passages')}>
+                {sermon.refs.map((r) => <li>{r.label}</li>)}
+              </ul>
+            )}
+          </header>
+          {sermon.fallback && <LangFallbackNote />}
+
+          {sermon.youtubeId && (
+            <section class="sd-video" aria-label={s('video_h')}>
+              <div class="sv" data-sermon-video data-id={sermon.youtubeId} data-title={s('video_title', { title: sermon.title })}>
+                <div class="sv-art">
+                  {sermon.cover ? <Picture media={sermon.cover} sizes="(min-width: 48rem) 46rem, 100vw" decorative /> : <GeneratedBanner seed={sermon.slug} tone="primary" />}
+                </div>
+                <button type="button" class="sv-play">
+                  <span class="sv-icon" aria-hidden="true"><Icon name="play" size={24} /></span>
+                  <span>{s('video_play')}</span>
+                </button>
+                <p class="sv-note">{s('video_note')}</p>
+              </div>
+            </section>
+          )}
+
+          {sermon.links.length > 0 && (
+            <section class="sd-links" aria-labelledby="sd-links-h">
+              <h2 id="sd-links-h" class="sd-h">{s('links_h')}</h2>
+              <ul>
+                {sermon.links.map((l) => (
+                  <li>
+                    <a class="sd-link" href={l.url} target="_blank" rel="noopener noreferrer">
+                      <span class="sd-link-icon" aria-hidden="true"><Icon name="headphones" size={20} /></span>
+                      <span class="sd-link-text">
+                        <strong>{l.label || l.host}</strong>
+                        <small>{s('opens_in', { host: l.host })}</small>
+                      </span>
+                      <Icon name="external" size={16} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {sermon.html && sermon.text.trim() && (
+            <section class="sd-notes">
+              <h2 class="sd-h">{s('notes')}</h2>
+              <div class="sd-body" set:html={sermon.html} />
+            </section>
+          )}
+          {sermon.transcriptHtml && (
+            <details class="sd-transcript">
+              <summary>{s('transcript')}</summary>
+              <div class="sd-body" set:html={sermon.transcriptHtml} />
+            </details>
+          )}
+          <p class="sd-share">
+            <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share_whatsapp')}<Icon name="external" size={16} /></Button>
+            {sermon.series && <Button href={`${sermonsListHref(locale)}?series=${sermon.series.slug}`} variant="ghost">{s('series_page')}</Button>}
+          </p>
+        </>
+      )
+    }
+  </article>
+</Site>
+
+<script>
+  import { initSermonVideo } from '../../scripts/sermon-video'
+  initSermonVideo()
+  document.addEventListener('astro:page-load', initSermonVideo)
+</script>
+
+<style>
+  .sd {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 46rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .sd-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .sd-preview {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--surface-2));
+    font-weight: 600;
+  }
+  .sd-head {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .sd-meta {
+    color: var(--ink-muted);
+  }
+  .sd-meta a {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+  .sd-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .sd-lead {
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .sd-refs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .sd-refs li {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+  }
+  .sv {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .sv-art {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+  }
+  .sv-art :global(img),
+  .sv-art :global(svg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sv-play {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-xl);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .sv-icon {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--surface) 92%, transparent);
+    box-shadow: var(--elevation-2);
+    color: var(--primary);
+    transition: transform var(--duration-ui) var(--ease-out);
+  }
+  .sv-play:hover .sv-icon {
+    transform: scale(1.06);
+  }
+  .sv-note {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .sv :global(.sv-frame) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--radius-xl);
+  }
+  .sd-h {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-block-end: 0.5rem;
+  }
+  .sd-links ul {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .sd-link {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    min-height: 3.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    text-decoration: none;
+  }
+  .sd-link:hover {
+    box-shadow: var(--elevation-2);
+  }
+  .sd-link-icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .sd-link-text {
+    display: grid;
+    flex: 1;
+  }
+  .sd-link-text small {
+    color: var(--ink-muted);
+  }
+  .sd-body {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.75;
+  }
+  .sd-body :global(> * + *) {
+    margin-block-start: 1em;
+  }
+  .sd-transcript summary {
+    cursor: pointer;
+    font-weight: 600;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+  }
+  .sd-share {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .sd-missing {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+</style>

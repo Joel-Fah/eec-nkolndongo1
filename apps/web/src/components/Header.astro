@@ -9,6 +9,7 @@ import { alternates, descKey, href, labelKey, pages, tabKey, tabs } from '../lib
 import { newsListHref } from '../lib/news-routes'
 import { content } from '../lib/pages'
 import { pageEntries, quickActions, searchHref } from '../lib/search'
+import { sermonsListHref } from '../lib/sermons-routes'
 import SiteLockup from './SiteLockup.astro'
 import ThemeToggle from './ThemeToggle.astro'
 
@@ -177,8 +178,8 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     </div>
   </dialog>
   <dialog id="search-dialog" class="dialog search-dialog" aria-label={t('search.dialog_title')} data-search data-locale={locale} data-all={searchHref(locale)} data-loading={t('search.loading')} data-rescount={t('search.count', { n: '{n}' })} data-resone={t('search.count_one')} data-empty={t('search.empty_t', { q: '{q}' })} data-more={t('search.all')} data-unavailable={t('search.unavailable')}
-    data-pages={JSON.stringify(searchPages)} data-type_pages={t('search.type_pages')} data-related={t('search.related')} data-sug_event={t('search.sug_event')} data-sug_guides={t('search.sug_guides')} data-sug_groups={t('search.sug_groups')} data-sug_news={t('search.sug_news')} data-did={t('search.did_you_mean')} data-type_news={t('search.type_news')} data-type_events={t('search.type_events')} data-type_guides={t('search.type_guides')} data-type_departments={t('search.type_departments')}
-    data-news={newsListHref(locale)} data-events={eventsListHref(locale)} data-guides={guidesHref(locale)} data-departments={departmentsHref(locale)}>
+    data-pages={JSON.stringify(searchPages)} data-type_pages={t('search.type_pages')} data-related={t('search.related')} data-sug_event={t('search.sug_event')} data-sug_guides={t('search.sug_guides')} data-sug_groups={t('search.sug_groups')} data-sug_news={t('search.sug_news')} data-did={t('search.did_you_mean')} data-type_news={t('search.type_news')} data-type_events={t('search.type_events')} data-type_sermons={t('search.type_sermons')} data-type_guides={t('search.type_guides')} data-type_departments={t('search.type_departments')}
+    data-news={newsListHref(locale)} data-sermons={sermonsListHref(locale)} data-events={eventsListHref(locale)} data-guides={guidesHref(locale)} data-departments={departmentsHref(locale)}>
     <form class="search-form" role="search" method="get" action={searchHref(locale)}>
       <label class="search-label" for="search-input">{t('search.dialog_title')}</label>
       <div class="search-field">

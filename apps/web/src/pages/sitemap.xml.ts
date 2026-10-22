@@ -13,6 +13,7 @@ import { eventHref } from '../lib/events-routes'
 import { guideHref } from '../lib/guides-routes'
 import { href, pages } from '../lib/nav'
 import { newsItemHref } from '../lib/news-routes'
+import { sermonHref } from '../lib/sermons-routes'
 
 export const prerender = false
 
@@ -28,6 +29,7 @@ const BUILT = [
   'evenements',
   'dimanche',
   'nouvelles',
+  'predications',
   'give',
   'privacy',
   'legal',
@@ -47,7 +49,7 @@ export const GET: APIRoute = async (ctx) => {
   }
   const today = new Date().toISOString().slice(0, 10)
   const year = new Date(Date.now() + 365 * 86_400_000).toISOString().slice(0, 10)
-  const [news, events, guides, groups] = await Promise.all([
+  const [news, events, guides, groups, sermons] = await Promise.all([
     Promise.all(
       [1, 2, 3, 4, 5].map((n) =>
         publicJson<{ items: { slug: string; publishedAt: string }[] }>(
@@ -62,6 +64,7 @@ export const GET: APIRoute = async (ctx) => {
     ),
     publicJson<{ items: { slug: string }[] }>(ctx, '/api/guides/public?locale=fr'),
     publicJson<{ items: { key: string }[] }>(ctx, '/api/departments/public?locale=fr'),
+    publicJson<{ items: { slug: string }[] }>(ctx, '/api/sermons/public?locale=fr&limit=24'),
   ])
   const seen = new Set<string>()
   for (const r of news)
@@ -81,6 +84,9 @@ export const GET: APIRoute = async (ctx) => {
         seen.add(`e:${it.slug}`)
         entries.push({ fr: eventHref('fr', it.slug), en: eventHref('en', it.slug) })
       }
+  if (sermons.state === 'ok')
+    for (const it of sermons.data.items)
+      entries.push({ fr: sermonHref('fr', it.slug), en: sermonHref('en', it.slug) })
   if (guides.state === 'ok')
     for (const it of guides.data.items)
       entries.push({ fr: guideHref('fr', it.slug), en: guideHref('en', it.slug) })
