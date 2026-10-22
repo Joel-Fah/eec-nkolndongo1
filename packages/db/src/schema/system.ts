@@ -118,3 +118,30 @@ export const contentVersions = pgTable('content_versions', {
   version: integer('version').notNull().default(1),
   updatedAt: updatedAt(),
 })
+
+/**
+ * Review comments on content waiting for validation (« À valider »): a content partner asks for a correction or leaves a
+ * note on one item (a settings field, a schedule slot, a page text). `item_kind` + `item_ref` name the item; nothing here
+ * is public. A comment is open until someone marks it resolved.
+ */
+export const contentReviews = pgTable(
+  'content_reviews',
+  {
+    id: id(),
+    itemKind: text('item_kind', { enum: ['settings', 'schedule', 'page_slot'] }).notNull(),
+    itemRef: text('item_ref').notNull(),
+    /** correction: asks for a change before validating. note: just a remark. */
+    kind: text('kind', { enum: ['correction', 'note'] })
+      .notNull()
+      .default('correction'),
+    body: text('body').notNull(),
+    status: text('status', { enum: ['open', 'resolved'] })
+      .notNull()
+      .default('open'),
+    createdBy: uuid('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    resolvedAt: tz('resolved_at'),
+    resolvedBy: uuid('resolved_by').references(() => user.id, { onDelete: 'set null' }),
+  },
+  (t) => [index('content_reviews_item_idx').on(t.itemKind, t.itemRef, t.status)],
+)
