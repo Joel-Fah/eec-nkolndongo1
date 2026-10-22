@@ -172,13 +172,19 @@ const stamp = Date.now().toString(36)
       headers: { 'content-type': 'application/json', origin: base },
       body: JSON.stringify({ ...body, ...extra }),
     })
-  const fast = await post({ openedAt: Date.now() })
+  const mint = async () =>
+    ((await (await fetch(`${base}/api/contact/token`)).json()) as { token: string }).token
+  const early = await mint()
+  const fast = await post({ token: early })
   ok('contact: too fast is refused', fast.status === 400)
-  const bot = await post({ website: 'http://spam.example', openedAt: Date.now() - 20_000 })
+  const forged = await post({ token: `${early.slice(0, -2)}xx` })
+  ok('contact: a forged token is refused', forged.status === 400)
+  await new Promise((r) => setTimeout(r, 4200))
+  const bot = await post({ website: 'http://spam.example', token: early })
   ok('contact: honeypot is quietly accepted but not stored', bot.status === 200)
-  const noConsent = await post({ consent: false, openedAt: Date.now() - 20_000 })
+  const noConsent = await post({ consent: false, token: early })
   ok('contact: no consent is refused', noConsent.status === 400)
-  const good = await post({ openedAt: Date.now() - 20_000 })
+  const good = await post({ token: early })
   const inbox = await api('/contact')
   const mine = (inbox.json.items as { id: string; preview: string }[] | undefined)?.find((m) =>
     m.preview.includes(`e2e ${stamp}`),

@@ -28,8 +28,23 @@ config.vars = {
 const deploy = JSON.parse(await readFile(join(root, 'apps/web/deploy.json'), 'utf8')) as {
   hyperdriveId?: string
 }
-if (deploy.hyperdriveId) config.hyperdrive = [{ binding: 'HYPERDRIVE', id: deploy.hyperdriveId }]
+// PREVIEW_WORKER=1 builds the SEPARATE preview Worker: its own name (so its own secrets, pointing at the dev database
+// and bucket, never production's), no Hyperdrive, no cron, never indexable. `wrangler versions upload` of the production
+// Worker would reuse production's secrets and bindings, which is exactly what a preview must not do.
+if (process.env.PREVIEW_WORKER === '1') {
+  config.name = `${config.name}-preview`
+  config.triggers = { crons: [] }
+  config.vars = {
+    ...config.vars,
+    SITE_INDEXABLE: '0',
+    APP_ORIGIN: process.env.PREVIEW_ORIGIN ?? `https://${config.name}.joelfah2003.workers.dev`,
+  }
+} else if (deploy.hyperdriveId) {
+  config.hyperdrive = [{ binding: 'HYPERDRIVE', id: deploy.hyperdriveId }]
+}
 await writeFile(configFile, JSON.stringify(config))
+if (process.env.PREVIEW_WORKER === '1')
+  console.log(`PREVIEW build: Worker "${config.name}", no Hyperdrive, no cron`)
 console.log(
   `Worker vars: ADMIN_PATH=${config.vars.ADMIN_PATH} SITE_INDEXABLE=${config.vars.SITE_INDEXABLE}`,
 )

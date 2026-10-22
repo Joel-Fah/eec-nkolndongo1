@@ -25,7 +25,7 @@ link. From then on, merges to `main` deploy through the `deploy` workflow.
    `ADMIN_PATH`), applies migrations to the production Neon branch, then `wrangler deploy`.
 2. **Migrations are additive by default.** A destructive one (drop, rename, type change) needs a decision record and
    Joël's explicit OK before merging.
-3. Preview without deploying: Actions → `preview` → Run workflow (uploads a version, gives a preview URL).
+3. Preview: Actions → `preview` → Run workflow. It deploys the branch to a **separate** Worker (`eec-nkolndongo1-preview`, see « Safe preview »), never touching production's data.
 4. Launch = set the repository variable `SITE_INDEXABLE=1` and redeploy. Until then every page, file and header says
    « noindex », robots.txt disallows everything, and a ribbon says the site is not indexed yet.
 
@@ -48,6 +48,14 @@ migrations are not rolled back by this: write a new forward migration.
 - Commands that change data (`db:migrate`, `db:seed`) ask you to **type the branch name** when it is not `dev`.
   `clean:test-data` and the spike refuse anything but `dev`. CI deploys without the prompt (it is the intended path).
 - Check before acting: `echo $NEON_BRANCH` (dev / production).
+
+## Safe preview (separate Worker, dev data)
+A version of the production Worker would reuse production's secrets and database, so previews run on their own Worker,
+`eec-nkolndongo1-preview` (built with `PREVIEW_WORKER=1`: no Hyperdrive, no cron, always noindex). One-time setup, once the
+Worker exists (first run of the `preview` workflow creates it): set its secrets **from your dev values** (`.env.local`), never
+production's: `wrangler secret put <NAME> --name eec-nkolndongo1-preview` for `AUTH_SECRET` (a new value), `DATABASE_URL_UNPOOLED`
+(the dev Neon branch), the `AWS_*`/`MEDIA_BUCKET` keys (the dev bucket). Then the preview URL is
+`https://eec-nkolndongo1-preview.<your subdomain>.workers.dev`. Check with the admin « Système » screen that the database name is dev.
 
 ## Media second copy (R2)
 `pnpm media:sync` copies the media files to a Cloudflare R2 bucket (only new ones, never deletes). The weekly `backup`
