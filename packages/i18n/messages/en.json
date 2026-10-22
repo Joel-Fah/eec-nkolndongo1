@@ -841,6 +841,36 @@
         "desc": "In the admin, a full banner: an illustration, cards and UI pieces floating at three depths (near and blurred, far and blurred, sharp) and one call to action to the guide.",
         "use": "The admin’s Design guide tab.",
         "a11y": "The floating pieces are decorative (hidden from screen readers and the pointer); the button is an ordinary link."
+      },
+      "validatecard": {
+        "name": "“To validate” card",
+        "desc": "A piece of information waiting to be checked: its current value, then Validate, Ask for a correction or Leave a note, with links to the field and to the public page. Open corrections stay visible until they are handled.",
+        "use": "Admin → À valider; .admin-panel with primary, secondary and ghost buttons; grouped by page.",
+        "a11y": "Each group is a named section; buttons have written labels; the message box has a hint; validation is announced by a toast."
+      },
+      "helplayout": {
+        "name": "Help guide",
+        "desc": "A narrow reading column for step-by-step guides: Erode title, numbered steps, a note box, and for cheat sheets a Print button (the printed sheet keeps only the text, no menu).",
+        "use": "Admin → Aide; .help-article, .help-body, .help-note; the top-bar “?” leads to the guide for the current screen.",
+        "a11y": "Ordered headings, real lists, underlined links; the “?” has a name (“Help for this screen”); print is black on white."
+      },
+      "healthcard": {
+        "name": "Health card",
+        "desc": "A check with its state as a green, orange or red badge, a figure in words (“12 MB of 512 MB (2 %)”) and, when not green, a sentence saying what to do.",
+        "use": "Admin → Santé; <Badge tone=\"success|warning|danger\">; orange starts at 70 % of a free limit.",
+        "a11y": "The state is written (“All good”, “Keep an eye on it”, “Action needed”), never colour alone; the summary is announced (role=status)."
+      },
+      "visitscharts": {
+        "name": "Visits without tracking",
+        "desc": "Thirty days of page views by language (soft area chart), phone or computer (donut) and the most read pages, with the sentence saying no cookie, IP address or identifier is used. Until the counter is switched on, a single box says so.",
+        "use": "Dashboard; <AreaChart> with days (“15 Oct”), <Donut>, ordered list; decision 0038.",
+        "a11y": "Each chart has its table of numbers and a name; the page list is an ordered list."
+      },
+      "sharecard": {
+        "name": "Share card",
+        "desc": "The image shown when a link is shared (WhatsApp, Facebook): the mark, the parish name and the section title, in Erode, in our colours. One card per section and language; a post or event uses its own photo.",
+        "use": "apps/web/public/og/*.jpg, 1200×630, drawn by scripts/og-generate.ts (rerun if the name or tagline changes); og:* tags in Base.astro.",
+        "a11y": "The image has alt text (the parish name); it carries nothing that is not also on the page."
       }
     },
     "rules": {
@@ -888,7 +918,7 @@
       "figures": {
         "name": "Key figures",
         "desc": "Large figures in Erode that count up once when they enter the screen.",
-        "use": "These are facts: the value stays null until validated (lib/stats.ts). In development an example is shown, tagged “example”; in production an unvalidated figure is not shown.",
+        "use": "These are facts: they come from home page texts (Site pages → Home) and only appear once published, that is validated (decision 0039). An unpublished figure stays hidden everywhere.",
         "a11y": "Definition list (dl); the count-up is not announced and doesn’t play with reduced motion."
       },
       "account": {

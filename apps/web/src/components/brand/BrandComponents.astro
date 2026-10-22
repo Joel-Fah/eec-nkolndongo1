@@ -97,6 +97,11 @@ type Id =
   | 'areachart'
   | 'mapillustration'
   | 'designbanner'
+  | 'validatecard'
+  | 'helplayout'
+  | 'healthcard'
+  | 'visitscharts'
+  | 'sharecard'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -281,6 +286,18 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('searchhints')}><p class="text-sm text-ink-muted">{t('brand.components.searchhints.use')}</p></DocBlock>
 
     <DocBlock {...doc('areachart')}><p class="text-sm text-ink-muted">{t('brand.components.areachart.use')}</p></DocBlock>
+
+    <DocBlock {...doc('validatecard')}><p class="text-sm text-ink-muted">{t('brand.components.validatecard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('helplayout')}><p class="text-sm text-ink-muted">{t('brand.components.helplayout.use')}</p></DocBlock>
+
+    <DocBlock {...doc('healthcard')}><p class="text-sm text-ink-muted">{t('brand.components.healthcard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('visitscharts')}><p class="text-sm text-ink-muted">{t('brand.components.visitscharts.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sharecard')}>
+      <img class="max-w-md rounded-lg ring-1 ring-line" src={`/og/default-${locale}.jpg`} width="1200" height="630" alt={t('site.parish')} loading="lazy" />
+    </DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

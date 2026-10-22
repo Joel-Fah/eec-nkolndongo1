@@ -841,6 +841,36 @@
         "desc": "Dans l’administration, un bandeau plein écran : une illustration, des cartes et des éléments d’interface en suspension à trois profondeurs (proche et flou, lointain et flou, net) et un seul appel à l’action vers le guide.",
         "use": "Onglet Guide de design de l’administration.",
         "a11y": "Les éléments flottants sont décoratifs (masqués aux lecteurs d’écran et au pointeur) ; le bouton est un lien ordinaire."
+      },
+      "validatecard": {
+        "name": "Carte « À valider »",
+        "desc": "Une information qui attend d’être relue : sa valeur actuelle, puis Valider, Demander une correction ou Laisser une remarque, avec les liens vers le champ et la page publique. Les corrections ouvertes restent visibles jusqu’à ce qu’elles soient traitées.",
+        "use": "Administration → À valider ; .admin-panel avec des boutons primaire, secondaire et fantôme ; groupes par page.",
+        "a11y": "Chaque groupe est une section nommée ; les boutons ont un libellé écrit ; la zone de message a une consigne ; la validation est annoncée par une notification."
+      },
+      "helplayout": {
+        "name": "Guide d’aide",
+        "desc": "Une colonne de lecture étroite pour les guides pas à pas : titre Erode, étapes numérotées, encadré de note, et pour les aide-mémoire un bouton Imprimer (la feuille imprimée ne garde que le texte, sans menu).",
+        "use": "Administration → Aide ; .help-article, .help-body, .help-note ; le « ? » de la barre du haut mène au guide de l’écran en cours.",
+        "a11y": "Titres hiérarchisés, listes réelles, liens soulignés ; le « ? » a un nom (« Aide pour cet écran ») ; l’impression est en noir sur blanc."
+      },
+      "healthcard": {
+        "name": "Carte de santé",
+        "desc": "Un contrôle avec son état en pastille verte, orange ou rouge, un chiffre en toutes lettres (« 12 Mo sur 512 Mo (2 % ») et, si ce n’est pas vert, une phrase qui dit quoi faire.",
+        "use": "Administration → Santé ; <Badge tone=\"success|warning|danger\"> ; l’orange commence à 70 % d’une limite gratuite.",
+        "a11y": "L’état est écrit (« Tout va bien », « À surveiller », « Il faut agir »), jamais la couleur seule ; le résumé est annoncé (role=status)."
+      },
+      "visitscharts": {
+        "name": "Visites sans suivi",
+        "desc": "Trente jours de pages vues par langue (courbe en aires douces), téléphone ou ordinateur (anneau) et les pages les plus lues, avec la phrase qui dit qu’aucun cookie, adresse IP ni identifiant n’est utilisé. Tant que le compteur n’est pas activé, un seul encadré le dit.",
+        "use": "Tableau de bord ; <AreaChart> avec des jours (« 15 oct. »), <Donut>, liste ordonnée ; décision 0038.",
+        "a11y": "Chaque graphique a son tableau de chiffres et un nom ; la liste des pages est une liste ordonnée."
+      },
+      "sharecard": {
+        "name": "Carte de partage",
+        "desc": "L’image qui s’affiche quand un lien est partagé (WhatsApp, Facebook) : la marque, le nom de la paroisse et le titre de la rubrique, en Erode, dans nos couleurs. Une carte par rubrique et par langue ; un article ou un événement utilise sa propre photo.",
+        "use": "apps/web/public/og/*.jpg, 1200×630, dessinées par scripts/og-generate.ts (à relancer si le nom ou la devise changent) ; balises og:* dans Base.astro.",
+        "a11y": "L’image a un texte alternatif (le nom de la paroisse) ; elle ne contient aucune information qui ne soit pas aussi dans la page."
       }
     },
     "rules": {
@@ -888,7 +918,7 @@
       "figures": {
         "name": "Chiffres clés",
         "desc": "De grands chiffres en Erode, qui comptent une fois en entrant dans l’écran.",
-        "use": "Ce sont des faits : valeur nulle tant qu’elle n’est pas validée (lib/stats.ts). En développement, un exemple marqué « exemple » ; en production, un chiffre non validé n’est pas affiché.",
+        "use": "Ce sont des faits : ils viennent de textes de la page d’accueil (Pages du site → Accueil) et n’apparaissent que lorsqu’ils sont publiés, donc validés (décision 0039). Un chiffre non publié reste caché, partout.",
         "a11y": "Liste de définitions (dl) ; le décompte n’est pas annoncé et ne joue pas avec le mouvement réduit."
       },
       "account": {
