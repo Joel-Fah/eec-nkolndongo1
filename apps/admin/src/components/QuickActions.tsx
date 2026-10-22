@@ -12,31 +12,39 @@ type Action = {
   label: MessageKey
 }
 
-const ACTIONS: Action[] = [
+const ACTIONS: (Action & { end?: boolean })[] = [
   {
     permission: 'media:upload',
     to: '/m/$module',
     params: { module: 'media' },
-    icon: 'upload',
+    icon: 'imageUp',
     label: 'dash.qa_upload',
   },
-  { permission: 'core:users-invite', to: '/users', icon: 'users', label: 'dash.qa_invite' },
+  { permission: 'core:users-invite', to: '/users', icon: 'userRoundPlus', label: 'dash.qa_invite' },
   {
     permission: 'members:read',
     to: '/m/$module',
     params: { module: 'members' },
-    icon: 'account',
+    icon: 'couple',
     label: 'dash.qa_members',
   },
+  { permission: 'core:system-outbox', to: '/outbox', icon: 'mailSend', label: 'dash.qa_outbox' },
+  // Settings and activity sit together at the far end of the line.
   {
     permission: 'settings:read',
     to: '/m/$module',
     params: { module: 'settings' },
     icon: 'settings',
     label: 'dash.qa_settings',
+    end: true,
   },
-  { permission: 'core:system-outbox', to: '/outbox', icon: 'mail', label: 'dash.qa_outbox' },
-  { permission: 'core:audit-read', to: '/audit', icon: 'clock', label: 'dash.qa_activity' },
+  {
+    permission: 'core:audit-read',
+    to: '/audit',
+    icon: 'timeline',
+    label: 'dash.qa_activity',
+    end: true,
+  },
 ]
 
 /** The things people do most, one click away, only those the person is allowed to do. */
@@ -47,8 +55,14 @@ export function QuickActions() {
   if (!items.length) return null
   return (
     <nav className="quick" aria-label={t('dash.quick')}>
-      {items.map((a) => (
-        <Link key={a.label} to={a.to} params={a.params as never} className="quick-action">
+      {items.map((a, i) => (
+        <Link
+          key={a.label}
+          to={a.to}
+          params={a.params as never}
+          className="quick-action"
+          data-end={a.end && !items[i - 1]?.end ? 'first' : a.end ? '' : undefined}
+        >
           <span className="quick-icon" aria-hidden="true">
             <Icon name={a.icon} size={20} />
           </span>

@@ -1,0 +1,209 @@
+---
+/**
+ * « Nous trouver »: the approved address and coordinates, « Itinéraire » links (a geo: link for Android maps apps, Google
+ * Maps, OpenStreetMap — no embedded map, so no third-party load and no data cost), landmarks, how to reach us, and the
+ * contact form. Only approved (validated) settings are shown.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
+import type { StoryData } from '../../lib/story-routes'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import ContactForm from './ContactForm.astro'
+import MapIllustration from './MapIllustration.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`settings.site.${key}` as 'settings.site.copy')
+const [settings, story] = await Promise.all([
+  publicJson<{ parish?: Record<string, string> }>(Astro, '/api/settings/public'),
+  publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
+])
+const p = settings.state === 'ok' ? (settings.data.parish ?? {}) : {}
+const directions = story.state === 'ok' ? story.data.slots.trouver?.directions?.text : ''
+const landmarks = story.state === 'ok' ? story.data.slots.trouver?.landmarks?.text : ''
+const lat = p.mapLat && p.mapLng ? Number(p.mapLat) : null
+const lng = p.mapLat && p.mapLng ? Number(p.mapLng) : null
+const hasPoint = lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng)
+const name = p.shortName || p.nameFr || ''
+const q = hasPoint ? `${lat},${lng}` : p.address ? encodeURIComponent(p.address) : ''
+const geo = hasPoint
+  ? `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(name)})`
+  : q
+    ? `geo:0,0?q=${q}`
+    : ''
+const google = p.mapUrl
+  ? p.mapUrl
+  : hasPoint
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+    : q
+      ? `https://www.google.com/maps/search/?api=1&query=${q}`
+      : ''
+const osm = hasPoint
+  ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`
+  : ''
+const phones = (p.phones ?? '')
+  .split(/[,;/]/)
+  .map((x) => x.trim())
+  .filter(Boolean)
+const wa = p.whatsapp
+  ? p.whatsapp.startsWith('https://')
+    ? p.whatsapp
+    : `https://wa.me/${p.whatsapp.replace(/[^\d]/g, '')}`
+  : ''
+const known = !!(p.address || hasPoint || p.mapUrl || phones.length || p.email || wa || landmarks)
+const path = (id: string) => href(locale, pages.find((x) => x.id === id)?.path[locale] ?? '')
+const firstVisit = story.state === 'ok' ? story.data.slots.trouver?.firstvisit?.text : ''
+const subject = (Astro.url.searchParams.get('sujet') ?? '').slice(0, 120)
+const category = Astro.url.searchParams.get('categorie') ?? ''
+Astro.response.headers.set(
+  'cache-control',
+  settings.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey('trouver'))} description={t('pages.trouver.lead')}>
+  <PageHero id="trouver" />
+  <section class="fu">
+    <div class="fu-left">
+      {!known && <PageView id="trouver" hideHeader />}
+      {
+        (p.address || landmarks || geo || google) && (
+          <article class="fu-card">
+            <MapIllustration name={p.shortName || ''} href={google || undefined} label={s('dir_open')} />
+            <h2><span class="fu-ico" aria-hidden="true"><Icon name="location" size={20} /></span>{s('where_t')}</h2>
+            <p class="fu-how">{directions || s('directions_default')}</p>
+            {p.address && <p class="fu-addr">{p.address}{p.bp ? ` · ${p.bp}` : ''}</p>}
+            {landmarks && <p class="fu-land"><strong>{s('landmarks')} :</strong> {landmarks}</p>}
+            <div class="fu-actions">
+              {geo && <Button href={geo} class="fu-android"><Icon name="location" size={20} />{s('dir_android')}</Button>}
+              {osm && <Button href={osm} variant="secondary" target="_blank" rel="noopener noreferrer">{s('dir_osm')}<Icon name="external" size={16} /></Button>}
+            </div>
+          </article>
+        )
+      }
+      <article class="fu-card fu-first">
+        <h2><span class="fu-ico" aria-hidden="true"><Icon name="heart" size={20} /></span>{s('first_t')}</h2>
+        <p>{firstVisit || s('first_p')}</p>
+        <div class="fu-actions">
+          <Button href={path('cultes')} variant="secondary"><Icon name="clock" size={20} />{s('first_services')}</Button>
+          <Button href={path('dimanche')} variant="secondary"><Icon name="church" size={20} />{s('first_sunday')}</Button>
+        </div>
+      </article>
+      {
+        (phones.length > 0 || p.email || wa) && (
+          <article class="fu-card">
+            <h2><span class="fu-ico" aria-hidden="true"><Icon name="phone" size={20} /></span>{s('quick_t')}</h2>
+            <ul class="fu-quick">
+              {wa && <li><a href={wa} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} /><span>{s('whatsapp')}</span><Icon name="external" size={16} /></a></li>}
+              {phones.map((ph) => <li><a href={`tel:${ph.replace(/[^\d+]/g, '')}`}><Icon name="phone" size={20} /><span>{ph}</span></a></li>)}
+              {p.email && <li><a href={`mailto:${p.email}`}><Icon name="mail" size={20} /><span>{p.email}</span></a></li>}
+              <li><a href="#contact"><Icon name="chat" size={20} /><span>{s('write')}</span></a></li>
+            </ul>
+          </article>
+        )
+      }
+    </div>
+    <div class="fu-right"><ContactForm subject={subject} category={category} /></div>
+  </section>
+</Site>
+
+<style>
+  .fu {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+    padding-block: 2.5rem 4rem;
+  }
+  @media (min-width: 64rem) {
+    .fu {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+    .fu-right {
+      position: sticky;
+      inset-block-start: 6rem;
+    }
+  }
+  .fu-left {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .fu-card {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .fu-first {
+    background: color-mix(in oklab, var(--season) 14%, var(--surface));
+  }
+  .fu-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .fu-ico {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .fu-how {
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.5;
+  }
+  .fu-addr {
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: 600;
+  }
+  .fu-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .fu-quick {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .fu-quick a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: background var(--duration-ui) var(--ease-out);
+  }
+  .fu-quick a > span {
+    flex: 1;
+  }
+  .fu-quick a:hover {
+    background: var(--primary-soft);
+  }
+  /* The geo: link only makes sense on a phone (Android opens its maps app); the web links serve everywhere. */
+  @media (hover: hover) and (pointer: fine) {
+    .fu-android {
+      display: none;
+    }
+  }
+</style>

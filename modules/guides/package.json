@@ -1,0 +1,42 @@
+{
+  "name": "@eec/module-guides",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api.ts",
+    "./admin": "./src/admin.tsx",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "@eec/admin-kit": "workspace:*",
+    "@eec/api-kit": "workspace:*",
+    "@eec/auth": "workspace:*",
+    "@eec/content-kit": "workspace:*",
+    "@eec/core": "workspace:*",
+    "@eec/db": "workspace:*",
+    "@eec/i18n": "workspace:*",
+    "@eec/modules-kit": "workspace:*",
+    "@eec/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.4",
+    "drizzle-orm": "0.45.4",
+    "hono": "4.13.13",
+    "react": "catalog:",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261016.1",
+    "@eec/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

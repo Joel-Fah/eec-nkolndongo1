@@ -34,8 +34,8 @@ super admin and (for now) the only developer. Read this file, then `STATUS.md`, 
 ## Stack at a glance (details in ARCHITECTURE.md)
 
 Astro (public) · Vite + React + TanStack (admin) · Hono on Cloudflare Workers (API) · Neon Postgres +
-Neon Auth · Drizzle · Cloudflare R2 (files) · YouTube (video) · Google Drive (archive only) ·
-Brevo (transactional email) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + display serif.
+self-hosted Better Auth (0018) · Drizzle · S3-compatible bucket: Neon Object Storage now, R2 later (0020) · YouTube (video) ·
+Google Drive (archive only) · outbox now, Brevo later (0019) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + Erode (0023).
 pnpm workspaces + Turborepo.
 
 ## How to work

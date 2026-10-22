@@ -6,6 +6,8 @@
  *   - sign-in rate-limit counters older than a day
  *   - mail outbox messages older than 90 days
  *   - audit entries older than 24 months
+ *   - contact messages: 12 months after « handled » (at most 24 after receipt); prayer requests 3 months after « handled »
+ *     (at most 6 after receipt)
  *   - member accounts whose deletion was requested more than 30 days ago (team accounts are never purged here)
  */
 import { dbUrl, type Env } from '@eec/api-kit'
@@ -19,6 +21,10 @@ export const RETENTION = {
   auditMonths: 24,
   deletionGraceDays: 30,
   linkGraceDays: 7,
+  contactHandledMonths: 12,
+  contactMaxMonths: 24,
+  prayerHandledMonths: 3,
+  prayerMaxMonths: 6,
 }
 
 export type RetentionResult = {
@@ -28,6 +34,7 @@ export type RetentionResult = {
   rateLimits: number
   outbox: number
   audit: number
+  contact: number
   accountsPurged: number
   accountsSkipped: number
 }
@@ -78,9 +85,20 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
           )
           .returning({ id: t.auditLog.id }),
       ),
+      contact: 0,
       accountsPurged: 0,
       accountsSkipped: 0,
     }
+
+    // Contact messages (module `contact`, table read by name so this job needs no module import). Prayer requests go
+    // sooner. The counts are the only thing recorded about them.
+    const cm = sql.raw(
+      `delete from contact_messages where
+        (sensitive = false and ((handled_at is not null and handled_at < now() - interval '${RETENTION.contactHandledMonths} months') or created_at < now() - interval '${RETENTION.contactMaxMonths} months'))
+        or (sensitive = true and ((handled_at is not null and handled_at < now() - interval '${RETENTION.prayerHandledMonths} months') or created_at < now() - interval '${RETENTION.prayerMaxMonths} months'))
+        returning id`,
+    )
+    result.contact = (await db.execute(cm)).rows.length
 
     // Accounts past their grace period. Anyone holding a role other than « membre » is a team account: skipped.
     const due = await db

@@ -6,7 +6,8 @@
   "exports": {
     ".": "./registry.ts",
     "./api": "./api.ts",
-    "./admin": "./admin.ts"
+    "./admin": "./admin.ts",
+    "./search": "./search.ts"
   },
   "scripts": {
     "lint": "biome check .",
@@ -20,11 +21,16 @@
     "@eec/auth": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/db": "workspace:*",
+    "@eec/module-contact": "workspace:*",
+    "@eec/module-departments": "workspace:*",
+    "@eec/module-guides": "workspace:*",
+    "@eec/module-legal": "workspace:*",
     "@eec/module-liturgy": "workspace:*",
     "@eec/module-media": "workspace:*",
     "@eec/module-events": "workspace:*",
     "@eec/module-members": "workspace:*",
     "@eec/module-news": "workspace:*",
+    "@eec/module-story": "workspace:*",
     "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",
     "@eec/modules-kit": "workspace:*",

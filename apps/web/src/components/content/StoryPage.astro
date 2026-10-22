@@ -1,0 +1,322 @@
+---
+/**
+ * The story pages (Notre histoire, Ce que nous croyons, Pasteurs et Conseil): the structure and motion are code,
+ * the words and people come from the admin (published only; otherwise the built-in text stays). History = « Gravir la
+ * colline »; Council = names only with a recorded consent. Data: cached public API; never a 500 when it is down.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
+import type { StoryData } from '../../lib/story-routes'
+import PageView from '../PageView.astro'
+import Picture from '../Picture.astro'
+import PageHero from '../page/PageHero.astro'
+
+interface Props {
+  id: 'histoire' | 'croyances' | 'pasteurs'
+}
+const { id } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`story.site.${key}` as 'story.site.invite_t')
+const result = await publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`)
+const data: StoryData =
+  result.state === 'ok' ? result.data : { slots: {}, milestones: [], council: [] }
+const slot = (key: string) => data.slots[id]?.[key]
+const path = (pageId: string) =>
+  href(locale, pages.find((p) => p.id === pageId)?.path[locale] ?? '')
+const milestones = id === 'histoire' ? data.milestones : []
+const council = id === 'pasteurs' ? data.council : []
+const texts: Record<number, string> =
+  id === 'croyances' && slot('intro') ? { 0: slot('intro')?.text ?? '' } : {}
+Astro.response.headers.set(
+  'cache-control',
+  result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+---
+
+<Site title={t(labelKey(id))}>
+  <PageHero id={id} />
+  {
+    id === 'histoire' && milestones.length > 0 ? (
+      <section class="hc" aria-labelledby="hc-title">
+        <h2 id="hc-title" class="hc-title">{s('climb_t')}</h2>
+        {slot('intro') && <p class="hc-intro">{slot('intro')?.text}</p>}
+        <ol class="hc-list" data-climb>
+          <svg class="hc-trail" data-trail aria-hidden="true" focusable="false"><path data-trail-path class="hc-path" fill="none" /></svg>
+          {
+            milestones.map((m, i) => (
+              <li class="hc-item" data-milestone data-side={i % 2 === 0 ? 'l' : 'r'}>
+                <span class="hc-dot" data-node aria-hidden="true"></span>
+                <div class="hc-card">
+                  <button type="button" class="hc-btn" data-open aria-expanded="false" aria-controls={`ms-${m.id}`}>
+                    <span class="hc-year">{m.year}</span>
+                    <span class="hc-ttl">{m.title}</span>
+                  </button>
+                  <div class="hc-panel" id={`ms-${m.id}`} data-panel>
+                    {m.image && <Picture class="hc-img" media={m.image as never} sizes="(min-width: 48rem) 20rem, 90vw" decorative />}
+                    {m.text && <p>{m.text}</p>}
+                  </div>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="hc-end">
+          <Illustration name="church" class="hc-art" />
+          <h3 class="hc-end-t">{s('invite_t')}</h3>
+          <p>{slot('invite')?.text ?? s('invite_p')}</p>
+          <p class="hc-actions">
+            <Button href={path('trouver')}>{s('visit')}</Button>
+            <Button href={path('account')} variant="secondary">{s('join')}</Button>
+          </p>
+        </div>
+      </section>
+    ) : id === 'pasteurs' && (council.length > 0 || slot('governance')) ? (
+      <section class="co">
+        {slot('governance') && <div class="co-gov" set:html={slot('governance')?.html} />}
+        {council.length === 0 && <PageView id="pasteurs" hideHeader omit={[0, 2]} />}
+        {
+          council.map((g) => (
+            <section class="co-group">
+              <h2 class="co-h">{g.label}</h2>
+              <ul class="co-grid">
+                {g.people.map((p) => (
+                  <li class="co-card">
+                    {p.photo ? <Picture class="co-photo" media={p.photo as never} sizes="5rem" decorative /> : <span class="co-ph" aria-hidden="true"></span>}
+                    <span class="co-text">
+                      {p.name ? <strong>{p.name}</strong> : <strong>{g.label}</strong>}
+                      {p.title && <span class="co-sub">{p.title}</span>}
+                      {p.term && <span class="co-sub">{p.term}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </section>
+    ) : (
+      <PageView id={id} hideHeader texts={texts} />
+    )
+  }
+</Site>
+
+<script>
+  import { initClimb } from '../../scripts/history-climb'
+  initClimb()
+  document.addEventListener('astro:page-load', initClimb)
+</script>
+
+<style>
+  .hc,
+  .co {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 64rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .hc-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+  }
+  .hc-intro {
+    max-width: 56ch;
+    font-size: var(--text-xl);
+    color: var(--ink-muted);
+  }
+  .hc-list {
+    position: relative;
+    display: grid;
+    gap: 2.5rem;
+    padding-block: 1rem;
+  }
+  /* Without script: a straight line down the middle; with script the winding trail replaces it. */
+  .hc-list::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    width: 0.25rem;
+    margin-inline-start: -0.125rem;
+    border-radius: var(--radius-xs, 0.25rem);
+    background: color-mix(in oklab, var(--season) 40%, transparent);
+  }
+  .hc-list[data-js]::before {
+    display: none;
+  }
+  .hc-trail {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hc-path {
+    stroke: var(--primary);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+  }
+  .hc-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hc-dot {
+    position: absolute;
+    inset-block-start: 1.5rem;
+    inset-inline-start: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: -0.625rem 0 0 -0.625rem;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 0 0 0.25rem var(--primary);
+  }
+  /* The dots step left and right in turn, so the trail winds up the hill instead of running straight. */
+  .hc-item[data-side='l'] .hc-dot {
+    inset-inline-start: calc(50% - 1.75rem);
+  }
+  .hc-item[data-side='r'] .hc-dot {
+    inset-inline-start: calc(50% + 1.75rem);
+  }
+  .hc-card {
+    grid-column: 1;
+    padding-inline-end: 3.75rem;
+    text-align: end;
+  }
+  .hc-item[data-side='r'] .hc-card {
+    grid-column: 2;
+    padding-inline: 3.75rem 0;
+    text-align: start;
+  }
+  .hc-btn {
+    display: grid;
+    gap: 0.125rem;
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    text-align: inherit;
+    cursor: pointer;
+  }
+  .hc-year {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .hc-ttl {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .hc-panel {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  /* Open by default without script (so nothing is hidden); the script closes them and makes them tappable. */
+  [data-js] .hc-panel[hidden] {
+    display: none;
+  }
+  .hc-list:not([data-js]) .hc-panel {
+    display: grid;
+  }
+  .hc :global(.hc-img) {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+  @media (max-width: 47.99rem) {
+    .hc-list::before {
+      inset-inline-start: 1.25rem;
+    }
+    .hc-item {
+      grid-template-columns: 1fr;
+    }
+    .hc-dot,
+    .hc-item[data-side='l'] .hc-dot,
+    .hc-item[data-side='r'] .hc-dot {
+      inset-inline-start: 1.25rem;
+    }
+    .hc-card,
+    .hc-item[data-side='r'] .hc-card {
+      grid-column: 1;
+      padding-inline: 3rem 0;
+      text-align: start;
+    }
+  }
+  .hc-end {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  .hc :global(.hc-art) {
+    width: min(100%, 14rem);
+    height: auto;
+  }
+  .hc-end-t {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl, 2rem);
+  }
+  .hc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .co-gov {
+    max-width: 56ch;
+    line-height: 1.7;
+  }
+  .co-group {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .co-h {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .co-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  }
+  .co-card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .co-card :global(.co-photo),
+  .co-ph {
+    flex: none;
+    width: 3.5rem;
+    height: 3.5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--primary-soft);
+  }
+  .co-text {
+    display: grid;
+  }
+  .co-sub {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hc-path {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import DepartmentsPage from '../../../../components/content/DepartmentsPage.astro'
+import { rightDepartmentsPath } from '../../../../lib/departments-routes'
+
+export const prerender = false
+if (!rightDepartmentsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<DepartmentsPage />

@@ -64,6 +64,18 @@ export default function SettingsPage() {
                 />
               ),
             },
+            {
+              id: 'giving',
+              label: t(k('tabs.giving')),
+              content: (
+                <SectionForm
+                  id="giving"
+                  data={data.data}
+                  canEdit={canEdit}
+                  canValidate={canValidate}
+                />
+              ),
+            },
             { id: 'features', label: t(k('tabs.features')), content: <Features /> },
             { id: 'system', label: t(k('tabs.system')), content: <System /> },
           ]}
@@ -193,7 +205,7 @@ function SectionForm({
                     ),
                   )}
                 </Badge>
-                {id === 'parish' && (
+                {id !== 'season' && (
                   <SwitchField
                     label={t(k('validate'))}
                     checked={v.validated}
@@ -206,7 +218,7 @@ function SectionForm({
           )
         })}
       </div>
-      {id === 'parish' && <p className="text-sm text-ink-muted">{t(k('validate_help'))}</p>}
+      {id !== 'season' && <p className="text-sm text-ink-muted">{t(k('validate_help'))}</p>}
       {canEdit && (
         <div>
           <Button type="submit" loading={save.isPending}>

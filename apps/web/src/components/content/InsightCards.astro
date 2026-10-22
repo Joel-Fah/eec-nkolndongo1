@@ -1,0 +1,164 @@
+---
+/**
+ * A few cards (three or five, otherwise none) that sum up a document's main points: slightly stacked, fanned on a gentle arc,
+ * cropped by the bottom edge — the same family as the admin dashboard's insight cards. Hover or focus spreads them and lifts
+ * the one under the pointer. Each links to its section. Decorative arrangement, readable content.
+ */
+import Icon from '@eec/ui/astro/Icon.astro'
+import type { IconName } from '@eec/ui/icons'
+
+interface Item {
+  title: string
+  text: string
+  href: string
+}
+interface Props {
+  items: Item[]
+  icons?: IconName[]
+  label: string
+  /** When given, each card links to its section; otherwise the cards are plain insights, no links or actions. */
+  more?: string
+  /** Set inside a banner that crops them: no margin or fade of their own. */
+  flush?: boolean
+}
+const {
+  items: all,
+  icons = ['shield', 'lock', 'info', 'users', 'mail'],
+  label,
+  more,
+  flush = false,
+} = Astro.props
+// Three or five: never a lonely pair or four.
+const n = all.length >= 5 ? 5 : all.length >= 3 ? 3 : 0
+const items = all.slice(0, n)
+---
+
+{
+  n > 0 && (
+    <ul class:list={['lx', flush && 'lx-flush']} aria-label={label} style={`--n:${n}`}>
+      {items.map((it, i) => (
+        <li class="lx-card" style={`--i:${i}`}>
+          <span class="lx-icon" aria-hidden="true"><Icon name={icons[i % icons.length] as IconName} size={20} /></span>
+          <p class="lx-title">{it.title}</p>
+          {it.text && <p class="lx-text">{it.text}</p>}
+          {more && <a class="lx-link" href={it.href}>{more}<Icon name="arrowRight" size={16} /></a>}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .lx {
+    --h: 12.5rem;
+    display: flex;
+    justify-content: center;
+    height: var(--h);
+    overflow: hidden;
+    padding-block-start: 1.75rem;
+    margin-block: 1rem 2rem;
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  }
+  .lx-flush {
+    --h: 13.5rem;
+    margin-block: 0.5rem 0;
+    padding-block-start: 1.25rem;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .lx-card {
+    --mid: calc((var(--n) - 1) / 2);
+    --off: calc(var(--i) - var(--mid));
+    --abs: max(var(--off), calc(var(--off) * -1));
+    --tilt: calc(var(--off) * 4deg);
+    /* The arc: the middle card stands highest, the outer ones sit lower. */
+    --drop: calc(var(--abs) * var(--abs) * 0.45rem);
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    flex: none;
+    width: 15rem;
+    min-height: 15rem;
+    padding: 1rem;
+    margin-inline-start: -1.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-2), inset 0 0 0 1px var(--line);
+    transform: translateY(var(--drop)) rotate(var(--tilt));
+    transform-origin: 50% 120%;
+    transition:
+      margin var(--duration-story) var(--ease-soft),
+      transform var(--duration-ui) var(--ease-out);
+    z-index: calc(10 - var(--abs) * 2);
+  }
+  .lx-card:first-child {
+    margin-inline-start: 0;
+  }
+  .lx:hover .lx-card,
+  .lx:focus-within .lx-card {
+    margin-inline-start: 0.5rem;
+    transform: translateY(calc(var(--drop) * 0.4)) rotate(calc(var(--tilt) * 0.4));
+  }
+  .lx:hover .lx-card:first-child,
+  .lx:focus-within .lx-card:first-child {
+    margin-inline-start: 0;
+  }
+  .lx .lx-card:hover,
+  .lx .lx-card:focus-within {
+    z-index: 20;
+    transform: translateY(-0.5rem) rotate(0) scale(1.03);
+  }
+  .lx-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .lx-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    line-height: 1.2;
+  }
+  .lx-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--ink-muted);
+  }
+  .lx-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--primary);
+  }
+  @media (max-width: 40rem) {
+    .lx {
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-inline: 1rem;
+    }
+    .lx-card {
+      width: 13rem;
+      margin-inline-start: -2.5rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lx-card {
+      transition: none;
+    }
+    .lx .lx-card:hover,
+    .lx .lx-card:focus-within {
+      transform: translateY(var(--drop)) rotate(var(--tilt));
+    }
+  }
+</style>

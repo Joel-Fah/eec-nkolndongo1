@@ -11,8 +11,8 @@ import { zValidator } from '@hono/zod-validator'
 import { and, desc, eq, ne, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
+import { currentPolicy, policyVersion } from '../policy.ts'
 import { readFlags } from './flags.ts'
-import { POLICY_VERSION } from './members.ts'
 
 const { user, profiles, session, account, consents, groupMembers, groups, auditLog } = schema
 
@@ -142,14 +142,58 @@ export const meRoutes = new Hono<AppEnv>()
       .select({ at: profiles.deletionRequestedAt })
       .from(profiles)
       .where(eq(profiles.userId, actor.userId))
+    const policy = await currentPolicy(db)
+    // « La politique a changé »: shown when the last privacy consent is for an older version; asking to accept again
+    // only when the purposes changed.
+    const mine = rows.find((r) => r.kind === 'privacy' && !r.withdrawnAt)
+    const changed = !!mine && mine.policyVersion !== policy.version && policy.publishedAt !== null
     return c.json({
       consents: rows,
-      currentPolicy: POLICY_VERSION,
+      currentPolicy: policy.version,
+      policyChange: changed
+        ? {
+            version: policy.version,
+            summaryFr: policy.summaryFr,
+            summaryEn: policy.summaryEn,
+            mustAccept: policy.purposeChanged,
+          }
+        : null,
       deletionRequestedAt: p?.at ?? null,
       purgeOn: p?.at ? new Date(p.at.getTime() + DELETION_GRACE_DAYS * DAY) : null,
       graceDays: DELETION_GRACE_DAYS,
       canDelete: !isStaff(actor.principal),
     })
+  })
+
+  // Accepting the changed policy (only asked when the purposes changed): a new consent row for the new version.
+  .post('/consents/privacy', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const db = await c.var.deps.db()
+    const version = await policyVersion(db)
+    const [already] = await db
+      .select({ id: consents.id })
+      .from(consents)
+      .where(
+        and(
+          eq(consents.userId, actor.userId),
+          eq(consents.kind, 'privacy'),
+          eq(consents.policyVersion, version),
+        ),
+      )
+      .limit(1)
+    if (!already)
+      await db
+        .insert(consents)
+        .values({ userId: actor.userId, kind: 'privacy', policyVersion: version })
+    await audit(c, {
+      action: 'consent.grant',
+      entityType: 'account',
+      entityId: actor.userId,
+      summaryFr: 'Nouvelle politique de confidentialité acceptée',
+      summaryEn: 'New privacy policy accepted',
+    })
+    return c.json({ ok: true })
   })
 
   // The optional consent (parish news later) can be given and withdrawn at any time; the history is kept.
@@ -172,7 +216,7 @@ export const meRoutes = new Hono<AppEnv>()
         if (!already)
           await db
             .insert(consents)
-            .values({ userId: actor.userId, kind: 'news', policyVersion: POLICY_VERSION })
+            .values({ userId: actor.userId, kind: 'news', policyVersion: await policyVersion(db) })
       } else await db.update(consents).set({ withdrawnAt: new Date() }).where(active)
       await audit(c, {
         action: granted ? 'consent.grant' : 'consent.withdraw',
@@ -257,7 +301,7 @@ export const meRoutes = new Hono<AppEnv>()
     const body = JSON.stringify(
       {
         generatedAt: new Date(),
-        policyVersion: POLICY_VERSION,
+        policyVersion: await policyVersion(db),
         account: account_,
         profile,
         consents: myConsents,

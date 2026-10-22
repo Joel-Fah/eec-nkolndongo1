@@ -74,7 +74,11 @@
     "every_label": "Toutes les {n} semaines",
     "moved": "Déplacé",
     "moved_from": "Déplacé du {date}",
-    "follows_note": "Suit l’horaire lié"
+    "follows_note": "Suit l’horaire lié",
+    "count_one": "1 horaire",
+    "count": "{n} horaires",
+    "read_more": "Voir les {n} horaires",
+    "close": "Fermer"
   },
   "view_grid": "Grille",
   "view_list": "Liste",

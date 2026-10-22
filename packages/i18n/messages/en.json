@@ -120,6 +120,10 @@
       "dimanche": {
         "label": "This Sunday",
         "desc": "The theme, readings and service of the coming Sunday."
+      },
+      "search": {
+        "label": "Search",
+        "desc": "Search the whole site"
       }
     },
     "main": "Main menu",
@@ -711,6 +715,132 @@
         "desc": "On the events page a sticky index lists the weeks shown and highlights the one on screen. Hidden on mobile.",
         "use": "Appears from three weeks; anchor links #ev-<date>.",
         "a11y": "Labelled navigation, aria-current on the visible week."
+      },
+      "fliptime": {
+        "name": "Flip-card time",
+        "desc": "A time as two soft cards (hours, minutes), no divider: used for the service time on the “This Sunday” card and page.",
+        "use": "<p class=\"flip-time\"><span class=\"flip-card\">09</span><span class=\"flip-colon\">:</span><span class=\"flip-card\">00</span></p>; size with --flip-size.",
+        "a11y": "The container carries the full time as its aria-label; the cards are aria-hidden."
+      },
+      "tablepicker": {
+        "name": "Table size picker",
+        "desc": "In the editor, a hover grid (8 × 8) previews the size; rows and columns can also be typed (up to 30 × 10).",
+        "use": "The editor’s Table button; click a cell or “Insert”.",
+        "a11y": "The grid is for the mouse; keyboard users use the rows and columns fields."
+      },
+      "deptcard": {
+        "name": "Group card and quiz",
+        "desc": "A card (photo, name, tagline, audience) per group, filterable; the “Where do you belong?” quiz goes question by question with a progress bar.",
+        "use": "Departments page; the whole card is a link. The quiz stores nothing.",
+        "a11y": "Filters are links (work without JavaScript); progress is announced (progressbar); focus moves to each new question."
+      },
+      "guidechecklist": {
+        "name": "Step checklist",
+        "desc": "A guide as expandable steps, with tick boxes, a progress bar, printing and reset. Ticks stay in the browser.",
+        "use": "Practical life pages; printing opens every step.",
+        "a11y": "Steps are <details> (full keyboard); one labelled box per step; a plain list without JavaScript."
+      },
+      "historyclimb": {
+        "name": "Climbing the hill",
+        "desc": "The history timeline: a winding trail draws itself as you scroll (GSAP, loaded on this page only) through the milestones, each expandable.",
+        "use": "Our story page, from the milestones published in the admin.",
+        "a11y": "Without animation (reduced motion, Save-Data): a plain timeline with the trail already drawn, everything readable. No scroll pinning."
+      },
+      "councilcard": {
+        "name": "Council card",
+        "desc": "A person (photo, name, title, term) or, without recorded consent, the role alone.",
+        "use": "Pastors and Council page, grouped by role.",
+        "a11y": "No personal data is sent to the browser without consent."
+      },
+      "liveswap": {
+        "name": "Filters without reload",
+        "desc": "On the agenda, departments and news, changing view, filter or page replaces only the results; the address and Back button follow.",
+        "use": "data-live-area region, data-live-nav links (data-live-scroll for pagination).",
+        "a11y": "Without JavaScript they are plain links. Focus and scroll position are kept."
+      },
+      "searchdialog": {
+        "name": "Site search",
+        "desc": "The header magnifier opens a dialog: results appear as you type; Enter goes to the full results page, grouped by type, with highlighted excerpts (accent- and case-insensitive).",
+        "use": "<dialog data-search> with <input name=\"q\">; the /search?q= page.",
+        "a11y": "Native dialog (focus trapped, Esc); results announced (aria-live); works without JavaScript through the GET form."
+      },
+      "contactform": {
+        "name": "Contact form",
+        "desc": "Name, e-mail or phone, subject, message and an unticked consent. Anti-spam without a third party: a hidden trap field, a minimum fill time, a per-address limit.",
+        "use": "<ContactForm subject=\"…\" /> on the Find us page; the subject comes from the “Ask a question” link.",
+        "a11y": "Every field is labelled; errors are announced (role=status); the prayer request says it is confidential."
+      },
+      "givingcard": {
+        "name": "Giving card",
+        "desc": "One card per method (MTN, Orange, bank): merchant, number, a “Copy the number” button and, on phones, a link to dial the merchant code. Nothing shows until the value is approved.",
+        "use": "Give page, from Settings → Giving; USSD code: tel: with # encoded as %23.",
+        "a11y": "The button says “Copied”; the dial link only appears on touch screens."
+      },
+      "directions": {
+        "name": "Directions links",
+        "desc": "Approved address and three links: the phone’s maps app (geo:), Google Maps, OpenStreetMap. No embedded map: no third-party data loaded.",
+        "use": "Find us page, from the approved coordinates in settings.",
+        "a11y": "Clear links with the “new tab” icon; the geo: link is hidden on desktop."
+      },
+      "todopanel": {
+        "name": "To do",
+        "desc": "On the admin home: what is waiting for the signed-in person (new messages, their drafts, this week’s publications, empty Sundays, times to approve, missing English titles), filtered by their rights.",
+        "use": "<TodoPanel />; each line leads to the module concerned.",
+        "a11y": "A list of links; hidden when nothing is waiting."
+      },
+      "policynotice": {
+        "name": "“The policy has changed” notice",
+        "desc": "In My space, a gentle notice with the summary of changes; an “I accept” button only appears when the purposes changed.",
+        "use": "My space → My data; fed by the latest published privacy version.",
+        "a11y": "role=status; link to the new policy."
+      },
+      "insightcards": {
+        "name": "Key-points cards",
+        "desc": "Three or five cards (otherwise none) summing up a document’s main points: slightly stacked, fanned on a gentle arc, cropped at the bottom; hover spreads them. Same family as the dashboard cards.",
+        "use": "<InsightCards items=\"…\" /> on privacy and the legal notice, built from the document’s headings.",
+        "a11y": "Each card links to its section; the arrangement is decorative, the content stays readable."
+      },
+      "inbox": {
+        "name": "Inbox layout",
+        "desc": "Messages grouped by week then by month on one side, the open message on the other (instead of a modal). On a small screen, one pane at a time.",
+        "use": "Admin → Messages; classes .inbox, .inbox-row, .inbox-view.",
+        "a11y": "List as navigation; active row with aria-current; Back button on small screens."
+      },
+      "todocards": {
+        "name": "To-do cards",
+        "desc": "Cards ranked by urgency — urgent (red), needs attention (amber), good to know (blue) — each with the icon of its screen and a count.",
+        "use": "<TodoPanel /> on the admin home.",
+        "a11y": "The level is said in words and with an icon, never by colour alone."
+      },
+      "conversation": {
+        "name": "Conversational form",
+        "desc": "A form in four short steps: the need (big tiles), the message (starting phrases), how to reply, a last look. One question at a time, with progress and back.",
+        "use": "<ContactForm /> on Find us; scripts/contact-form.ts.",
+        "a11y": "Each step is a fieldset with a legend; focus moves to the new question; errors are announced."
+      },
+      "searchhints": {
+        "name": "Search hints and actions",
+        "desc": "Empty box: what you can search, words to try, direct actions and real suggestions from the site. No result: “Did you mean…”. Search forgives typos.",
+        "use": "Header dialog and the /search page; /api/search/suggest.",
+        "a11y": "Suggestions are ordinary links; the actions list is a list of links."
+      },
+      "areachart": {
+        "name": "Smooth area charts",
+        "desc": "Smoothed curves (no overshoot) with a gradient under the line, rounded ends, rounded bars and a round-ended donut; every chart has a table of its numbers (months written out with the year) in a fold that opens smoothly.",
+        "use": "<AreaChart>, <BarChart>, <Donut>, <ChartCard> in the admin; colours by tokens.",
+        "a11y": "Each chart has a name (role=img) and an equivalent table; tooltips are <title>."
+      },
+      "mapillustration": {
+        "name": "Drawn map",
+        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded.",
+        "use": "<MapIllustration name href label /> on Find us.",
+        "a11y": "Decorative (aria-hidden); the address and the button carry the information."
+      },
+      "designbanner": {
+        "name": "Design guide banner",
+        "desc": "In the admin, a full banner: an illustration, cards and UI pieces floating at three depths (near and blurred, far and blurred, sharp) and one call to action to the guide.",
+        "use": "The admin’s Design guide tab.",
+        "a11y": "The floating pieces are decorative (hidden from screen readers and the pointer); the button is an ordinary link."
       }
     },
     "rules": {
@@ -1055,7 +1185,7 @@
     },
     "teams": {
       "title": "Groups",
-      "lead": "Departments, committees and choirs. Leaders are the people holding the “Group leader” role for that group.",
+      "lead": "Departments, committees and choirs: the people, the rights and each group’s public page, in one place. Leaders are the people who hold the “Group leader” role for that group.",
       "new": "New group",
       "kind": "Type",
       "kinds": {
@@ -1080,7 +1210,8 @@
       "created": "Group created.",
       "saved": "Group saved.",
       "empty_title": "No groups yet",
-      "empty_text": "Create the parish’s departments, committees and choirs."
+      "empty_text": "Create the parish’s departments, committees and choirs.",
+      "public_page": "Public page"
     },
     "audit": {
       "title": "Activity log",
@@ -1277,7 +1408,18 @@
     "chart_bar": "Example bar chart over twelve months",
     "chart_table": "See the charts’ numbers",
     "chart_month": "Month",
-    "chart_value": "Value"
+    "chart_value": "Value",
+    "cta_t": "The design guide",
+    "cta_p": "Colours, typography, components, motion: it is all documented, so every screen stays consistent.",
+    "cta": "Open the guide",
+    "tease_colour": "Colours and light and dark themes",
+    "tease_type": "Erode for headings, Switzer for text",
+    "tease_parts": "Buttons, fields, dialogs, cards",
+    "tease_button": "Save",
+    "tease_badge": "New",
+    "tease_switch": "Dark mode",
+    "tease_secondary": "Cancel",
+    "photo_credit": "Photo: {name} · Pexels"
   },
   "page": {
     "cta_title": "A question, a memory, a wish to come?",
@@ -1614,7 +1756,10 @@
     "panel_devices": "My devices",
     "devices_current": "this device",
     "devices_others": "Sign me out of other devices",
-    "devices_unknown": "Device"
+    "devices_unknown": "Device",
+    "policy_changed_t": "The privacy policy has changed",
+    "policy_read": "Read the new policy",
+    "policy_accept": "I accept the new policy"
   },
   "hero": {
     "stats": {
@@ -1657,7 +1802,11 @@
     "listen": "Listen",
     "soon": "Soon",
     "credits_t": "Thank you to the photographers",
-    "credits_p": "The names behind the images on this site."
+    "credits_p": "The names behind the images on this site.",
+    "trouver_write_t": "A question?",
+    "trouver_write_p": "Write to us: the team replies.",
+    "trouver_first_t": "First visit?",
+    "trouver_first_p": "Come as you are."
   },
   "bible": {
     "lsg": "LSG",
@@ -1697,7 +1846,34 @@
     "qa_members": "View members",
     "qa_settings": "Settings",
     "qa_outbox": "Outbox",
-    "qa_activity": "Recent activity"
+    "qa_activity": "Recent activity",
+    "todo_title": "To do",
+    "todo_messages": "{n} new message(s) to read.",
+    "todo_drafts_news": "{n} news draft(s) of yours.",
+    "todo_drafts_events": "{n} event draft(s) of yours.",
+    "todo_drafts_guides": "{n} guide draft(s).",
+    "todo_scheduled_news": "{n} news post(s) scheduled this week.",
+    "todo_scheduled_events": "{n} event(s) scheduled this week.",
+    "todo_empty_sundays": "{n} Sunday(s) with no programme in the next 4 weeks: {dates}.",
+    "todo_slots": "{n} time(s) waiting for approval.",
+    "todo_missing_en_news": "{n} published news post(s) without an English title.",
+    "todo_missing_en_events": "{n} published event(s) without an English title.",
+    "todo_missing_en_guides": "{n} published guide(s) without an English title.",
+    "todo_level_critical": "urgent",
+    "todo_level_attention": "needs attention",
+    "todo_level_info": "good to know",
+    "trends_title": "Trends",
+    "chart_messages": "Messages received per month",
+    "chart_publications": "Publications per month",
+    "chart_media": "Photos added per month",
+    "chart_categories": "Messages by subject (90 days)",
+    "series_messages": "Messages",
+    "series_news": "News",
+    "series_events": "Events",
+    "series_media": "Photos",
+    "view_numbers": "View the numbers",
+    "month": "Month",
+    "total": "in all"
   },
   "content": {
     "status": {
@@ -1814,5 +1990,54 @@
       "stay": "Keep filling",
       "leave": "Discard"
     }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "A word, a name, a topic…",
+    "go": "Search",
+    "dialog_title": "Search the site",
+    "all": "See all results",
+    "results_for": "Results for “{q}”",
+    "count": "{n} results",
+    "count_one": "1 result",
+    "empty_t": "Nothing found for “{q}”",
+    "empty_p": "Try another word, or browse these pages.",
+    "start_t": "What are you looking for?",
+    "start_p": "Type a word: a news item, an event, a group, a guide.",
+    "suggest_t": "To get started",
+    "suggest_guides": "Guides",
+    "suggest_event": "Next event",
+    "type_news": "News",
+    "type_events": "Calendar",
+    "type_guides": "Practical life",
+    "type_departments": "Departments",
+    "type_pages": "Pages",
+    "min": "Type at least 2 letters.",
+    "unavailable": "Search is not answering right now. Please try again in a moment.",
+    "hint": "Press Enter for all results",
+    "close": "Close",
+    "loading": "Searching…",
+    "hints_t": "You can search for",
+    "hints_p": "A news item, an event, a group, a guide (baptism, marriage…) or a page of the site. Typos and accents don’t matter.",
+    "try": "Try",
+    "ex1": "times",
+    "ex2": "baptism",
+    "ex3": "youth",
+    "ex4": "prayer",
+    "actions_t": "Go straight to",
+    "act_cultes": "Service times",
+    "act_dimanche": "This Sunday",
+    "act_evenements": "Calendar",
+    "act_departements": "Groups and departments",
+    "act_pratique": "Practical life",
+    "act_trouver": "Find us",
+    "act_write": "Write a message",
+    "act_give": "Give",
+    "sug_guides": "Guides",
+    "sug_groups": "Groups",
+    "sug_news": "Latest news",
+    "sug_event": "Next event",
+    "did_you_mean": "Did you mean:",
+    "related": "Suggested actions"
   }
 }

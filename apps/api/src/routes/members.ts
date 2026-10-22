@@ -12,9 +12,10 @@ import { zValidator } from '@hono/zod-validator'
 import { eq, inArray } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { policyVersion } from '../policy.ts'
 
 /** Bump when the privacy policy text changes: people are asked again. Later served from settings. */
-export const POLICY_VERSION = '2026-10-brouillon'
+export { DRAFT_POLICY as POLICY_VERSION } from '../policy.ts'
 
 const signup = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -71,7 +72,7 @@ export const memberRoutes = new Hono<AppEnv>()
         l: locale,
         privacy: acceptPrivacy,
         news: acceptNews,
-        v: POLICY_VERSION,
+        v: await policyVersion(await c.var.deps.db()),
       }
       const headers = new Headers({ 'content-type': 'application/json' })
       for (const cookie of res.headers.getSetCookie()) headers.append('set-cookie', cookie)
@@ -122,12 +123,13 @@ export const memberRoutes = new Hono<AppEnv>()
           locale: c.req.header('accept-language')?.startsWith('en') ? 'en' : 'fr',
         })
         .where(eq(schema.profiles.userId, user.id))
+      const currentVersion = await policyVersion(db)
       await db
         .insert(schema.consents)
         .values([
-          { userId: user.id, kind: 'privacy', policyVersion: POLICY_VERSION },
+          { userId: user.id, kind: 'privacy', policyVersion: currentVersion },
           ...(body.acceptNews
-            ? [{ userId: user.id, kind: 'news' as const, policyVersion: POLICY_VERSION }]
+            ? [{ userId: user.id, kind: 'news' as const, policyVersion: currentVersion }]
             : []),
         ])
       if (body.groupKeys.length) {
@@ -150,7 +152,7 @@ export const memberRoutes = new Hono<AppEnv>()
         summaryEn: 'New member sign-up',
         diff: {
           consents: ['privacy', ...(body.acceptNews ? ['news'] : [])],
-          policyVersion: POLICY_VERSION,
+          policyVersion: currentVersion,
         },
         ip: clientIp(c),
         userAgent: c.req.header('user-agent'),

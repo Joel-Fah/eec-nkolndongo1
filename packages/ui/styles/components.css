@@ -1626,7 +1626,7 @@
   }
 }
 
-/* A time as two flip cards (hours, minutes), gentle and quiet: a soft card, a hairline where the leaf folds. */
+/* A time as two flip cards (hours, minutes), gentle and quiet: plain soft cards. */
 .flip-time {
   display: inline-flex;
   align-items: center;
@@ -1639,18 +1639,13 @@
   display: none;
 }
 .flip-card {
-  overflow: hidden;
   position: relative;
   display: grid;
   place-items: center;
   min-width: 1.9em;
   padding: 0.4em 0.25em;
   border-radius: var(--radius-md);
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--ink) 4%, var(--surface)) 50%,
-    var(--surface) 50%
-  );
+  background: var(--surface);
   box-shadow:
     var(--elevation-1),
     inset 0 0 0 1px var(--line);
@@ -1658,15 +1653,6 @@
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   letter-spacing: 0.02em;
-}
-.flip-card::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 50%;
-  height: 1px;
-  background: var(--line-strong);
-  opacity: 0.6;
 }
 .flip-colon {
   opacity: 0.5;

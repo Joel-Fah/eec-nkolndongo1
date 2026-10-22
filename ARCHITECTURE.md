@@ -20,7 +20,7 @@ Database, auth, API modules and content are Phase 02+. Rationale for each choice
 | API | **Hono**, mounted in the site's Worker under `/api` (single origin, decision 0017) | Single place for validation and permission checks |
 | Database | **Neon Postgres** (free plan) | **Drizzle ORM** + `pg`; Hyperdrive in production, direct connection locally |
 | Auth | **Better Auth**, self-hosted on our Neon database (decision 0018) | Identity only. Authorization is ours (see §5) |
-| Files | **Cloudflare R2** | Images, PDFs, sermon audio. Free egress, served via Cloudflare CDN |
+| Files | **S3-compatible bucket**: Neon Object Storage now, Cloudflare R2 later (decision 0020) | Images and PDFs through `/media/<key>` (edge-cached); the bucket is never public |
 | Video | **YouTube** | Embedded with a click-to-load facade |
 | Archive | **Google Drive** | Raw originals / backups only — never served to the site |
 | Email | Outbox now (decision 0019); **Brevo** later | Needs a domain. Invitations and staff resets are links |
@@ -52,7 +52,8 @@ packages/
 modules/
   registry.ts     The single list of modules (data only)
   api.ts, admin.ts  Their API routers and admin pages (server / browser sides of the registry)
-  <module>/       One folder per feature (see §4) — today: settings
+  <module>/       One folder per feature (see §4) — settings, media, members, news, events, schedule, liturgy,
+                  departments, guides, story, contact, legal (search and the admin « À faire » roll-up live with the API)
 scripts/          One-off tooling (pexels curation, seeding, image optimisation)
 docs/             All documentation
 .claude/skills/   Project skills for Claude
@@ -106,7 +107,10 @@ modules/events/                 workspace package @eec/module-events
 
 ## 6. Rendering & content freshness
 
-- Story pages (Accueil shell, Notre histoire, Ce que nous croyons…) are **prerendered** at build time.
+- The Accueil shell and the remaining static pages are **prerendered**; every page that shows live content (news, agenda,
+  horaires, Ce dimanche, départements, guides, the story pages, Donner, Nous trouver, legal, search) is **rendered on demand
+  from cached public JSON** (decision 0027). Story pages keep their structure and animation in code and take their words and
+  people from the admin (module `story`); an unpublished text never replaces the built-in one.
 - Live content (actualités, agenda, prédications, horaires) uses **on-demand rendering** or public JSON in
   the Worker, cached at the edge with the Cache API: short freshness + stale-while-revalidate, last good
   value if the database is down, and a **content version** in the cache key so a save shows up within
@@ -117,11 +121,11 @@ modules/events/                 workspace package @eec/module-events
 
 ## 7. Media pipeline
 
-- Upload (admin) → API validates type/size → image resized to responsive AVIF/WebP variants → R2.
+- Upload (admin) → photos are resized and re-encoded **in the browser** (WebP; JPEG where WebP encoding is missing) → API checks type/size by first bytes → S3-compatible bucket (decision 0020).
 - Audio: normalised to mono Opus/MP3 at speech bitrates before upload (keeps sermons ~15–25 MB/hour).
 - Video: YouTube URL only; the site stores the ID and renders a lightweight facade.
-- Drive: manual or scripted archive of originals; R2 keeps only web-ready versions.
-- Placeholder imagery: curated once from Pexels (no people), stored in R2 with credits (see skill
+- Drive: manual or scripted archive of originals; the bucket keeps only web-ready versions.
+- Placeholder imagery: curated once from Pexels (no people), stored in the bucket with credits (see skill
   `pexels-curation`).
 
 ## 8. Low-data & resilience
@@ -151,3 +155,13 @@ voice and tone, logo, colour, type, shape, motion, icons, illustration, every co
 - `modules/media` (library, `/media/<key>`), `modules/members` (admin list, export, headcount), `apps/api/src/retention.ts`
   (daily Cron), security headers (`packages/api-kit/src/security-headers.ts`), backups (`scripts/backup/`). See the decisions
   0020, 0022 and `docs/ops/runbook.md`.
+
+## Phase 03 additions
+- Content modules: `news`, `events`, `schedule`, `liturgy`, `departments`, `guides`, `story` (page slots, history milestones, council),
+  `contact` (form + inbox), `legal` (versioned documents). Shared kit: `@eec/core` (rich text, lifecycle, recurrence, ICS,
+  schedule, liturgy, bible refs, departments quiz, page slots), `@eec/api-kit` (`contentRoutes`, cache, preview links,
+  guards), `@eec/content-kit` (editor, media picker, publish dialog, revisions, guarded dialog).
+- Cross-module pieces live in the registry package, not in a module: `modules/search.ts` (decision 0030) and, in `apps/api`,
+  `routes/todo.ts` (admin « À faire ») and `policy.ts` (the privacy-policy version in force, decision 0033).
+- Decisions: 0027 (rendering), 0028 (rich text), 0029 (events), 0030 (search), 0031 (people and consent), 0032 (Bible
+  translations), 0033 (legal versions). Content truth: `pnpm content:pending`. Manual end-to-end run: `pnpm e2e`.

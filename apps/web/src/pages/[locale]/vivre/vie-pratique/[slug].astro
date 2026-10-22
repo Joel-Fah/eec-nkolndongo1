@@ -1,0 +1,11 @@
+---
+import GuidePage from '../../../../components/content/GuidePage.astro'
+import { rightGuidesPath } from '../../../../lib/guides-routes'
+
+export const prerender = false
+const { slug } = Astro.params
+if (!rightGuidesPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname) || !slug)
+  return Astro.rewrite('/404')
+---
+
+<GuidePage slug={slug} />

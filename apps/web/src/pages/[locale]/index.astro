@@ -126,6 +126,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     </div>
   </section>
   <section class="home-section sunday" aria-labelledby="sunday-title" data-sunday data-supper={t('liturgy.site.holy_supper')} data-season_avent={t('season.avent')} data-season_noel={t('season.noel')} data-season_epiphanie={t('season.epiphanie')} data-season_careme={t('season.careme')} data-season_semaine-sainte={t('season.semaine-sainte')} data-season_paques={t('season.paques')} data-season_pentecote={t('season.pentecote')} data-season_moissons={t('season.moissons')} data-locale={locale} data-base={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} hidden>
+    <div class="sunday-deck">
     <div class="sunday-card">
       <Illustration name="cherry-blossom" class="sunday-art" />
       <div class="sunday-body">
@@ -147,6 +148,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
           <Button href={href(locale, pages.find((p) => p.id === 'dimanche')?.path[locale] ?? '')} data-sunday-link>{t('liturgy.site.see_program')}<Icon name="arrowRight" size={20} /></Button>
         </div>
       </div>
+    </div>
     </div>
   </section>
 
@@ -501,6 +503,32 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   }
 
   /* « Ce dimanche »: season-tinted card, the cherry blossom (flipped, cropped on the right edge) behind the text. */
+  /* The whole card sits on two empty cards, centred beneath it, like a deck. */
+  .sunday-deck {
+    position: relative;
+    isolation: isolate;
+    margin-block-end: 1.5rem;
+  }
+  .sunday-deck::before,
+  .sunday-deck::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    height: 100%;
+    border-radius: var(--radius-xl);
+    background: color-mix(in oklab, var(--season) 12%, var(--surface));
+    box-shadow: var(--elevation-1), inset 0 0 0 1.5px color-mix(in oklab, var(--season) 28%, transparent);
+  }
+  .sunday-deck::before {
+    inset-inline: 1.25rem;
+    inset-block-start: 0.75rem;
+    opacity: 0.8;
+  }
+  .sunday-deck::after {
+    inset-inline: 2.5rem;
+    inset-block-start: 1.5rem;
+    opacity: 0.55;
+  }
   .sunday-card {
     position: relative;
     isolation: isolate;
@@ -511,11 +539,11 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   }
   .sunday-card .sunday-art {
     position: absolute;
-    inset-block: -35% -35%;
-    inset-inline-end: 7%;
+    inset-block: -45% -45%;
+    inset-inline-end: 5%;
     z-index: -1;
     width: auto;
-    height: 170%;
+    height: 190%;
     aspect-ratio: 1;
     transform: scaleX(-1);
     pointer-events: none;
@@ -537,7 +565,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     display: grid;
     gap: 0.75rem;
     max-width: 38rem;
-    padding: clamp(1.25rem, 3vw, 1.75rem);
+    padding: clamp(1.5rem, 3.4vw, 2.25rem);
   }
   .sunday-head {
     display: flex;
@@ -604,6 +632,11 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--ink-muted);
+  }
+  .sunday-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
   .sunday-readings {
     display: flex;
