@@ -1046,7 +1046,8 @@
       "ui": "Design guide",
       "account": "My account",
       "validate": "To validate",
-      "help": "Help"
+      "help": "Help",
+      "health": "Health"
     },
     "user": {
       "menu": "Account menu",
@@ -1340,6 +1341,41 @@
       "back": "All help",
       "print": "Print",
       "not_found": "This guide does not exist."
+    },
+    "health": {
+      "title": "Site health",
+      "lead": "A check every night, and on demand. Green: all good. Orange: keep an eye on it. Red: act. Orange alerts start at 70 % of a free limit.",
+      "run": "Check now",
+      "running": "Checking…",
+      "last": "Last check: {date}",
+      "never": "No check yet. Run one.",
+      "status_ok": "All good",
+      "status_warn": "Keep an eye on it",
+      "status_fail": "Action needed",
+      "database": "Database",
+      "bucket": "File storage",
+      "backup": "Last backup",
+      "outbox": "Outbox",
+      "dbSize": "Database space",
+      "mediaSize": "Files space",
+      "database_v": "Answered in {n} ms",
+      "bucket_ok": "Reachable",
+      "bucket_fail": "Unreachable: photos will stop showing",
+      "backup_v": "{n} day(s) ago",
+      "backup_none": "No backup recorded",
+      "outbox_v": "{n} message(s) to relay",
+      "size_v": "{used} of {limit} ({pct} %)",
+      "help_database": "If it is slow or red, the database may be asleep: try again in a minute.",
+      "help_bucket": "If red, tell Joël: the storage keys may need renewing.",
+      "help_backup": "The automatic backup runs every Sunday. Red: see the procedure in the runbook.",
+      "help_outbox": "Open the outbox and relay the waiting messages.",
+      "help_dbSize": "Free limit: 0.5 GB. At 70 %, tell Joël.",
+      "help_mediaSize": "Free limit: 5 GB. Archive or delete unused files in the media library.",
+      "elsewhere_title": "To read elsewhere",
+      "elsewhere": "Outgoing traffic (Neon) is read in the Neon console, and requests per day (100,000 at most) in the Cloudflare dashboard. The site cannot read them itself.",
+      "insight": "The site health needs attention.",
+      "insight_do": "See health",
+      "error": "The check failed. Try again."
     }
   },
   "login": {
@@ -1914,7 +1950,9 @@
     "series_media": "Photos",
     "view_numbers": "View the numbers",
     "month": "Month",
-    "total": "in all"
+    "total": "in all",
+    "insight_health": "The site health needs attention.",
+    "insight_health_do": "See health"
   },
   "content": {
     "status": {

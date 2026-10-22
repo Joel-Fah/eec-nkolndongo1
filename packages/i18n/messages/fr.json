@@ -1046,7 +1046,8 @@
       "ui": "Guide de design",
       "account": "Mon compte",
       "validate": "À valider",
-      "help": "Aide"
+      "help": "Aide",
+      "health": "Santé"
     },
     "user": {
       "menu": "Menu du compte",
@@ -1340,6 +1341,41 @@
       "back": "Toutes les aides",
       "print": "Imprimer",
       "not_found": "Ce guide n’existe pas."
+    },
+    "health": {
+      "title": "Santé du site",
+      "lead": "Un contrôle chaque nuit, et à la demande. Vert : tout va bien. Orange : à surveiller. Rouge : il faut agir. Les alertes orange commencent à 70 % d’une limite gratuite.",
+      "run": "Vérifier maintenant",
+      "running": "Vérification…",
+      "last": "Dernier contrôle : {date}",
+      "never": "Aucun contrôle pour l’instant. Lancez-en un.",
+      "status_ok": "Tout va bien",
+      "status_warn": "À surveiller",
+      "status_fail": "Il faut agir",
+      "database": "Base de données",
+      "bucket": "Stockage des fichiers",
+      "backup": "Dernière sauvegarde",
+      "outbox": "Boîte d’envoi",
+      "dbSize": "Espace de la base",
+      "mediaSize": "Espace des fichiers",
+      "database_v": "Réponse en {n} ms",
+      "bucket_ok": "Joignable",
+      "bucket_fail": "Injoignable : les photos ne s’afficheront plus",
+      "backup_v": "Il y a {n} jour(s)",
+      "backup_none": "Aucune sauvegarde enregistrée",
+      "outbox_v": "{n} message(s) à transmettre",
+      "size_v": "{used} sur {limit} ({pct} %)",
+      "help_database": "Si c’est lent ou rouge, la base de données est peut-être endormie : réessayez dans une minute.",
+      "help_bucket": "Si c’est rouge, prévenez Joël : les clés du stockage sont peut-être à renouveler.",
+      "help_backup": "La sauvegarde automatique a lieu chaque dimanche. Rouge : voir la procédure dans le guide d’exploitation.",
+      "help_outbox": "Ouvrez la boîte d’envoi et transmettez les messages en attente.",
+      "help_dbSize": "Limite gratuite : 0,5 Go. À 70 %, prévenez Joël.",
+      "help_mediaSize": "Limite gratuite : 5 Go. Archivez ou supprimez les fichiers inutiles dans la médiathèque.",
+      "elsewhere_title": "À lire ailleurs",
+      "elsewhere": "Le trafic sortant (Neon) se lit dans la console Neon, et le nombre de requêtes par jour (100 000 au plus) dans le tableau de bord Cloudflare. Le site ne peut pas les lire lui-même.",
+      "insight": "La santé du site demande de l’attention.",
+      "insight_do": "Voir la santé",
+      "error": "Le contrôle a échoué. Réessayez."
     }
   },
   "login": {
@@ -1914,7 +1950,9 @@
     "series_media": "Photos",
     "view_numbers": "Voir les chiffres",
     "month": "Mois",
-    "total": "au total"
+    "total": "au total",
+    "insight_health": "La santé du site demande de l’attention.",
+    "insight_health_do": "Voir la santé"
   },
   "content": {
     "status": {

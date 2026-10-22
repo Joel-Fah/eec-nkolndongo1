@@ -55,7 +55,12 @@ export function useDashboardData() {
     queryFn: () => api<{ n: number; canApprove: number }>('/validation/count'),
     enabled: hasPermission(me, 'core:validation-read'),
   })
-  return { me, members, media, audit, outbox, validation }
+  const health = useQuery({
+    queryKey: ['system-health'],
+    queryFn: () => api<{ latest: { status: 'ok' | 'warn' | 'fail' } | null }>('/system-health'),
+    enabled: hasPermission(me, 'core:system-health'),
+  })
+  return { me, members, media, audit, outbox, validation, health }
 }
 
 /** Change between two periods: direction and a rounded percentage (null when there is nothing to compare to). */
@@ -73,7 +78,7 @@ export type Insight = {
   text: string
   n?: number
   action: string
-  to: '/outbox' | '/validate' | '/m/$module' | '/groups' | '/'
+  to: '/outbox' | '/validate' | '/health' | '/m/$module' | '/groups' | '/'
   params?: { module: string }
 }
 
@@ -82,7 +87,7 @@ export type Insight = {
  * act on appears; when nothing needs attention, one reassuring card says so.
  */
 export function useInsights(): Insight[] {
-  const { me, members, media, outbox, validation } = useDashboardData()
+  const { me, members, media, outbox, validation, health } = useDashboardData()
   const out: Insight[] = []
   const pending = outbox.data?.messages.length ?? 0
   if (pending > 0)
@@ -93,6 +98,14 @@ export function useInsights(): Insight[] {
       n: pending,
       action: 'dash.insight_outbox_do',
       to: '/outbox',
+    })
+  if (health.data?.latest && health.data.latest.status !== 'ok')
+    out.push({
+      key: 'health',
+      icon: 'shield',
+      text: 'dash.insight_health',
+      action: 'dash.insight_health_do',
+      to: '/health',
     })
   if (validation.data && validation.data.n > 0)
     out.push({

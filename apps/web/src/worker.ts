@@ -10,6 +10,7 @@
 import { handle } from '@astrojs/cloudflare/handler'
 import type { ExecutionContext } from '@cloudflare/workers-types'
 import { createApp } from '@eec/api'
+import { runHealth } from '@eec/api/health'
 import { runRetention } from '@eec/api/retention'
 import { type Env, securityHeaders } from '@eec/api-kit'
 import { adminPrefix } from '@eec/core'
@@ -67,6 +68,13 @@ export default {
         (result) => console.log('retention', JSON.stringify(result)),
         (error) =>
           console.error('retention failed', error instanceof Error ? error.message : error),
+      ),
+    )
+    // The same trigger records the daily health row (Admin → Santé). Its own failure never stops the retention job.
+    ctx.waitUntil(
+      runHealth(env).then(
+        (result) => console.log('health', result.status),
+        (error) => console.error('health failed', error instanceof Error ? error.message : error),
       ),
     )
   },

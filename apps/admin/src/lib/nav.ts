@@ -75,6 +75,15 @@ const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
     order: 50,
   },
   {
+    id: 'health',
+    group: 'settings',
+    path: '/health',
+    icon: 'pulse',
+    label: 'admin.items.health',
+    permission: 'core:system-health',
+    order: 30,
+  },
+  {
     id: 'help',
     group: 'settings',
     path: '/help',

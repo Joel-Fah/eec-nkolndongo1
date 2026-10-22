@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAuditRouteImport } from './routes/_app/audit'
 import { Route as AppGroupsRouteImport } from './routes/_app/groups'
+import { Route as AppHealthRouteImport } from './routes/_app/health'
 import { Route as AppOutboxRouteImport } from './routes/_app/outbox'
 import { Route as AppRolesRouteImport } from './routes/_app/roles'
 import { Route as AppUiRouteImport } from './routes/_app/ui'
@@ -54,6 +55,11 @@ const AppAuditRoute = AppAuditRouteImport.update({
 const AppGroupsRoute = AppGroupsRouteImport.update({
   id: '/groups',
   path: '/groups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHealthRoute = AppHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutboxRoute = AppOutboxRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
+  '/health': typeof AppHealthRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
+  '/health': typeof AppHealthRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/_app/account': typeof AppAccountRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/groups': typeof AppGroupsRoute
+  '/_app/health': typeof AppHealthRoute
   '/_app/outbox': typeof AppOutboxRoute
   '/_app/roles': typeof AppRolesRoute
   '/_app/ui': typeof AppUiRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/audit'
     | '/groups'
+    | '/health'
     | '/outbox'
     | '/roles'
     | '/ui'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/audit'
     | '/groups'
+    | '/health'
     | '/outbox'
     | '/roles'
     | '/ui'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_app/account'
     | '/_app/audit'
     | '/_app/groups'
+    | '/_app/health'
     | '/_app/outbox'
     | '/_app/roles'
     | '/_app/ui'
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/groups'
       fullPath: '/groups'
       preLoaderRoute: typeof AppGroupsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/health': {
+      id: '/_app/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof AppHealthRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/outbox': {
@@ -361,6 +380,7 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppAuditRoute: typeof AppAuditRoute
   AppGroupsRoute: typeof AppGroupsRoute
+  AppHealthRoute: typeof AppHealthRoute
   AppOutboxRoute: typeof AppOutboxRoute
   AppRolesRoute: typeof AppRolesRoute
   AppUiRoute: typeof AppUiRoute
@@ -377,6 +397,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppAuditRoute: AppAuditRoute,
   AppGroupsRoute: AppGroupsRoute,
+  AppHealthRoute: AppHealthRoute,
   AppOutboxRoute: AppOutboxRoute,
   AppRolesRoute: AppRolesRoute,
   AppUiRoute: AppUiRoute,
