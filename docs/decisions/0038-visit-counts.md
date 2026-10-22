@@ -1,5 +1,5 @@
 # 0038 — Visit counts without tracking (Workers Analytics Engine), off until enabled
-**Status:** Accepted · 2026-10-22 (the counter ships dormant; Joël switches it on)
+**Status:** Accepted · 2026-10-22 (Analytics Engine enabled by Joël the same day; dataset `analytics_events`; counting starts with the next production deploy)
 **Context:** The parish would like to know which pages are read. We use no cookies, no third-party script and no client
 beacon (decision 0017 and the privacy policy). Cloudflare's Workers Analytics Engine can store small data points written by
 the Worker itself. Cloudflare's pricing page lists a Free allowance (100 000 data points written and 10 000 queries a day,

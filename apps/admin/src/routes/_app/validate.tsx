@@ -1,4 +1,5 @@
 import { api, useLocale } from '@eec/admin-kit'
+import { ViewToggle } from '@eec/content-kit'
 import type { MessageKey } from '@eec/i18n'
 import { Badge, Button, EmptyState, Icon, TextField } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -44,8 +45,23 @@ const PRIO = {
   low: { icon: 'info', tone: 'info' },
 } as const
 
+const VIEW_KEY = 'eec-validate-view'
+
 function Validate() {
   const { t, locale } = useLocale()
+  const [view, setViewState] = useState<'grid' | 'list'>(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'list'
+    } catch {
+      return 'list'
+    }
+  })
+  const setView = (v: 'grid' | 'list') => {
+    setViewState(v)
+    try {
+      localStorage.setItem(VIEW_KEY, v)
+    } catch {}
+  }
   const q = useQuery({
     queryKey: ['validation'],
     queryFn: () => api<{ items: Item[] }>('/validation'),
@@ -56,7 +72,21 @@ function Validate() {
   const count = (p: Priority) => items.filter((i) => i.priority === p).length
   return (
     <div className="grid gap-6">
-      <PageHeader title={t('admin.validate.title')} lead={t('admin.validate.lead')} />
+      <PageHeader
+        title={t('admin.validate.title')}
+        lead={t('admin.validate.lead')}
+        actions={
+          <ViewToggle
+            value={view}
+            onChange={setView}
+            label={t('admin.validate.view')}
+            options={[
+              { id: 'list', label: t('admin.validate.view_list'), icon: 'layoutList' },
+              { id: 'grid', label: t('admin.validate.view_grid'), icon: 'gridView' },
+            ]}
+          />
+        }
+      />
       {items.length > 0 && (
         <p className="flex flex-wrap items-center gap-2" role="status">
           {PRIORITIES.map((p) => (
@@ -80,7 +110,11 @@ function Validate() {
         groups.map((g) => (
           <section key={g} className="grid gap-3" aria-label={g}>
             <h2 className="text-xl">{g}</h2>
-            <ul className="grid gap-3">
+            <ul
+              className={
+                view === 'grid' ? 'grid gap-4 md:grid-cols-2 xl:grid-cols-3' : 'grid gap-3'
+              }
+            >
               {items
                 .filter((i) => i.group[locale] === g)
                 .map((i) => (

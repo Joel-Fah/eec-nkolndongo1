@@ -84,7 +84,7 @@ By hand: `pnpm --filter @eec/api retention`.
   on demand. The backup workflow writes the « last backup » mark (`system_marks`); until its first run after this version
   the backup shows orange « aucune sauvegarde enregistrée ». Neon egress and Workers requests/day cannot be read by the
   Worker: read them in the Neon console and the Cloudflare dashboard (monthly).
-- **Visit counts** (decision 0038) are **dormant**. To switch on, once, with the Cloudflare dashboard open:
+- **Visit counts** (decision 0038): Analytics Engine was enabled by Joël (2026-10-22), `deploy.json` names the dataset `analytics_events` and the account. **Still to do by Joël: set the Worker secret `CF_ANALYTICS_TOKEN`** (step 5). The dataset appears in the dashboard only after the first deploy writes data. Original steps, for the record:
   1. Dashboard → **Workers & Pages → Analytics Engine** (in the left menu, under « Workers & Pages » or « Storage & databases »):
      enable it if it asks, and **note the plan it shows** (Free is expected: 100 000 points a day). If it asks for a card or an
      upgrade, **stop and tell me**: we leave it dormant.

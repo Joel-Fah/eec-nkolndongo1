@@ -1399,7 +1399,10 @@
       "prio_high": "Priorité haute",
       "prio_medium": "À surveiller",
       "prio_low": "Peu urgent",
-      "prio_count": "{n} · {label}"
+      "prio_count": "{n} · {label}",
+      "view": "Affichage",
+      "view_list": "Liste",
+      "view_grid": "Cartes"
     },
     "help": {
       "title": "Aide",

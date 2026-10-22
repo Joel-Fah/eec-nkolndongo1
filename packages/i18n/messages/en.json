@@ -1399,7 +1399,10 @@
       "prio_high": "High priority",
       "prio_medium": "Keep an eye",
       "prio_low": "Not urgent",
-      "prio_count": "{n} · {label}"
+      "prio_count": "{n} · {label}",
+      "view": "View",
+      "view_list": "List",
+      "view_grid": "Cards"
     },
     "help": {
       "title": "Help",

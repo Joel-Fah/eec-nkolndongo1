@@ -2239,3 +2239,131 @@ html[data-nav-open] {
   inline-size: 2px;
   background: var(--ink-muted);
 }
+
+/* ── Chart tooltip (ours, not the browser's) and the opening animation ───────────────────── */
+.chart-wrap {
+  position: relative;
+}
+.chart-tip {
+  position: absolute;
+  z-index: 5;
+  translate: -50% calc(-100% - 0.75rem);
+  width: max-content;
+  max-width: 14rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  box-shadow: var(--elevation-2);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chart-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: chart-draw 1.1s var(--ease-out) 0.1s forwards;
+  }
+  .chart-area {
+    opacity: 0;
+    animation: chart-fade 0.8s var(--ease-out) 0.45s forwards;
+  }
+  .chart-pop {
+    opacity: 0;
+    animation: chart-fade 0.4s var(--ease-out) 1s forwards;
+  }
+  .chart-bar {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    animation: chart-grow 0.7s var(--ease-out) forwards;
+  }
+  .donut-arc {
+    opacity: 0;
+    animation: chart-fade 0.7s var(--ease-out) 0.15s forwards;
+  }
+  .health-meter > span {
+    transform-origin: left center;
+    animation: chart-sweep 0.9s var(--ease-out) both;
+  }
+  .health-strip li {
+    transform-origin: bottom;
+    animation: chart-grow 0.5s var(--ease-out) both;
+  }
+  .health-strip li:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .health-strip li:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .health-strip li:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .health-strip li:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .health-strip li:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  .health-strip li:nth-child(7) {
+    animation-delay: 360ms;
+  }
+}
+@keyframes chart-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes chart-fade {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes chart-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes chart-sweep {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Health: gentler colours (soft tints, not full-strength paint), so the page stays calm in light mode. */
+.health-strip li[data-level="ok"] {
+  background: color-mix(in oklab, var(--success) 42%, transparent);
+}
+.health-strip li[data-level="warn"] {
+  background: color-mix(in oklab, var(--warning) 45%, transparent);
+}
+.health-strip li[data-level="fail"] {
+  background: color-mix(in oklab, var(--danger) 45%, transparent);
+}
+.health-meter > span {
+  background: color-mix(in oklab, var(--success) 50%, transparent);
+}
+.health-meter[data-level="warn"] > span {
+  background: color-mix(in oklab, var(--warning) 55%, transparent);
+}
+.health-meter[data-level="fail"] > span {
+  background: color-mix(in oklab, var(--danger) 55%, transparent);
+}
+.health-card .chart-line {
+  stroke-width: 2.25;
+  opacity: 0.7;
+}
+.health-card .chart-bar {
+  opacity: 0.6;
+}
+.health-banner-icon {
+  background: color-mix(in oklab, currentcolor 10%, transparent);
+}

@@ -1,22 +1,22 @@
 import { useMemo } from 'react'
 
 /**
- * An abstract banner drawn on the fly: a different composition and palette each time (waves, rings, dots, blocks, arcs,
- * stripes), always from our colour tokens so it follows light and dark. Decorative only (aria-hidden); nothing is stored.
- * Used above the help sheet; usable for any panel that wants a header image without a photo.
+ * An abstract banner drawn on the fly, in the same gentle manner as the generated banners of the public site (events with
+ * no photo): soft translucent circles, wide faint rings, dotted arcs, a field of dots and a low wave, in one of our tone
+ * families. A different composition each time; light and dark follow because colours are tokens. Decorative only.
  */
-type Tone = 'primary' | 'gold' | 'clay' | 'info' | 'success'
-const PALETTES: Tone[][] = [
-  ['primary', 'gold', 'success'],
-  ['info', 'clay', 'gold'],
-  ['clay', 'primary', 'gold'],
-  ['success', 'info', 'primary'],
-  ['gold', 'primary', 'clay'],
-]
-const W = 480
-const H = 190
+type Tone = 'primary' | 'info' | 'gold' | 'clay' | 'success'
+const TONES: Tone[] = ['primary', 'info', 'gold', 'clay', 'success']
+const MAIN: Record<Tone, string> = {
+  primary: 'var(--primary)',
+  info: 'var(--info, var(--primary))',
+  gold: 'var(--gold)',
+  clay: 'var(--clay)',
+  success: 'var(--success, var(--primary))',
+}
+const W = 1200
+const H = 480
 
-/** A small seeded random generator (mulberry32). */
 function rng(seed: number) {
   let a = seed
   return () => {
@@ -26,165 +26,43 @@ function rng(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
-const c = (t: Tone) => `var(--${t})`
-
-function wave(r: () => number, y: number, amp: number) {
-  const pts = Array.from({ length: 5 }, (_, i) => [(i * W) / 4, y + (r() - 0.5) * amp * 2])
-  let d = `M0 ${H}L0 ${pts[0]?.[1]}`
-  for (let i = 1; i < pts.length; i++) {
-    const [x0, y0] = pts[i - 1] as number[]
-    const [x1, y1] = pts[i] as number[]
-    const mx = ((x0 ?? 0) + (x1 ?? 0)) / 2
-    d += `C${mx} ${y0} ${mx} ${y1} ${x1} ${y1}`
-  }
-  return `${d}L${W} ${H}Z`
-}
-
-function scene(style: number, r: () => number, p: Tone[]) {
-  const [a, b, d] = p as [Tone, Tone, Tone]
-  switch (style) {
-    case 0: // waves + sun
-      return (
-        <>
-          <circle
-            cx={90 + r() * 300}
-            cy={60 + r() * 30}
-            r={34 + r() * 22}
-            fill={c(b)}
-            opacity=".85"
-          />
-          <path d={wave(r, 120, 18)} fill={c(a)} opacity=".35" />
-          <path d={wave(r, 140, 16)} fill={c(d)} opacity=".45" />
-          <path d={wave(r, 162, 12)} fill={c(a)} opacity=".6" />
-        </>
-      )
-    case 1: {
-      // rings
-      const cx = 120 + r() * 240
-      const cy = 70 + r() * 60
-      return (
-        <>
-          {[110, 86, 62, 40, 20].map((rad, i) => (
-            <circle
-              key={rad}
-              cx={cx}
-              cy={cy}
-              r={rad}
-              fill={i % 2 ? c(b) : 'none'}
-              stroke={c(i % 2 ? d : a)}
-              strokeWidth={i % 2 ? 0 : 10}
-              opacity={0.25 + i * 0.12}
-            />
-          ))}
-        </>
-      )
-    }
-    case 2: {
-      // dot grid + disc
-      const dots = []
-      for (let x = 14; x < W; x += 26)
-        for (let y = 14; y < H; y += 26)
-          dots.push(
-            <circle
-              key={`${x}-${y}`}
-              cx={x}
-              cy={y}
-              r={2.2}
-              fill={c(a)}
-              opacity={0.15 + (x / W) * 0.5}
-            />,
-          )
-      return (
-        <>
-          {dots}
-          <circle
-            cx={300 + r() * 120}
-            cy={60 + r() * 70}
-            r={50 + r() * 20}
-            fill={c(b)}
-            opacity=".8"
-          />
-          <circle
-            cx={90 + r() * 90}
-            cy={100 + r() * 60}
-            r={26 + r() * 14}
-            fill={c(d)}
-            opacity=".7"
-          />
-        </>
-      )
-    }
-    case 3: {
-      // rounded blocks
-      const blocks = []
-      for (let i = 0; i < 9; i++) {
-        const w = 46 + r() * 70
-        const h = 30 + r() * 60
-        blocks.push(
-          <rect
-            key={i}
-            x={(i % 5) * 100 - 10 + r() * 30}
-            y={Math.floor(i / 5) * 90 + r() * 30}
-            width={w}
-            height={h}
-            rx={14 + r() * 12}
-            fill={c([a, b, d][Math.floor(r() * 3)] as Tone)}
-            opacity={0.35 + r() * 0.5}
-          />,
-        )
-      }
-      return <>{blocks}</>
-    }
-    case 4: {
-      // arcs (a rainbow)
-      const cx = 140 + r() * 200
-      return (
-        <>
-          {[130, 104, 78, 52].map((rad, i) => (
-            <path
-              key={rad}
-              d={`M${cx - rad} ${H}A${rad} ${rad} 0 0 1 ${cx + rad} ${H}`}
-              fill="none"
-              stroke={c([a, b, d, a][i] as Tone)}
-              strokeWidth="18"
-              strokeLinecap="round"
-              opacity={0.5 + i * 0.12}
-            />
-          ))}
-          <circle cx={30 + r() * 60} cy={40 + r() * 30} r="14" fill={c(b)} opacity=".8" />
-        </>
-      )
-    }
-    default: {
-      // diagonal stripes
-      return (
-        <>
-          {Array.from({ length: 7 }, (_, i) => (
-            <rect
-              key={i}
-              x={-60 + i * 80 + r() * 20}
-              y={-40}
-              width={32 + r() * 26}
-              height={300}
-              rx="16"
-              transform="rotate(24 240 95)"
-              fill={c([a, b, d][i % 3] as Tone)}
-              opacity={0.3 + r() * 0.45}
-            />
-          ))}
-        </>
-      )
-    }
-  }
-}
 
 export function AbstractBanner({ seed }: { seed: number }) {
   const art = useMemo(() => {
     const r = rng(seed)
-    const palette = PALETTES[Math.floor(r() * PALETTES.length)] as Tone[]
-    const style = Math.floor(r() * 6)
-    return { style, palette, node: scene(style, r, palette) }
+    const between = (a: number, b: number) => a + r() * (b - a)
+    const tone = TONES[Math.floor(r() * TONES.length)] as Tone
+    const main = MAIN[tone]
+    const palette = ['var(--primary)', 'var(--gold)', 'var(--clay)', main]
+    const pick = () => palette[Math.floor(r() * palette.length)] as string
+    const circles = Array.from({ length: 4 }, () => ({
+      cx: between(0, W),
+      cy: between(-40, H + 40),
+      r: between(70, 230),
+      fill: pick(),
+      o: between(0.1, 0.28),
+    }))
+    const rings = Array.from({ length: 3 }, () => ({
+      cx: between(100, W - 100),
+      cy: between(40, H - 40),
+      r: between(60, 170),
+      stroke: pick(),
+      w: between(8, 22),
+      o: between(0.14, 0.32),
+    }))
+    const amp = between(30, 70)
+    const y0 = between(H * 0.62, H * 0.78)
+    const wave = `M0 ${y0.toFixed(0)} C ${W * 0.25} ${(y0 - amp).toFixed(0)}, ${W * 0.5} ${(y0 + amp).toFixed(0)}, ${W * 0.75} ${y0.toFixed(0)} S ${W} ${(y0 - amp / 2).toFixed(0)}, ${W} ${(y0 - amp / 3).toFixed(0)} V ${H} H 0 Z`
+    const dots = { x: between(40, W - 380), y: between(30, H - 220), cols: 9, rows: 6, gap: 26 }
+    const arcs = Array.from({ length: 2 }, () => ({
+      x: between(0, W),
+      y: between(0, H),
+      r: between(150, 320),
+      start: between(0, 360),
+    }))
+    return { main, circles, rings, wave, dots, arcs }
   }, [seed])
+  const { main, circles, rings, wave, dots, arcs } = art
   return (
     <svg
       className="abstract-banner"
@@ -192,11 +70,54 @@ export function AbstractBanner({ seed }: { seed: number }) {
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
       focusable="false"
-      data-style={art.style}
     >
-      <rect width={W} height={H} fill="var(--surface-2)" />
-      <rect width={W} height={H} fill={c(art.palette[0] as Tone)} opacity=".08" />
-      {art.node}
+      <rect
+        width={W}
+        height={H}
+        style={{ fill: `color-mix(in oklab, ${main} 14%, var(--surface))` }}
+      />
+      {circles.map((c, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed decorative list
+        <circle key={i} cx={c.cx} cy={c.cy} r={c.r} style={{ fill: c.fill, opacity: c.o }} />
+      ))}
+      {rings.map((c, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed decorative list
+        <circle
+          key={i}
+          cx={c.cx}
+          cy={c.cy}
+          r={c.r}
+          style={{ fill: 'none', stroke: c.stroke, strokeWidth: c.w, opacity: c.o }}
+        />
+      ))}
+      {arcs.map((a, i) => (
+        <path
+          // biome-ignore lint/suspicious/noArrayIndexKey: a fixed decorative list
+          key={i}
+          d={`M${a.x + a.r} ${a.y} A ${a.r} ${a.r} 0 0 1 ${a.x} ${a.y + a.r}`}
+          transform={`rotate(${a.start} ${a.x} ${a.y})`}
+          style={{
+            fill: 'none',
+            stroke: main,
+            strokeWidth: 3,
+            strokeDasharray: '2 14',
+            strokeLinecap: 'round',
+            opacity: 0.4,
+          }}
+        />
+      ))}
+      {Array.from({ length: dots.rows }, (_, row) =>
+        Array.from({ length: dots.cols }, (_, col) => (
+          <circle
+            key={`${row}-${col}`}
+            cx={dots.x + col * dots.gap}
+            cy={dots.y + row * dots.gap}
+            r="3"
+            style={{ fill: main, opacity: 0.28 }}
+          />
+        )),
+      )}
+      <path d={wave} style={{ fill: main, opacity: 0.18 }} />
     </svg>
   )
 }
