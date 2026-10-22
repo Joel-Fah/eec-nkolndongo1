@@ -871,6 +871,42 @@
         "desc": "The image shown when a link is shared (WhatsApp, Facebook): the mark, the parish name and the section title, in Erode, in our colours. One card per section and language; a post or event uses its own photo.",
         "use": "apps/web/public/og/*.jpg, 1200×630, drawn by scripts/og-generate.ts (rerun if the name or tagline changes); og:* tags in Base.astro.",
         "a11y": "The image has alt text (the parish name); it carries nothing that is not also on the page."
+      },
+      "tooltip": {
+        "name": "Tooltip",
+        "desc": "The small dark bubble naming an icon button: it appears after a short pause on mouse hover and as soon as the button gets keyboard focus, instead of the browser’s grey tooltip.",
+        "use": "A data-tip=\"text\" attribute on the button (data-tip-end at the right edge, data-tip-start at the left, data-tip-above to open upwards); keep aria-label. No JavaScript, public site and admin.",
+        "a11y": "The accessible name stays the aria-label; the bubble is a visual aid (never the only information). No bubble on touch; reduced motion: no transition."
+      },
+      "helpsheet": {
+        "name": "Help sheet",
+        "desc": "The guide for the current screen in a side sheet over it: nothing moves behind, so closing it leaves you exactly where you were. An abstract banner (different each time) carries the title, the reading time and “For you”. Top: “All help” on the left, close on the right.",
+        "use": "Admin: the top-bar “?”; <HelpSheet>, <AbstractBanner seed>; the Help page remains a page of its own.",
+        "a11y": "Modal dialog (focus trapped, Escape closes, focus returns to the “?”); title and description linked; the banner is decorative (aria-hidden)."
+      },
+      "abstractbanner": {
+        "name": "Abstract banner",
+        "desc": "A header image drawn on the fly, no photo: waves, rings, dots, blocks, arcs or stripes, in a palette taken from our colours (light and dark follow). Each opening draws another composition; nothing is stored.",
+        "use": "<AbstractBanner seed={n}> (React, admin); six compositions, five palettes; colours by tokens only.",
+        "a11y": "Decorative (aria-hidden); text over it sits on a veil that keeps contrast in both themes."
+      },
+      "healthstrip": {
+        "name": "Health strip",
+        "desc": "Seven bars, one a day, green, orange or red (grey: no check), like a service status page, with the large status banner and, per check, a week curve or gauge.",
+        "use": "Admin → Santé, as cards or a list (remembered view toggle); .health-strip, .health-meter, .health-banner.",
+        "a11y": "Each bar has text (day and state) for screen readers and a tooltip; the state is written, never colour alone."
+      },
+      "prioritychip": {
+        "name": "Priority chip",
+        "desc": "A small label with an icon, words and a colour (high, keep an eye, not urgent) to say what matters first; the most urgent card also carries a soft red frame.",
+        "use": ".prio .prio-high|medium|low; To validate, modelled on the “To do” cards.",
+        "a11y": "Icon + text + colour: never colour alone; contrast checked in both themes."
+      },
+      "helpgrid": {
+        "name": "Help grid",
+        "desc": "The Help page as cards: one icon per guide in a tinted tile, the title in Erode and a summary line; guides matching your rights come first.",
+        "use": ".help-grid-card, .help-grid-icon; three columns on large screens.",
+        "a11y": "Each card is a link with its title; the icon is decorative."
       }
     },
     "rules": {
@@ -1359,7 +1395,11 @@
       "cannot": "You can review and comment, but not validate this.",
       "kind_correction": "Correction",
       "kind_note": "Note",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "prio_high": "High priority",
+      "prio_medium": "Keep an eye",
+      "prio_low": "Not urgent",
+      "prio_count": "{n} · {label}"
     },
     "help": {
       "title": "Help",
@@ -1370,7 +1410,11 @@
       "here": "Help for this screen",
       "back": "All help",
       "print": "Print",
-      "not_found": "This guide does not exist."
+      "not_found": "This guide does not exist.",
+      "close": "Close help",
+      "minutes": "{n} min read",
+      "for_you": "For you",
+      "not_for_you": "For another role"
     },
     "health": {
       "title": "Site health",
@@ -1405,7 +1449,12 @@
       "elsewhere": "Outgoing traffic (Neon) is read in the Neon console, and requests per day (100,000 at most) in the Cloudflare dashboard. The site cannot read them itself.",
       "insight": "The site health needs attention.",
       "insight_do": "See health",
-      "error": "The check failed. Try again."
+      "error": "The check failed. Try again.",
+      "week": "Last 7 days",
+      "no_check": "no check",
+      "view": "View",
+      "view_grid": "Cards",
+      "view_list": "List"
     }
   },
   "login": {

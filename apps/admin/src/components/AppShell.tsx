@@ -7,6 +7,7 @@ import { labelOf, navFor } from '../lib/nav'
 import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
+import { HelpSheet } from './HelpSheet'
 import { Icon } from './Icon'
 import { LeavingScreen } from './LeavingScreen'
 import { NavProgress } from './Loading'
@@ -16,6 +17,7 @@ export function AppShell() {
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   useEffect(() => {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
@@ -113,20 +115,26 @@ export function AppShell() {
           </button>
           <div className="admin-topbar-tools">
             {guideForPath(path) && (
-              <Link
+              <button
+                type="button"
                 className="btn btn-ghost btn-icon"
-                to="/help/$slug"
-                params={{ slug: guideForPath(path)?.slug ?? '' }}
                 aria-label={t('admin.help.here')}
-                title={t('admin.help.here')}
+                data-tip={t('admin.help.here')}
+                aria-haspopup="dialog"
+                onClick={() => setHelpOpen(true)}
               >
                 <Icon name="help" size={20} />
-              </Link>
+              </button>
             )}
             <LocaleSwitch />
             <ThemeButton />
             <Menu.Root>
-              <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
+              <Menu.Trigger
+                className="avatar admin-avatar"
+                aria-label={t('admin.user.menu')}
+                data-tip={t('admin.user.menu')}
+                data-tip-end
+              >
                 {initials}
               </Menu.Trigger>
               <Menu.Portal>
@@ -164,6 +172,10 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      <HelpSheet
+        slug={helpOpen ? (guideForPath(path)?.slug ?? null) : null}
+        onOpenChange={setHelpOpen}
+      />
       {leaving && <LeavingScreen />}
     </div>
   )

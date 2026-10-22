@@ -15,7 +15,37 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 
 type Kind = 'settings' | 'schedule' | 'page_slot'
+/** How soon a wrong value would hurt visitors: addresses, phones, times and giving numbers first. */
+export type Priority = 'high' | 'medium' | 'low'
+const RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+const HIGH_FIELDS = new Set([
+  'parish.address',
+  'parish.phones',
+  'parish.email',
+  'parish.whatsapp',
+  'parish.mapLat',
+  'parish.mapLng',
+  'parish.mapUrl',
+  'giving.momoNumber',
+  'giving.momoCode',
+  'giving.omNumber',
+  'giving.omCode',
+  'giving.bankAccount',
+  'giving.bankHolder',
+])
+const LOW_FIELDS = new Set([
+  'season.override',
+  'season.overrideUntil',
+  'parish.facebook',
+  'parish.youtube',
+])
+export const settingPriority = (key: string): Priority =>
+  HIGH_FIELDS.has(key) ? 'high' : LOW_FIELDS.has(key) ? 'low' : 'medium'
+export const slotPriority = (page: string, slot: string): Priority =>
+  page === 'trouver' || page === 'give' || slot.startsWith('fig_') ? 'medium' : 'low'
+
 type Item = {
+  priority: Priority
   id: string
   kind: Kind
   /** Where it lives in the admin, and (when it has one) the public page showing it. */
@@ -30,9 +60,9 @@ type Item = {
 }
 
 const SECTION_NAMES: Record<string, { fr: string; en: string }> = {
-  parish: { fr: 'Paramètres · Paroisse', en: 'Settings · Parish' },
-  season: { fr: 'Paramètres · Saison', en: 'Settings · Season' },
-  giving: { fr: 'Paramètres · Donner', en: 'Settings · Give' },
+  parish: { fr: 'Paramètres — Paroisse', en: 'Settings — Parish' },
+  season: { fr: 'Paramètres — Saison', en: 'Settings — Season' },
+  giving: { fr: 'Paramètres — Donner', en: 'Settings — Give' },
 }
 const SECTION_PAGES: Record<string, { fr: string; en: string } | null> = {
   parish: { fr: 'fr/decouvrir/nous-trouver/', en: 'en/discover/find-us/' },
@@ -70,6 +100,7 @@ async function pending(c: import('hono').Context<AppEnv>) {
     for (const r of rows)
       items.push({
         id: `settings:${r.section}.${r.k}`,
+        priority: settingPriority(`${r.section}.${r.k}`),
         kind: 'settings',
         group: SECTION_NAMES[r.section] ?? { fr: r.section, en: r.section },
         fieldKey: r.k,
@@ -88,14 +119,17 @@ async function pending(c: import('hono').Context<AppEnv>) {
         weekday: number
         start_time: string
         place_fr: string
+        kind: string
       }>(
-        sql`select id, label_fr, label_en, weekday, start_time, place_fr from schedule_slots where validated = false order by weekday, start_time`,
+        sql`select id, label_fr, label_en, weekday, start_time, place_fr, kind from schedule_slots where validated = false order by weekday, start_time`,
       )
     ).rows
     const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
     for (const r of rows)
       items.push({
         id: `schedule:${r.id}`,
+        // Sunday services and the like are what people plan their week around.
+        priority: r.kind === 'culte' ? 'high' : 'medium',
         kind: 'schedule',
         group: { fr: 'Cultes et horaires', en: 'Services and times' },
         label: { fr: r.label_fr, en: r.label_en || r.label_fr },
@@ -119,6 +153,7 @@ async function pending(c: import('hono').Context<AppEnv>) {
       if (!text.trim()) continue
       items.push({
         id: `page_slot:${r.page_key}.${r.slot_key}`,
+        priority: slotPriority(r.page_key, r.slot_key),
         kind: 'page_slot',
         group: page.label,
         label: def.label,
@@ -135,6 +170,7 @@ async function pending(c: import('hono').Context<AppEnv>) {
     .leftJoin(user, eq(user.id, contentReviews.createdBy))
     .where(eq(contentReviews.status, 'open'))
     .orderBy(desc(contentReviews.createdAt))
+  items.sort((a, b) => RANK[a.priority] - RANK[b.priority])
   return {
     items: items.map((i) => ({
       ...i,

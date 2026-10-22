@@ -21,16 +21,15 @@ function HelpIndex() {
         <h2 id="help-guides" className="text-xl">
           {t('admin.help.guides')}
         </h2>
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {sort(GUIDES).map((g) => (
             <li key={g.slug}>
-              <Link
-                to="/help/$slug"
-                params={{ slug: g.slug }}
-                className="admin-panel flex items-center justify-between gap-3 no-underline"
-              >
-                <span className="font-medium">{g.title[locale]}</span>
-                <Icon name="arrowRight" size={16} />
+              <Link to="/help/$slug" params={{ slug: g.slug }} className="help-grid-card">
+                <span className="help-grid-icon" aria-hidden="true">
+                  <Icon name={g.icon} size={24} />
+                </span>
+                <span className="font-display text-xl">{g.title[locale]}</span>
+                <span className="text-sm text-ink-muted">{g.summary[locale]}</span>
               </Link>
             </li>
           ))}
@@ -41,16 +40,15 @@ function HelpIndex() {
           {t('admin.help.memos')}
         </h2>
         <p className="text-sm text-ink-muted">{t('admin.help.memos_help')}</p>
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {sort(MEMOS).map((g) => (
             <li key={g.slug}>
-              <Link
-                to="/help/$slug"
-                params={{ slug: g.slug }}
-                className="admin-panel flex items-center justify-between gap-3 no-underline"
-              >
-                <span className="font-medium">{g.title[locale]}</span>
-                <Icon name="print" size={16} />
+              <Link to="/help/$slug" params={{ slug: g.slug }} className="help-grid-card">
+                <span className="help-grid-icon" aria-hidden="true">
+                  <Icon name={g.icon} size={24} />
+                </span>
+                <span className="font-display text-xl">{g.title[locale]}</span>
+                <span className="text-sm text-ink-muted">{g.summary[locale]}</span>
               </Link>
             </li>
           ))}

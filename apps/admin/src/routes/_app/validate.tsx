@@ -22,7 +22,9 @@ type Review = {
   author: string | null
   createdAt: string
 }
+type Priority = 'high' | 'medium' | 'low'
 type Item = {
+  priority: Priority
   id: string
   kind: 'settings' | 'schedule' | 'page_slot'
   group: { fr: string; en: string }
@@ -35,6 +37,13 @@ type Item = {
   reviews: Review[]
 }
 
+const PRIORITIES: Priority[] = ['high', 'medium', 'low']
+const PRIO = {
+  high: { icon: 'alert', tone: 'danger' },
+  medium: { icon: 'clock', tone: 'warning' },
+  low: { icon: 'info', tone: 'info' },
+} as const
+
 function Validate() {
   const { t, locale } = useLocale()
   const q = useQuery({
@@ -42,10 +51,25 @@ function Validate() {
     queryFn: () => api<{ items: Item[] }>('/validation'),
   })
   const items = q.data?.items ?? []
+  // The API sorts by priority: groups appear by their most urgent item.
   const groups = [...new Set(items.map((i) => i.group[locale]))]
+  const count = (p: Priority) => items.filter((i) => i.priority === p).length
   return (
     <div className="grid gap-6">
       <PageHeader title={t('admin.validate.title')} lead={t('admin.validate.lead')} />
+      {items.length > 0 && (
+        <p className="flex flex-wrap items-center gap-2" role="status">
+          {PRIORITIES.map((p) => (
+            <span key={p} className={`prio prio-${p}`} data-n={count(p)}>
+              <Icon name={PRIO[p].icon} size={16} />
+              {t('admin.validate.prio_count', {
+                n: String(count(p)),
+                label: t(`admin.validate.prio_${p}` as MessageKey),
+              })}
+            </span>
+          ))}
+        </p>
+      )}
       {q.data && items.length === 0 ? (
         <EmptyState
           title={t('admin.validate.empty_title')}
@@ -110,9 +134,13 @@ function ItemCard({ item }: { item: Item }) {
     },
   })
   return (
-    <li className="admin-panel grid gap-3">
+    <li className="admin-panel grid gap-3" data-priority={item.priority}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="grid gap-1">
+          <span className={`prio prio-${item.priority}`}>
+            <Icon name={PRIO[item.priority].icon} size={16} />
+            {t(`admin.validate.prio_${item.priority}` as MessageKey)}
+          </span>
           <h3 className="text-lg">{label}</h3>
           <p className="text-sm text-ink-muted">{t('admin.validate.current')}</p>
           <p className="max-w-[70ch] whitespace-pre-line font-medium">{item.value}</p>

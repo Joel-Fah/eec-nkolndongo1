@@ -42,3 +42,13 @@ Weights (production build, lab profile): JS 15–16.4 KB gz, first load 158–20
   `core:visits-read`, the `validateur` role).
 - `pnpm content:pending` and « À valider » share their sources by convention, not code (decision 0040).
 - Static pages (home) are not counted by the visit counter (0038).
+
+## Feedback round on Checkpoint A (2026-10-22) — done on dev
+- Tooltips: the browser's grey `title` is replaced by our dark bubble (`data-tip`, CSS only, hover after a pause + keyboard focus) on
+  the public header, theme/language buttons, social links and the admin top bar (help, language, theme, profile).
+- Help: the page is a grid of icon cards; the contextual « ? » opens a **side sheet** over the screen (abstract random banner,
+  title, reading time, « Pour vous »; « Toutes les aides » top left, close top right).
+- Health: cards/list toggle (remembered), a status banner and a 7-day strip like a status page, plus a week curve/bars/gauge per check.
+- À valider: priority chips (high / keep an eye / not urgent) with icon + words + colour, list sorted by priority.
+- **Checkpoint B re-scoped (decision 0034):** no audio hosting and no processing on the site; a sermon holds a YouTube link and/or a
+  Google Drive link. No podcast feed until a host with direct file URLs exists (R2 or Internet Archive).

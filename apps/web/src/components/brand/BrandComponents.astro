@@ -102,6 +102,12 @@ type Id =
   | 'healthcard'
   | 'visitscharts'
   | 'sharecard'
+  | 'tooltip'
+  | 'helpsheet'
+  | 'abstractbanner'
+  | 'healthstrip'
+  | 'prioritychip'
+  | 'helpgrid'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -298,6 +304,23 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('sharecard')}>
       <img class="max-w-md rounded-lg ring-1 ring-line" src={`/og/default-${locale}.jpg`} width="1200" height="630" alt={t('site.parish')} loading="lazy" />
     </DocBlock>
+
+    <DocBlock {...doc('tooltip')}>
+      <div class="flex flex-wrap gap-4 py-6">
+        <button type="button" class="btn btn-ghost btn-icon" aria-label={t('nav.search')} data-tip={t('nav.search')}><Icon name="search" /></button>
+        <button type="button" class="btn btn-secondary btn-icon" aria-label={t('nav.account')} data-tip={t('nav.account')}><Icon name="account" /></button>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('helpsheet')}><p class="text-sm text-ink-muted">{t('brand.components.helpsheet.use')}</p></DocBlock>
+
+    <DocBlock {...doc('abstractbanner')}><p class="text-sm text-ink-muted">{t('brand.components.abstractbanner.use')}</p></DocBlock>
+
+    <DocBlock {...doc('healthstrip')}><p class="text-sm text-ink-muted">{t('brand.components.healthstrip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('prioritychip')}><p class="text-sm text-ink-muted">{t('brand.components.prioritychip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('helpgrid')}><p class="text-sm text-ink-muted">{t('brand.components.helpgrid.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

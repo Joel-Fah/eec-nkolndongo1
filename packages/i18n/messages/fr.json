@@ -871,6 +871,42 @@
         "desc": "L’image qui s’affiche quand un lien est partagé (WhatsApp, Facebook) : la marque, le nom de la paroisse et le titre de la rubrique, en Erode, dans nos couleurs. Une carte par rubrique et par langue ; un article ou un événement utilise sa propre photo.",
         "use": "apps/web/public/og/*.jpg, 1200×630, dessinées par scripts/og-generate.ts (à relancer si le nom ou la devise changent) ; balises og:* dans Base.astro.",
         "a11y": "L’image a un texte alternatif (le nom de la paroisse) ; elle ne contient aucune information qui ne soit pas aussi dans la page."
+      },
+      "tooltip": {
+        "name": "Info-bulle",
+        "desc": "La petite bulle sombre qui nomme un bouton-icône : elle apparaît après une courte pause au survol de la souris et dès que le bouton reçoit le focus au clavier, au lieu de l’infobulle grise du navigateur.",
+        "use": "Un attribut data-tip=\"texte\" sur le bouton (data-tip-end à droite de l’écran, data-tip-start à gauche, data-tip-above vers le haut) ; garder aria-label. Sans JavaScript, public et administration.",
+        "a11y": "Le nom accessible reste l’aria-label ; la bulle est un renfort visuel (jamais la seule information). Pas de bulle au toucher ; mouvement réduit : pas de transition."
+      },
+      "helpsheet": {
+        "name": "Feuille d’aide",
+        "desc": "Le guide de l’écran en cours, dans une feuille latérale par-dessus lui : rien ne bouge derrière, donc on referme et on est exactement là où on était. Une bannière abstraite (différente à chaque ouverture) porte le titre, la durée de lecture et « Pour vous ». En haut : « Toutes les aides » à gauche, fermer à droite.",
+        "use": "Administration : le « ? » de la barre du haut ; <HelpSheet>, <AbstractBanner seed> ; la page Aide reste une page à part.",
+        "a11y": "Boîte de dialogue modale (focus piégé, Échap ferme, le focus revient au « ? ») ; titre et description liés ; la bannière est décorative (aria-hidden)."
+      },
+      "abstractbanner": {
+        "name": "Bannière abstraite",
+        "desc": "Une image d’en-tête dessinée à la volée, sans photo : vagues, anneaux, points, blocs, arcs ou bandes, dans une palette tirée de nos couleurs (clair et sombre suivent). Chaque ouverture tire une autre composition ; rien n’est stocké.",
+        "use": "<AbstractBanner seed={n}> (React, administration) ; six compositions, cinq palettes ; couleurs uniquement par jetons.",
+        "a11y": "Décorative (aria-hidden) ; le texte posé dessus reste sur un voile qui garde le contraste dans les deux thèmes."
+      },
+      "healthstrip": {
+        "name": "Bande de santé",
+        "desc": "Sept barres, une par jour, vertes, orange ou rouges (grises : pas de contrôle), comme une page d’état de service, avec la grande bannière d’état et, selon le contrôle, une courbe ou une jauge de la semaine.",
+        "use": "Administration → Santé, en cartes ou en liste (bouton d’affichage mémorisé) ; .health-strip, .health-meter, .health-banner.",
+        "a11y": "Chaque barre a un texte (jour et état) pour les lecteurs d’écran et une info-bulle ; l’état est écrit, jamais la couleur seule."
+      },
+      "prioritychip": {
+        "name": "Pastille de priorité",
+        "desc": "Une petite étiquette avec une icône, des mots et une couleur (haute, à surveiller, peu urgent) pour dire ce qui compte d’abord ; la carte la plus urgente porte aussi un cadre rouge doux.",
+        "use": ".prio .prio-high|medium|low ; À valider, sur le modèle des cartes « À faire ».",
+        "a11y": "Icône + texte + couleur : jamais la couleur seule ; contraste vérifié dans les deux thèmes."
+      },
+      "helpgrid": {
+        "name": "Grille d’aide",
+        "desc": "La page Aide en cartes : une icône par guide dans une pastille teintée, le titre en Erode et une ligne de résumé ; les guides qui correspondent à vos droits viennent en premier.",
+        "use": ".help-grid-card, .help-grid-icon ; trois colonnes sur grand écran.",
+        "a11y": "Chaque carte est un lien avec son titre ; l’icône est décorative."
       }
     },
     "rules": {
@@ -1359,7 +1395,11 @@
       "cannot": "Vous pouvez relire et commenter, mais pas valider ceci.",
       "kind_correction": "Correction",
       "kind_note": "Remarque",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "prio_high": "Priorité haute",
+      "prio_medium": "À surveiller",
+      "prio_low": "Peu urgent",
+      "prio_count": "{n} · {label}"
     },
     "help": {
       "title": "Aide",
@@ -1370,7 +1410,11 @@
       "here": "Aide pour cet écran",
       "back": "Toutes les aides",
       "print": "Imprimer",
-      "not_found": "Ce guide n’existe pas."
+      "not_found": "Ce guide n’existe pas.",
+      "close": "Fermer l’aide",
+      "minutes": "{n} min de lecture",
+      "for_you": "Pour vous",
+      "not_for_you": "Pour un autre rôle"
     },
     "health": {
       "title": "Santé du site",
@@ -1405,7 +1449,12 @@
       "elsewhere": "Le trafic sortant (Neon) se lit dans la console Neon, et le nombre de requêtes par jour (100 000 au plus) dans le tableau de bord Cloudflare. Le site ne peut pas les lire lui-même.",
       "insight": "La santé du site demande de l’attention.",
       "insight_do": "Voir la santé",
-      "error": "Le contrôle a échoué. Réessayez."
+      "error": "Le contrôle a échoué. Réessayez.",
+      "week": "7 derniers jours",
+      "no_check": "pas de contrôle",
+      "view": "Affichage",
+      "view_grid": "Cartes",
+      "view_list": "Liste"
     }
   },
   "login": {

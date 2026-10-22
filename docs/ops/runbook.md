@@ -84,11 +84,19 @@ By hand: `pnpm --filter @eec/api retention`.
   on demand. The backup workflow writes the « last backup » mark (`system_marks`); until its first run after this version
   the backup shows orange « aucune sauvegarde enregistrée ». Neon egress and Workers requests/day cannot be read by the
   Worker: read them in the Neon console and the Cloudflare dashboard (monthly).
-- **Visit counts** (decision 0038) are **dormant**. To switch on, once: (1) Cloudflare dashboard → Workers & Pages → Analytics
-  Engine → enable it (note the plan it shows); (2) put `analyticsDataset` (for example `eec_visits`) and `accountId` in
-  `apps/web/deploy.json` and merge; (3) create an API token « Account Analytics: Read » and set it:
-  `wrangler secret put CF_ANALYTICS_TOKEN`. Without (1) do **not** set the dataset: a binding to a service the account has
-  not enabled fails the deploy.
+- **Visit counts** (decision 0038) are **dormant**. To switch on, once, with the Cloudflare dashboard open:
+  1. Dashboard → **Workers & Pages → Analytics Engine** (in the left menu, under « Workers & Pages » or « Storage & databases »):
+     enable it if it asks, and **note the plan it shows** (Free is expected: 100 000 points a day). If it asks for a card or an
+     upgrade, **stop and tell me**: we leave it dormant.
+  2. Pick a dataset name, for example `eec_visits` (it is created by the first write; nothing to create by hand).
+  3. Dashboard → right column of any page (or the URL `dash.cloudflare.com/<id>`): copy the **Account ID** (a 32-character id; not a
+     secret).
+  4. Put both in `apps/web/deploy.json` (`"analyticsDataset": "eec_visits"`, `"accountId": "<id>"`) and merge (I can do this).
+  5. My Profile → **API Tokens → Create token → Custom token**: permission **Account · Account Analytics · Read**, scoped to this
+     account only. Copy it once and set it: `pnpm --filter @eec/web exec wrangler secret put CF_ANALYTICS_TOKEN --config
+     dist/server/wrangler.json` (or in the Worker's *Settings → Variables and Secrets* as a secret).
+  6. After the next deploy, open the admin home: the « Visites » section fills in from the next day. Without step 1 do **not** set
+     the dataset: a binding to a service the account has not enabled fails the deploy.
 - **Validator role**: after a deploy that adds permissions, run `pnpm db:seed` in `prod-shell.sh` (idempotent: new permissions
   and the « Validateur de contenu » role), then grant the role on **Rôles / Utilisateurs** with Joël. The role sees **À valider**.
 - **Share cards** (`apps/web/public/og/*.jpg`): redrawn by `node scripts/og-generate.ts` (needs Chrome and playwright-core) when

@@ -38,6 +38,7 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0031 | Names and photos of people: public only with a recorded consent | Accepted |
 | 0032 | Bible translations: public domain only (LSG 1910, WEB) | Accepted |
 | 0033 | Legal documents are versioned; members told when the policy changes | Accepted |
+| 0034 | Sermon audio: no hosting and no processing on the site; links only | Accepted |
 | 0038 | Visit counts without tracking (Analytics Engine), off until enabled | Accepted |
 | 0039 | Home texts and key figures are content slots | Accepted |
 | 0040 | A role and a screen for the content partner to validate and comment | Accepted |

@@ -114,14 +114,14 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     </nav>
 
     <div class="site-tools site-pod" data-pod="r">
-      <button type="button" class="btn btn-ghost btn-icon site-tool-desktop" aria-label={t('nav.search')} title={t('nav.search')} data-dialog-open="search-dialog" aria-haspopup="dialog">
+      <button type="button" class="btn btn-ghost btn-icon site-tool-desktop" aria-label={t('nav.search')} data-tip={t('nav.search')} data-dialog-open="search-dialog" aria-haspopup="dialog">
         <Icon name="search" />
       </button>
-      <a href={switchHref} hreflang={other} lang={other} class="btn btn-ghost site-lang site-tool-desktop" aria-label={t('common.language.switch_label')} title={t('nav.language_short')}>
+      <a href={switchHref} hreflang={other} lang={other} class="btn btn-ghost site-lang site-tool-desktop" aria-label={t('common.language.switch_label')} data-tip={t('nav.language_short')}>
         {other.toUpperCase()}
       </a>
       <span class="site-tool-desktop"><ThemeToggle /></span>
-      <a href={href(locale, accountPath)} class="btn btn-secondary btn-icon site-tool-desktop" aria-label={t('nav.account')} title={t('nav.account')}>
+      <a href={href(locale, accountPath)} class="btn btn-secondary btn-icon site-tool-desktop" aria-label={t('nav.account')} data-tip={t('nav.account')} data-tip-end>
         <Icon name="account" />
       </a>
       <button type="button" class="btn btn-ghost btn-icon site-menu-button" data-dialog-open="mobile-menu" aria-haspopup="dialog" aria-label={t('nav.open_menu')}>
