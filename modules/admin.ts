@@ -13,3 +13,11 @@ export const moduleAdmin: Record<string, LazyExoticComponent<ComponentType>> = {
   schedule: lazy(() => import('@eec/module-schedule/admin')),
   settings: lazy(() => import('@eec/module-settings/admin')),
 }
+
+/** Pieces of a module's screen shown inside another screen (a group's public page, edited from Groups). */
+export const GroupPageEditor = lazy(() =>
+  import('@eec/module-departments/admin').then((m) => ({ default: m.GroupPageEditor })),
+)
+export const DepartmentQuizEditor = lazy(() =>
+  import('@eec/module-departments/admin').then((m) => ({ default: m.QuizEditor })),
+)

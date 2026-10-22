@@ -120,13 +120,13 @@ export default function DepartmentsPage() {
           ))}
         </ul>
       )}
-      {editing && <PageEditor item={editing} onClose={() => setEditing(null)} />}
+      {editing && <GroupPageEditor item={editing} onClose={() => setEditing(null)} />}
       {quizOpen && <QuizEditor onClose={() => setQuizOpen(false)} />}
     </div>
   )
 }
 
-function PageEditor({ item, onClose }: { item: Item; onClose: () => void }) {
+export function GroupPageEditor({ item, onClose }: { item: Item; onClose: () => void }) {
   const { t, locale } = useLocale()
   const me = useMe().data
   const qc = useQueryClient()
@@ -499,7 +499,7 @@ function People({
   )
 }
 
-function QuizEditor({ onClose }: { onClose: () => void }) {
+export function QuizEditor({ onClose }: { onClose: () => void }) {
   const { t } = useLocale()
   const qc = useQueryClient()
   const quiz = useQuery({

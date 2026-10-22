@@ -1097,7 +1097,7 @@
     },
     "teams": {
       "title": "Groups",
-      "lead": "Departments, committees and choirs. Leaders are the people holding the “Group leader” role for that group.",
+      "lead": "Departments, committees and choirs: the people, the rights and each group’s public page, in one place. Leaders are the people who hold the “Group leader” role for that group.",
       "new": "New group",
       "kind": "Type",
       "kinds": {
@@ -1122,7 +1122,8 @@
       "created": "Group created.",
       "saved": "Group saved.",
       "empty_title": "No groups yet",
-      "empty_text": "Create the parish’s departments, committees and choirs."
+      "empty_text": "Create the parish’s departments, committees and choirs.",
+      "public_page": "Public page"
     },
     "audit": {
       "title": "Activity log",

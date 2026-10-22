@@ -1097,7 +1097,7 @@
     },
     "teams": {
       "title": "Groupes",
-      "lead": "Départements, comités et chorales. Les responsables sont les personnes qui ont le rôle « Responsable de groupe » pour ce groupe.",
+      "lead": "Départements, comités et chorales : les personnes, les droits et la page publique de chaque groupe, au même endroit. Les responsables sont les personnes qui ont le rôle « Responsable de groupe » pour ce groupe.",
       "new": "Nouveau groupe",
       "kind": "Type",
       "kinds": {
@@ -1122,7 +1122,8 @@
       "created": "Groupe créé.",
       "saved": "Groupe enregistré.",
       "empty_title": "Aucun groupe pour l’instant",
-      "empty_text": "Créez les départements, comités et chorales de la paroisse."
+      "empty_text": "Créez les départements, comités et chorales de la paroisse.",
+      "public_page": "Page publique"
     },
     "audit": {
       "title": "Journal d’activité",

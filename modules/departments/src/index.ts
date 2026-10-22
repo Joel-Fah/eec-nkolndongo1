@@ -33,16 +33,5 @@ export const departmentsModule = defineModule({
       },
     },
   ],
-  admin: {
-    nav: [
-      {
-        group: 'parish',
-        label: { fr: 'Départements', en: 'Departments' },
-        path: '/m/departments',
-        icon: 'department',
-        order: 40,
-        permission: 'departments:read',
-      },
-    ],
-  },
+  // No menu entry of its own: a group's public page is edited from the Groups screen.
 })
