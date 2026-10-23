@@ -176,6 +176,13 @@
       "when": 1792752006658,
       "tag": "0024_abnormal_lightspeed",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792762692870,
+      "tag": "0025_lumpy_titania",
+      "breakpoints": true
     }
   ]
 }
