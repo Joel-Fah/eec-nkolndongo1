@@ -169,6 +169,13 @@
       "when": 1792735233727,
       "tag": "0023_small_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792752006658,
+      "tag": "0024_abnormal_lightspeed",
+      "breakpoints": true
     }
   ]
 }
