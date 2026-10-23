@@ -2,7 +2,16 @@
 import type { Reading } from '@eec/core'
 import { id, timestamps } from '@eec/db/columns'
 import { user } from '@eec/db/schema'
-import { index, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core'
 
 export const meditationPlans = pgTable(
   'meditation_plans',
@@ -54,4 +63,20 @@ export const meditationDays = pgTable(
     ...timestamps(),
   },
   (t) => [uniqueIndex('meditation_days_plan_date_idx').on(t.planId, t.date)],
+)
+
+/**
+ * The text of the Bible in a translation we may quote (decision 0032): Louis Segond 1910 for French (public domain), loaded once
+ * by `pnpm bible:seed`. Read by staff to prefill the verse of the day; nothing here is public by itself.
+ */
+export const bibleVerses = pgTable(
+  'bible_verses',
+  {
+    translation: text('translation').notNull(),
+    book: text('book').notNull(),
+    chapter: integer('chapter').notNull(),
+    verse: integer('verse').notNull(),
+    text: text('text').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.translation, t.book, t.chapter, t.verse] })],
 )

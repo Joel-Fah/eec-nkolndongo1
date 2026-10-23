@@ -212,7 +212,7 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
   )
   const row = (f: Form) => (
     <button type="button" className="admin-row reg-form-row" onClick={() => onOpen(f.id)}>
-      <span className="grid text-start">
+      <span className="reg-form-main">
         <strong>{(locale === 'en' && f.titleEn) || f.titleFr}</strong>
         <span className="text-sm text-ink-muted">
           {dayText(f.eventDate, locale)} ·{' '}
@@ -223,10 +223,12 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
           })}
         </span>
       </span>
-      {f.counts.registrations > 0 && <RetentionChip r={f.retention} />}
-      <Badge tone={f.state === 'published' ? 'success' : 'warning'}>
-        {t(k(`state_${f.state}`))}
-      </Badge>
+      <span className="reg-form-end">
+        {f.counts.registrations > 0 && <RetentionChip r={f.retention} />}
+        <Badge tone={f.state === 'published' ? 'success' : 'warning'}>
+          {t(k(`state_${f.state}`))}
+        </Badge>
+      </span>
     </button>
   )
   return (
@@ -1000,11 +1002,12 @@ function useEvents(locale: string) {
           startsAt: string
           allDay: boolean
           cancelled: boolean
+          acceptsRegistrations: boolean
         }[]
       }>(`/events/public?locale=${locale}&from=${from}&to=${to}`)
       const seen = new Map<string, EventChoice>()
       for (const o of r.items) {
-        if (o.cancelled || seen.has(o.slug)) continue
+        if (o.cancelled || !o.acceptsRegistrations || seen.has(o.slug)) continue
         const date = o.allDay
           ? o.startsAt.slice(0, 10)
           : new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(

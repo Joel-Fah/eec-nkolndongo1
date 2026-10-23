@@ -201,7 +201,7 @@
   "view_grid": "Grid",
   "new_from_event": "New form for an event",
   "new_from_event_help": "A registration is always tied to a Calendar event. Pick it: the title and day follow from it.",
-  "new_no_event": "Every upcoming event already has a form, or there is none: create the event in the Calendar first.",
+  "new_no_event": "No upcoming event takes registrations (yet), or they already have a form. In the Calendar, open the event and tick “This event takes registrations”.",
   "new_go": "Create the form",
   "cancel": "Cancel",
   "f_event": "Event",

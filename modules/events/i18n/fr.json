@@ -199,5 +199,7 @@
   "until_date": "Au",
   "untitled_full": "Événement sans titre",
   "side_slug_help": "Créée automatiquement à partir du titre, toujours unique ; elle ne change plus une fois l’événement publié.",
-  "registrations": "Inscriptions"
+  "registrations": "Inscriptions",
+  "side_registrations": "Cet événement accepte des inscriptions",
+  "side_registrations_help": "Seuls les événements qui l’acceptent peuvent avoir un formulaire d’inscription. Une fois coché et enregistré, le bouton « Inscriptions » apparaît en haut."
 }

@@ -67,6 +67,7 @@ export async function initClimb() {
 
   let path = trail(root)
   if (!path) return
+  const dots = [...root.querySelectorAll<HTMLElement>('[data-node]')]
   const len = path.getTotalLength()
   path.style.strokeDasharray = `${len}`
   path.style.strokeDashoffset = reduced() ? '0' : `${len}`
@@ -85,8 +86,10 @@ export async function initClimb() {
       scrollTrigger: {
         trigger: root,
         start: 'top 70%',
-        end: 'bottom 60%',
-        scrub: 0.6,
+        // The trail reaches the last step while it is still comfortably on screen, not after it has scrolled away.
+        endTrigger: dots.at(-1) ?? root,
+        end: 'top 65%',
+        scrub: 0.25,
         invalidateOnRefresh: true,
       },
     })

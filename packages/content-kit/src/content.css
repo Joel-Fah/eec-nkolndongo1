@@ -1218,6 +1218,9 @@ html[data-rte-full] .eec-popover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  align-content: flex-start;
+  justify-content: flex-start;
+  text-align: start;
   gap: 0.375rem;
   min-height: 2.75rem;
   padding: 0.375rem 0.5rem;
@@ -1235,6 +1238,7 @@ html[data-rte-full] .eec-popover {
 }
 .tag {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   border-radius: var(--radius-sm);
   background: var(--primary-soft);
@@ -1262,7 +1266,7 @@ html[data-rte-full] .eec-popover {
 .tag-new,
 .tag-edit {
   min-width: 8rem;
-  flex: 1;
+  flex: 1 1 8rem;
   min-height: 2rem;
   border: 0;
   background: transparent;

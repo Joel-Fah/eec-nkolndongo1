@@ -494,7 +494,7 @@ function History() {
                   label={t(k('ms_layout'))}
                   value={form.layout}
                   onValueChange={(x) => x && set({ layout: x })}
-                  options={['auto', 'fan', 'stack', 'bento', 'row'].map((x) => ({
+                  options={['auto', 'fan', 'stack', 'bento', 'scatter'].map((x) => ({
                     value: x,
                     label: t(k(`ms_layout_${x}`)),
                   }))}

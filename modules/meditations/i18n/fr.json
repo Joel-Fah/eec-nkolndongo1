@@ -58,7 +58,7 @@
   "psalm_help": "Un numéro seul = tout le psaume. Ajoutez « De » et « À » pour un passage (89, versets 31 à 47).",
   "psalm_ph": "89, 31-47",
   "verse_h": "Verset du jour (facultatif)",
-  "verse_help": "Le verset est le premier du premier passage ; choisissez un autre passage ou ajustez chapitre et versets. Le texte anglais se remplit tout seul (World English Bible) ; le texte français se tape en Louis Segond 1910. Sans texte, aucun verset n’est affiché.",
+  "verse_help": "Le verset est tiré au hasard parmi les versets des lectures et du psaume du jour ; « Tirer un autre verset » en choisit un autre, ou ajustez livre, chapitre et versets. Les textes se remplissent tout seuls (Louis Segond 1910 et World English Bible) et restent modifiables.",
   "verse_pick": "Passage du verset du jour",
   "verse_fr": "Texte (Louis Segond 1910)",
   "verse_en": "Texte (World English Bible)",
@@ -142,5 +142,6 @@
   "issue_bad_order": "Le passage va à l’envers : {d}.",
   "verse_loading": "Recherche du texte…",
   "verse_en_help": "Prérempli depuis la World English Bible (domaine public) ; modifiable.",
-  "verse_fr_help": "À saisir en Louis Segond 1910 (aucune source française libre n’est branchée)."
+  "verse_fr_help": "Prérempli depuis la Louis Segond 1910 (domaine public) ; modifiable.",
+  "verse_draw": "Tirer un autre verset"
 }

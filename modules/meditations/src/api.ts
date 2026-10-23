@@ -26,12 +26,13 @@ import {
   READING_LABELS,
   slugify,
   uniqueSlug,
+  verseDigits,
 } from '@eec/core'
 import type { Db } from '@eec/db'
 import { and, asc, desc, eq, gte, ilike, lte, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { meditationDays, meditationPlans } from './schema.ts'
+import { bibleVerses, meditationDays, meditationPlans } from './schema.ts'
 
 const AREA = 'meditations'
 type Locale = 'fr' | 'en'
@@ -441,13 +442,44 @@ export const meditationsApi = new Hono<AppEnv>()
     return c.json({ ok: true })
   })
   // Bulk import (the CSV is read and checked in the browser; the server checks every row again). Existing days are updated.
-  // The text of a passage in the World English Bible (public domain), read from bible-api.com for the staff only, so the
-  // verse of the day can be prefilled. Only the first range of the passage; the editor trims it. French (LSG 1910) is typed.
+  // The text of a passage, for the staff, to prefill the verse of the day: French from Louis Segond 1910 (loaded in the database by
+  // `pnpm bible:seed`, public domain), English from the World English Bible (bible-api.com). Only the first range of the passage.
   .get('/bible-text', requirePermission('meditations:edit'), async (c) => {
     const raw = (c.req.query('ref') ?? '').slice(0, 80)
     const sp = parseStructured(raw)
     const seg = sp?.segments[0]
     if (!sp || !seg) return fail(c, 400, 'invalid')
+    if (c.req.query('locale') === 'fr') {
+      const db = await c.var.deps.db()
+      const last = seg.endChapter ?? seg.chapter
+      const from = seg.from != null ? verseDigits(seg.from) : 1
+      const to = seg.to != null ? verseDigits(seg.to) : seg.from != null ? from : 999
+      const rows = await db
+        .select({ chapter: bibleVerses.chapter, verse: bibleVerses.verse, text: bibleVerses.text })
+        .from(bibleVerses)
+        .where(
+          and(
+            eq(bibleVerses.translation, 'lsg'),
+            eq(bibleVerses.book, sp.book),
+            gte(bibleVerses.chapter, seg.chapter),
+            lte(bibleVerses.chapter, last),
+          ),
+        )
+        .orderBy(asc(bibleVerses.chapter), asc(bibleVerses.verse))
+      const text = rows
+        .filter((r) =>
+          last === seg.chapter
+            ? r.verse >= from && r.verse <= to
+            : r.chapter === seg.chapter
+              ? r.verse >= from
+              : r.chapter < last || r.verse <= to,
+        )
+        .map((r) => r.text)
+        .join(' ')
+        .slice(0, 1200)
+      if (!text) return fail(c, 404, 'not_found')
+      return c.json({ text, translation: 'Louis Segond 1910' })
+    }
     const q = formatPassage(formatStructured({ book: sp.book, segments: [seg] }), 'en').replace(
       /[–]/g,
       '-',

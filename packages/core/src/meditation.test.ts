@@ -4,6 +4,8 @@ import {
   formatPassage,
   formatPsalm,
   parsePassage,
+  passageVerses,
+  pickVerse,
   readMeditationCsv,
 } from './meditation.ts'
 
@@ -160,5 +162,24 @@ describe('structured passages', () => {
     expect(defaultLabel('jhn')).toBe('gospel')
     expect(defaultLabel('rom')).toBe('epistle')
     expect(defaultLabel('rev')).toBe('nt')
+  })
+})
+
+describe('the verse of the day', () => {
+  it('lists the verses of a passage', () => {
+    expect(passageVerses(parseStructured('Amos 4, 1-3') as never)).toEqual([
+      { chapter: 4, verse: 1 },
+      { chapter: 4, verse: 2 },
+      { chapter: 4, verse: 3 },
+    ])
+    expect(passageVerses(parseStructured('Jean 7, 53–8, 11') as never).length).toBe(1 + 11)
+    expect(passageVerses(parseStructured('Jude 3') as never)).toEqual([{ chapter: 1, verse: 3 }])
+  })
+  it('picks one verse among all the passages of the day, readings and psalm', () => {
+    const seen = new Set<string>()
+    for (let i = 0; i < 40; i++)
+      seen.add(pickVerse(['Amos 4, 1-2', 'Psaumes 89, 31-32'], () => i / 40) as string)
+    expect([...seen].sort()).toEqual(['Amos 4, 1', 'Amos 4, 2', 'Psaumes 89, 31', 'Psaumes 89, 32'])
+    expect(pickVerse([], () => 0.5)).toBeNull()
   })
 })

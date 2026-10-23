@@ -11,6 +11,7 @@ import {
   inRange,
   type VerseNo,
   verseCount,
+  verseDigits,
 } from './bible.ts'
 
 const fold = (s: string) =>
@@ -368,4 +369,42 @@ export function readMeditationCsv(csv: string): ImportResult {
     rows.push({ line, date, headline: get(iHeadline), readings, psalm, valid })
   })
   return { rows, issues, ignored }
+}
+
+// ——— Picking a verse of the day ————————————————————————————————
+/** Every verse a passage covers, as (chapter, verse) with the part letter dropped (« 10a » → 10). A chapter alone covers all of it. */
+export function passageVerses(p: StructuredPassage): { chapter: number; verse: number }[] {
+  const out: { chapter: number; verse: number }[] = []
+  const range = (chapter: number, from: number, to: number) => {
+    for (let v = from; v <= to; v++) out.push({ chapter, verse: v })
+  }
+  for (const s of p.segments) {
+    const last = s.endChapter ?? s.chapter
+    const first = s.from != null ? verseDigits(s.from) : 1
+    if (s.endChapter && s.endChapter !== s.chapter) {
+      range(s.chapter, first, verseCount(p.book, s.chapter))
+      for (let c = s.chapter + 1; c < last; c++) range(c, 1, verseCount(p.book, c))
+      range(last, 1, s.to != null ? verseDigits(s.to) : verseCount(p.book, last))
+    } else
+      range(
+        s.chapter,
+        first,
+        s.to != null ? verseDigits(s.to) : s.from != null ? first : verseCount(p.book, s.chapter),
+      )
+  }
+  return out
+}
+
+/** One verse among all those of a day's passages (readings and psalm), as a stored reference (« Amos 4, 7 »). `random` is 0 ≤ x < 1. */
+export function pickVerse(passages: string[], random: () => number = Math.random): string | null {
+  const all = passages.flatMap((raw) => {
+    const sp = parseStructured(raw)
+    return sp ? passageVerses(sp).map((v) => ({ book: sp.book, ...v })) : []
+  })
+  const v = all[Math.floor(random() * all.length)]
+  if (!v) return null
+  return formatStructured({
+    book: v.book,
+    segments: [{ chapter: v.chapter, from: v.verse, endChapter: null, to: null }],
+  })
 }

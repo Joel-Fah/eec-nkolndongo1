@@ -5,6 +5,7 @@
  * colline »; Council = names only with a recorded consent. Data: cached public API; never a 500 when it is down.
  */
 import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
 import Site from '../../layouts/Site.astro'
 import { publicJson } from '../../lib/content-api'
@@ -50,9 +51,10 @@ Astro.response.headers.set(
           {
             milestones.map((m, i) => {
               const pics = (m.images ?? []) as never[]
-              const layout = m.layout && m.layout !== 'auto' ? m.layout : ({ 1: 'one', 2: 'stack', 3: 'fan', 4: 'bento' } as Record<number, string>)[pics.length] ?? 'row'
+              const chosen = m.layout && m.layout !== 'auto' ? m.layout : ({ 2: 'stack', 3: 'fan', 4: 'bento' } as Record<number, string>)[pics.length] ?? 'scatter'
+              const layout = ['fan', 'stack', 'bento', 'scatter'].includes(chosen) ? chosen : 'scatter'
               return (
-                <li class="hc-item" data-milestone data-side={i % 2 === 0 ? 'l' : 'r'}>
+                <li class="hc-item" data-milestone data-side={i % 2 === 0 ? 'l' : 'r'} data-last={i === milestones.length - 1 ? '' : undefined}>
                   <span class="hc-dot" data-node aria-hidden="true"></span>
                   <div class="hc-card">
                     <h3 class="hc-head">
@@ -63,7 +65,7 @@ Astro.response.headers.set(
                     {pics.length > 0 && (
                       <div class="hc-deck" data-layout={pics.length === 1 ? 'one' : layout} style={`--n:${pics.length}`}>
                         {pics.map((pic, j) => (
-                          <figure class="hc-pic" style={`--i:${j}`}>
+                          <figure class="hc-pic" style={`--i:${j};--rx:${(((i * 7 + j * 13) % 11) - 5) * 1.6}deg;--dx:${(((i * 5 + j * 9) % 7) - 3) * 4}%;--dy:${(((i * 3 + j * 5) % 5) - 2) * 5}%`}>
                             <Picture class="hc-img" media={pic} sizes="(min-width: 48rem) 20rem, 90vw" decorative />
                           </figure>
                         ))}
@@ -76,19 +78,28 @@ Astro.response.headers.set(
           }
         </ol>
         <div class="hc-end">
-          <Illustration name="church" class="hc-art" />
           <p class="hc-end-kicker">{s('invite_kicker')}</p>
           <h3 class="hc-end-t">{s('invite_t')}</h3>
           <p class="hc-end-p">{slot('invite')?.text ?? s('invite_p')}</p>
           <ol class="hc-ways">
-            <li><span class="hc-way-n" aria-hidden="true">1</span><span><strong>{s('way1_t')}</strong>{s('way1_p')}</span></li>
-            <li><span class="hc-way-n" aria-hidden="true">2</span><span><strong>{s('way2_t')}</strong>{s('way2_p')}</span></li>
-            <li><span class="hc-way-n" aria-hidden="true">3</span><span><strong>{s('way3_t')}</strong>{s('way3_p')}</span></li>
+            {
+              [
+                { art: 'exploring', t: s('way1_t'), p: s('way1_p') },
+                { art: 'solidarity', t: s('way2_t'), p: s('way2_p') },
+                { art: 'collecting', t: s('way3_t'), p: s('way3_p') },
+              ].map((w, n) => (
+                <li class="hc-way" style={`--n:${n}`}>
+                  <div class="hc-way-art"><Illustration name={w.art} /></div>
+                  <p class="hc-way-t">{w.t}</p>
+                  <p class="hc-way-p">{w.p}</p>
+                </li>
+              ))
+            }
           </ol>
           <p class="hc-actions">
-            <Button href={path('trouver')} size="lg">{s('visit')}</Button>
-            <Button href={path('departements')} variant="secondary" size="lg">{s('groups')}</Button>
-            <Button href={path('account')} variant="ghost" size="lg">{s('join')}</Button>
+            <Button href={path('trouver')} size="lg"><Icon name="location" size={20} />{s('visit')}</Button>
+            <Button href={path('departements')} variant="secondary" size="lg"><Icon name="users" size={20} />{s('groups')}</Button>
+            <Button href={path('account')} variant="ghost" size="lg">{s('join')}<Icon name="external" size={20} /></Button>
           </p>
         </div>
       </section>
@@ -231,7 +242,7 @@ Astro.response.headers.set(
     margin-block-start: 0.75rem;
     color: var(--ink-muted);
   }
-  /* A step's pictures as a deck of cards. Hovering one lifts it a little and brings it to the front. */
+  /* A step's pictures as a deck of cards. Every picture grows a little when hovered. */
   .hc-deck {
     position: relative;
     display: grid;
@@ -247,6 +258,7 @@ Astro.response.headers.set(
     aspect-ratio: 4 / 3;
     transition:
       transform var(--duration-ui, 0.28s) var(--ease-out, ease),
+      scale var(--duration-ui, 0.28s) var(--ease-out, ease),
       box-shadow var(--duration-ui, 0.28s) var(--ease-out, ease);
   }
   .hc-pic :global(img),
@@ -257,11 +269,14 @@ Astro.response.headers.set(
   }
   .hc-pic:hover {
     z-index: 5;
+    scale: 1.06;
     box-shadow: var(--elevation-3, var(--elevation-2));
   }
-  .hc-deck[data-layout='one'] .hc-pic:hover {
-    transform: translateY(-4px) scale(1.02);
+  /* One picture (the last step's is tilted, as if pinned there). */
+  .hc-item[data-last] .hc-deck[data-layout='one'] .hc-pic {
+    transform: rotate(-3.5deg);
   }
+  /* Fan: hovering the deck opens it so each card can be seen; the hovered one grows. */
   .hc-deck[data-layout='fan'] .hc-pic,
   .hc-deck[data-layout='stack'] .hc-pic {
     grid-area: 1 / 1;
@@ -271,24 +286,26 @@ Astro.response.headers.set(
   }
   .hc-deck[data-layout='fan'] .hc-pic {
     --o: calc(var(--i) - (var(--n) - 1) / 2);
-    width: 66%;
+    width: 64%;
     justify-self: center;
-    transform: translateX(calc(var(--o) * 18%)) rotate(calc(var(--o) * 6deg));
+    transform: translateX(calc(var(--o) * 16%)) rotate(calc(var(--o) * 6deg));
     transform-origin: 50% 110%;
   }
-  .hc-deck[data-layout='fan'] .hc-pic:hover {
-    transform: translateX(calc(var(--o) * 18%)) translateY(-10px) rotate(0deg) scale(1.05);
+  .hc-deck[data-layout='fan']:hover .hc-pic {
+    transform: translateX(calc(var(--o) * 52%)) rotate(calc(var(--o) * 3deg));
+  }
+  /* Stack: slightly offset cards. */
+  .hc-deck[data-layout='stack'] {
+    padding-block-end: 2.5rem;
   }
   .hc-deck[data-layout='stack'] .hc-pic {
     width: 82%;
     transform: translate(calc(var(--i) * 9%), calc(var(--i) * 9%)) rotate(calc(var(--i) * -2.5deg));
   }
-  .hc-deck[data-layout='stack'] .hc-pic:hover {
-    transform: translate(calc(var(--i) * 9%), calc(var(--i) * 9% - 8px)) rotate(0deg) scale(1.04);
+  .hc-deck[data-layout='stack']:hover .hc-pic {
+    transform: translate(calc(var(--i) * 14%), calc(var(--i) * 12%)) rotate(calc(var(--i) * -3deg));
   }
-  .hc-deck[data-layout='stack'] {
-    padding-block-end: 2.5rem;
-  }
+  /* Bento: a wide picture, and smaller ones below that tuck slightly over it. */
   .hc-deck[data-layout='bento'] {
     grid-template-columns: repeat(6, 1fr);
     gap: 0.5rem;
@@ -296,31 +313,48 @@ Astro.response.headers.set(
   .hc-deck[data-layout='bento'] .hc-pic {
     grid-column: span 2;
     aspect-ratio: 1;
+    margin-block-start: -1.75rem;
+    border: 0.25rem solid var(--surface);
+    position: relative;
+    z-index: 1;
   }
   .hc-deck[data-layout='bento'] .hc-pic:first-child {
     grid-column: span 6;
     aspect-ratio: 16 / 9;
+    margin-block-start: 0;
+    border: 0;
+    z-index: 0;
   }
-  .hc-deck[data-layout='bento'] .hc-pic:hover,
-  .hc-deck[data-layout='row'] .hc-pic:hover {
-    transform: translateY(-5px) scale(1.04);
+  /* Scatter: polaroids dropped on the table. */
+  .hc-deck[data-layout='scatter'] {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    padding-block: 1rem 2rem;
   }
-  .hc-deck[data-layout='row'] {
-    grid-auto-flow: column;
-    grid-auto-columns: 70%;
-    gap: 0.75rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+  .hc-deck[data-layout='scatter'] .hc-pic {
+    padding: 0.5rem 0.5rem 1.75rem;
+    border-radius: var(--radius-xs, 0.25rem);
+    background: #fff;
+    aspect-ratio: 1;
+    margin: -0.5rem;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rx));
   }
-  .hc-deck[data-layout='row'] .hc-pic {
-    scroll-snap-align: center;
+  .hc-deck[data-layout='scatter'] .hc-pic :global(img),
+  .hc-deck[data-layout='scatter'] .hc-pic :global(picture) {
+    border-radius: 0.125rem;
+  }
+  .hc-deck[data-layout='scatter'] .hc-pic:hover {
+    transform: translate(var(--dx), var(--dy)) rotate(0deg);
   }
   @media (prefers-reduced-motion: reduce) {
     .hc-pic {
       transition: none;
     }
     .hc-pic:hover {
-      transform: none !important;
+      scale: 1;
+    }
+    .hc-deck:hover .hc-pic {
+      transform: none;
     }
   }
   @media (max-width: 47.99rem) {
@@ -342,18 +376,13 @@ Astro.response.headers.set(
       text-align: start;
     }
   }
+  /* The closing invitation: open on the page, no card around it. */
   .hc-end {
     display: grid;
     justify-items: center;
     gap: 1rem;
-    padding: clamp(1.5rem, 4vw, 3rem);
-    border-radius: var(--radius-xl);
-    background: var(--primary-soft);
+    padding-block: 2rem 1rem;
     text-align: center;
-  }
-  .hc :global(.hc-art) {
-    width: min(100%, 14rem);
-    height: auto;
   }
   .hc-end-kicker {
     font-size: var(--text-sm);
@@ -373,34 +402,76 @@ Astro.response.headers.set(
     max-width: 52ch;
     font-size: var(--text-lg);
   }
+  /* Three polaroid cards, fanned; hovering the row opens them out. Each: a themed tile with its illustration cropped 10 % at the foot. */
   .hc-ways {
     display: grid;
-    gap: 0.75rem;
-    width: min(100%, 44rem);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-    text-align: start;
+    grid-template-columns: repeat(3, minmax(0, 15rem));
+    justify-content: center;
+    margin-block: 1.5rem;
+    padding-block: 1rem;
   }
-  .hc-ways li {
-    display: flex;
-    gap: 0.75rem;
-    padding: 0.875rem 1rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    box-shadow: var(--elevation-1);
-  }
-  .hc-ways strong {
-    display: block;
-  }
-  .hc-way-n {
+  .hc-way {
+    --o: calc(var(--n) - 1);
     display: grid;
-    flex: none;
-    place-items: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: var(--primary);
-    color: var(--on-primary);
-    font-weight: 700;
+    gap: 0.25rem;
+    padding: 0.625rem 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-2);
+    text-align: start;
+    transform: translateX(calc(var(--o) * -14%)) rotate(calc(var(--o) * 5deg));
+    transition:
+      transform var(--duration-ui, 0.28s) var(--ease-out, ease),
+      scale var(--duration-ui, 0.28s) var(--ease-out, ease),
+      box-shadow var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hc-ways:hover .hc-way {
+    transform: translateX(calc(var(--o) * 4%)) rotate(calc(var(--o) * 2deg));
+  }
+  .hc-way:hover {
+    z-index: 2;
+    scale: 1.05;
+  }
+  .hc-way-art {
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    aspect-ratio: 1;
+  }
+  .hc-way-art :global(.illo) {
+    display: block;
+    margin-block-end: -10%;
+  }
+  .hc-way-art :global(img) {
+    width: 100%;
+    height: auto;
+  }
+  .hc-way-t {
+    padding-block-start: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+  .hc-way-p {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  @media (max-width: 47.99rem) {
+    .hc-ways {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding-inline: 1.5rem;
+    }
+    .hc-way {
+      transform: rotate(calc(var(--o) * 2.5deg));
+    }
+    .hc-ways:hover .hc-way {
+      transform: rotate(calc(var(--o) * 2.5deg));
+    }
+    /* On a phone the pictures of a step are a little wider than the column, so they feel big. */
+    .hc-deck {
+      margin-inline: -2.5rem -1rem;
+    }
   }
   .hc-actions {
     display: flex;

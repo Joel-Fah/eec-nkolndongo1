@@ -32,7 +32,7 @@ export const slotBody = z
   .partial()
   .strict()
 /** How a step's pictures sit: auto picks one by the number of pictures. */
-export const MILESTONE_LAYOUTS = ['auto', 'fan', 'stack', 'bento', 'row'] as const
+export const MILESTONE_LAYOUTS = ['auto', 'fan', 'stack', 'bento', 'scatter'] as const
 export const milestoneBody = z
   .object({
     year: text(40),

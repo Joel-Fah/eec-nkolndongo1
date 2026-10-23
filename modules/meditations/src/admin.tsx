@@ -14,6 +14,7 @@ import {
   type ImportResult,
   parsePsalm,
   parseStructured,
+  pickVerse,
   type Reading,
   readMeditationCsv,
 } from '@eec/core'
@@ -484,7 +485,17 @@ function DayForm({
 }) {
   const { t, locale } = useLocale()
   const lang = locale === 'en' ? 'en' : 'fr'
-  const [v, setV] = useState(day)
+  // A day without a verse gets one drawn at random among its own verses (readings and psalm).
+  const [v, setV] = useState(() => ({
+    ...day,
+    verseRef:
+      day.verseRef ||
+      pickVerse([
+        ...day.readings.map((r) => r.ref),
+        ...(day.psalm ? [`Psaumes ${day.psalm}`] : []),
+      ]) ||
+      '',
+  }))
   const [confirmDelete, setConfirmDelete] = useState(false)
   const set = <K extends keyof Day>(key: K, value: Day[K]) => setV((x) => ({ ...x, [key]: value }))
   const setReading = (i: number, next: Reading) =>
@@ -508,27 +519,38 @@ function DayForm({
   const choices =
     v.verseRef && !passages.includes(v.verseRef) ? [...passages, v.verseRef] : passages
   // The verse of the day starts as the first verse of the first passage; the editor can pick another passage or narrow it.
-  const verseRef = v.verseRef || firstVerse(choices[0] ?? '')
+  const verseRef = v.verseRef
+  const drawVerse = () => {
+    setAutoText(true)
+    setAutoFr(true)
+    set('verseRef', pickVerse(passages) ?? '')
+  }
+  // The first time passages exist, draw.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only when the passages first appear
+  useEffect(() => {
+    if (!v.verseRef && passages.length) drawVerse()
+  }, [passages.length])
   const [autoText, setAutoText] = useState(!day.verseEn)
+  const [autoFr, setAutoFr] = useState(!day.verseFr)
   const [loadingText, setLoadingText] = useState(false)
   // biome-ignore lint/correctness/useExhaustiveDependencies: refetch when the verse changes
   useEffect(() => {
-    if (!canEdit || !autoText || !verseRef) return
+    if (!canEdit || !verseRef || !(autoText || autoFr)) return
     const timer = setTimeout(async () => {
       setLoadingText(true)
-      try {
-        const r = await api<{ text: string }>(
-          `/meditations/bible-text?ref=${encodeURIComponent(verseRef)}`,
+      const get = (l: 'fr' | 'en') =>
+        api<{ text: string }>(
+          `/meditations/bible-text?ref=${encodeURIComponent(verseRef)}&locale=${l}`,
+        ).then(
+          (r) => r.text,
+          () => null,
         )
-        setV((x) => ({ ...x, verseEn: r.text }))
-      } catch {
-        // No text found (or the service is down): the editor types it.
-      } finally {
-        setLoadingText(false)
-      }
+      const [fr, en] = await Promise.all([autoFr ? get('fr') : null, autoText ? get('en') : null])
+      setV((x) => ({ ...x, ...(fr ? { verseFr: fr } : {}), ...(en ? { verseEn: en } : {}) }))
+      setLoadingText(false)
     }, 600)
     return () => clearTimeout(timer)
-  }, [verseRef, autoText])
+  }, [verseRef, autoText, autoFr])
   const save = useMutation({
     mutationFn: () =>
       api(`/meditations/plans/${planId}/days/${day.date}`, {
@@ -628,6 +650,14 @@ function DayForm({
               onValueChange={(x) => x && set('verseRef', firstVerse(x))}
               options={choices.map((p) => ({ value: p, label: formatPassage(p, lang) }))}
             />
+            {canEdit && (
+              <div>
+                <Button variant="secondary" size="sm" onClick={drawVerse}>
+                  <Icon name="refresh" size={16} />
+                  {t(k('verse_draw'))}
+                </Button>
+              </div>
+            )}
             {parseStructured(verseRef)?.segments[0] && (
               <RefEditor
                 idPrefix={`${day.date}-verse`}
@@ -635,6 +665,7 @@ function DayForm({
                 value={toBibleRef(verseRef)}
                 onChange={(r) => {
                   setAutoText(true)
+                  setAutoFr(true)
                   set(
                     'verseRef',
                     formatStructured({
@@ -660,9 +691,12 @@ function DayForm({
             placeholder=""
             textarea
             value={v.verseFr}
-            hint={t(k('verse_fr_help'))}
+            hint={loadingText ? t(k('verse_loading')) : t(k('verse_fr_help'))}
             disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('verseFr', e.target.value)}
+            onChange={(e: { target: { value: string } }) => {
+              setAutoFr(false)
+              set('verseFr', e.target.value)
+            }}
           />
           <TextField
             label={t(k('verse_en'))}

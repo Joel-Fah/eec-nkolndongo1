@@ -80,6 +80,7 @@ type Full = Item & {
   locationFr: string
   locationEn: string
   registrationUrl: string | null
+  acceptsRegistrations: boolean
   coverMediaId: string | null
 }
 type Draft = Pick<
@@ -101,6 +102,7 @@ type Draft = Pick<
   | 'coverMediaId'
   | 'groupId'
   | 'featured'
+  | 'acceptsRegistrations'
   | 'kind'
   | 'slug'
 >
@@ -619,6 +621,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
       coverMediaId: r.coverMediaId,
       groupId: r.groupId,
       featured: r.featured,
+      acceptsRegistrations: r.acceptsRegistrations,
       kind: r.kind,
       slug: r.slug,
     }
@@ -1177,7 +1180,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                   {t(k('duplicate'))}
                 </Button>
               )}
-              {canRegister && (
+              {canRegister && draft.acceptsRegistrations && (
                 <a
                   className="btn btn-secondary btn-sm"
                   href={`${location.pathname.split('/m/')[0]}/m/registrations#new:${draft.slug}`}
@@ -1247,6 +1250,12 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
               <code className="admin-link-box">{draft.slug}</code>
               <p className="text-xs text-ink-muted">{t(k('side_slug_help'))}</p>
             </div>
+            <SwitchField
+              label={t(k('side_registrations'))}
+              checked={draft.acceptsRegistrations}
+              onCheckedChange={(v: boolean) => set('acceptsRegistrations', v)}
+            />
+            <p className="text-xs text-ink-muted">{t(k('side_registrations_help'))}</p>
             <SwitchField
               label={t(k('side_feature'))}
               checked={draft.featured}

@@ -201,7 +201,7 @@
   "view_grid": "Grille",
   "new_from_event": "Nouveau formulaire pour un événement",
   "new_from_event_help": "Une inscription est toujours liée à un événement de l’Agenda. Choisissez-le : le titre et le jour s’en déduisent.",
-  "new_no_event": "Tous les événements à venir ont déjà un formulaire, ou il n’y en a pas : créez d’abord l’événement dans l’Agenda.",
+  "new_no_event": "Aucun événement à venir n’accepte (encore) d’inscriptions, ou ils ont déjà un formulaire. Dans l’Agenda, ouvrez l’événement et cochez « Cet événement accepte des inscriptions ».",
   "new_go": "Créer le formulaire",
   "cancel": "Annuler",
   "f_event": "Événement",
