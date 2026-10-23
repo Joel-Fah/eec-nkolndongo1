@@ -6,7 +6,14 @@ import { index, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-c
 export const BLOCK_KINDS = ['announcements', 'sunday', 'agenda', 'meditations', 'text'] as const
 export type BlockKind = (typeof BLOCK_KINDS)[number]
 /** One line of a block: a short heading and its text, in both languages (English optional). */
-export type BulletinItem = { titleFr: string; titleEn: string; textFr: string; textEn: string }
+/** `key` ties a line to the record it came from (a Sunday's readings, an event, a day of meditation, a news item). */
+export type BulletinItem = {
+  titleFr: string
+  titleEn: string
+  textFr: string
+  textEn: string
+  key?: string
+}
 export type BulletinBlock = {
   id: string
   kind: BlockKind

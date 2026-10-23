@@ -1,6 +1,10 @@
 # Remplir « Ce dimanche »
 
-La carte **Ce dimanche** de l'accueil montre le thème, les lectures et, si les personnes sont d'accord, qui prêche.
+## Ce que c’est
+
+**Ce dimanche** est la carte de l’accueil qui annonce le prochain culte : son thème, ses lectures et, si les personnes sont d’accord, qui prêche. Elle se prépare dans **Liturgie**, un dimanche à la fois.
+
+## Pas à pas
 
 1. Ouvrez **Liturgie**, onglet **Dimanches**. Les dimanches **à préparer** sont en haut.
 2. Choisissez le dimanche, puis remplissez le **thème** et les **lectures** (**Ajouter une lecture**).

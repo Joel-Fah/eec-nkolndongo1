@@ -1,6 +1,10 @@
 # Aide-mémoire : Responsable de groupe
 
-Vous gérez **votre** groupe.
+## Ce que c’est
+
+Cette fiche tient sur une page, à imprimer : elle résume ce que fait un **responsable de groupe** (celui qui gère la page et les personnes de son groupe).
+
+## Pas à pas
 
 1. **Page du groupe** : Groupes → votre groupe → Page publique → Publier.
 2. **Personnes affichées** : seulement avec leur accord (case à cocher).

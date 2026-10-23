@@ -1,6 +1,8 @@
 # Add a sermon
 
-A sermon has a **text page** on the site and, if you have them, a **YouTube video** and **links** (for example the audio on Google Drive). **Only the title is required.**
+## What it is
+
+A **sermon** has a **text page** on the site and, if you have them, a **YouTube video** and **links** (for example the audio on Google Drive). The site stores no audio file: it points to where the file lives. **Only the title is required.**
 
 ## Step by step
 

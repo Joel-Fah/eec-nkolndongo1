@@ -1,6 +1,10 @@
 # Cheat sheet: Editor
 
-You write and publish the site's content.
+## What it is
+
+This one-page sheet is meant for printing: it sums up what an **editor** (the person who writes and publishes the site’s content) does.
+
+## Step by step
 
 1. **News**: Actualités → Écrire → Publier (or Programmer).
 2. **Event**: Agenda → Créer. Use Répétition for a regular meeting; "Annuler cette date" for a single date.

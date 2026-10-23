@@ -1,6 +1,10 @@
 # Answer incoming messages
 
-Contact form messages arrive in **Messages**.
+## What it is
+
+**Messages** is the inbox of the site’s contact form: what visitors write to the parish. Each message has a status (new, taken, handled) so that nobody answers twice.
+
+## Step by step
 
 1. Open **Messages**. New ones are marked.
 2. Click a message to read it. Click **Prendre en charge** (take it) to say "I'm on it".

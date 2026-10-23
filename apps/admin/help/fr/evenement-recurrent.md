@@ -1,6 +1,10 @@
 # Ajouter un événement qui se répète
 
-Pour un rendez-vous régulier (une répétition, une rencontre mensuelle), créez l'événement **une seule fois**.
+## Ce que c’est
+
+Un **événement récurrent** est un rendez-vous qui revient (une répétition, une rencontre mensuelle). On le crée **une seule fois** avec sa règle de répétition ; le site en déduit toutes les dates à venir.
+
+## Pas à pas
 
 1. Ouvrez **Agenda**, puis **Créer un événement**.
 2. Indiquez le titre, la date et l'heure de la première fois.

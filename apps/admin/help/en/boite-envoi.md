@@ -1,6 +1,10 @@
 # Relay an outbox message
 
-The site does not send e-mails yet. Messages that should go out (reset link, invitation) wait in **Boîte d'envoi**.
+## What it is
+
+The **Outbox** is the list of messages the site should send by e-mail (password reset link, invitation). The site does not send e-mails yet: these messages wait there, and you pass them on by hand.
+
+## Step by step
 
 1. Open **Boîte d'envoi**: the **À transmettre** tab lists what is waiting.
 2. Copy the **link** and send it yourself to the person (WhatsApp, SMS, call).

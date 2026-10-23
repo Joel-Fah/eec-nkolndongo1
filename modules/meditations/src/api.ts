@@ -14,10 +14,14 @@ import {
   versionFor,
 } from '@eec/api-kit'
 import {
+  checkPassage,
+  checkPsalm,
+  defaultLabel,
   formatPassage,
   formatPsalm,
-  PASSAGE_TAIL,
   parsePassage,
+  parsePsalm,
+  parseStructured,
   READING_LABELS,
   slugify,
   uniqueSlug,
@@ -37,16 +41,16 @@ const todayLocal = () =>
 
 const reading = z
   .object({
-    label: z.union([z.enum(READING_LABELS), z.literal('')]),
+    label: z.enum(READING_LABELS),
     ref: z
       .string()
       .trim()
       .min(2)
       .max(80)
       .refine((r) => {
-        const p = parsePassage(r)
-        // The book part is letters, digits, spaces and dots only (never markup); the numbers follow the usual shape.
-        return /^[\p{L}0-9 .’']+$/u.test(p.name) && (p.tail === '' || PASSAGE_TAIL.test(p.tail))
+        // Every passage must exist: the book is known, the chapters and verses are inside it.
+        const structured = parseStructured(r)
+        return !!structured && checkPassage(structured) === null
       }),
   })
   .strict()
@@ -54,7 +58,11 @@ const psalm = z
   .string()
   .trim()
   .max(40)
-  .refine((p) => p === '' || PASSAGE_TAIL.test(p))
+  .refine((p) => {
+    if (p === '') return true
+    const ps = parsePsalm(p)
+    return !!ps && checkPsalm(ps) === null
+  })
 
 export const dayBody = z
   .object({
@@ -112,7 +120,10 @@ function dayDto(d: DayRow, locale: Locale) {
   return {
     date: d.date,
     headline: (en && d.headlineEn) || d.headlineFr,
-    readings: d.readings.map((r) => ({ label: r.label, ref: formatPassage(r.ref, locale) })),
+    readings: d.readings.map((r) => ({
+      label: r.label || defaultLabel(parsePassage(r.ref).book),
+      ref: formatPassage(r.ref, locale),
+    })),
     psalm: d.psalm ? formatPsalm(d.psalm, locale) : '',
     reflection: (en && d.reflectionEn) || d.reflectionFr,
     // A verse is shown only when its text exists in the reader's translation (we never quote what we may not).
@@ -257,10 +268,18 @@ export const meditationsApi = new Hono<AppEnv>()
       .select({
         p: meditationPlans,
         n: sql<number>`(select count(*)::int from meditation_days d where d.plan_id = meditation_plans.id)`,
+        first: sql<
+          string | null
+        >`(select min(d.date) from meditation_days d where d.plan_id = meditation_plans.id)`,
+        last: sql<
+          string | null
+        >`(select max(d.date) from meditation_days d where d.plan_id = meditation_plans.id)`,
       })
       .from(meditationPlans)
       .orderBy(desc(meditationPlans.startsOn))
-    return c.json({ items: rows.map((r) => ({ ...r.p, days: r.n })) })
+    return c.json({
+      items: rows.map((r) => ({ ...r.p, days: r.n, firstDay: r.first, lastDay: r.last })),
+    })
   })
   .post('/plans', requirePermission('meditations:edit'), async (c) => {
     const body = planBody.safeParse(await c.req.json().catch(() => null))

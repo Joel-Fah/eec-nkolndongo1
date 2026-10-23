@@ -1,6 +1,8 @@
 # Que veut dire « valider » ?
 
-Sur le site, les **faits** (horaires, adresse, numéros de don, chiffres) ne s'affichent que lorsqu'une personne autorisée les a **relus et validés**. Tant que ce n'est pas fait, le site dit « bientôt » ou n'affiche rien.
+## Ce que c’est
+
+**Valider**, c’est confirmer qu’une information (horaire, adresse, numéro de don, chiffre) est exacte. Sur le site, les **faits** ne s’affichent que lorsqu’une personne autorisée les a relus et validés ; tant que ce n’est pas fait, le site dit « bientôt » ou n’affiche rien.
 
 ## Si vous validez
 

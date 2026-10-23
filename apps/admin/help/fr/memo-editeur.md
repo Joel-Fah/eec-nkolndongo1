@@ -1,6 +1,10 @@
 # Aide-mémoire : Éditeur
 
-Vous écrivez et publiez les contenus du site.
+## Ce que c’est
+
+Cette fiche tient sur une page, à imprimer : elle résume ce que fait un **éditeur** (celui qui écrit et publie les contenus du site).
+
+## Pas à pas
 
 1. **Actualité** : Actualités → Écrire → Publier (ou Programmer).
 2. **Événement** : Agenda → Créer. Répétition pour un rendez-vous régulier ; « Annuler cette date » pour une seule date.

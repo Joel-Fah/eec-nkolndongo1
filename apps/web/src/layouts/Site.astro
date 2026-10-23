@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions'
 import Footer from '../components/Footer.astro'
 import Header from '../components/Header.astro'
+import SiteLockup from '../components/SiteLockup.astro'
 import { alternates } from '../lib/nav'
 import Base from './Base.astro'
 
@@ -12,8 +13,10 @@ interface Props {
   image?: string
   imageAlt?: string
   type?: 'website' | 'article'
+  /** The printed letterhead (mark + full names). Off for a page that prints its own inside a named @page. */
+  letterhead?: boolean
 }
-const { title, description, noindex, image, imageAlt, type } = Astro.props
+const { title, description, noindex, image, imageAlt, type, letterhead = true } = Astro.props
 ---
 
 <Base title={title} description={description} noindex={noindex} alternates={alternates(Astro.url.pathname)} image={image} imageAlt={imageAlt} type={type}>
@@ -22,6 +25,13 @@ const { title, description, noindex, image, imageAlt, type } = Astro.props
     <slot name="head" />
   </Fragment>
   <Header />
+  {
+    letterhead && (
+      <div class="print-letterhead" aria-hidden="true">
+        <SiteLockup variant="two" class="text-[1.1rem]" />
+      </div>
+    )
+  }
   <main id="main" class="page" tabindex="-1">
     <slot />
   </main>
@@ -29,6 +39,29 @@ const { title, description, noindex, image, imageAlt, type } = Astro.props
 </Base>
 
 <style is:global>
+  /* Anything printed or saved as PDF carries the parish's mark and full names, and none of the site's navigation. */
+  .print-letterhead {
+    display: none;
+  }
+  @media print {
+    .print-letterhead {
+      display: block;
+      width: min(100%, 26rem);
+      margin: 0 0 1.25rem;
+      color: #000;
+    }
+    .skip-link,
+    .site-ribbon,
+    .site-header,
+    header.site-header,
+    .site-cta,
+    .site-footer,
+    .site-playground,
+    #mobile-menu,
+    #search-dialog {
+      display: none !important;
+    }
+  }
   /* Page turn: the old page slides away a little and fades, the new one arrives from the other side. */
   @keyframes eec-page-out {
     to {

@@ -108,7 +108,7 @@ const { name = '', href, label } = Astro.props
 
 <script>
   // The drawing traces itself the first time the map scrolls into view (instantly, if motion is reduced). Once the building has
-  // risen, a click on it makes it bounce (the building only; a squash and a hop, once at a time). Decorative: no keyboard role.
+  // risen, a click on it makes it bounce (the whole map answers, the building bounces; a squash and a hop, once at a time). Decorative: no keyboard role.
   const RISE_MS = 3300
   const run = () => {
     for (const el of document.querySelectorAll<HTMLElement>('[data-map]:not([data-js])')) {
@@ -116,7 +116,9 @@ const { name = '', href, label } = Astro.props
       const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
       const bld = el.querySelector<SVGGElement>('.mi-bld')
       let bouncing = false
-      bld?.addEventListener('click', () => {
+      // A click anywhere on the map (not on the directions button) makes the building bounce.
+      el.addEventListener('click', (e) => {
+        if (!bld || (e.target as Element).closest('.mi-cta, a, button')) return
         if (reduced || bouncing || !el.hasAttribute('data-ready')) return
         bouncing = true
         const a = bld.animate(
@@ -200,7 +202,7 @@ const { name = '', href, label } = Astro.props
       transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s,
       opacity 0.3s ease 2.2s;
   }
-  .mi[data-ready] .mi-bld {
+  .mi[data-ready] svg {
     cursor: pointer;
   }
   .mi[data-js]:not([data-in]) .mi-bld {
@@ -330,7 +332,11 @@ const { name = '', href, label } = Astro.props
     inset-block-end: 0.75rem;
     inset-inline: 0.75rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    pointer-events: none;
+  }
+  .mi-cta :global(a) {
+    pointer-events: auto;
   }
   @media (prefers-reduced-motion: reduce) {
     .draw,

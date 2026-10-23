@@ -1,6 +1,10 @@
 # Répondre aux messages reçus
 
-Les messages du formulaire de contact arrivent dans **Messages**.
+## Ce que c’est
+
+**Messages** est la boîte de réception du formulaire de contact du site : ce que les visiteurs écrivent à la paroisse. Chaque message a un état (nouveau, pris en charge, traité) pour que personne ne réponde deux fois.
+
+## Pas à pas
 
 1. Ouvrez **Messages**. Les nouveaux sont marqués.
 2. Cliquez sur un message pour le lire. Cliquez sur **Prendre en charge** pour dire « je m'en occupe ».

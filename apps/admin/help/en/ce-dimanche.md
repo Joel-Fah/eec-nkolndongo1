@@ -1,6 +1,10 @@
 # Fill in "This Sunday"
 
-The **This Sunday** card on the home page shows the theme, the readings and, if the people agree, who preaches.
+## What it is
+
+**This Sunday** is the home page card that announces the next service: its theme, its readings and, if the people agree, who preaches. It is prepared in **Liturgy**, one Sunday at a time.
+
+## Step by step
 
 1. Open **Liturgie**, tab **Dimanches**. Sundays **to prepare** are at the top.
 2. Pick the Sunday, then fill in the **theme** and the **readings** (**Ajouter une lecture**).

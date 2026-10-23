@@ -1,6 +1,10 @@
 # Schedule a news item
 
-Write now, publish later: the item appears by itself at the chosen date.
+## What it is
+
+**Scheduling** a news item means writing it now and choosing the day and time when it appears on its own on the site.
+
+## Step by step
 
 1. Open the news item (or create one).
 2. Click **Publier**. Under **Quand ?** (when), choose **Plus tard, à un jour et une heure choisis** (later) and enter the date and time.

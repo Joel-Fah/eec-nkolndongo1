@@ -64,7 +64,7 @@ describe('the calendar CSV', () => {
     expect(r.rows[0]).toMatchObject({
       date: '2026-07-01',
       psalm: '89, 31-47',
-      readings: [{ label: '', ref: 'Amos 4, 1-13' }],
+      readings: [{ label: 'ot', ref: 'Amos 4, 1-13' }],
     })
     expect(r.rows[1]?.readings.map((x) => x.label)).toEqual(['ot', 'epistle', 'gospel'])
     expect(r.rows[2]?.headline).toBe('1er Dim. Avent')
@@ -86,5 +86,79 @@ describe('the calendar CSV', () => {
   })
   it('refuses a file without the expected columns', () => {
     expect(readMeditationCsv('a,b\n1,2').issues[0]?.code).toBe('bad_header')
+  })
+})
+
+import { chapterCount, cleanRef, inRange, verseCount } from './bible.ts'
+import {
+  checkPassage,
+  checkPsalm,
+  defaultLabel,
+  formatPsalmRef,
+  formatStructured,
+  parsePsalm,
+  parseStructured,
+} from './meditation.ts'
+
+describe('chapters and verses exist', () => {
+  it('knows how many chapters and verses', () => {
+    expect(chapterCount('jhn')).toBe(21)
+    expect(chapterCount('psa')).toBe(150)
+    expect(verseCount('jhn', 3)).toBe(36)
+    expect(verseCount('psa', 119)).toBe(178) // 176 verses + Segond's 2 extra (titles)
+    expect(chapterCount('3jn')).toBe(1)
+  })
+  it('refuses a chapter or verse that does not exist, accepts a, b parts by their number', () => {
+    expect(inRange('jhn', 140)).toBe(false)
+    expect(inRange('jhn', 3, 16)).toBe(true)
+    expect(inRange('jhn', 3, 173)).toBe(false)
+    expect(inRange('jhn', 5, '9b')).toBe(true)
+    expect(inRange('jhn', 5, '90b')).toBe(false)
+    expect(cleanRef({ book: 'jhn', chapter: 140, from: 173, to: 180 })).toBeNull()
+    expect(cleanRef({ book: 'jhn', chapter: 3, from: 16 })).not.toBeNull()
+  })
+})
+
+describe('structured passages', () => {
+  it('reads and writes the forms the parish uses, losslessly', () => {
+    for (const raw of [
+      'Amos 4, 1-13',
+      'Jean 7, 53–8, 11',
+      'Esaïe 63, 16-19; 64, 2-7',
+      'Soph. 1, 14–2,3',
+      '3 Jean 1-15',
+      'Jean 5, 9b-18',
+      'Gen. 15, 1-6; 21, 1-3',
+      'Genèse 3',
+      '1 Thessaloniciens 1, 5-10',
+    ]) {
+      const p = parseStructured(raw)
+      expect(p, raw).not.toBeNull()
+      expect(parseStructured(formatStructured(p as NonNullable<typeof p>)), raw).toEqual(p)
+    }
+    expect(formatStructured(parseStructured('1 Thessaloniciens 1, 5-10') as never)).toBe(
+      '1 Thessaloniciens 1, 5-10',
+    )
+    expect(formatStructured(parseStructured('3 Jean 1-15') as never)).toBe('3 Jean 1-15')
+  })
+  it('catches impossible passages with a clear reason', () => {
+    expect(checkPassage(parseStructured('Jean 140, 173-180') as never)?.code).toBe('bad_chapter')
+    expect(checkPassage(parseStructured('Jean 3, 90') as never)?.code).toBe('bad_verse')
+    expect(checkPassage(parseStructured('Jean 3, 16-2') as never)?.code).toBe('bad_order')
+    expect(checkPassage(parseStructured('Jean 3, 16') as never)).toBeNull()
+  })
+  it('the psalm: a number is the whole psalm, number and verses a part', () => {
+    expect(parsePsalm('89, 31-47')).toEqual({ psalm: 89, from: 31, to: 47 })
+    expect(parsePsalm('64')).toEqual({ psalm: 64, from: null, to: null })
+    expect(parsePsalm('1-22')).toBeNull()
+    expect(formatPsalmRef({ psalm: 89, from: 31, to: 47 })).toBe('89, 31-47')
+    expect(checkPsalm({ psalm: 151, from: null, to: null })?.code).toBe('bad_chapter')
+    expect(checkPsalm({ psalm: 23, from: 1, to: 9 })?.code).toBe('bad_verse')
+  })
+  it('names a reading by its book', () => {
+    expect(defaultLabel('amo')).toBe('ot')
+    expect(defaultLabel('jhn')).toBe('gospel')
+    expect(defaultLabel('rom')).toBe('epistle')
+    expect(defaultLabel('rev')).toBe('nt')
   })
 })

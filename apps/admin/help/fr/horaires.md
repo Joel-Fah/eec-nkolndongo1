@@ -1,6 +1,10 @@
 # Mettre à jour les horaires
 
-Les horaires des cultes et rencontres se gèrent dans **Cultes et horaires**.
+## Ce que c’est
+
+Les **horaires** sont la liste des cultes et rencontres de la semaine, telle que les visiteurs la voient sur le site. Ils se gèrent dans **Cultes et horaires**.
+
+## Pas à pas
 
 1. Ouvrez **Cultes et horaires** et choisissez le jour.
 2. Cliquez sur une ligne pour la modifier, ou sur **Ajouter** pour une nouvelle.

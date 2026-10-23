@@ -1,6 +1,8 @@
 # Ajouter une prédication
 
-Une prédication a une **page de texte** sur le site, avec, si vous en avez, une **vidéo YouTube** et des **liens** (par exemple l'audio sur Google Drive). **Seul le titre est obligatoire.**
+## Ce que c’est
+
+Une **prédication** a une **page de texte** sur le site, avec, si vous en avez, une **vidéo YouTube** et des **liens** (par exemple l’audio sur Google Drive). Le site ne stocke aucun fichier audio : il renvoie vers l’endroit où il se trouve. **Seul le titre est obligatoire.**
 
 ## Pas à pas
 

@@ -5,12 +5,13 @@
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { ConfirmDialog } from '@eec/content-kit'
 import {
+  checkPassage,
+  checkPsalm,
   formatPassage,
   formatPsalm,
   type ImportResult,
-  PASSAGE_TAIL,
-  parsePassage,
-  READING_LABELS,
+  parsePsalm,
+  parseStructured,
   type Reading,
   readMeditationCsv,
 } from '@eec/core'
@@ -27,6 +28,7 @@ import {
 } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { PsalmEditor, ReadingEditor } from './passages.tsx'
 
 type Plan = {
   id: string
@@ -39,6 +41,8 @@ type Plan = {
   endsOn: string
   state: 'draft' | 'published'
   days: number
+  firstDay: string | null
+  lastDay: string | null
 }
 type Day = {
   id: string
@@ -55,6 +59,16 @@ type Day = {
 }
 
 const k = (key: string) => `meditations.${key}` as MessageKey
+/** « 1 juil. 2026 »: a day written for the screen's language. */
+const dayFormat = (locale: string) => (d: string) =>
+  new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${d}T12:00:00Z`))
+/** The days a programme really covers: from its first to its last day, or the planned dates while it is empty. */
+const covered = (p: Plan) => ({ from: p.firstDay ?? p.startsOn, to: p.lastDay ?? p.endsOn })
 const say = (title: string, tone: 'success' | 'danger' = 'success') =>
   toastManager.add({ title, data: { tone } })
 
@@ -97,13 +111,7 @@ function Plans({ onOpen }: { onOpen: (id: string) => void }) {
     },
     onError: () => say(t(k('error')), 'danger'),
   })
-  const fmt = (d: string) =>
-    new Intl.DateTimeFormat(locale, {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      timeZone: 'UTC',
-    }).format(new Date(`${d}T12:00:00Z`))
+  const fmt = dayFormat(locale)
   return (
     <div className="grid gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -181,7 +189,8 @@ function Plans({ onOpen }: { onOpen: (id: string) => void }) {
                   {(locale === 'en' && p.titleEn) || p.titleFr}
                 </strong>
                 <span className="text-sm text-ink-muted">
-                  {fmt(p.startsOn)} → {fmt(p.endsOn)} · {t(k('days_count'), { n: String(p.days) })}
+                  {fmt(covered(p).from)} → {fmt(covered(p).to)} ·{' '}
+                  {t(k('days_count'), { n: String(p.days) })}
                 </span>
               </button>
             </li>
@@ -232,10 +241,12 @@ function PlanView({ id, onBack }: { id: string; onBack: () => void }) {
   if (!plan) return <div className="admin-panel" aria-busy="true" />
   return (
     <div className="grid gap-6">
-      <Button variant="ghost" onClick={onBack}>
-        <Icon name="chevronLeft" size={20} />
-        {t(k('back'))}
-      </Button>
+      <div>
+        <Button variant="ghost" onClick={onBack}>
+          <Icon name="chevronLeft" size={20} />
+          {t(k('back'))}
+        </Button>
+      </div>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="grid gap-2">
           <Badge tone={plan.state === 'published' ? 'success' : 'warning'}>
@@ -243,7 +254,8 @@ function PlanView({ id, onBack }: { id: string; onBack: () => void }) {
           </Badge>
           <h1 className="text-4xl">{(locale === 'en' && plan.titleEn) || plan.titleFr}</h1>
           <p className="text-ink-muted">
-            {plan.startsOn} → {plan.endsOn} · {t(k('days_count'), { n: String(plan.days) })}
+            {dayFormat(locale)(covered(plan).from)} → {dayFormat(locale)(covered(plan).to)} ·{' '}
+            {t(k('days_count'), { n: String(plan.days) })}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -300,6 +312,12 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
   const qc = useQueryClient()
   const [month, setMonth] = useState('')
   const [openDate, setOpenDate] = useState<string | null>(null)
+  // The form of the last opened day stays mounted while it folds, so closing animates too.
+  const [mounted, setMounted] = useState<string | null>(null)
+  const toggle = (date: string | null) => {
+    setOpenDate(date)
+    if (date) setMounted(date)
+  }
   const [adding, setAdding] = useState('')
   const q = useQuery({
     queryKey: ['meditation-days', plan.id, month],
@@ -324,9 +342,11 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
   const weekday = (d: string) =>
-    new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', timeZone: 'UTC' }).format(
+    new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(
       new Date(`${d}T12:00:00Z`),
     )
+  const dayNo = (d: string) => String(Number(d.slice(8)))
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
   const items = q.data?.items ?? []
   const shown =
     adding && !items.some((d) => d.date === adding)
@@ -355,7 +375,7 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
             value={adding}
             onChange={(e: { target: { value: string } }) => {
               setAdding(e.target.value)
-              setOpenDate(e.target.value || null)
+              toggle(e.target.value || null)
             }}
           />
         )}
@@ -370,30 +390,42 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
                 type="button"
                 className="med-head"
                 aria-expanded={openDate === d.date}
-                onClick={() => setOpenDate(openDate === d.date ? null : d.date)}
+                onClick={() => toggle(openDate === d.date ? null : d.date)}
               >
-                <span className="med-date">{weekday(d.date)}</span>
-                <span className="med-headline">{d.headlineFr}</span>
-                <span className="med-readings">
-                  {d.readings.map((r) => formatPassage(r.ref, locale)).join(' · ')}
+                <span className="med-date">
+                  {weekday(d.date)} <b>{dayNo(d.date)}</b>
+                  {d.date === today && <Badge tone="info">{t(k('today'))}</Badge>}
+                </span>
+                <span className="med-main">
+                  <span className="med-headline">{d.headlineFr}</span>
+                  <span className="med-readings">
+                    {d.readings.map((r, i) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: a static list
+                      <span key={i}>{formatPassage(r.ref, locale)}</span>
+                    ))}
+                  </span>
                 </span>
                 <span className="med-psalm">{d.psalm ? formatPsalm(d.psalm, locale) : ''}</span>
                 <Icon name="chevronDown" size={16} />
               </button>
-              {openDate === d.date && (
-                <DayForm
-                  key={d.date}
-                  planId={plan.id}
-                  day={d}
-                  canEdit={canEdit}
-                  onDone={() => {
-                    setOpenDate(null)
-                    setAdding('')
-                    qc.invalidateQueries({ queryKey: ['meditation-days', plan.id] })
-                    qc.invalidateQueries({ queryKey: ['meditation-plans'] })
-                  }}
-                />
-              )}
+              <div className="med-collapse" data-open={openDate === d.date ? '' : undefined}>
+                <div className="med-collapse-inner" inert={openDate !== d.date}>
+                  {mounted === d.date && (
+                    <DayForm
+                      key={d.date}
+                      planId={plan.id}
+                      day={d}
+                      canEdit={canEdit}
+                      onDone={() => {
+                        toggle(null)
+                        setAdding('')
+                        qc.invalidateQueries({ queryKey: ['meditation-days', plan.id] })
+                        qc.invalidateQueries({ queryKey: ['meditation-plans'] })
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
             </li>
           ))}
         </ul>
@@ -428,16 +460,31 @@ function DayForm({
   onDone: () => void
 }) {
   const { t, locale } = useLocale()
+  const lang = locale === 'en' ? 'en' : 'fr'
   const [v, setV] = useState(day)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const set = <K extends keyof Day>(key: K, value: Day[K]) => setV((x) => ({ ...x, [key]: value }))
-  const refOk = (r: string) => {
-    const tail = parsePassage(r).tail
-    return r.trim().length >= 2 && (tail === '' || PASSAGE_TAIL.test(tail))
+  const setReading = (i: number, next: Reading) =>
+    set(
+      'readings',
+      v.readings.map((y, j) => (j === i ? next : y)),
+    )
+  const readingOk = (r: Reading) => {
+    const sp = parseStructured(r.ref)
+    return !!sp && !checkPassage(sp) && r.label !== ''
   }
+  const psalmRef = v.psalm.trim() ? parsePsalm(v.psalm) : null
+  const psalmOk = v.psalm.trim() === '' || (!!psalmRef && !checkPsalm(psalmRef))
   const valid =
-    v.readings.every((r) => refOk(r.ref)) &&
-    (v.psalm === '' || PASSAGE_TAIL.test(v.psalm)) &&
-    (v.readings.length > 0 || v.psalm.trim() !== '')
+    v.readings.every(readingOk) && psalmOk && (v.readings.length > 0 || v.psalm.trim() !== '')
+  // The verse of the day is one of the day's own passages: the first one until the editor picks another.
+  const passages = [
+    ...v.readings.filter((r) => parseStructured(r.ref)).map((r) => r.ref),
+    ...(psalmRef ? [`Psaumes ${v.psalm}`] : []),
+  ]
+  const choices =
+    v.verseRef && !passages.includes(v.verseRef) ? [...passages, v.verseRef] : passages
+  const verseRef = v.verseRef || (choices[0] ?? '')
   const save = useMutation({
     mutationFn: () =>
       api(`/meditations/plans/${planId}/days/${day.date}`, {
@@ -449,7 +496,7 @@ function DayForm({
           psalm: v.psalm,
           reflectionFr: v.reflectionFr,
           reflectionEn: v.reflectionEn,
-          verseRef: v.verseRef,
+          verseRef: choices.includes(verseRef) ? verseRef : '',
           verseFr: v.verseFr,
           verseEn: v.verseEn,
         },
@@ -468,10 +515,6 @@ function DayForm({
     },
     onError: () => say(t(k('error')), 'danger'),
   })
-  const passages = [
-    ...v.readings.map((r) => r.ref),
-    ...(v.psalm ? [`Psaumes ${v.psalm}`] : []),
-  ].filter(Boolean)
   return (
     <div className="med-form">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -494,60 +537,20 @@ function DayForm({
         <h3 className="text-lg">{t(k('readings'))}</h3>
         <p className="text-sm text-ink-muted">{t(k('readings_help'))}</p>
         {v.readings.map((r, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
-          <div key={i} className="reading-box">
-            <div className="link-row" data-other="">
-              <SelectField
-                label={t(k('reading_label'))}
-                value={r.label || 'none'}
-                onValueChange={(x) =>
-                  x &&
-                  set(
-                    'readings',
-                    v.readings.map((y, j) =>
-                      j === i ? { ...y, label: x === 'none' ? '' : (x as Reading['label']) } : y,
-                    ),
-                  )
-                }
-                options={[
-                  { value: 'none', label: t(k('label_none')) },
-                  ...READING_LABELS.map((l) => ({ value: l, label: t(k(`label_${l}`)) })),
-                ]}
-              />
-              <TextField
-                label={t(k('reading_ref'))}
-                placeholder="Amos 4, 1-13"
-                hint={
-                  r.ref && !refOk(r.ref)
-                    ? t(k('issue_bad_ref'), { d: r.ref })
-                    : r.ref
-                      ? formatPassage(r.ref, locale === 'en' ? 'en' : 'fr')
-                      : undefined
-                }
-                value={r.ref}
-                disabled={!canEdit}
-                onChange={(e: { target: { value: string } }) =>
-                  set(
-                    'readings',
-                    v.readings.map((y, j) => (j === i ? { ...y, ref: e.target.value } : y)),
-                  )
-                }
-              />
-              <Button
-                variant="secondary"
-                className="reading-remove"
-                aria-label={t(k('remove'))}
-                onClick={() =>
-                  set(
-                    'readings',
-                    v.readings.filter((_, j) => j !== i),
-                  )
-                }
-              >
-                <Icon name="close" size={20} />
-              </Button>
-            </div>
-          </div>
+          <ReadingEditor
+            // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
+            key={i}
+            idPrefix={`${day.date}-r${i}`}
+            value={r}
+            disabled={!canEdit}
+            onChange={(next) => setReading(i, next)}
+            onRemove={() =>
+              set(
+                'readings',
+                v.readings.filter((_, j) => j !== i),
+              )
+            }
+          />
         ))}
         {v.readings.length < 3 && canEdit && (
           <div>
@@ -556,42 +559,32 @@ function DayForm({
               size="sm"
               onClick={() => set('readings', [...v.readings, { label: '', ref: '' }])}
             >
+              <Icon name="plus" size={16} />
               {t(k('add_reading'))}
             </Button>
           </div>
         )}
-        <TextField
-          label={t(k('psalm'))}
-          placeholder={t(k('psalm_ph'))}
-          hint={t(k('psalm_help'))}
-          value={v.psalm}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('psalm', e.target.value)}
-        />
+      </div>
+      <div className="grid gap-2">
+        <h3 className="text-lg">{t(k('psalm'))}</h3>
+        <p className="text-sm text-ink-muted">{t(k('psalm_help'))}</p>
+        <PsalmEditor value={v.psalm} disabled={!canEdit} onChange={(x) => set('psalm', x)} />
       </div>
       <div className="grid gap-2">
         <h3 className="text-lg">{t(k('verse_h'))}</h3>
         <p className="text-sm text-ink-muted">{t(k('verse_help'))}</p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <SelectField
-            label={t(k('verse_pick'))}
-            value="pick"
-            onValueChange={(x) => x && x !== 'pick' && set('verseRef', x === 'none' ? '' : x)}
-            placeholder={t(k('verse_pick'))}
-            options={[
-              { value: 'pick', label: t(k('verse_pick')) },
-              { value: 'none', label: t(k('verse_none')) },
-              ...passages.map((p) => ({ value: p.replace(/^Psaumes /, 'Psaumes '), label: p })),
-            ]}
-          />
-          <TextField
-            label={t(k('verse_ref'))}
-            placeholder="Amos 4, 12"
-            value={v.verseRef}
-            disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('verseRef', e.target.value)}
-          />
-        </div>
+        {choices.length === 0 ? (
+          <p className="text-sm text-ink-muted">{t(k('verse_wait'))}</p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              label={t(k('verse_pick'))}
+              value={verseRef}
+              onValueChange={(x) => x && set('verseRef', x)}
+              options={choices.map((p) => ({ value: p, label: formatPassage(p, lang) }))}
+            />
+          </div>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           <TextField
             label={t(k('verse_fr'))}
@@ -611,54 +604,69 @@ function DayForm({
           />
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <TextField
-          label={t(k('reflection_fr'))}
-          hint={t(k('reflection_help'))}
-          placeholder=""
-          textarea
-          value={v.reflectionFr}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('reflectionFr', e.target.value)}
-        />
-        <TextField
-          label={t(k('reflection_en'))}
-          placeholder=""
-          textarea
-          value={v.reflectionEn}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('reflectionEn', e.target.value)}
-        />
-      </div>
       {canEdit && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Button loading={save.isPending} disabled={!valid} onClick={() => save.mutate()}>
             {t(k('save'))}
           </Button>
           {day.id && (
-            <Button variant="ghost" loading={del.isPending} onClick={() => del.mutate()}>
+            <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+              <Icon name="trash" size={20} />
               {t(k('delete_day'))}
             </Button>
           )}
         </div>
       )}
+      <ConfirmDialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title={t(k('delete_day_t'))}
+        text={t(k('delete_day_p'))}
+        confirmLabel={t(k('delete_day'))}
+        danger
+        busy={del.isPending}
+        onConfirm={() => del.mutate()}
+      />
     </div>
   )
 }
 
 /* ── CSV import ───────────────────────────────────────────────────────── */
+/** The model file: the header the importer reads, an ordinary day, a Sunday with three readings, a holiday headline. */
+const TEMPLATE_CSV = [
+  'Date,Day,Headline,Reading 1 Label,Reading 1 Ref,Reading 2 Label,Reading 2 Ref,Reading 3 Label,Reading 3 Ref,Psalm',
+  '2026-07-01,Mercredi,,,"Amos 4, 1-13",,,,,"89, 31-47"',
+  '2026-07-02,Jeudi,,,"Amos 5, 1-17",,,,,64',
+  '2026-07-05,Dimanche,,Ancien Testament,"Esaïe 63, 16-19; 64, 2-7",Épître,"1 Thessaloniciens 1, 5-10",Évangile,"Matthieu 22, 34-40",18',
+  '2026-12-25,Vendredi,Noël,Ancien Testament,"Esaïe 9, 1-6",Épître,"Tite 2, 11-14",Évangile,"Luc 2, 1-14",96',
+].join('\r\n')
+
+function downloadTemplate() {
+  // A BOM so a spreadsheet opens the accents correctly.
+  const blob = new Blob([`\uFEFF${TEMPLATE_CSV}\r\n`], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'meditations-modele.csv'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 function ImportPanel({ plan, onDone }: { plan: Plan; onDone: () => void }) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
+  const lang = locale === 'en' ? 'en' : 'fr'
   const [text, setText] = useState('')
   const [result, setResult] = useState<ImportResult | null>(null)
   const errors = result?.issues.filter((i) => i.level === 'error') ?? []
   const warnings = result?.issues.filter((i) => i.level === 'warning') ?? []
-  const outside = result?.rows.filter((r) => r.date < plan.startsOn || r.date > plan.endsOn) ?? []
+  const ok = result?.rows.filter((r) => r.valid) ?? []
+  const skipped = (result?.rows.length ?? 0) - ok.length
+  const outside = ok.filter((r) => r.date < plan.startsOn || r.date > plan.endsOn)
   const run = useMutation({
     mutationFn: () =>
       api<{ created: number; updated: number }>(`/meditations/plans/${plan.id}/import`, {
         method: 'POST',
-        body: { rows: (result?.rows ?? []).map(({ line: _l, ...r }) => r) },
+        body: { rows: ok.map(({ line: _l, valid: _v, ...r }) => r) },
       }),
     onSuccess: (r) => {
       say(t(k('import_done'), { created: String(r.created), updated: String(r.updated) }))
@@ -671,12 +679,26 @@ function ImportPanel({ plan, onDone }: { plan: Plan; onDone: () => void }) {
   const check = (csv: string) => setResult(csv.trim() ? readMeditationCsv(csv) : null)
   const issueText = (i: ImportResult['issues'][number]) =>
     t(k(`issue_${i.code}`), { d: i.detail ?? '' })
+  const lines = new Set(result?.rows.map((r) => r.line))
+  const general = result?.issues.filter((i) => !lines.has(i.line)) ?? []
+  const weekday = (d: string) =>
+    new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    }).format(new Date(`${d}T12:00:00Z`))
   return (
     <div className="grid gap-4">
       <h2 className="text-xl">{t(k('import_h'))}</h2>
       <p className="max-w-[70ch] text-ink-muted">{t(k('import_help'))}</p>
       <div className="flex flex-wrap items-center gap-3">
+        <Button variant="secondary" onClick={downloadTemplate}>
+          <Icon name="download" size={20} />
+          {t(k('import_template'))}
+        </Button>
         <label className="btn btn-secondary">
+          <Icon name="upload" size={20} />
           {t(k('import_file'))}
           <input
             type="file"
@@ -733,29 +755,34 @@ function ImportPanel({ plan, onDone }: { plan: Plan; onDone: () => void }) {
           )}
           {outside.length > 0 && (
             <p className="text-sm text-ink-muted">
-              {outside.length} × {plan.startsOn} → {plan.endsOn}
+              {t(k('import_outside'), {
+                n: String(outside.length),
+                a: plan.startsOn,
+                b: plan.endsOn,
+              })}
             </p>
           )}
-          {result.issues.length > 0 && (
+          {general.length > 0 && (
             <ul className="grid gap-1">
-              {result.issues.map((i, n) => (
+              {general.map((i, n) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: a static report
                 <li
                   key={n}
-                  className={`prio ${i.level === 'error' ? 'prio-high' : 'prio-medium'}`}
+                  className="prio prio-high"
                   style={{ textTransform: 'none', justifySelf: 'start' }}
                 >
-                  <Icon name={i.level === 'error' ? 'alert' : 'info'} size={16} />
+                  <Icon name="alert" size={16} />
                   {t(k('line'), { n: String(i.line) })} · {issueText(i)}
                 </li>
               ))}
             </ul>
           )}
           {result.rows.length > 0 && (
-            <div className="chart-table-wrap">
+            <div className="chart-table-wrap med-preview">
               <table className="chart-table">
                 <thead>
                   <tr>
+                    <th scope="col">{t(k('col_status'))}</th>
                     <th scope="col">{t(k('col_date'))}</th>
                     <th scope="col">{t(k('col_headline'))}</th>
                     <th scope="col">{t(k('col_readings'))}</th>
@@ -763,28 +790,50 @@ function ImportPanel({ plan, onDone }: { plan: Plan; onDone: () => void }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {result.rows.slice(0, 8).map((r) => (
-                    <tr key={r.date}>
-                      <th scope="row">{r.date}</th>
-                      <td>{r.headline}</td>
-                      <td>{r.readings.map((x) => x.ref).join(' · ')}</td>
-                      <td>{r.psalm}</td>
-                    </tr>
-                  ))}
+                  {result.rows.map((r) => {
+                    const mine = result.issues.filter((i) => i.line === r.line)
+                    const level = !r.valid ? 'error' : mine.length ? 'warning' : 'ok'
+                    return (
+                      <tr key={`${r.date}-${r.line}`} data-level={level}>
+                        <td>
+                          <Icon
+                            name={level === 'ok' ? 'check' : level === 'warning' ? 'info' : 'alert'}
+                            size={16}
+                          />
+                          <span className="sr-only">{t(k(`row_${level}`))}</span>
+                        </td>
+                        <th scope="row">{weekday(r.date)}</th>
+                        <td>{r.headline}</td>
+                        <td>
+                          {r.readings.map((x) => formatPassage(x.ref, lang)).join(' · ')}
+                          {mine.map((i, n) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: a static report
+                            <span key={n} className="med-preview-issue">
+                              {issueText(i)}
+                            </span>
+                          ))}
+                        </td>
+                        <td>{r.psalm ? formatPsalm(r.psalm, lang) : ''}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
           )}
-          {errors.length > 0 ? (
-            <p className="text-sm text-danger">{t(k('import_blocked'))}</p>
-          ) : (
-            result.rows.length > 0 && (
+          {ok.length > 0 && (
+            <div className="grid gap-2">
+              {skipped > 0 && (
+                <p className="text-sm text-danger">
+                  {t(k('import_skipped'), { n: String(skipped) })}
+                </p>
+              )}
               <div>
                 <Button loading={run.isPending} onClick={() => run.mutate()}>
-                  {t(k('import_go'), { n: String(result.rows.length) })}
+                  {t(k('import_go'), { n: String(ok.length) })}
                 </Button>
               </div>
-            )
+            </div>
           )}
         </div>
       )}

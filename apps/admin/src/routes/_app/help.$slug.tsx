@@ -2,6 +2,7 @@ import { useLocale } from '@eec/admin-kit'
 import { Button, EmptyState } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { Brand } from '../../components/Brand'
 import { Icon } from '../../components/Icon'
 import { Illustration } from '../../components/Illustration'
 import { GUIDES, loadGuide, MEMOS } from '../../lib/help'
@@ -32,6 +33,7 @@ function Guide() {
   const isMemo = MEMOS.some((m) => m.slug === slug)
   return (
     <article className="help-article grid gap-4">
+      <Brand className="help-letterhead" />
       <div className="help-actions flex flex-wrap items-center justify-between gap-2">
         <Link className="btn btn-ghost" to="/help">
           <Icon name="arrowLeft" size={16} />

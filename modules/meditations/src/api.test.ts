@@ -7,8 +7,12 @@ const csv = readFileSync(new URL('../fixtures/meditations-2026.csv', import.meta
 
 describe('the parish calendar for 2026 (real values)', () => {
   const r = readMeditationCsv(csv)
-  it('reads every day, July to December, with no error', () => {
-    expect(r.issues.filter((i) => i.level === 'error')).toEqual([])
+  it('reads every day, July to December; the only error is a real one in the calendar (Hébreux 8, 19 does not exist)', () => {
+    const errors = r.issues.filter((i) => i.level === 'error')
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({ code: 'bad_verse' })
+    expect(r.rows.find((x) => x.line === errors[0]?.line)?.date).toBe('2026-12-27')
+    expect(r.rows.filter((x) => x.valid)).toHaveLength(183)
     expect(r.rows).toHaveLength(184)
     expect(r.rows[0]?.date).toBe('2026-07-01')
     expect(r.rows.at(-1)?.date).toBe('2026-12-31')
@@ -47,10 +51,10 @@ describe('meditation input', () => {
     ).toBe(true)
     expect(
       dayBody.safeParse({
-        readings: Array.from({ length: 4 }, () => ({ label: '', ref: 'Jean 1, 1' })),
+        readings: Array.from({ length: 4 }, () => ({ label: 'gospel', ref: 'Jean 1, 1' })),
       }).success,
     ).toBe(false)
-    expect(dayBody.safeParse({ readings: [{ label: 'gospel', ref: 'Jean <b>' }] }).success).toBe(
+    expect(dayBody.safeParse({ readings: [{ label: 'gospel', ref: 'Jean <b> 1' }] }).success).toBe(
       false,
     )
     expect(dayBody.safeParse({ state: 'published' }).success).toBe(false)
@@ -58,9 +62,30 @@ describe('meditation input', () => {
   it('an import row needs a real date and something to read', () => {
     expect(
       importBody.safeParse({
-        rows: [{ date: '2026-07-01', readings: [{ label: '', ref: 'Amos 4, 1-13' }], psalm: '89' }],
+        rows: [
+          { date: '2026-07-01', readings: [{ label: 'ot', ref: 'Amos 4, 1-13' }], psalm: '89' },
+        ],
       }).success,
     ).toBe(true)
+    // A passage that does not exist is refused, wherever it comes from.
+    expect(
+      importBody.safeParse({
+        rows: [
+          {
+            date: '2026-07-01',
+            readings: [{ label: 'gospel', ref: 'Jean 140, 173-180' }],
+            psalm: '89',
+          },
+        ],
+      }).success,
+    ).toBe(false)
+    expect(
+      importBody.safeParse({
+        rows: [
+          { date: '2026-07-01', readings: [{ label: 'ot', ref: 'Amos 4, 1-13' }], psalm: '151' },
+        ],
+      }).success,
+    ).toBe(false)
     expect(
       importBody.safeParse({ rows: [{ date: '1/7/2026', readings: [], psalm: '89' }] }).success,
     ).toBe(false)

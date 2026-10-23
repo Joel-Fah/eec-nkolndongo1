@@ -3,6 +3,8 @@
  * Louis Segond (French) and World English Bible (English) usage; abbreviations are the common short forms.
  * No verse text lives here: texts are typed from the agreed public-domain translations (decision 0032).
  */
+import { VERSE_COUNTS, VERSE_SLACK } from './bible-ranges.ts'
+
 export type BookId = (typeof BOOKS)[number]['id']
 
 export const BOOKS = [
@@ -100,6 +102,23 @@ export function cleanVerse(v: unknown): VerseNo | null {
 
 export const isBookId = (v: unknown): v is BookId => BOOKS.some((b) => b.id === v)
 
+/** How many chapters a book has (« Jean » 21, « Psaumes » 150). */
+export const chapterCount = (book: BookId): number => VERSE_COUNTS[book].length
+/** The most verses a chapter can have in our Bibles (the larger of the English and French counts, plus Segond's few extras). 0 if it does not exist. */
+export const verseCount = (book: BookId, chapter: number): number => {
+  const n = VERSE_COUNTS[book][chapter - 1]
+  return n === undefined ? 0 : n + (VERSE_SLACK[book] ?? 0)
+}
+/** The numeric part of a verse number (« 10a » → 10, 0 when unreadable). */
+export const verseDigits = (v: VerseNo): number => parts(v)[0]
+/** Is a chapter, and optionally a verse (« 10a » counts as 10), inside the book? */
+export function inRange(book: BookId, chapter: number, verse?: VerseNo | null): boolean {
+  if (!Number.isInteger(chapter) || chapter < 1 || chapter > chapterCount(book)) return false
+  if (verse == null || verse === '') return true
+  const n = verseDigits(verse)
+  return n >= 1 && n <= verseCount(book, chapter)
+}
+
 /** « Matthieu 11 : 28 » (French spacing) or « Matthew 11:28–30 ». */
 export function formatRef(ref: BibleRef, locale: 'fr' | 'en'): string {
   const book = BOOKS.find((b) => b.id === ref.book)
@@ -118,7 +137,9 @@ export function cleanRef(raw: unknown): BibleRef | null {
   const r = raw as Record<string, unknown>
   if (!isBookId(r.book)) return null
   const chapter =
-    Number.isInteger(r.chapter) && (r.chapter as number) >= 1 && (r.chapter as number) <= 150
+    Number.isInteger(r.chapter) &&
+    (r.chapter as number) >= 1 &&
+    (r.chapter as number) <= chapterCount(r.book)
       ? (r.chapter as number)
       : null
   if (!chapter) return null
@@ -127,5 +148,11 @@ export function cleanRef(raw: unknown): BibleRef | null {
   const to = blank(r.to) ? null : cleanVerse(r.to)
   if (!blank(r.from) && from === null) return null
   if (!blank(r.to) && (to === null || from === null || compareVerses(to, from) < 0)) return null
+  // A verse that the chapter does not have is refused (« Jean 140 : 173 » never gets in).
+  if (
+    (from != null && !inRange(r.book, chapter, from)) ||
+    (to != null && !inRange(r.book, chapter, to))
+  )
+    return null
   return { book: r.book, chapter, from, to }
 }

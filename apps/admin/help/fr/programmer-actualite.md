@@ -1,6 +1,10 @@
 # Programmer une actualité
 
-Écrivez maintenant, publiez plus tard : l'actualité apparaît toute seule à la date choisie.
+## Ce que c’est
+
+**Programmer** une actualité, c’est l’écrire maintenant et choisir le jour et l’heure où elle apparaîtra toute seule sur le site.
+
+## Pas à pas
 
 1. Ouvrez l'actualité (ou créez-en une).
 2. Cliquez sur **Publier**. Dans **Quand ?**, choisissez **Plus tard, à un jour et une heure choisis** et indiquez la date et l'heure.

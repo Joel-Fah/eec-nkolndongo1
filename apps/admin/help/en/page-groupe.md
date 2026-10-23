@@ -1,6 +1,10 @@
 # Edit a group page
 
-Each group (choir, youth, women…) can have a public page.
+## What it is
+
+A **group page** (choir, youth, women…) is the group’s public introduction on the site: a tagline, meeting days, a text and a way to contact them. Each group has its own; its leader edits it.
+
+## Step by step
 
 1. Open **Groupes**, pick the group, then **Page publique**.
 2. Fill in the tagline, the meeting days, the presentation text and a way to get in touch.

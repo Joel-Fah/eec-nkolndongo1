@@ -1,5 +1,11 @@
 # Ajouter des photos avec de bonnes descriptions
 
+## Ce que c’est
+
+La **Médiathèque** est la réserve de photos du site. Chaque photo y est allégée, nettoyée de sa position GPS et décrite en une phrase, avant d’être utilisée dans une actualité, une page ou un événement.
+
+## Pas à pas
+
 1. Ouvrez **Médiathèque**, puis déposez vos photos (ou **Ajouter des fichiers**).
 2. Vos photos sont allégées et la position GPS est retirée **sur votre appareil**, avant l'envoi.
 3. Pour chaque photo, écrivez une **description** : une phrase qui dit ce qu'on voit. Elle est lue aux personnes malvoyantes et affichée si l'image ne charge pas.

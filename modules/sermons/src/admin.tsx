@@ -8,6 +8,7 @@ import {
   ConfirmDialog,
   CoverField,
   PublishDialog,
+  RefEditor,
   RevisionsDrawer,
   SaveIndicator,
   StatusBadge,
@@ -828,80 +829,27 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
           <div className="admin-panel grid gap-3">
             <h2 className="text-lg">{t(k('passages'))}</h2>
             <p className="text-sm text-ink-muted">{t(k('passages_help'))}</p>
-            {draft.refs.map((r, i) => {
-              const bad =
-                r.from != null && r.to != null && r.to !== '' && compareVerses(r.to, r.from) < 0
-              return (
-                <div
-                  key={`${r.book}-${i}`}
-                  className="reading-box"
-                  data-invalid={bad ? '' : undefined}
-                >
-                  <div className="reading-row">
-                    <div className="reading-book">
-                      <SelectField
-                        label={t(k('book'))}
-                        value={r.book}
-                        onValueChange={(v) => v && setRef(i, { book: v as BibleRef['book'] })}
-                        options={BOOKS.map((b) => ({
-                          value: b.id,
-                          label: locale === 'en' ? b.en : b.fr,
-                        }))}
-                      />
-                    </div>
-                    <label className="reading-num">
-                      <span className="field-label">{t(k('chapter'))}</span>
-                      <input
-                        className="input"
-                        inputMode="numeric"
-                        maxLength={3}
-                        value={r.chapter}
-                        onChange={(e) =>
-                          setRef(i, {
-                            chapter: Math.min(150, Number(e.target.value.replace(/\D/g, '')) || 1),
-                          })
-                        }
-                      />
-                    </label>
-                    <label className="reading-num">
-                      <span className="field-label">{t(k('from'))}</span>
-                      <input
-                        className="input"
-                        maxLength={4}
-                        placeholder="1b"
-                        aria-invalid={bad}
-                        value={r.from ?? ''}
-                        onChange={(e) => setRef(i, { from: verseInput(e.target.value) })}
-                      />
-                    </label>
-                    <label className="reading-num">
-                      <span className="field-label">{t(k('to'))}</span>
-                      <input
-                        className="input"
-                        maxLength={4}
-                        placeholder="20"
-                        aria-invalid={bad}
-                        value={r.to ?? ''}
-                        onChange={(e) => setRef(i, { to: verseInput(e.target.value) })}
-                      />
-                    </label>
-                    <Button
-                      variant="secondary"
-                      className="reading-remove"
-                      aria-label={t(k('remove'))}
-                      onClick={() =>
-                        set(
-                          'refs',
-                          draft.refs.filter((_, j) => j !== i),
-                        )
-                      }
-                    >
-                      <Icon name="close" size={20} />
-                    </Button>
-                  </div>
-                </div>
-              )
-            })}
+            {draft.refs.map((r, i) => (
+              <RefEditor
+                // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
+                key={i}
+                idPrefix={`passage-${i}`}
+                value={r}
+                disabled={!canEdit}
+                onChange={(next) =>
+                  set(
+                    'refs',
+                    draft.refs.map((x, j) => (j === i ? next : x)),
+                  )
+                }
+                onRemove={() =>
+                  set(
+                    'refs',
+                    draft.refs.filter((_, j) => j !== i),
+                  )
+                }
+              />
+            ))}
             {draft.refs.length < 8 && canEdit && (
               <div>
                 <Button

@@ -1,6 +1,8 @@
 # Publish a news item
 
-A news item is a text shown on the **News** page of the site: an announcement, a report, an invitation.
+## What it is
+
+A **news item** is a text that appears on the site’s **News** page: an announcement, a report, an invitation. Until it is published, nobody sees it.
 
 ## Step by step
 

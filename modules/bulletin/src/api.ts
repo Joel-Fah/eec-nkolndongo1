@@ -43,6 +43,7 @@ const item = z
     titleEn: z.string().trim().max(160),
     textFr: z.string().trim().max(800),
     textEn: z.string().trim().max(800),
+    key: z.string().max(200).optional(),
   })
   .strict()
 const block = z

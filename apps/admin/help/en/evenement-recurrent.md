@@ -1,6 +1,10 @@
 # Add a repeating event
 
-For a regular meeting (a rehearsal, a monthly gathering), create the event **once**.
+## What it is
+
+A **recurring event** is a meeting that comes back (a rehearsal, a monthly gathering). You create it **once** with its repeat rule; the site works out all the coming dates.
+
+## Step by step
 
 1. Open **Agenda**, then **Créer un événement** (create an event).
 2. Enter the title, and the date and time of the first occurrence.

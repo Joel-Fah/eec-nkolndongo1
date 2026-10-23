@@ -1,6 +1,8 @@
 # Publier une actualité
 
-Une actualité est un texte qui apparaît sur la page **Actualités** du site : une annonce, un compte rendu, une invitation.
+## Ce que c’est
+
+Une **actualité** est un texte qui apparaît sur la page **Actualités** du site : une annonce, un compte rendu, une invitation. Tant qu’elle n’est pas publiée, personne ne la voit.
 
 ## Pas à pas
 

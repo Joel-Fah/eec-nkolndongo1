@@ -1,6 +1,10 @@
 # Modifier la page d'un groupe
 
-Chaque groupe (chorale, jeunesse, femmes…) peut avoir sa page publique.
+## Ce que c’est
+
+La **page d’un groupe** (chorale, jeunesse, femmes…) est sa présentation publique sur le site : une phrase d’accroche, les jours de rencontre, un texte et un moyen de contact. Chaque groupe a la sienne ; son responsable la modifie.
+
+## Pas à pas
 
 1. Ouvrez **Groupes** et choisissez le groupe, puis **Page publique**.
 2. Remplissez la phrase d'accroche, les jours de rencontre, le texte de présentation et un moyen de contact.

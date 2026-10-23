@@ -119,7 +119,7 @@ const [medPlan] = await db
     slug: 'meditations-2026-exemple',
     titleFr: 'Méditations 2026',
     titleEn: 'Meditations 2026',
-    startsOn: '2026-01-01',
+    startsOn: '2026-07-01',
     endsOn: '2026-12-31',
     state: 'published',
   })

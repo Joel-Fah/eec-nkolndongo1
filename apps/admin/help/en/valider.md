@@ -1,6 +1,8 @@
 # What does "validate" mean?
 
-On the site, **facts** (times, address, giving numbers, figures) only appear once an authorised person has **checked and validated** them. Until then, the site says "soon" or shows nothing.
+## What it is
+
+**Validating** means confirming that a piece of information (time, address, giving number, figure) is correct. On the site, **facts** only appear once an authorised person has checked and validated them; until then the site says “soon” or shows nothing.
 
 ## If you validate
 

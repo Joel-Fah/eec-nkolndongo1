@@ -949,6 +949,36 @@
         "desc": "The week’s bulletin as a reading page, with an A4 or A5 choice: when printing, the menu, footer and buttons disappear and the page takes the chosen size (no PDF made by the server).",
         "use": ".bl, @page a4 / a5 (named page); ?format=a5; the browser’s “Save as PDF”.",
         "a11y": "Ordered headings, sections as lists; print is black on white; actions are not printed."
+      },
+      "segmented": {
+        "name": "@eec/ui/astro/Segmented.astro ; <nav aria-label>, aria-current=\"true\" sur le choix actif ; hauteur 44 px.",
+        "desc": "@eec/ui/astro/Segmented.astro; <nav aria-label>, aria-current=\"true\" on the active choice; 44 px tall.",
+        "use": "Navigation par liens : Tab puis Entrée ; le choix actif est annoncé « page courante ».",
+        "a11y": "Link navigation: Tab then Enter; the active choice is announced as the current page."
+      },
+      "passagefields": {
+        "name": "RefEditor, ChapterVerseFields (@eec/content-kit) ; ReadingEditor, PsalmEditor (modules/meditations) ; limites : @eec/core (chapterCount, verseCount).",
+        "desc": "RefEditor, ChapterVerseFields (@eec/content-kit); ReadingEditor, PsalmEditor (modules/meditations); limits: @eec/core (chapterCount, verseCount).",
+        "use": "Chaque champ est étiqueté ; l’erreur est annoncée (role=\"alert\") ; les limites sont écrites en placeholder (1–21).",
+        "a11y": "Every field is labelled; the error is announced (role=\"alert\"); the limits are written as placeholders (1–21)."
+      },
+      "printletterhead": {
+        "name": ".print-letterhead (Site.astro) ; .help-letterhead (admin) ; toujours le Lockup, jamais le logomark seul.",
+        "desc": ".print-letterhead (Site.astro); .help-letterhead (admin); always the Lockup, never the logomark alone.",
+        "use": "Décoratif pour les lecteurs d’écran (aria-hidden) ; le titre du document reste le premier titre.",
+        "a11y": "Decorative for screen readers (aria-hidden); the document title stays the first heading."
+      },
+      "sourcepicker": {
+        "name": "CheckboxField + .bulletin-nodata (modules/bulletin).",
+        "desc": "CheckboxField + .bulletin-nodata (modules/bulletin).",
+        "use": "Cases à cocher natives de la charte ; le message vide est un paragraphe suivi d’un lien.",
+        "a11y": "Design-system checkboxes; the empty message is a paragraph followed by a link."
+      },
+      "foldrow": {
+        "name": ".med-row, .med-collapse[data-open] (grid-template-rows 0fr → 1fr) ; aria-expanded sur le bouton ; contenu replié en inert.",
+        "desc": ".med-row, .med-collapse[data-open] (grid-template-rows 0fr → 1fr); aria-expanded on the button; folded content is inert.",
+        "use": "Le bouton annonce son état ; le contenu replié n’est pas atteignable au clavier.",
+        "a11y": "The button announces its state; folded content cannot be reached by keyboard."
       }
     },
     "rules": {
@@ -2202,6 +2232,14 @@
       "text": "What you filled in is not saved. If you leave now, you will lose it.",
       "stay": "Keep filling",
       "leave": "Discard"
+    },
+    "passage": {
+      "book": "Book",
+      "chapter": "Chapter",
+      "from": "From",
+      "to": "To",
+      "remove": "Remove the passage",
+      "order": "The last verse must come after the first."
     }
   },
   "search": {

@@ -50,11 +50,13 @@ type News = { items: { title: string; excerpt: string; publishedAt: string }[] }
 const pair = (
   fr: Partial<BulletinItem> & { titleFr?: string },
   en: Partial<BulletinItem> & { titleEn?: string },
+  key: string,
 ): BulletinItem => ({
   titleFr: fr.titleFr ?? '',
   textFr: fr.textFr ?? '',
   titleEn: en.titleEn ?? '',
   textEn: en.textEn ?? '',
+  key,
 })
 
 export type Assembled = {
@@ -93,6 +95,7 @@ export async function assemble(weekOf: string): Promise<Assembled> {
       pair(
         { titleFr: sFr.name, textFr: sFr.theme },
         { titleEn: sEn?.name ?? '', textEn: sEn?.theme ?? '' },
+        'sun-name',
       ),
     )
     if (sFr.readings.length)
@@ -100,6 +103,7 @@ export async function assemble(weekOf: string): Promise<Assembled> {
         pair(
           { titleFr: 'Lectures', textFr: sFr.readings.map((r) => r.label).join(' · ') },
           { titleEn: 'Readings', textEn: (sEn?.readings ?? []).map((r) => r.label).join(' · ') },
+          'sun-readings',
         ),
       )
     if (sFr.preacher)
@@ -107,17 +111,23 @@ export async function assemble(weekOf: string): Promise<Assembled> {
         pair(
           { titleFr: 'Prédication', textFr: sFr.preacher },
           { titleEn: 'Preaching', textEn: sFr.preacher },
+          'sun-preacher',
         ),
       )
     if (sFr.hymns)
       items.push(
-        pair({ titleFr: 'Cantiques', textFr: sFr.hymns }, { titleEn: 'Hymns', textEn: sFr.hymns }),
+        pair(
+          { titleFr: 'Cantiques', textFr: sFr.hymns },
+          { titleEn: 'Hymns', textEn: sFr.hymns },
+          'sun-hymns',
+        ),
       )
     if (sFr.holySupper)
       items.push(
         pair(
           { titleFr: 'Sainte Cène', textFr: 'Ce dimanche, nous célébrons la Sainte Cène.' },
           { titleEn: 'Holy Supper', textEn: 'This Sunday we celebrate the Holy Supper.' },
+          'sun-supper',
         ),
       )
     blocks.push({ id: id(), kind: 'sunday', titleFr: 'Ce dimanche', titleEn: 'This Sunday', items })
@@ -141,6 +151,7 @@ export async function assemble(weekOf: string): Promise<Assembled> {
         titleEn: `${dayLabel(dayOf(o), 'en')}${time(o, 'en')}`,
         textEn: `${en?.title ?? o.title}${(en?.location ?? o.location) ? ` — ${en?.location ?? o.location}` : ''}`,
       },
+      `ev-${o.slug}-${o.startsAt}`,
     )
   })
   if (agenda.length)
@@ -162,6 +173,7 @@ export async function assemble(weekOf: string): Promise<Assembled> {
       pair(
         { titleFr: dayLabel(d, 'fr'), textFr: line(f) },
         { titleEn: dayLabel(d, 'en'), textEn: e ? line(e) : '' },
+        `med-${d}`,
       ),
     ]
   })
@@ -180,6 +192,7 @@ export async function assemble(weekOf: string): Promise<Assembled> {
     pair(
       { titleFr: n.title, textFr: n.excerpt },
       { titleEn: newsEn?.items[i]?.title ?? '', textEn: newsEn?.items[i]?.excerpt ?? '' },
+      `ann-${n.title}`,
     ),
   )
   if (ann.length)

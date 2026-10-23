@@ -949,6 +949,36 @@
         "desc": "Le bulletin de la semaine en page de lecture, avec un choix A4 ou A5 : à l’impression le menu, le pied de page et les boutons disparaissent, et la page prend la taille choisie (aucun PDF fabriqué par le serveur).",
         "use": ".bl, @page a4 / a5 (page nommée) ; ?format=a5 ; « Enregistrer en PDF » du navigateur.",
         "a11y": "Titres hiérarchisés, rubriques en listes ; l’impression est en noir sur blanc ; les actions ne sont pas imprimées."
+      },
+      "segmented": {
+        "name": "Choix segmenté",
+        "desc": "Choisir entre quelques vues d’une même page (format du papier, liste ou grille) : une piste teintée, le choix actif surélevé. Chaque option est un lien : ça marche sans JavaScript et le choix reste dans l’adresse.",
+        "use": "Segmented choice",
+        "a11y": "Choosing between a few views of the same page (paper size, list or grid): a tinted track, the active choice raised. Each option is a link: it works without JavaScript and the choice lives in the address."
+      },
+      "passagefields": {
+        "name": "Champs d’un passage biblique",
+        "desc": "Un passage se saisit par livre, chapitre, De et À. Le chapitre ne dépasse pas le dernier du livre, un verset ne dépasse pas le dernier du chapitre (« 10a » compte pour 10) : « Jean 140 : 173 » ne peut pas être tapé. Une seule ligne d’aperçu sous tous les champs montre le résultat. Les méditations ajoutent la nature (Ancien Testament, Épître, Évangile), des parties supplémentaires et un chapitre de fin ; le psaume est un numéro seul (tout le psaume) ou un numéro avec De et À.",
+        "use": "Bible passage fields",
+        "a11y": "A passage is entered by book, chapter, From and To. The chapter cannot go past the book’s last, a verse cannot go past the chapter’s last (“10a” counts as 10): “John 140:173” cannot be typed. One preview line under all the fields shows the result. Meditations add the kind (Old Testament, Epistle, Gospel), extra parts and an end chapter; the psalm is a number alone (whole psalm) or a number with From and To."
+      },
+      "printletterhead": {
+        "name": "En-tête des documents imprimés",
+        "desc": "Tout ce qui s’imprime ou s’enregistre en PDF (bulletin, guides, aide-mémoire) porte le logomark et les noms complets : « Église Évangélique du Cameroun » et « Paroisse de Nkolndongo 1 ». À l’écran il est caché ; à l’impression le menu et le pied de page disparaissent.",
+        "use": "Printed-document letterhead",
+        "a11y": "Everything that is printed or saved as a PDF (bulletin, guides, cheat sheets) carries the logomark and the full names: “Église Évangélique du Cameroun” and “Paroisse de Nkolndongo 1”. On screen it is hidden; when printing, the menu and footer disappear."
+      },
+      "sourcepicker": {
+        "name": "Choix parmi l’existant",
+        "desc": "Une rubrique qui vient d’un autre écran (Liturgie, Événements, Méditations, Actualités) ne se retape pas : on coche ce qu’on veut y mettre. S’il n’y a rien, un message dit d’où l’information devrait venir et propose d’ouvrir cet écran.",
+        "use": "Pick from what exists",
+        "a11y": "A section that comes from another screen (Liturgy, Events, Meditations, News) is not retyped: you tick what you want in. If there is nothing, a message says where the information should come from and offers to open that screen."
+      },
+      "foldrow": {
+        "name": "Ligne dépliante",
+        "desc": "Une ligne qui s’ouvre et se ferme en douceur (hauteur animée sans mesure en JavaScript) ; le chevron est à l’extrémité droite et se retourne. Le jour du jour porte une pastille « Aujourd’hui ». Avec « réduire les animations », elle s’ouvre sans transition.",
+        "use": "Fold row",
+        "a11y": "A row that opens and closes smoothly (height animated without measuring in JavaScript); the chevron sits at the far right and turns over. Today carries an “Today” badge. With reduced motion it opens without a transition."
       }
     },
     "rules": {
@@ -2202,6 +2232,14 @@
       "text": "Ce que vous avez rempli n’est pas enregistré. Si vous quittez maintenant, vous le perdrez.",
       "stay": "Continuer à remplir",
       "leave": "Abandonner"
+    },
+    "passage": {
+      "book": "Livre",
+      "chapter": "Chapitre",
+      "from": "De",
+      "to": "À",
+      "remove": "Retirer le passage",
+      "order": "Le verset de fin doit venir après le verset de début."
     }
   },
   "search": {

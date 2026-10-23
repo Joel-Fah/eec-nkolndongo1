@@ -1,6 +1,10 @@
 # Cheat sheet: Content validator
 
-You check information before it goes public.
+## What it is
+
+This one-page sheet is meant for printing: it sums up what a **content validator** (the person who checks information before it goes public) does.
+
+## Step by step
 
 1. **À valider** menu.
 2. Compare each line with reality.

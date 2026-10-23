@@ -696,6 +696,21 @@
   flex: 1 1 11rem;
   min-width: 0;
 }
+.reading-kind {
+  flex: 0 1 12rem;
+  min-width: 9rem;
+}
+.reading-until {
+  align-self: center;
+  padding-block-start: 1.25rem;
+  color: var(--ink-muted);
+}
+.reading-part-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+}
 .reading-num {
   display: grid;
   gap: 0.25rem;
