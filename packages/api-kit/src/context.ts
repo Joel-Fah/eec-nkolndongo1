@@ -10,6 +10,8 @@ export type Deps = {
   /** A short-lived connection of its own, for work that outlives the response (cache refresh). */
   withDb: <R>(fn: (db: Db) => Promise<R>) => Promise<R>
   auth: () => Promise<Auth>
+  /** The privacy-policy version in force: stored with every consent a visitor gives. */
+  policy: () => Promise<string>
   /** The signed-in user's id (null if anonymous) and rights, loaded once per request. */
   actor: () => Promise<{ userId: string; principal: Principal } | null>
 }

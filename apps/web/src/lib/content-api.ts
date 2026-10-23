@@ -32,6 +32,30 @@ export async function publicJson<T>({ url, locals }: Ctx, path: string): Promise
   }
 }
 
+/**
+ * A form posted to the page (a registration, a cancellation) goes to the same API, in the same Worker, with what the API's
+ * checks need: the page's origin (CSRF), the visitor's address (rate limit) and cookies (a signed-in member). No JavaScript needed.
+ */
+export async function apiPost<T>(
+  { url, locals, request }: Ctx & { request: Request },
+  path: string,
+  body: unknown,
+): Promise<{ status: number; data: T | null }> {
+  try {
+    const headers = new Headers({ 'content-type': 'application/json', origin: url.origin })
+    for (const name of ['cookie', 'cf-connecting-ip', 'x-forwarded-for', 'user-agent'])
+      if (request.headers.has(name)) headers.set(name, request.headers.get(name) as string)
+    const res = await app.fetch(
+      new Request(new URL(path, url), { method: 'POST', headers, body: JSON.stringify(body) }),
+      env as unknown as Env,
+      (locals as { cfContext?: ExecutionContext }).cfContext,
+    )
+    return { status: res.status, data: (await res.json().catch(() => null)) as T | null }
+  } catch {
+    return { status: 503, data: null }
+  }
+}
+
 export type NewsCover = {
   variants: { key: string; width: number; size: number; mime: string }[]
   placeholder: string | null
@@ -155,4 +179,26 @@ export type MeditationPlan = {
   description: string
   startsOn: string
   endsOn: string
+}
+
+export type PublicRegField = {
+  id: string
+  kind: 'group' | 'text' | 'choice' | 'multi' | 'yesno'
+  label: string
+  required: boolean
+  options: { value: string; label: string }[]
+}
+export type PublicRegForm = {
+  slug: string
+  title: string
+  intro: string
+  eventSlug: string | null
+  eventDate: string
+  audience: 'open' | 'members'
+  forMinors: boolean
+  askWhatsapp: boolean
+  waitlist: boolean
+  state: 'draft' | 'not_yet' | 'open' | 'full' | 'closed'
+  spotsLeft: number | null
+  fields: PublicRegField[]
 }

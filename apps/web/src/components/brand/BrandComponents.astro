@@ -121,6 +121,9 @@ type Id =
   | 'printletterhead'
   | 'sourcepicker'
   | 'foldrow'
+  | 'retentionchip'
+  | 'checkinlist'
+  | 'registerform'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -367,6 +370,12 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('sourcepicker')}><p class="text-sm text-ink-muted">{t('brand.components.sourcepicker.use')}</p></DocBlock>
 
     <DocBlock {...doc('foldrow')}><p class="text-sm text-ink-muted">{t('brand.components.foldrow.use')}</p></DocBlock>
+
+    <DocBlock {...doc('retentionchip')}><p class="text-sm text-ink-muted">{t('brand.components.retentionchip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('checkinlist')}><p class="text-sm text-ink-muted">{t('brand.components.checkinlist.use')}</p></DocBlock>
+
+    <DocBlock {...doc('registerform')}><p class="text-sm text-ink-muted">{t('brand.components.registerform.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

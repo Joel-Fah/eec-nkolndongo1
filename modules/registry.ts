@@ -16,6 +16,7 @@ import { mediaModule } from '@eec/module-media'
 import { meditationsModule } from '@eec/module-meditations'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
+import { registrationsModule } from '@eec/module-registrations'
 import { scheduleModule } from '@eec/module-schedule'
 import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
@@ -31,6 +32,7 @@ export const modules: readonly DefinedModule[] = [
   sermonsModule,
   meditationsModule,
   bulletinModule,
+  registrationsModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

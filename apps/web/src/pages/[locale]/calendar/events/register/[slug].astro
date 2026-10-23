@@ -1,0 +1,11 @@
+---
+import RegistrationPage from '../../../../../components/content/RegistrationPage.astro'
+import { rightRegistrationPath } from '../../../../../lib/registrations-routes'
+
+export const prerender = false
+if (!rightRegistrationPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+const { slug } = Astro.params
+---
+
+<RegistrationPage slug={slug ?? ''} />

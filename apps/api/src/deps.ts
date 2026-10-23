@@ -67,6 +67,7 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
     withDb,
     timeoutMs: c.env.HYPERDRIVE ? 1500 : 8000,
     auth: getAuth,
+    policy: async () => policyVersion(await db()),
     actor: getActor,
   })
   try {

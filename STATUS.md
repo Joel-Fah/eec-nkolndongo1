@@ -1,7 +1,7 @@
 # STATUS
 
 ## Current phase: 04a — Go-live · Checkpoint A (launch kit) ready for review
-_Last updated: 2026-10-22._ Branch `feat/phase-04a-go-live` (from `main`, which already carries Phase 03: both PRs were merged and
+_Last updated: 2026-10-23._ Branch `feat/phase-04a-go-live` (from `main`, which already carries Phase 03: both PRs were merged and
 the `deploy` workflow shipped them, migrations 0006–0018 included, on 2026-10-22). **Dev only for everything new**; nothing of
 04a is deployed. Report in progress: `docs/phases/PHASE_04_REPORT.md`.
 **Built (A):** home texts and four key figures as slots (0039); « Validateur de contenu » role + **À valider** screen with
@@ -13,7 +13,13 @@ access test, separate preview Worker on dev data).
 (CPU, LCP, CLS, egress), TalkBack + keyboard + tap-to-dial + `.ics` device pass, and the R2 / launch-address answers. They gate the
 PR merge (merging deploys) and Checkpoint B's audio decision (0034), not the dev work.
 **Checkpoint B (sermons, links only, decision 0034) built on dev:** see `docs/phases/PHASE_04_REPORT.md`.
-**Checkpoint C (meditations with the real 2026 calendar, bulletin) built on dev; registrations waiting for decision 0035.**
+**Checkpoint C built on dev (2026-10-23):** meditations (real 2026 calendar; passages entered as book/chapter/from/to with
+chapter and verse limits; CSV template + row-by-row preview), bulletin (parts ticked from existing data, never retyped), and
+**registrations** (decision 0035 accepted: phone required with/without +237, age bands, retention 6 months with a coloured countdown
+in the admin, open and members-only forms, CSV export for super admin + secretariat, waitlist promotion via the outbox, check-in,
+works without JavaScript). Migration 0024 (additive) applied on dev only. Everything printed carries the logomark and full names.
+**Known gaps:** « Mes inscriptions » in Mon espace; per-event `.ics` on the confirmation page (the event page has it); the
+Hébreux 8, 19 typo in the parish's 2026 calendar (real error, flagged by the new checks).
 **Next:** Joël's review of A, B and C → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
 video-only first; audio after 0034).
 

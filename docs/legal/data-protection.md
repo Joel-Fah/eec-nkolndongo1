@@ -81,14 +81,22 @@
   youtube-nocookie.com (YouTube then sees that visitor, under its own policy: stated in the privacy policy). The audit log records
   which fields changed, never the name or a link.
 
-## Proposed for Phase 04b — **not built, awaiting Joël's review** (decision 0035)
-- **Event registrations**: name, phone **or** e-mail, number of people, and optional fields chosen per form from a short list
-  (group, age band, short text, choices, yes/no). No sensitive question can be added. **Children** only through a parent or
-  guardian, as a **first name and an age band**. One unticked consent box per registration, stored with the policy version.
-- **Retention**: 6 months after the event, hard cap 12 months after the form closed; attendance counts kept anonymised.
-- **Access**: read, manage and export are separate permissions (the CSV export is dangerous and audited); a group leader sees
-  their own group's forms only; the check-in view shows names, not phone numbers.
-- The privacy policy gets a new version when this ships; members are informed (decision 0033).
+## Added in Phase 04c — event registrations (decision 0035, accepted)
+- **Event registrations** (module `registrations`): name, **phone (required, with or without +237)**, optional WhatsApp number and
+  e-mail, number of people, and optional questions chosen per form from a short list (group, short text, one or several choices,
+  yes/no). **No sensitive question can be added**: the builder and the API refuse labels about health, origin, religion, politics
+  or money. **Children** only through a parent or guardian (required, unticked box), as a **first name and an age band**.
+  One unticked consent box per registration, stored with the time and the privacy-policy version (« +oral » when staff typed it
+  for someone who agreed by phone). Forms are open to anyone or to members only.
+- **Retention**: deleted 6 months after the event, at most 12 months after the form closed, by the daily job, which first writes
+  anonymous totals per form (registered, waitlisted, cancelled, present: no name, no contact). The admin shows the days left and
+  the deletion date on every form, in calm / warning (≤ 60 days) / critical (< 15 days) colours.
+- **Access**: `read`, `edit`, `manage`, `export`, `delete` are separate permissions, group-scoped. The **CSV export is for the super
+  admin and the secretariat only**, audited with the number of rows. The check-in view shows names, never phone numbers.
+- **Waitlist**: a cancellation promotes the next person; the notice (first name + phone) goes to the outbox (deleted after 90 days).
+- **Cancel link**: signed, expires two days after the event, shows only the first name and the activity. No IP address is stored;
+  a salted hash is the rate-limit key only.
+- The privacy policy needs a new version when this ships (decision 0033); members are informed.
 
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond

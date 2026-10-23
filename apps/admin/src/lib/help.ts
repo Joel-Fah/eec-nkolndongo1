@@ -19,6 +19,17 @@ export type Guide = {
 
 export const GUIDES: Guide[] = [
   {
+    slug: 'inscriptions',
+    icon: 'checklist',
+    summary: {
+      fr: 'Un formulaire par activité, le pointage et la suppression automatique.',
+      en: 'One form per activity, check-in and automatic deletion.',
+    },
+    title: { fr: 'Créer un formulaire d’inscription', en: 'Create a registration form' },
+    permission: 'registrations:edit',
+    screens: ['/m/registrations'],
+  },
+  {
     slug: 'publier-actualite',
     icon: 'newspaper',
     summary: {

@@ -979,6 +979,24 @@
         "desc": ".med-row, .med-collapse[data-open] (grid-template-rows 0fr → 1fr); aria-expanded on the button; folded content is inert.",
         "use": "Le bouton annonce son état ; le contenu replié n’est pas atteignable au clavier.",
         "a11y": "The button announces its state; folded content cannot be reached by keyboard."
+      },
+      "retentionchip": {
+        "name": ".reg-retention[data-level] ; retentionLevel() dans @eec/core.",
+        "desc": ".reg-retention[data-level]; retentionLevel() in @eec/core.",
+        "use": "Texte complet lu tel quel ; icône décorative.",
+        "a11y": "Full text is read as is; the icon is decorative."
+      },
+      "checkinlist": {
+        "name": ".reg-checkin, aria-pressed.",
+        "desc": ".reg-checkin, aria-pressed.",
+        "use": "Boutons à bascule (aria-pressed) ; l’état est écrit (« Présent »).",
+        "a11y": "Toggle buttons (aria-pressed); the state is written (“Present”)."
+      },
+      "registerform": {
+        "name": "RegistrationPage.astro, RegistrationCancelPage.astro ; Choice, Field.",
+        "desc": "RegistrationPage.astro, RegistrationCancelPage.astro; Choice, Field.",
+        "use": "Libellés liés, erreurs en role=\"alert\", groupes radio nommés.",
+        "a11y": "Linked labels, errors with role=\"alert\", named radio groups."
       }
     },
     "rules": {
@@ -1392,7 +1410,8 @@
       "template": "Message",
       "templates": {
         "password-reset": "Password reset",
-        "invitation": "Invitation"
+        "invitation": "Invitation",
+        "registration-promoted": "A place opened up (registration)"
       },
       "link": "Link to pass on",
       "relayed": "Mark as relayed",
@@ -1400,7 +1419,8 @@
       "done_relayed": "Marked as relayed.",
       "done_dismissed": "Message dismissed.",
       "empty_title": "Nothing to relay",
-      "empty_text": "All caught up. New requests will appear here."
+      "empty_text": "All caught up. New requests will appear here.",
+      "registration_note": "A place opened up for “{form}”: tell this person by phone or WhatsApp (code {code})."
     },
     "account": {
       "title": "My account",

@@ -33,6 +33,7 @@
     "@eec/module-sermons": "workspace:*",
     "@eec/module-meditations": "workspace:*",
     "@eec/module-bulletin": "workspace:*",
+    "@eec/module-registrations": "workspace:*",
     "@eec/module-story": "workspace:*",
     "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",

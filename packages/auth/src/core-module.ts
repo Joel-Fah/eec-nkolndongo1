@@ -81,6 +81,11 @@ export const systemRoles = [
       'departments:publish',
       'contact:read',
       'contact:handle',
+      'registrations:read',
+      'registrations:edit',
+      'registrations:manage',
+      // The CSV export is for the super admin and the secretariat only (decision 0035).
+      'registrations:export',
     ],
   },
   {
@@ -137,6 +142,9 @@ export const systemRoles = [
       'news:edit',
       'departments:read',
       'departments:update',
+      'registrations:read',
+      'registrations:edit',
+      'registrations:manage',
     ],
   },
   {

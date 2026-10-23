@@ -979,6 +979,24 @@
         "desc": "Une ligne qui s’ouvre et se ferme en douceur (hauteur animée sans mesure en JavaScript) ; le chevron est à l’extrémité droite et se retourne. Le jour du jour porte une pastille « Aujourd’hui ». Avec « réduire les animations », elle s’ouvre sans transition.",
         "use": "Fold row",
         "a11y": "A row that opens and closes smoothly (height animated without measuring in JavaScript); the chevron sits at the far right and turns over. Today carries an “Today” badge. With reduced motion it opens without a transition."
+      },
+      "retentionchip": {
+        "name": "Compte à rebours de conservation",
+        "desc": "Combien de temps restent les données d’un formulaire, écrit en toutes lettres (« Suppression dans 12 jours ») avec la date, en vert au-delà de 60 jours, ambre jusqu’à 15 jours, rouge en dessous. La couleur ne vient jamais seule : une icône et des mots l’accompagnent.",
+        "use": "Retention countdown",
+        "a11y": "How long a form’s data stays, written in full (“Data deleted in 12 days”) with the date: green above 60 days, amber down to 15, red below. Colour never stands alone: an icon and words go with it."
+      },
+      "checkinlist": {
+        "name": "Pointage à une main",
+        "desc": "Une grande ligne par personne (≥ 56 px) : un toucher pointe, un second annule. Le changement s’affiche tout de suite et revient en arrière si le réseau refuse. Aucun numéro de téléphone.",
+        "use": "One-handed check-in",
+        "a11y": "One big row per person (≥ 56 px): a tap checks in, a second undoes it. The change shows at once and rolls back if the network refuses. No phone number."
+      },
+      "registerform": {
+        "name": "Formulaire d’inscription public",
+        "desc": "Un formulaire HTML ordinaire qui envoie vers sa propre page : il marche sans JavaScript. Téléphone obligatoire (avec ou sans +237), case d’accord jamais cochée, enfants par prénom et tranche d’âge, page de confirmation avec code, partage WhatsApp et lien d’annulation.",
+        "use": "Public registration form",
+        "a11y": "A plain HTML form that posts to its own page: it works without JavaScript. Phone required (with or without +237), agreement box never pre-ticked, children by first name and age band, a confirmation page with code, WhatsApp share and cancel link."
       }
     },
     "rules": {
@@ -1392,7 +1410,8 @@
       "template": "Message",
       "templates": {
         "password-reset": "Réinitialisation du mot de passe",
-        "invitation": "Invitation"
+        "invitation": "Invitation",
+        "registration-promoted": "Une place s’est libérée (inscription)"
       },
       "link": "Lien à transmettre",
       "relayed": "Marquer comme transmis",
@@ -1400,7 +1419,8 @@
       "done_relayed": "Marqué comme transmis.",
       "done_dismissed": "Message écarté.",
       "empty_title": "Rien à transmettre",
-      "empty_text": "Tout est à jour. Les nouvelles demandes apparaîtront ici."
+      "empty_text": "Tout est à jour. Les nouvelles demandes apparaîtront ici.",
+      "registration_note": "Une place s’est libérée pour « {form} » : prévenez cette personne par téléphone ou WhatsApp (code {code})."
     },
     "account": {
       "title": "Mon compte",

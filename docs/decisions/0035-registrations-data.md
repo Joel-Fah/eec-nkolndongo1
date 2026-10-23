@@ -1,5 +1,5 @@
 # 0035 — Registrations (Inscriptions): what is collected, from whom, for how long
-**Status:** PROPOSED · 2026-10-23 · **nothing is built until Joël has read this and the `data-protection.md` section it adds**
+**Status:** ACCEPTED · 2026-10-23 (Joël's answers below, same day) · the `data-protection.md` section and the privacy-policy version ship with the code
 **Context:** Retreats, concerts, catechism, JAPE outings need a way to sign up. This is **new personal data** (names, phone
 numbers, sometimes children's first names). The data-protection law of Cameroon (Loi n°2024/017) asks for explicit consent,
 minimisation, a retention period and a way to withdraw. A minor is involved: this needs an explicit decision.
@@ -36,12 +36,18 @@ minimisation, a retention period and a way to withdraw. A minor is involved: thi
    content in the log). Someone who asks for a copy of their data gets it from the secretariat (the form's fields only).
 10. **Not collected, ever:** a payment, an amount, an ID document, an address, a photo, a surname for a child, any field about
     health, origin, religion or finances.
-**To decide with Joël (before building):**
-- Is a phone number or an e-mail enough, or must a phone always be required (the parish reaches people by WhatsApp)?
-- The adult age limit and the age bands (for example 0–5, 6–9, 10–13, 14–17).
-- Is 6 months after the event right, with a 12-month hard cap, or shorter?
-- « Members only » forms: keep, or leave out for now?
-- Who may export the CSV (suggest: super admin and secretariat only).
-**Consequences if accepted:** new tables (`registration_forms`, `registrations`, `registration_people`, `registration_counts`),
+**Joël's answers (they replace the open questions and override the proposal where they differ):**
+- **A phone number is required** (the parish reaches people by WhatsApp), with an optional **WhatsApp number** when it differs.
+  The form accepts it **with or without the country code**: most people type it without (`6 77 12 34 56`), so a number of
+  8–9 digits is read as a Cameroon number and stored as `+237…`; `+237…`, `00237…` and other `+` codes are kept as typed
+  (digits only checked). An e-mail is optional.
+- **Age bands: yes** (0–5, 6–9, 10–13, 14–17; 18 and over is « adulte »).
+- **Retention: 6 months after the event, 12-month hard cap, as proposed. The admin must SEE the time left** on each registration
+  and on each form, with a severity colour: calm above 60 days, warning from 60 to 15 days, critical under 15 days and on the
+  day of deletion. Nothing is hidden: the date of deletion is written out.
+- **Both kinds of forms: members only AND open to anyone** (the choice is made per form).
+- **CSV export: super admin and secretariat only** (audited with the number of rows, never the content).
+
+**Consequences:** new tables (`registration_forms`, `registrations`, `registration_people`, `registration_counts`),
 new permissions, three public mutations in the route-table test (submit, cancel, token), retention job extended and tested,
 `data-protection.md` and the privacy policy updated (a new policy version), help guides for staff.
