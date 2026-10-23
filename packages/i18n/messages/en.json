@@ -832,7 +832,7 @@
       },
       "mapillustration": {
         "name": "Drawn map",
-        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded.",
+        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded. Once the drawing is complete, a click on the building makes it bounce (the building only); no effect with “reduce motion”.",
         "use": "<MapIllustration name href label /> on Find us.",
         "a11y": "Decorative (aria-hidden); the address and the button carry the information."
       },

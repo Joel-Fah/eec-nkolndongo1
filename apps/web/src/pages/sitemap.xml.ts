@@ -11,6 +11,7 @@ import { publicJson } from '../lib/content-api'
 import { departmentHref } from '../lib/departments-routes'
 import { eventHref } from '../lib/events-routes'
 import { guideHref } from '../lib/guides-routes'
+import { bulletinHref } from '../lib/meditations-routes'
 import { href, pages } from '../lib/nav'
 import { newsItemHref } from '../lib/news-routes'
 import { sermonHref } from '../lib/sermons-routes'
@@ -50,7 +51,7 @@ export const GET: APIRoute = async (ctx) => {
   }
   const today = new Date().toISOString().slice(0, 10)
   const year = new Date(Date.now() + 365 * 86_400_000).toISOString().slice(0, 10)
-  const [news, events, guides, groups, sermons] = await Promise.all([
+  const [news, events, guides, groups, sermons, bulletins] = await Promise.all([
     Promise.all(
       [1, 2, 3, 4, 5].map((n) =>
         publicJson<{ items: { slug: string; publishedAt: string }[] }>(
@@ -66,6 +67,7 @@ export const GET: APIRoute = async (ctx) => {
     publicJson<{ items: { slug: string }[] }>(ctx, '/api/guides/public?locale=fr'),
     publicJson<{ items: { key: string }[] }>(ctx, '/api/departments/public?locale=fr'),
     publicJson<{ items: { slug: string }[] }>(ctx, '/api/sermons/public?locale=fr&limit=24'),
+    publicJson<{ items: { weekOf: string }[] }>(ctx, '/api/bulletin/public/archive?locale=fr'),
   ])
   const seen = new Set<string>()
   for (const r of news)
@@ -88,6 +90,13 @@ export const GET: APIRoute = async (ctx) => {
   if (sermons.state === 'ok')
     for (const it of sermons.data.items)
       entries.push({ fr: sermonHref('fr', it.slug), en: sermonHref('en', it.slug) })
+  if (bulletins.state === 'ok')
+    for (const it of bulletins.data.items)
+      entries.push({
+        fr: bulletinHref('fr', it.weekOf),
+        en: bulletinHref('en', it.weekOf),
+        lastmod: it.weekOf,
+      })
   if (guides.state === 'ok')
     for (const it of guides.data.items)
       entries.push({ fr: guideHref('fr', it.slug), en: guideHref('en', it.slug) })

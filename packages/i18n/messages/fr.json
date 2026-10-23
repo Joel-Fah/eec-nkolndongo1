@@ -832,7 +832,7 @@
       },
       "mapillustration": {
         "name": "Carte dessinée",
-        "desc": "Une carte illustrée, pas une vraie : courbes de niveau de la colline, ruisseau, routes, blocs et le repère de la paroisse, avec le bouton Google Maps par-dessus. Aucune donnée tierce chargée.",
+        "desc": "Une carte illustrée, pas une vraie : courbes de niveau de la colline, ruisseau, routes, blocs et le repère de la paroisse, avec le bouton Google Maps par-dessus. Aucune donnée tierce chargée. Une fois le dessin terminé, un clic sur le bâtiment le fait rebondir (lui seul) ; sans effet avec « réduire les animations ».",
         "use": "<MapIllustration name href label /> sur Nous trouver.",
         "a11y": "Décoratif (aria-hidden) ; l’adresse et le bouton portent l’information."
       },

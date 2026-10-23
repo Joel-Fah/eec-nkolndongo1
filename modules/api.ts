@@ -1,5 +1,6 @@
 /** Server side of the registry: each module's API router, mounted at /api/<id> (apps/api). */
 import type { AppEnv } from '@eec/api-kit'
+import { bulletinApi } from '@eec/module-bulletin/api'
 import { contactApi } from '@eec/module-contact/api'
 import { departmentsApi } from '@eec/module-departments/api'
 import { eventsApi } from '@eec/module-events/api'
@@ -29,6 +30,7 @@ export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   news: newsApi,
   sermons: sermonsApi,
   meditations: meditationsApi,
+  bulletin: bulletinApi,
   story: storyApi,
   schedule: scheduleApi,
   settings: settingsApi,

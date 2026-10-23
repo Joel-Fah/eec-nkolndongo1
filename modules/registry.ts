@@ -5,6 +5,7 @@
  * Data only — no server or browser code here, so both the API and the admin can import it.
  */
 import { coreModule } from '@eec/auth/core-module'
+import { bulletinModule } from '@eec/module-bulletin'
 import { contactModule } from '@eec/module-contact'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
@@ -29,6 +30,7 @@ export const modules: readonly DefinedModule[] = [
   newsModule,
   sermonsModule,
   meditationsModule,
+  bulletinModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

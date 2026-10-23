@@ -11,7 +11,7 @@ import Select from '@eec/ui/astro/Select.astro'
 import Site from '../../layouts/Site.astro'
 import { type MeditationDay, type MeditationPlan, publicJson } from '../../lib/content-api'
 import { localeOf, useT } from '../../lib/i18n'
-import { meditationsHref } from '../../lib/meditations-routes'
+import { bulletinHref, meditationsHref } from '../../lib/meditations-routes'
 import { labelKey } from '../../lib/nav'
 import PageHero from '../page/PageHero.astro'
 import UnavailableState from './UnavailableState.astro'
@@ -63,6 +63,11 @@ const monthDays = await publicJson<Month>(
   `/api/meditations/public/month?locale=${locale}&month=${/^\d{4}-\d{2}$/.test(monthFor) ? monthFor : date.slice(0, 7)}`,
 )
 const listed = monthDays.state === 'ok' ? monthDays.data.days : []
+const bulletin = await publicJson<{ bulletin: { weekOf: string; title: string } | null }>(
+  Astro,
+  `/api/bulletin/public/latest?locale=${locale}`,
+)
+const latestBulletin = bulletin.state === 'ok' ? bulletin.data.bulletin : null
 const base = meditationsHref(locale)
 const link = (d: string) => `${base}?jour=${d}`
 const labelText = (l: string) => (l ? s(`label_${l}`) : '')
@@ -170,6 +175,15 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
                 ))
               }
             </ul>
+          </section>
+
+          <section class="md-bulletin" aria-labelledby="md-bl-h">
+            <h2 id="md-bl-h" class="md-h">{s('bulletin_h')}</h2>
+            <a class="md-bl-card" href={latestBulletin ? bulletinHref(locale, latestBulletin.weekOf) : bulletinHref(locale)}>
+              <span class="md-bl-icon" aria-hidden="true"><Icon name="newspaper" size={24} /></span>
+              <span>{latestBulletin ? `${fmt(latestBulletin.weekOf, { weekday: 'long', day: 'numeric', month: 'long' })}${latestBulletin.title ? ` — ${latestBulletin.title}` : ''}` : t('bulletin.site.empty_t')}</span>
+              <Icon name="arrowRight" size={20} />
+            </a>
           </section>
 
           <section class="md-cal" data-med-calendar data-locale={locale} data-busy={s('calendar_busy')} data-error={s('calendar_error')} data-label={plan.slug} aria-labelledby="md-cal-h">
@@ -408,6 +422,38 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
     font-style: normal;
     font-size: var(--text-xs);
     font-weight: 700;
+    color: var(--primary);
+  }
+  .md-bulletin {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .md-bl-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .md-bl-card > span:nth-child(2) {
+    flex: 1;
+    text-transform: capitalize;
+  }
+  .md-bl-card:hover {
+    box-shadow: var(--elevation-2);
+  }
+  .md-bl-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
     color: var(--primary);
   }
   .md-cal {

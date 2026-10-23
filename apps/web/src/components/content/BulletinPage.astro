@@ -1,0 +1,351 @@
+---
+/**
+ * The bulletin on the site: a clean reading page, A4 or A5 print layouts through print CSS (no server PDF), a WhatsApp share,
+ * the paper bulletin's PDF link (any https address, shown with its host), and the archive by month. French first.
+ */
+import { shortDate } from '@eec/core/dates'
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import { bulletinHref, meditationsHref } from '../../lib/meditations-routes'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  week?: string
+}
+const { week } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`bulletin.site.${key}` as 'bulletin.site.title', vars)
+type B = {
+  weekOf: string
+  title: string
+  pdfUrl: string
+  publishedAt: string | null
+  blocks: {
+    id: string
+    kind: string
+    title: string
+    items: { title: string; text: string; fallback: boolean }[]
+  }[]
+}
+const res = week
+  ? await publicJson<{ bulletin: B | null }>(
+      Astro,
+      `/api/bulletin/public/item/${encodeURIComponent(week)}?locale=${locale}`,
+    )
+  : await publicJson<{ bulletin: B | null }>(Astro, `/api/bulletin/public/latest?locale=${locale}`)
+const archive = await publicJson<{ items: { weekOf: string; title: string }[] }>(
+  Astro,
+  `/api/bulletin/public/archive?locale=${locale}`,
+)
+const b = res.state === 'ok' ? res.data.bulletin : null
+const unavailable = res.state === 'unavailable'
+if (!b && week && !unavailable) Astro.response.status = 404
+Astro.response.headers.set(
+  'cache-control',
+  b ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
+)
+const format = Astro.url.searchParams.get('format') === 'a5' ? 'a5' : 'a4'
+const fmt = (d: string) =>
+  new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${d}T12:00:00Z`))
+const url = b ? new URL(bulletinHref(locale, b.weekOf), Astro.site ?? Astro.url).href : ''
+const wa = b
+  ? `https://wa.me/?text=${encodeURIComponent(`${s('title')} — ${fmt(b.weekOf)}\n${url}`)}`
+  : ''
+const host = b?.pdfUrl ? new URL(b.pdfUrl).hostname.replace(/^www\./, '') : ''
+// Archive grouped by month.
+const groups = new Map<string, { weekOf: string; title: string }[]>()
+for (const it of archive.state === 'ok' ? archive.data.items : [])
+  groups.set(it.weekOf.slice(0, 7), [...(groups.get(it.weekOf.slice(0, 7)) ?? []), it])
+const monthName = (m: string) => {
+  const n = new Intl.DateTimeFormat(locale, {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${m}-01T12:00:00Z`))
+  return n.charAt(0).toUpperCase() + n.slice(1)
+}
+const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
+---
+
+<Site title={b ? `${s('title')} — ${fmt(b.weekOf)}` : s('title')} description={b ? b.title || s('latest') : undefined} noindex={!b}>
+  <article class="bl" data-format={format}>
+    <p class="bl-back bl-noprint"><a href={meditationsHref(locale)}><Icon name="chevronLeft" size={20} />{t('meditations.site.today_h')}</a></p>
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !b ? (
+        <div class="bl-empty">
+          <Illustration name="news" class="bl-art" />
+          <p class="bl-empty-title">{week ? s('not_found_t') : s('empty_t')}</p>
+          <p>{week ? s('not_found_p') : s('empty_p')}</p>
+        </div>
+      ) : (
+        <>
+          <header class="bl-head">
+            <p class="bl-kicker">{t('site.parish')}</p>
+            <h1 class="bl-title">{b.title || s('title')}</h1>
+            <p class="bl-week">{fmt(b.weekOf)}</p>
+          </header>
+          {anyFallback && <p class="bl-note bl-noprint">{s('fallback')}</p>}
+          <div class="bl-blocks">
+            {
+              b.blocks.map((blk) => (
+                <section class="bl-block" data-kind={blk.kind}>
+                  <h2 class="bl-h">{blk.title}</h2>
+                  <ul class="bl-items">
+                    {blk.items.map((it) => (
+                      <li>
+                        {it.title && <strong>{it.title}</strong>}
+                        {it.text && <span>{it.text}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))
+            }
+          </div>
+          <div class="bl-actions bl-noprint">
+            <form method="get" class="bl-format" aria-label={s('format')}>
+              <label><input type="radio" name="format" value="a4" checked={format === 'a4'} />{s('a4')}</label>
+              <label><input type="radio" name="format" value="a5" checked={format === 'a5'} />{s('a5')}</label>
+            </form>
+            <button type="button" class="btn btn-primary" data-print><Icon name="print" size={20} />{s('print')}</button>
+            <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share_whatsapp')}<Icon name="external" size={16} /></Button>
+            {b.pdfUrl && <Button href={b.pdfUrl} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="pdf" size={20} />{s('pdf')} · {s('opens_in', { host })}</Button>}
+          </div>
+        </>
+      )
+    }
+
+    {
+      groups.size > 0 && (
+        <section class="bl-archive bl-noprint" aria-labelledby="bl-arch-h">
+          <h2 id="bl-arch-h" class="bl-h">{s('archive')}</h2>
+          {[...groups.entries()].map(([m, items]) => (
+            <div class="bl-month">
+              <h3>{monthName(m)}</h3>
+              <ul>
+                {items.map((x) => <li><a href={bulletinHref(locale, x.weekOf)} aria-current={b?.weekOf === x.weekOf ? 'page' : undefined}>{fmt(x.weekOf)}{x.title ? ` — ${x.title}` : ''}</a></li>)}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )
+    }
+  </article>
+</Site>
+
+<script>
+  const bind = () => {
+    for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-print]'))
+      if (!btn.dataset.bound) {
+        btn.dataset.bound = '1'
+        btn.addEventListener('click', () => window.print())
+      }
+    // Choosing a format only changes the page's address (?format=a5) so the print layout and the preview agree.
+    for (const form of document.querySelectorAll<HTMLFormElement>('.bl-format'))
+      if (!form.dataset.bound) {
+        form.dataset.bound = '1'
+        form.addEventListener('change', () => form.requestSubmit())
+      }
+  }
+  bind()
+  document.addEventListener('astro:page-load', bind)
+</script>
+
+<style>
+  .bl {
+    display: grid;
+    gap: 1.75rem;
+    width: min(100% - 2rem, 46rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .bl-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .bl-head {
+    display: grid;
+    gap: 0.375rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--primary-soft);
+  }
+  .bl-kicker {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .bl-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.08;
+  }
+  .bl-week {
+    font-size: var(--text-lg, 1.125rem);
+    text-transform: capitalize;
+  }
+  .bl-note {
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    font-size: var(--text-sm);
+  }
+  .bl-blocks {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .bl-block {
+    display: grid;
+    gap: 0.625rem;
+    break-inside: avoid;
+  }
+  .bl-h {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+  .bl-items {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .bl-items li {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+    break-inside: avoid;
+  }
+  .bl-items strong {
+    font-weight: 700;
+  }
+  .bl-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .bl-format {
+    display: inline-flex;
+    gap: 1rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+  .bl-format label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.25rem;
+  }
+  .bl-archive {
+    display: grid;
+    gap: 1rem;
+  }
+  .bl-month h3 {
+    font-weight: 700;
+    margin-block-end: 0.375rem;
+  }
+  .bl-month ul {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .bl-month a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    color: inherit;
+    text-decoration: none;
+  }
+  .bl-month a:hover,
+  .bl-month a[aria-current] {
+    background: var(--primary-soft);
+  }
+  .bl-empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface-2);
+    text-align: center;
+  }
+  .bl-empty :global(.bl-art) {
+    width: min(100%, 16rem);
+    height: auto;
+  }
+  .bl-empty-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+</style>
+
+<style is:global>
+  /* Print: only the bulletin, on white, in A4 or A5 (chosen with ?format=); the browser's « Save as PDF » makes the file. */
+  @page a4 {
+    size: A4;
+    margin: 14mm;
+  }
+  @page a5 {
+    size: A5;
+    margin: 10mm;
+  }
+  @media print {
+    .bl[data-format='a4'] {
+      page: a4;
+    }
+    .bl[data-format='a5'] {
+      page: a5;
+      font-size: 0.9em;
+    }
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+    .bl-noprint,
+    .skip-link,
+    .site-ribbon,
+    .site-header,
+    header.site-header,
+    .site-cta,
+    .site-footer,
+    footer,
+    .site-playground,
+    #mobile-menu,
+    #search-dialog {
+      display: none !important;
+    }
+    .bl {
+      width: 100%;
+      padding: 0;
+    }
+    .bl-head {
+      background: transparent;
+      box-shadow: inset 0 0 0 1.5px #000;
+    }
+    .bl-items li {
+      box-shadow: inset 0 0 0 1px #999;
+      background: transparent;
+    }
+  }
+</style>

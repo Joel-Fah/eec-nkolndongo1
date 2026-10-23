@@ -107,11 +107,34 @@ const { name = '', href, label } = Astro.props
 </div>
 
 <script>
-  // The drawing traces itself the first time the map scrolls into view (instantly, if motion is reduced).
+  // The drawing traces itself the first time the map scrolls into view (instantly, if motion is reduced). Once the building has
+  // risen, a click on it makes it bounce (the building only; a squash and a hop, once at a time). Decorative: no keyboard role.
+  const RISE_MS = 3300
   const run = () => {
     for (const el of document.querySelectorAll<HTMLElement>('[data-map]:not([data-js])')) {
       el.setAttribute('data-js', '')
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+      const bld = el.querySelector<SVGGElement>('.mi-bld')
+      let bouncing = false
+      bld?.addEventListener('click', () => {
+        if (reduced || bouncing || !el.hasAttribute('data-ready')) return
+        bouncing = true
+        const a = bld.animate(
+          [
+            { transform: 'translateY(0) scale(1, 1)' },
+            { transform: 'translateY(0) scale(1.08, 0.82)', offset: 0.18 },
+            { transform: 'translateY(-9px) scale(0.95, 1.14)', offset: 0.42 },
+            { transform: 'translateY(0) scale(1.06, 0.88)', offset: 0.68 },
+            { transform: 'translateY(-2px) scale(0.99, 1.03)', offset: 0.84 },
+            { transform: 'translateY(0) scale(1, 1)' },
+          ],
+          { duration: 720, easing: 'cubic-bezier(.3,.7,.4,1)' },
+        )
+        a.onfinish = a.oncancel = () => {
+          bouncing = false
+        }
+      })
+      if (reduced || !('IntersectionObserver' in window)) {
         el.setAttribute('data-in', '')
         continue
       }
@@ -120,6 +143,7 @@ const { name = '', href, label } = Astro.props
           if (entries.some((e) => e.isIntersecting)) {
             el.setAttribute('data-in', '')
             io.disconnect()
+            setTimeout(() => el.setAttribute('data-ready', ''), RISE_MS)
           }
         },
         { threshold: 0.4 },
@@ -175,6 +199,9 @@ const { name = '', href, label } = Astro.props
     transition:
       transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s,
       opacity 0.3s ease 2.2s;
+  }
+  .mi[data-ready] .mi-bld {
+    cursor: pointer;
   }
   .mi[data-js]:not([data-in]) .mi-bld {
     transform: scaleY(0.05);
