@@ -183,6 +183,13 @@
       "when": 1792762692870,
       "tag": "0025_lumpy_titania",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792766922857,
+      "tag": "0026_tricky_electro",
+      "breakpoints": true
     }
   ]
 }
