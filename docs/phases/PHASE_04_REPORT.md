@@ -68,3 +68,27 @@ persistent mini-player with Media Session, the podcast RSS. All parked in 0034 f
 - **Tests:** 7 unit tests (links, YouTube parsing, input); route-table and boundaries tests green; `pnpm check` 81/81.
 - **Not done / to decide:** a series has no page of its own (the list is filtered by `?series=`); « Quick-create from a Sunday »
   is a picker inside the editor, not a button on the Sunday; weights (production build, lab profile 4× CPU, slow 4G): list JS 16.1 KB gz / 150 KB first load, sermon page 15 KB / 144 KB, third-party 0; the home 16.6 KB / 209 KB. LCP 2.7–3.2 s on the new pages in this lab run (warm local workerd, dev database): above 2.5 s, to read again on a real phone.
+
+## Checkpoint C — meditations and bulletin built on dev; registrations NOT built (decision 0035 awaits Joël)
+- **Meditations** (module `meditations`, migration 0022): programmes (dates, publish), days with up to three readings + a psalm +
+  optional headline, reflection and verse of the day; **CSV import** checked line by line in the browser and again on the server
+  (`readMeditationCsv` in `@eec/core`); the parish's **real 2026 calendar** (184 days, July–December) is the test fixture: it reads
+  with **no error and no unknown book**, and two **warnings** (2026-09-16 and 09-17: the psalm column holds « 1-22 » / « 23-43 »,
+  verse ranges without a psalm number: to check with the Bible service). The « Reflection Theme » and « Status » columns are ignored.
+- **Passages** are the parish's own printed references (« Amos 4, 1-13 », « Jean 7, 53–8, 11 », « Esaïe 63, 16-19; 64, 2-7 »),
+  shown in French as written and in English with the book translated and verses with a colon; **no text is stored**, except the
+  verse of the day **if staff type it** (LSG / WEB, decision 0032). The verse of the day is picked from the day's readings and, when it
+  has a text, **replaces the home verse for that day** (the general verse stays as the fallback).
+- **Public « Méditations et bulletin »:** the meditation of the day (previous/next day without reloading), the week strip, the month's
+  programme (custom month select), « Ajouter à mon calendrier » (an .ics built **in the browser** at the hour the visitor picks, nothing
+  sent), a home « Méditation du jour » card.
+- **Bulletin** (module `bulletin`, migration 0023): « Composer le bulletin de dimanche » assembles a draft **from the site's own public
+  data** (this Sunday, the week's events, the meditations, the recent news) in the admin, or copies last week's, or starts empty; blocks
+  are editable and reorderable, French and English; publish; public reading page with the archive by month, **A4 / A5 print layouts
+  through print CSS** (checked: Chromium prints A4 594×842 pt and A5 420×595 pt; no server PDF), WhatsApp share, and a link to the
+  paper bulletin's PDF as any https address.
+- **Deviations / not done:** the PDF is a link, not a library file (the media picker only handles images); the news « annonce »
+  category does not exist, so announcements are the week's news posts, edited by hand; the OG card for a bulletin is the news card.
+- **Registrations:** decision **0035 written as PROPOSED** and `data-protection.md` updated; **no registration code exists**. Questions for
+  Joël are at the end of 0035.
+- **Also in this round:** the isometric church on the Find us map bounces on click once its drawing is complete.

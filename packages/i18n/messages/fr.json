@@ -925,6 +925,30 @@
         "desc": "Des liens « Écouter ou télécharger » : une icône, le nom donné par l’équipe et, dessous, le site où le lien mène (« S’ouvre sur drive.google.com »). Le lien s’ouvre dans un nouvel onglet ; la page ne charge rien de ce site.",
         "use": ".sd-link ; adresses https uniquement, jamais obligatoires ; décision 0034.",
         "a11y": "Le nom du lien est visible et l’hôte aussi ; rel=\"noopener noreferrer\" ; cible 56 px de haut."
+      },
+      "meditationcard": {
+        "name": "Méditation du jour",
+        "desc": "La carte du jour : la date, le titre de la fête s’il y en a un, chaque lecture dans sa pastille (Ancien Testament, Épître, Évangile), le psaume à part, et le verset du jour quand son texte a été saisi. Jour précédent / suivant sans recharger.",
+        "use": "Public → Méditations et bulletin ; .md-today ; références seulement (décision 0032).",
+        "a11y": "Une liste de lectures ; la date est un titre ; les boutons de navigation sont écrits ; le jour courant est marqué aria-current."
+      },
+      "weekstrip": {
+        "name": "Semaine en bandeau",
+        "desc": "Sept jours, du lundi au dimanche, chacun avec son jour, son numéro et sa première lecture ; le jour choisi est plein, aujourd’hui est cerclé d’or.",
+        "use": ".md-week-grid, .md-day ; liens qui ne changent que la zone des résultats.",
+        "a11y": "Chaque jour est un lien ; aria-current=\"date\" ; la couleur n’est jamais le seul signal."
+      },
+      "csvimport": {
+        "name": "Import CSV vérifié",
+        "desc": "Un fichier ou un texte collé est lu dans le navigateur ; un compte rendu dit combien de jours, quelles lignes ont une erreur (bloquante) ou un avertissement, et montre les premiers jours avant toute écriture.",
+        "use": "Administration → Méditations → Importer ; readMeditationCsv dans @eec/core ; le serveur revérifie chaque ligne.",
+        "a11y": "Le compte rendu est annoncé (role=status) ; chaque problème a une icône, un texte et sa ligne."
+      },
+      "printbulletin": {
+        "name": "Bulletin imprimable",
+        "desc": "Le bulletin de la semaine en page de lecture, avec un choix A4 ou A5 : à l’impression le menu, le pied de page et les boutons disparaissent, et la page prend la taille choisie (aucun PDF fabriqué par le serveur).",
+        "use": ".bl, @page a4 / a5 (page nommée) ; ?format=a5 ; « Enregistrer en PDF » du navigateur.",
+        "a11y": "Titres hiérarchisés, rubriques en listes ; l’impression est en noir sur blanc ; les actions ne sont pas imprimées."
       }
     },
     "rules": {

@@ -111,6 +111,10 @@ type Id =
   | 'sermoncard'
   | 'videofacade'
   | 'outboundlinks'
+  | 'meditationcard'
+  | 'weekstrip'
+  | 'csvimport'
+  | 'printbulletin'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -330,6 +334,14 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('videofacade')}><p class="text-sm text-ink-muted">{t('brand.components.videofacade.use')}</p></DocBlock>
 
     <DocBlock {...doc('outboundlinks')}><p class="text-sm text-ink-muted">{t('brand.components.outboundlinks.use')}</p></DocBlock>
+
+    <DocBlock {...doc('meditationcard')}><p class="text-sm text-ink-muted">{t('brand.components.meditationcard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('weekstrip')}><p class="text-sm text-ink-muted">{t('brand.components.weekstrip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('csvimport')}><p class="text-sm text-ink-muted">{t('brand.components.csvimport.use')}</p></DocBlock>
+
+    <DocBlock {...doc('printbulletin')}><p class="text-sm text-ink-muted">{t('brand.components.printbulletin.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

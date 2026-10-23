@@ -925,6 +925,30 @@
         "desc": "“Listen or download” links: an icon, the name the team gave and, below, the site the link leads to (“Opens on drive.google.com”). The link opens in a new tab; the page loads nothing from that site.",
         "use": ".sd-link; https addresses only, never required; decision 0034.",
         "a11y": "The link name is visible and so is the host; rel=\"noopener noreferrer\"; 56 px tall target."
+      },
+      "meditationcard": {
+        "name": "Meditation of the day",
+        "desc": "The day’s card: the date, the feast’s title if any, each reading in its tile (Old Testament, Epistle, Gospel), the psalm apart, and the verse of the day when its text was typed. Previous / next day without reloading.",
+        "use": "Public → Meditations and bulletin; .md-today; references only (decision 0032).",
+        "a11y": "A list of readings; the date is a heading; navigation buttons are written; the current day is marked aria-current."
+      },
+      "weekstrip": {
+        "name": "Week strip",
+        "desc": "Seven days, Monday to Sunday, each with its weekday, number and first reading; the chosen day is filled, today is ringed in gold.",
+        "use": ".md-week-grid, .md-day; links that only change the results area.",
+        "a11y": "Each day is a link; aria-current=\"date\"; colour is never the only signal."
+      },
+      "csvimport": {
+        "name": "Checked CSV import",
+        "desc": "A file or pasted text is read in the browser; a report says how many days, which lines have an error (blocking) or a warning, and shows the first days before anything is written.",
+        "use": "Admin → Meditations → Import; readMeditationCsv in @eec/core; the server checks each row again.",
+        "a11y": "The report is announced (role=status); each problem has an icon, text and its line."
+      },
+      "printbulletin": {
+        "name": "Printable bulletin",
+        "desc": "The week’s bulletin as a reading page, with an A4 or A5 choice: when printing, the menu, footer and buttons disappear and the page takes the chosen size (no PDF made by the server).",
+        "use": ".bl, @page a4 / a5 (named page); ?format=a5; the browser’s “Save as PDF”.",
+        "a11y": "Ordered headings, sections as lists; print is black on white; actions are not printed."
       }
     },
     "rules": {

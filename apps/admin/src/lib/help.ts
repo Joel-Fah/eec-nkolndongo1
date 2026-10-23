@@ -41,6 +41,28 @@ export const GUIDES: Guide[] = [
     screens: ['/m/sermons'],
   },
   {
+    slug: 'meditations',
+    icon: 'book',
+    summary: {
+      fr: 'Le calendrier de l’année en CSV, puis publié.',
+      en: 'The year’s calendar as a CSV, then published.',
+    },
+    title: { fr: 'Importer le programme de méditation', en: 'Import the meditation programme' },
+    permission: 'meditations:edit',
+    screens: ['/m/meditations'],
+  },
+  {
+    slug: 'bulletin',
+    icon: 'newspaper',
+    summary: {
+      fr: 'Remplir depuis le site, corriger, publier, imprimer.',
+      en: 'Fill from the site, correct, publish, print.',
+    },
+    title: { fr: 'Composer le bulletin de dimanche', en: 'Compose the Sunday bulletin' },
+    permission: 'bulletin:edit',
+    screens: ['/m/bulletin'],
+  },
+  {
     slug: 'programmer-actualite',
     icon: 'calendar',
     summary: {

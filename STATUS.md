@@ -13,7 +13,8 @@ access test, separate preview Worker on dev data).
 (CPU, LCP, CLS, egress), TalkBack + keyboard + tap-to-dial + `.ics` device pass, and the R2 / launch-address answers. They gate the
 PR merge (merging deploys) and Checkpoint B's audio decision (0034), not the dev work.
 **Checkpoint B (sermons, links only, decision 0034) built on dev:** see `docs/phases/PHASE_04_REPORT.md`.
-**Next:** Joël's review of A and B → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
+**Checkpoint C (meditations with the real 2026 calendar, bulletin) built on dev; registrations waiting for decision 0035.**
+**Next:** Joël's review of A, B and C → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:
 video-only first; audio after 0034).
 
 ## Previous phase: 03 — Parish Life (merged into main, deployed 2026-10-22)

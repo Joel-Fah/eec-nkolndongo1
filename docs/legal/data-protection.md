@@ -81,6 +81,15 @@
   youtube-nocookie.com (YouTube then sees that visitor, under its own policy: stated in the privacy policy). The audit log records
   which fields changed, never the name or a link.
 
+## Proposed for Phase 04b — **not built, awaiting Joël's review** (decision 0035)
+- **Event registrations**: name, phone **or** e-mail, number of people, and optional fields chosen per form from a short list
+  (group, age band, short text, choices, yes/no). No sensitive question can be added. **Children** only through a parent or
+  guardian, as a **first name and an age band**. One unticked consent box per registration, stored with the policy version.
+- **Retention**: 6 months after the event, hard cap 12 months after the form closed; attendance counts kept anonymised.
+- **Access**: read, manage and export are separate permissions (the CSV export is dangerous and audited); a group leader sees
+  their own group's forms only; the check-in view shows names, not phone numbers.
+- The privacy policy gets a new version when this ships; members are informed (decision 0033).
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.
