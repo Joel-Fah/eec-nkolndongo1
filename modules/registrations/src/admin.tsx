@@ -294,7 +294,7 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
       {list.data && items.length === 0 && !creating ? (
         <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />
       ) : view === 'grid' ? (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="admin-grid-3">
           {items.map((f) => (
             <li key={f.id}>{tile(f)}</li>
           ))}

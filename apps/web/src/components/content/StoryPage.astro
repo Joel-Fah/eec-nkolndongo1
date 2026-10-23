@@ -64,11 +64,19 @@ Astro.response.headers.set(
                     {m.text && <p class="hc-text">{m.text}</p>}
                     {pics.length > 0 && (
                       <div class="hc-deck" data-layout={pics.length === 1 ? 'one' : layout} style={`--n:${pics.length}`}>
-                        {pics.map((pic, j) => (
-                          <figure class="hc-pic" style={`--i:${j};--rx:${(((i * 7 + j * 13) % 11) - 5) * 1.6}deg;--dx:${(((i * 5 + j * 9) % 7) - 3) * 4}%;--dy:${(((i * 3 + j * 5) % 5) - 2) * 5}%`}>
-                            <Picture class="hc-img" media={pic} sizes="(min-width: 48rem) 20rem, 90vw" decorative />
-                          </figure>
-                        ))}
+                        {pics.map((pic, j) => {
+                          const finale = i === milestones.length - 1 && j === pics.length - 1
+                          return (
+                            <figure class="hc-pic" data-finale={finale ? '' : undefined} style={`--i:${j};--rx:${(((i * 7 + j * 13) % 11) - 5) * 1.6}deg;--dx:${(((i * 5 + j * 9) % 7) - 3) * 4}%;--dy:${(((i * 3 + j * 5) % 5) - 2) * 5}%`}>
+                              <div class="hc-photo"><Picture class="hc-img" media={pic} sizes="(min-width: 48rem) 20rem, 90vw" decorative /></div>
+                              {finale && (
+                                <span class="hc-cheer" aria-hidden="true">
+                                  {Array.from({ length: 14 }, (_, c) => <i style={`--k:${c}`} data-shape={['star', 'dot', 'bar', 'ring'][c % 4]} />)}
+                                </span>
+                              )}
+                            </figure>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
@@ -88,7 +96,7 @@ Astro.response.headers.set(
                 { art: 'solidarity', t: s('way2_t'), p: s('way2_p') },
                 { art: 'collecting', t: s('way3_t'), p: s('way3_p') },
               ].map((w, n) => (
-                <li class="hc-way" style={`--n:${n}`}>
+                <li class="hc-way" style={`--n:${n};--crop:${['16%', '0%', '30%'][n]}`} data-mid={n === 1 ? '' : undefined}>
                   <div class="hc-way-art"><Illustration name={w.art} /></div>
                   <p class="hc-way-t">{w.t}</p>
                   <p class="hc-way-p">{w.p}</p>
@@ -242,8 +250,9 @@ Astro.response.headers.set(
     margin-block-start: 0.75rem;
     color: var(--ink-muted);
   }
-  /* A step's pictures as a deck of cards. Every picture grows a little when hovered. */
+  /* A step's pictures as a deck of polaroids, each layout keeping its own arrangement. Every picture grows a little when hovered. */
   .hc-deck {
+    --polaroid: #fff;
     position: relative;
     display: grid;
     margin-block-start: 1rem;
@@ -251,18 +260,29 @@ Astro.response.headers.set(
     isolation: isolate;
   }
   .hc-pic {
-    overflow: hidden;
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.5rem 1.75rem;
+    border-radius: var(--radius-xs, 0.25rem);
+    background: var(--polaroid);
     box-shadow: var(--elevation-2);
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 5 / 4.4;
     transition:
       transform var(--duration-ui, 0.28s) var(--ease-out, ease),
       scale var(--duration-ui, 0.28s) var(--ease-out, ease),
       box-shadow var(--duration-ui, 0.28s) var(--ease-out, ease);
   }
+  .hc-photo {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 0.125rem;
+  }
   .hc-pic :global(img),
+  .hc-pic :global(picture),
   .hc :global(.hc-img) {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -272,7 +292,10 @@ Astro.response.headers.set(
     scale: 1.06;
     box-shadow: var(--elevation-3, var(--elevation-2));
   }
-  /* One picture (the last step's is tilted, as if pinned there). */
+  /* One picture: a little askew, as if pinned; the last step's is tilted the other way. */
+  .hc-deck[data-layout='one'] .hc-pic {
+    transform: rotate(1.5deg);
+  }
   .hc-item[data-last] .hc-deck[data-layout='one'] .hc-pic {
     transform: rotate(-3.5deg);
   }
@@ -294,7 +317,6 @@ Astro.response.headers.set(
   .hc-deck[data-layout='fan']:hover .hc-pic {
     transform: translateX(calc(var(--o) * 52%)) rotate(calc(var(--o) * 3deg));
   }
-  /* Stack: slightly offset cards. */
   .hc-deck[data-layout='stack'] {
     padding-block-end: 2.5rem;
   }
@@ -305,25 +327,50 @@ Astro.response.headers.set(
   .hc-deck[data-layout='stack']:hover .hc-pic {
     transform: translate(calc(var(--i) * 14%), calc(var(--i) * 12%)) rotate(calc(var(--i) * -3deg));
   }
-  /* Bento: a wide picture, and smaller ones below that tuck slightly over it. */
+  /* Bento: a wide main picture; the others lie on top of it, tilted, just covering its edges (one at the top left, the rest below). */
   .hc-deck[data-layout='bento'] {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.5rem;
+    display: block;
+    padding: 1.5rem 0.75rem 3rem;
   }
   .hc-deck[data-layout='bento'] .hc-pic {
-    grid-column: span 2;
-    aspect-ratio: 1;
-    margin-block-start: -1.75rem;
-    border: 0.25rem solid var(--surface);
-    position: relative;
+    position: absolute;
     z-index: 1;
+    width: 36%;
+    aspect-ratio: 1;
   }
   .hc-deck[data-layout='bento'] .hc-pic:first-child {
-    grid-column: span 6;
-    aspect-ratio: 16 / 9;
-    margin-block-start: 0;
-    border: 0;
+    position: relative;
     z-index: 0;
+    width: auto;
+    aspect-ratio: 16 / 10;
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:nth-child(2) {
+    inset-block-start: 0;
+    inset-inline-start: -1%;
+    transform: rotate(-7deg);
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:nth-child(3) {
+    inset-block-end: 1rem;
+    inset-inline-start: 8%;
+    transform: rotate(5deg);
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:nth-child(4) {
+    inset-block-end: 0.5rem;
+    inset-inline-end: 4%;
+    transform: rotate(-4deg);
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:nth-child(5) {
+    inset-block-start: 0;
+    inset-inline-end: -1%;
+    transform: rotate(6deg);
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:nth-child(6) {
+    inset-block-end: 0.5rem;
+    inset-inline-end: 30%;
+    transform: rotate(3deg);
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:not(:first-child):hover {
+    transform: rotate(0deg);
   }
   /* Scatter: polaroids dropped on the table. */
   .hc-deck[data-layout='scatter'] {
@@ -332,19 +379,67 @@ Astro.response.headers.set(
     padding-block: 1rem 2rem;
   }
   .hc-deck[data-layout='scatter'] .hc-pic {
-    padding: 0.5rem 0.5rem 1.75rem;
-    border-radius: var(--radius-xs, 0.25rem);
-    background: #fff;
     aspect-ratio: 1;
     margin: -0.5rem;
     transform: translate(var(--dx), var(--dy)) rotate(var(--rx));
   }
-  .hc-deck[data-layout='scatter'] .hc-pic :global(img),
-  .hc-deck[data-layout='scatter'] .hc-pic :global(picture) {
-    border-radius: 0.125rem;
-  }
   .hc-deck[data-layout='scatter'] .hc-pic:hover {
     transform: translate(var(--dx), var(--dy)) rotate(0deg);
+  }
+  /* The very last picture: hovering it throws a little party. The pieces pop in together and stay while hovered;
+     when the pointer leaves they fade out one after another, slowly. */
+  .hc-cheer {
+    position: absolute;
+    inset: -14% -12%;
+    pointer-events: none;
+  }
+  .hc-cheer i {
+    --a: calc(var(--k) * 25.7deg);
+    position: absolute;
+    inset-block-start: calc(50% + 50% * sin(var(--a)));
+    inset-inline-start: calc(50% + 52% * cos(var(--a)));
+    width: 0.75rem;
+    height: 0.75rem;
+    margin: -0.375rem;
+    opacity: 0;
+    scale: 0.3;
+    rotate: calc(var(--k) * 37deg);
+    background: var(--c, var(--gold));
+    transition:
+      opacity 1.4s ease calc(var(--k) * 0.18s),
+      scale 1.4s ease calc(var(--k) * 0.18s);
+  }
+  .hc-cheer i:nth-child(3n) {
+    --c: var(--primary);
+  }
+  .hc-cheer i:nth-child(3n + 1) {
+    --c: var(--clay, var(--season));
+  }
+  .hc-cheer i[data-shape='star'] {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: -0.55rem;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+  .hc-cheer i[data-shape='dot'] {
+    border-radius: 50%;
+  }
+  .hc-cheer i[data-shape='bar'] {
+    width: 0.375rem;
+    height: 1.25rem;
+    border-radius: 0.125rem;
+  }
+  .hc-cheer i[data-shape='ring'] {
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: inset 0 0 0 0.2rem var(--c, var(--gold));
+  }
+  .hc-pic:hover .hc-cheer i {
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 0.25s ease calc(var(--k) * 0.03s),
+      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--k) * 0.03s);
   }
   @media (prefers-reduced-motion: reduce) {
     .hc-pic {
@@ -355,6 +450,9 @@ Astro.response.headers.set(
     }
     .hc-deck:hover .hc-pic {
       transform: none;
+    }
+    .hc-cheer i {
+      transition-duration: 0.01s;
     }
   }
   @media (max-width: 47.99rem) {
@@ -432,7 +530,10 @@ Astro.response.headers.set(
     z-index: 2;
     scale: 1.05;
   }
+  /* The illustration is cropped at the foot by --crop (more on the last card); the middle one stands on the bottom edge, a little larger. */
   .hc-way-art {
+    display: flex;
+    align-items: flex-end;
     overflow: hidden;
     border-radius: var(--radius-sm);
     background: var(--primary-soft);
@@ -440,7 +541,12 @@ Astro.response.headers.set(
   }
   .hc-way-art :global(.illo) {
     display: block;
-    margin-block-end: -10%;
+    width: 100%;
+    margin-block-end: calc(var(--crop) * -1);
+  }
+  .hc-way[data-mid] .hc-way-art :global(.illo) {
+    transform: scale(1.2);
+    transform-origin: 50% 100%;
   }
   .hc-way-art :global(img) {
     width: 100%;

@@ -181,7 +181,7 @@ function Plans({ onOpen }: { onOpen: (id: string) => void }) {
       {list.data && list.data.items.length === 0 && !creating ? (
         <EmptyState title={t(k('plans_empty_t'))} text={t(k('plans_empty_p'))} />
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="admin-grid-3">
           {(list.data?.items ?? []).map((p) => (
             <li key={p.id}>
               <button type="button" className="admin-panel plan-tile" onClick={() => onOpen(p.id)}>

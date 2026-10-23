@@ -2796,3 +2796,20 @@ html[data-nav-open] {
   gap: 0.5rem;
   margin-inline-start: auto;
 }
+
+/* A grid view of cards: three columns on a wide screen, two on a tablet, one on a phone. */
+.admin-grid-3 {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 63.99rem) {
+  .admin-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 39.99rem) {
+  .admin-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
