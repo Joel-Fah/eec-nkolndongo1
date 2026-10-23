@@ -96,7 +96,7 @@ Astro.response.headers.set(
                 { art: 'solidarity', t: s('way2_t'), p: s('way2_p') },
                 { art: 'collecting', t: s('way3_t'), p: s('way3_p') },
               ].map((w, n) => (
-                <li class="hc-way" style={`--n:${n};--crop:${['16%', '0%', '30%'][n]}`} data-mid={n === 1 ? '' : undefined}>
+                <li class="hc-way" style={`--n:${n};--crop:${['21%', '10%', '28%'][n]}`} data-mid={n === 1 ? '' : undefined}>
                   <div class="hc-way-art"><Illustration name={w.art} /></div>
                   <p class="hc-way-t">{w.t}</p>
                   <p class="hc-way-p">{w.p}</p>
@@ -330,12 +330,12 @@ Astro.response.headers.set(
   /* Bento: a wide main picture; the others lie on top of it, tilted, just covering its edges (one at the top left, the rest below). */
   .hc-deck[data-layout='bento'] {
     display: block;
-    padding: 1.5rem 0.75rem 3rem;
+    padding: 2rem 1rem 4rem;
   }
   .hc-deck[data-layout='bento'] .hc-pic {
     position: absolute;
     z-index: 1;
-    width: 36%;
+    width: 29%;
     aspect-ratio: 1;
   }
   .hc-deck[data-layout='bento'] .hc-pic:first-child {
@@ -345,28 +345,28 @@ Astro.response.headers.set(
     aspect-ratio: 16 / 10;
   }
   .hc-deck[data-layout='bento'] .hc-pic:nth-child(2) {
-    inset-block-start: 0;
-    inset-inline-start: -1%;
+    inset-block-start: -0.5rem;
+    inset-inline-start: -6%;
     transform: rotate(-7deg);
   }
   .hc-deck[data-layout='bento'] .hc-pic:nth-child(3) {
-    inset-block-end: 1rem;
-    inset-inline-start: 8%;
+    inset-block-end: -0.5rem;
+    inset-inline-start: -4%;
     transform: rotate(5deg);
   }
   .hc-deck[data-layout='bento'] .hc-pic:nth-child(4) {
-    inset-block-end: 0.5rem;
-    inset-inline-end: 4%;
+    inset-block-end: -0.5rem;
+    inset-inline-end: -4%;
     transform: rotate(-4deg);
   }
   .hc-deck[data-layout='bento'] .hc-pic:nth-child(5) {
-    inset-block-start: 0;
-    inset-inline-end: -1%;
+    inset-block-start: -0.5rem;
+    inset-inline-end: -6%;
     transform: rotate(6deg);
   }
   .hc-deck[data-layout='bento'] .hc-pic:nth-child(6) {
-    inset-block-end: 0.5rem;
-    inset-inline-end: 30%;
+    inset-block-end: -1rem;
+    inset-inline-end: 36%;
     transform: rotate(3deg);
   }
   .hc-deck[data-layout='bento'] .hc-pic:not(:first-child):hover {
@@ -545,7 +545,11 @@ Astro.response.headers.set(
     margin-block-end: calc(var(--crop) * -1);
   }
   .hc-way[data-mid] .hc-way-art :global(.illo) {
-    transform: scale(1.2);
+    transform: scale(1.3);
+    transform-origin: 50% 100%;
+  }
+  .hc-way:last-child .hc-way-art :global(.illo) {
+    transform: scale(1.1);
     transform-origin: 50% 100%;
   }
   .hc-way-art :global(img) {
