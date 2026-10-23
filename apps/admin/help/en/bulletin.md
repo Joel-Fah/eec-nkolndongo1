@@ -2,7 +2,7 @@
 
 ## What it is
 
-The **bulletin** is the week’s sheet, one per Sunday: what happens this Sunday, the week’s agenda, each day’s meditation and the announcements. It appears on the site, where anyone can print it (A4 or A5) or save it as a PDF. It is not retyped: its sections come from the other screens (Liturgy, Events, Meditations, News); you tick what you want in, and you can add a free text.
+The **bulletin** is the week’s sheet, one per Sunday: what happens this Sunday, the week’s agenda, each day’s meditation and the announcements. It appears on the site, where anyone can print it or save it as a PDF (the paper size is chosen in the print window). It is not retyped: its sections come from the other screens (Liturgy, Events, Meditations, News); you tick what you want in, and you can add a free text.
 
 ## Step by step
 
@@ -11,7 +11,7 @@ The **bulletin** is the week’s sheet, one per Sunday: what happens this Sunday
 3. An empty section says where the information should come from and offers to open that screen.
 4. For a word of the week, click **Add a free text**: it is the only part written here. English is optional.
 5. Optional: paste the address of the **paper bulletin's PDF** (for example on Google Drive).
-6. Click **Publish**. The page is on the site, to print in **A4** or **A5** or save as a PDF.
+6. Click **Publish**. The page is on the site, to print or save as a PDF.
 
 ## Good to know
 

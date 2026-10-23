@@ -58,7 +58,7 @@
   "psalm_help": "A number alone = the whole psalm. Add “From” and “To” for a part (Psalm 89, verses 31 to 47).",
   "psalm_ph": "89, 31-47",
   "verse_h": "Verse of the day (optional)",
-  "verse_help": "The verse is picked among the day’s passages (the first by default); change it if needed. Then type its text in the permitted translation: Louis Segond 1910 for French, World English Bible for English. Without text, no verse is shown.",
+  "verse_help": "The verse is the first of the first passage; pick another passage or adjust chapter and verses. The English text fills itself (World English Bible); the French text is typed in Louis Segond 1910. Without text, no verse is shown.",
   "verse_pick": "Passage of the verse of the day",
   "verse_fr": "Text (Louis Segond 1910)",
   "verse_en": "Text (World English Bible)",
@@ -139,5 +139,8 @@
   "row_error": "Error",
   "issue_bad_chapter": "This chapter does not exist: {d}.",
   "issue_bad_verse": "This verse does not exist: {d}.",
-  "issue_bad_order": "The passage runs backwards: {d}."
+  "issue_bad_order": "The passage runs backwards: {d}.",
+  "verse_loading": "Looking up the text…",
+  "verse_en_help": "Prefilled from the World English Bible (public domain); editable.",
+  "verse_fr_help": "To be typed in Louis Segond 1910 (no free French source is connected)."
 }

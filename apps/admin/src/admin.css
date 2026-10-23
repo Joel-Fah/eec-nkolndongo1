@@ -2207,8 +2207,14 @@ html[data-nav-open] {
   }
 }
 .health-strip {
+  position: relative;
+  z-index: 2; /* its tooltips hang over what follows (the meter, the text) */
   display: flex;
   gap: 0.25rem;
+}
+.health-strip li:hover,
+.health-strip li:focus-visible {
+  z-index: 3;
 }
 .health-strip li {
   position: relative;
@@ -2229,6 +2235,7 @@ html[data-nav-open] {
 }
 .health-meter {
   position: relative;
+  z-index: 0;
   height: 0.75rem;
   border-radius: 999px;
   background: var(--surface-2);
@@ -2714,4 +2721,61 @@ html[data-nav-open] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1rem;
+}
+/* Registration form editor: rows whose fields all share one height and one rhythm, help text under the row, not inside it. */
+.reg-grid {
+  display: grid;
+  gap: 1.25rem 0.75rem;
+  align-items: start;
+}
+.reg-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.reg-grid-3 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 63.99rem) {
+  .reg-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 39.99rem) {
+  .reg-grid-2,
+  .reg-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+.reg-q-row {
+  display: grid;
+  gap: 0.75rem;
+  align-items: end;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+@media (max-width: 47.99rem) {
+  .reg-q-row {
+    grid-template-columns: 1fr;
+  }
+}
+.reg-add {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  border: 2px dotted var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  margin-block-end: 1rem;
+}
+.reg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-block-start: 0.5rem;
+}
+.reg-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
 }

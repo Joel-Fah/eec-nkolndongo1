@@ -7,7 +7,6 @@ import { shortDate } from '@eec/core/dates'
 import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
-import Segmented from '@eec/ui/astro/Segmented.astro'
 import Site from '../../layouts/Site.astro'
 import { publicJson } from '../../lib/content-api'
 import { localeOf, useT } from '../../lib/i18n'
@@ -52,7 +51,6 @@ Astro.response.headers.set(
   'cache-control',
   b ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
 )
-const format = Astro.url.searchParams.get('format') === 'a5' ? 'a5' : 'a4'
 const fmt = (d: string) =>
   new Intl.DateTimeFormat(locale, {
     weekday: 'long',
@@ -82,7 +80,7 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
 ---
 
 <Site title={b ? `${s('title')} — ${fmt(b.weekOf)}` : s('title')} description={b ? b.title || s('latest') : undefined} noindex={!b} letterhead={false}>
-  <article class="bl" data-format={format}>
+  <article class="bl">
     <div class="bl-letterhead" aria-hidden="true"><SiteLockup variant="two" class="text-[1.1rem]" /></div>
     <p class="bl-back bl-noprint"><a href={meditationsHref(locale)}><Icon name="chevronLeft" size={20} />{t('meditations.site.today_h')}</a></p>
     {
@@ -120,14 +118,7 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
             }
           </div>
           <div class="bl-actions bl-noprint">
-            <Segmented
-              label={s('format')}
-              current={format}
-              options={[
-                { value: 'a4', label: s('a4'), href: '?format=a4' },
-                { value: 'a5', label: s('a5'), href: '?format=a5' },
-              ]}
-            />
+
             <button type="button" class="btn btn-primary" data-print><Icon name="print" size={20} />{s('print')}</button>
             <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share_whatsapp')}<Icon name="external" size={16} /></Button>
             {b.pdfUrl && <Button href={b.pdfUrl} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="pdf" size={20} />{s('pdf')} · {s('opens_in', { host })}</Button>}
@@ -288,14 +279,10 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
 </style>
 
 <style is:global>
-  /* Print: only the bulletin, on white, in A4 or A5 (chosen with ?format=); the browser's « Save as PDF » makes the file. */
-  @page a4 {
-    size: A4;
-    margin: 14mm;
-  }
-  @page a5 {
-    size: A5;
-    margin: 10mm;
+  /* Print: only the bulletin, on white. */
+  /* The paper size is chosen in the browser's print window, which also offers « Save as PDF ». */
+  @page {
+    margin: 12mm;
   }
   .bl-letterhead {
     display: none;
@@ -306,13 +293,6 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
       width: min(100%, 26rem);
       margin-block-end: 0.75rem;
       color: #000;
-    }
-    .bl[data-format='a4'] {
-      page: a4;
-    }
-    .bl[data-format='a5'] {
-      page: a5;
-      font-size: 0.9em;
     }
     html,
     body {

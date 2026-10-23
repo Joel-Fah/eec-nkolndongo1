@@ -3,12 +3,14 @@
  * place to edit), and the import of the parish's yearly calendar from a CSV, checked line by line before anything is saved.
  */
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
-import { ConfirmDialog } from '@eec/content-kit'
+import { ConfirmDialog, RefEditor } from '@eec/content-kit'
 import {
+  type BibleRef,
   checkPassage,
   checkPsalm,
   formatPassage,
   formatPsalm,
+  formatStructured,
   type ImportResult,
   parsePsalm,
   parseStructured,
@@ -434,6 +436,27 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
   )
 }
 
+/** The first verse of a passage (« Amos 4, 1-13 » → « Amos 4, 1 »): a verse of the day is one verse, the editor can widen it. */
+function firstVerse(ref: string): string {
+  const sp = parseStructured(ref)
+  const seg = sp?.segments[0]
+  if (!sp || !seg) return ref
+  return formatStructured({
+    book: sp.book,
+    segments: [{ chapter: seg.chapter, from: seg.from ?? 1, endChapter: null, to: null }],
+  })
+}
+const toBibleRef = (ref: string): BibleRef => {
+  const sp = parseStructured(ref)
+  const seg = sp?.segments[0]
+  return {
+    book: sp?.book ?? 'gen',
+    chapter: seg?.chapter ?? 1,
+    from: seg?.from ?? null,
+    to: seg?.to ?? null,
+  }
+}
+
 const blankDay = (date: string): Day => ({
   id: '',
   date,
@@ -484,7 +507,28 @@ function DayForm({
   ]
   const choices =
     v.verseRef && !passages.includes(v.verseRef) ? [...passages, v.verseRef] : passages
-  const verseRef = v.verseRef || (choices[0] ?? '')
+  // The verse of the day starts as the first verse of the first passage; the editor can pick another passage or narrow it.
+  const verseRef = v.verseRef || firstVerse(choices[0] ?? '')
+  const [autoText, setAutoText] = useState(!day.verseEn)
+  const [loadingText, setLoadingText] = useState(false)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refetch when the verse changes
+  useEffect(() => {
+    if (!canEdit || !autoText || !verseRef) return
+    const timer = setTimeout(async () => {
+      setLoadingText(true)
+      try {
+        const r = await api<{ text: string }>(
+          `/meditations/bible-text?ref=${encodeURIComponent(verseRef)}`,
+        )
+        setV((x) => ({ ...x, verseEn: r.text }))
+      } catch {
+        // No text found (or the service is down): the editor types it.
+      } finally {
+        setLoadingText(false)
+      }
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [verseRef, autoText])
   const save = useMutation({
     mutationFn: () =>
       api(`/meditations/plans/${planId}/days/${day.date}`, {
@@ -496,7 +540,7 @@ function DayForm({
           psalm: v.psalm,
           reflectionFr: v.reflectionFr,
           reflectionEn: v.reflectionEn,
-          verseRef: choices.includes(verseRef) ? verseRef : '',
+          verseRef: parseStructured(verseRef) ? verseRef : '',
           verseFr: v.verseFr,
           verseEn: v.verseEn,
         },
@@ -576,13 +620,38 @@ function DayForm({
         {choices.length === 0 ? (
           <p className="text-sm text-ink-muted">{t(k('verse_wait'))}</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3">
             <SelectField
               label={t(k('verse_pick'))}
-              value={verseRef}
-              onValueChange={(x) => x && set('verseRef', x)}
+              value={choices.find((p) => firstVerse(p) === verseRef) ?? ''}
+              placeholder={formatPassage(verseRef, lang)}
+              onValueChange={(x) => x && set('verseRef', firstVerse(x))}
               options={choices.map((p) => ({ value: p, label: formatPassage(p, lang) }))}
             />
+            {parseStructured(verseRef)?.segments[0] && (
+              <RefEditor
+                idPrefix={`${day.date}-verse`}
+                disabled={!canEdit}
+                value={toBibleRef(verseRef)}
+                onChange={(r) => {
+                  setAutoText(true)
+                  set(
+                    'verseRef',
+                    formatStructured({
+                      book: r.book,
+                      segments: [
+                        {
+                          chapter: r.chapter,
+                          from: r.from ?? null,
+                          endChapter: null,
+                          to: r.to ?? null,
+                        },
+                      ],
+                    }),
+                  )
+                }}
+              />
+            )}
           </div>
         )}
         <div className="grid gap-3 sm:grid-cols-2">
@@ -591,6 +660,7 @@ function DayForm({
             placeholder=""
             textarea
             value={v.verseFr}
+            hint={t(k('verse_fr_help'))}
             disabled={!canEdit}
             onChange={(e: { target: { value: string } }) => set('verseFr', e.target.value)}
           />
@@ -599,8 +669,12 @@ function DayForm({
             placeholder=""
             textarea
             value={v.verseEn}
+            hint={loadingText ? t(k('verse_loading')) : t(k('verse_en_help'))}
             disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('verseEn', e.target.value)}
+            onChange={(e: { target: { value: string } }) => {
+              setAutoText(false)
+              set('verseEn', e.target.value)
+            }}
           />
         </div>
       </div>

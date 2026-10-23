@@ -168,9 +168,9 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
                 listed.map((x) => (
                   <li>
                     <a href={link(x.date)} aria-current={x.date === date ? 'date' : undefined} data-today={x.date === today ? '' : undefined}>
-                      <span class="md-list-d">{cap(fmt(x.date, { weekday: 'long' }))}<small>{fmt(x.date, { day: 'numeric' })}{x.date === today ? ` · ${s('today_tag')}` : ''}</small></span>
+                      <span class="md-list-d"><b>{fmt(x.date, { day: 'numeric' })}</b> {cap(fmt(x.date, { weekday: 'long' }))}{x.date === today && <small>{s('today_tag')}</small>}</span>
                       <span class="md-list-t">{x.headline && <em>{x.headline}</em>}{x.readings.map((r) => r.ref).join(' · ')}</span>
-                      {x.psalm && <span class="md-list-p">{x.psalm.replace(/^(Psaume|Psalm)\s/, '')}</span>}
+                      {x.psalm && <span class="md-list-p">{s('psalm')} {x.psalm.replace(/^(Psaume|Psalm)\s/, '')}</span>}
                     </a>
                   </li>
                 ))
@@ -400,7 +400,7 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
   }
   .md-list a {
     display: grid;
-    grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
     gap: 0.75rem;
     min-height: 2.75rem;
     align-items: center;
@@ -416,15 +416,24 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
     background: var(--primary-soft);
   }
   .md-list-d {
-    display: grid;
-    font-weight: 600;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .md-list-d b {
+    display: inline-block;
+    min-width: 1.5rem;
+    font-weight: 700;
   }
   .md-list-d small {
+    margin-inline-start: 0.5rem;
+    padding: 0.0625rem 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--primary-soft));
     font-size: var(--text-xs);
-    font-weight: 500;
-    color: var(--ink-muted);
+    font-weight: 600;
   }
   .md-list-p {
+    white-space: nowrap;
     justify-self: end;
     text-align: end;
     font-weight: 600;

@@ -9,4 +9,5 @@ export { ChapterVerseFields, clampChapter, clampVerse, RefEditor } from './RefEd
 export { RevisionsDrawer } from './RevisionsDrawer.tsx'
 export { SaveIndicator } from './SaveIndicator.tsx'
 export { StatusBadge } from './status.tsx'
+export { TagInput } from './TagInput.tsx'
 export { ViewToggle } from './ViewToggle.tsx'

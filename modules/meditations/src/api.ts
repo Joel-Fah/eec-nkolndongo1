@@ -19,6 +19,7 @@ import {
   defaultLabel,
   formatPassage,
   formatPsalm,
+  formatStructured,
   parsePassage,
   parsePsalm,
   parseStructured,
@@ -440,6 +441,30 @@ export const meditationsApi = new Hono<AppEnv>()
     return c.json({ ok: true })
   })
   // Bulk import (the CSV is read and checked in the browser; the server checks every row again). Existing days are updated.
+  // The text of a passage in the World English Bible (public domain), read from bible-api.com for the staff only, so the
+  // verse of the day can be prefilled. Only the first range of the passage; the editor trims it. French (LSG 1910) is typed.
+  .get('/bible-text', requirePermission('meditations:edit'), async (c) => {
+    const raw = (c.req.query('ref') ?? '').slice(0, 80)
+    const sp = parseStructured(raw)
+    const seg = sp?.segments[0]
+    if (!sp || !seg) return fail(c, 400, 'invalid')
+    const q = formatPassage(formatStructured({ book: sp.book, segments: [seg] }), 'en').replace(
+      /[–]/g,
+      '-',
+    )
+    try {
+      const res = await fetch(`https://bible-api.com/${encodeURIComponent(q)}?translation=web`, {
+        signal: AbortSignal.timeout(6000),
+      })
+      if (!res.ok) return fail(c, 404, 'not_found')
+      const j = (await res.json()) as { reference?: string; text?: string }
+      const text = (j.text ?? '').replace(/\s+/g, ' ').trim().slice(0, 1200)
+      if (!text) return fail(c, 404, 'not_found')
+      return c.json({ reference: j.reference ?? q, text, translation: 'World English Bible' })
+    } catch {
+      return fail(c, 409, 'unavailable')
+    }
+  })
   .post('/plans/:id/import', requirePermission('meditations:edit'), async (c) => {
     const body = importBody.safeParse(await c.req.json().catch(() => null))
     if (!body.success) return fail(c, 400, 'invalid')

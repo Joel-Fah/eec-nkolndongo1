@@ -719,6 +719,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
     ).slice(0, 10)
   }, [draft])
 
+  const canRegister = hasPermission(useMe().data, 'registrations:edit')
   if (!draft || !meta) return <div className="admin-panel" aria-busy="true" />
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => (d ? { ...d, [key]: value } : d))
@@ -1175,6 +1176,15 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                 >
                   {t(k('duplicate'))}
                 </Button>
+              )}
+              {canRegister && (
+                <a
+                  className="btn btn-secondary btn-sm"
+                  href={`${location.pathname.split('/m/')[0]}/m/registrations#new:${draft.slug}`}
+                >
+                  <Icon name="taskDaily" size={16} />
+                  {t(k('registrations'))}
+                </a>
               )}
               {live && (
                 <a className="btn btn-ghost btn-sm" href={siteUrl} target="_blank" rel="noreferrer">

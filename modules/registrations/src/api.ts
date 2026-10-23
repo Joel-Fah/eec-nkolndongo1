@@ -630,6 +630,8 @@ export const registrationsApi = new Hono<AppEnv>()
     const titleFr = parsed.data.titleFr
     const eventDate = parsed.data.eventDate
     if (!titleFr || !eventDate) return fail(c, 400, 'invalid')
+    // A registration always belongs to an event of the Calendar (an event may have none).
+    if (!b.eventSlug) return fail(c, 400, 'event_required')
     if (!(await mayOn(c, 'registrations:edit', b.groupId ?? null))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
     const actor = await c.var.deps.actor()
@@ -685,6 +687,8 @@ export const registrationsApi = new Hono<AppEnv>()
     if (b.groupId !== undefined && !(await mayOn(c, 'registrations:edit', b.groupId)))
       return fail(c, 403, 'forbidden')
     const actor = await c.var.deps.actor()
+    if (b.state === 'published' && !(b.eventSlug ?? f.eventSlug))
+      return fail(c, 400, 'event_required')
     const set: Partial<typeof registrationForms.$inferInsert> = {
       updatedBy: actor?.userId,
       updatedAt: new Date(),

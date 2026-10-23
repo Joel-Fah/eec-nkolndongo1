@@ -2,7 +2,7 @@
 
 ## Ce que c’est
 
-Le **bulletin** est la feuille de la semaine, une par dimanche : ce qui se passe ce dimanche, l’agenda de la semaine, la méditation de chaque jour et les annonces. Il s’affiche sur le site, où chacun peut l’imprimer (A4 ou A5) ou l’enregistrer en PDF. Il n’est pas à retaper : ses rubriques viennent des autres écrans (Liturgie, Événements, Méditations, Actualités) ; vous cochez ce que vous voulez y mettre, et vous pouvez ajouter un texte libre.
+Le **bulletin** est la feuille de la semaine, une par dimanche : ce qui se passe ce dimanche, l’agenda de la semaine, la méditation de chaque jour et les annonces. Il s’affiche sur le site, où chacun peut l’imprimer ou l’enregistrer en PDF (la taille du papier se choisit dans la fenêtre d’impression). Il n’est pas à retaper : ses rubriques viennent des autres écrans (Liturgie, Événements, Méditations, Actualités) ; vous cochez ce que vous voulez y mettre, et vous pouvez ajouter un texte libre.
 
 ## Pas à pas
 
@@ -11,7 +11,7 @@ Le **bulletin** est la feuille de la semaine, une par dimanche : ce qui se passe
 3. Une rubrique vide indique d'où devrait venir l'information et propose d'ouvrir l'écran concerné.
 4. Pour un mot de la semaine, cliquez sur **Ajouter un texte libre** : c'est la seule partie qu'on écrit ici. L'anglais est facultatif.
 5. Facultatif : collez l'adresse du **PDF du bulletin papier** (par exemple sur Google Drive).
-6. Cliquez sur **Publier**. La page est sur le site, à imprimer en **A4** ou **A5** ou à enregistrer en PDF.
+6. Cliquez sur **Publier**. La page est sur le site, à imprimer ou à enregistrer en PDF.
 
 ## Bon à savoir
 

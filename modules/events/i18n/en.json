@@ -198,5 +198,6 @@
   "from": "From",
   "until_date": "To",
   "untitled_full": "Untitled event",
-  "side_slug_help": "Created automatically from the title, always unique; it no longer changes once the event is published."
+  "side_slug_help": "Created automatically from the title, always unique; it no longer changes once the event is published.",
+  "registrations": "Registrations"
 }

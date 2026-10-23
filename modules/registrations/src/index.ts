@@ -47,7 +47,7 @@ export const registrationsModule = defineModule({
         group: 'parish',
         label: { fr: 'Inscriptions', en: 'Registrations' },
         path: '/m/registrations',
-        icon: 'checklist',
+        icon: 'taskDaily',
         order: 25,
         permission: 'registrations:read',
       },

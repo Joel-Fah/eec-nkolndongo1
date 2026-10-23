@@ -73,6 +73,8 @@ export const createBody = z
     weekOf: day.refine(isSunday, 'sunday'),
     blocks: z.array(block).max(12).optional(),
     copyFrom: day.optional(),
+    titleFr: z.string().trim().max(160).optional(),
+    titleEn: z.string().trim().max(160).optional(),
   })
   .strict()
 
@@ -213,6 +215,8 @@ export const bulletinApi = new Hono<AppEnv>()
       .insert(bulletins)
       .values({
         weekOf: body.data.weekOf,
+        titleFr: body.data.titleFr ?? '',
+        titleEn: body.data.titleEn ?? '',
         blocks,
         createdBy: actor?.userId,
         updatedBy: actor?.userId,

@@ -7,6 +7,17 @@ const reduced = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches ||
   (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
 
+/** A small seeded generator (mulberry32): the same wandering every time. */
+function rng(seed: number) {
+  let a = seed
+  return () => {
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
 function trail(root: HTMLElement) {
   const svg = root.querySelector<SVGSVGElement>('[data-trail]')
   const path = root.querySelector<SVGPathElement>('[data-trail-path]')
@@ -20,13 +31,27 @@ function trail(root: HTMLElement) {
   svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`)
   svg.setAttribute('width', String(box.width))
   svg.setAttribute('height', String(box.height))
-  // A smooth S between each pair of points: out of the first downwards, into the next from above.
+  // The trail passes through every step once, in order, but wanders between them: each stretch bends its own way and now and
+  // then makes a loop before moving on. The wandering is seeded from the step's number, so it is the same on every visit.
+  const wide = box.width > 760
+  const r = wide ? 44 : 20
   let d = `M ${pts[0]?.[0]} ${pts[0]?.[1]}`
   for (let i = 1; i < pts.length; i++) {
     const [x0, y0] = pts[i - 1] as readonly [number, number]
     const [x1, y1] = pts[i] as readonly [number, number]
+    const rnd = rng(i * 7919 + 13)
     const my = (y0 + y1) / 2
-    d += ` C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`
+    const dir = rnd() < 0.5 ? -1 : 1
+    if (y1 - y0 > r * 6 && rnd() < 0.7) {
+      // Down to a point beside the middle, a teardrop loop there, then on to the step.
+      const mx = (x0 + x1) / 2 + dir * r * (0.6 + rnd())
+      d += ` C ${x0} ${y0 + (my - y0) * 0.6}, ${mx - dir * r} ${my - r * 1.6}, ${mx} ${my - r * 0.4}`
+      d += ` C ${mx + dir * r * 1.9} ${my + r * 0.9}, ${mx + dir * r * 1.9} ${my - r * 1.7}, ${mx} ${my - r * 0.2}`
+      d += ` C ${mx - dir * r * 0.8} ${my + r * 0.8}, ${x1} ${my + (y1 - my) * 0.4}, ${x1} ${y1}`
+    } else {
+      const bend = dir * r * (0.5 + rnd() * 1.5)
+      d += ` C ${x0 + bend} ${my}, ${x1 - bend} ${my}, ${x1} ${y1}`
+    }
   }
   path.setAttribute('d', d)
   return path
@@ -38,18 +63,7 @@ export async function initClimb() {
   root.dataset.ready = '1'
   root.setAttribute('data-js', '')
 
-  // Closed to start with (they are open without script, so nothing is ever hidden from anyone).
-  for (const panel of root.querySelectorAll<HTMLElement>('[data-panel]')) panel.hidden = true
-
-  // Tap to open: each milestone is a button controlling its own text.
-  for (const b of root.querySelectorAll<HTMLButtonElement>('[data-open]')) {
-    b.addEventListener('click', () => {
-      const open = b.getAttribute('aria-expanded') !== 'true'
-      b.setAttribute('aria-expanded', String(open))
-      const panel = document.getElementById(b.getAttribute('aria-controls') ?? '')
-      if (panel) panel.hidden = !open
-    })
-  }
+  // The steps are always open: the trail goes through them, and a step that folds would move it.
 
   let path = trail(root)
   if (!path) return
@@ -91,7 +105,7 @@ export async function initClimb() {
     }
   })
   let t: number | undefined
-  window.addEventListener('resize', () => {
+  const redraw = () => {
     window.clearTimeout(t)
     t = window.setTimeout(() => {
       path = trail(root)
@@ -101,5 +115,8 @@ export async function initClimb() {
       }
       ScrollTrigger.refresh()
     }, 200)
-  })
+  }
+  window.addEventListener('resize', redraw)
+  // Pictures arriving change the steps' heights: draw the trail again.
+  new ResizeObserver(redraw).observe(root)
 }

@@ -64,6 +64,25 @@ const sundays = () => {
     new Date(next.getTime() + (i - 3) * 7 * 86_400_000).toISOString().slice(0, 10),
   )
 }
+/** « Bulletin du Dimanche 25 octobre 2026 au Samedi 31 octobre 2026 »: the name a new bulletin starts with. */
+const weekTitle = (weekOf: string, l: 'fr' | 'en') => {
+  const f = (d: string) => {
+    const x = new Intl.DateTimeFormat(l, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${d}T12:00:00Z`))
+    return x.charAt(0).toUpperCase() + x.slice(1)
+  }
+  const end = new Date(Date.parse(`${weekOf}T12:00:00Z`) + 6 * 86_400_000)
+    .toISOString()
+    .slice(0, 10)
+  return l === 'fr'
+    ? `Bulletin du ${f(weekOf)} au ${f(end)}`
+    : `Bulletin from ${f(weekOf)} to ${f(end)}`
+}
 const longDate = (d: string, locale: string) =>
   new Intl.DateTimeFormat(locale, {
     day: 'numeric',
@@ -118,6 +137,8 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
         method: 'POST',
         body: {
           weekOf: week,
+          titleFr: weekTitle(week, 'fr'),
+          titleEn: weekTitle(week, 'en'),
           ...(blocks ? { blocks } : {}),
           ...(mode === 'copy' && previous ? { copyFrom: previous.weekOf } : {}),
         },
@@ -145,16 +166,27 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
               onValueChange={(v) => v && setWeek(v)}
               options={weeks.map((w) => ({ value: w, label: fmt(w) }))}
             />
-            <SelectField
-              label=" "
-              value={mode}
-              onValueChange={(v) => v && setMode(v as typeof mode)}
-              options={[
-                { value: 'assemble', label: t(k('compose_assemble')) },
-                ...(previous ? [{ value: 'copy', label: t(k('compose_copy')) }] : []),
-                { value: 'blank', label: t(k('compose_blank')) },
-              ]}
-            />
+            <fieldset className="grid gap-1">
+              <legend className="field-label">{t(k('compose_how'))}</legend>
+              {(
+                [
+                  ['assemble', t(k('compose_assemble'))],
+                  ...(previous ? [['copy', t(k('compose_copy'))]] : []),
+                  ['blank', t(k('compose_blank'))],
+                ] as [typeof mode, string][]
+              ).map(([value, label]) => (
+                <label key={value} className="check-row">
+                  <input
+                    type="radio"
+                    className="radio"
+                    name="compose-mode"
+                    checked={mode === value}
+                    onChange={() => setMode(value)}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </fieldset>
           </div>
           {existing ? (
             <p className="flex flex-wrap items-center gap-3">

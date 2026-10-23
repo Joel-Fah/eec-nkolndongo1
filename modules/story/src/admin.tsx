@@ -44,6 +44,8 @@ type Milestone = {
   textFr: string
   textEn: string
   mediaId: string | null
+  extraMediaIds: string[]
+  layout: string
   sortOrder: number
   state: 'draft' | 'published'
 }
@@ -300,6 +302,8 @@ const blankMs: Omit<Milestone, 'id' | 'state'> = {
   textFr: '',
   textEn: '',
   mediaId: null,
+  extraMediaIds: [],
+  layout: 'auto',
   sortOrder: 0,
 }
 
@@ -323,7 +327,8 @@ function History() {
   }
   const save = useMutation({
     mutationFn: (f: Partial<Milestone> & typeof blankMs) => {
-      const { id, state: _s, ...body } = f as Milestone
+      const { id, state: _s, ...raw } = f as Milestone
+      const body = { ...raw, extraMediaIds: raw.extraMediaIds.filter(Boolean) }
       return id
         ? api(`/story/milestones/${id}`, { method: 'PUT', body })
         : api('/story/milestones', { method: 'POST', body })
@@ -456,6 +461,45 @@ function History() {
                 />
               </div>
               <CoverField mediaId={form.mediaId} onChange={(id) => set({ mediaId: id })} />
+              {form.extraMediaIds.map((m, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
+                <div key={i} className="grid gap-1">
+                  <CoverField
+                    mediaId={m}
+                    onChange={(id) =>
+                      set({
+                        extraMediaIds: id
+                          ? form.extraMediaIds.map((x, j) => (j === i ? id : x))
+                          : form.extraMediaIds.filter((_, j) => j !== i),
+                      })
+                    }
+                  />
+                </div>
+              ))}
+              {form.mediaId && form.extraMediaIds.length < 5 && (
+                <div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={() => set({ extraMediaIds: [...form.extraMediaIds, ''] })}
+                  >
+                    <Icon name="plus" size={16} />
+                    {t(k('ms_more_pictures'))}
+                  </Button>
+                </div>
+              )}
+              {form.mediaId && form.extraMediaIds.length > 0 && (
+                <SelectField
+                  label={t(k('ms_layout'))}
+                  value={form.layout}
+                  onValueChange={(x) => x && set({ layout: x })}
+                  options={['auto', 'fan', 'stack', 'bento', 'row'].map((x) => ({
+                    value: x,
+                    label: t(k(`ms_layout_${x}`)),
+                  }))}
+                />
+              )}
               <p className="text-sm text-ink-muted">{t(k('ms_validate'))}</p>
               <div className="dialog-actions">
                 <Button variant="secondary" onClick={requestClose}>

@@ -48,30 +48,47 @@ Astro.response.headers.set(
         <ol class="hc-list" data-climb>
           <svg class="hc-trail" data-trail aria-hidden="true" focusable="false"><path data-trail-path class="hc-path" fill="none" /></svg>
           {
-            milestones.map((m, i) => (
-              <li class="hc-item" data-milestone data-side={i % 2 === 0 ? 'l' : 'r'}>
-                <span class="hc-dot" data-node aria-hidden="true"></span>
-                <div class="hc-card">
-                  <button type="button" class="hc-btn" data-open aria-expanded="false" aria-controls={`ms-${m.id}`}>
-                    <span class="hc-year">{m.year}</span>
-                    <span class="hc-ttl">{m.title}</span>
-                  </button>
-                  <div class="hc-panel" id={`ms-${m.id}`} data-panel>
-                    {m.image && <Picture class="hc-img" media={m.image as never} sizes="(min-width: 48rem) 20rem, 90vw" decorative />}
-                    {m.text && <p>{m.text}</p>}
+            milestones.map((m, i) => {
+              const pics = (m.images ?? []) as never[]
+              const layout = m.layout && m.layout !== 'auto' ? m.layout : ({ 1: 'one', 2: 'stack', 3: 'fan', 4: 'bento' } as Record<number, string>)[pics.length] ?? 'row'
+              return (
+                <li class="hc-item" data-milestone data-side={i % 2 === 0 ? 'l' : 'r'}>
+                  <span class="hc-dot" data-node aria-hidden="true"></span>
+                  <div class="hc-card">
+                    <h3 class="hc-head">
+                      <span class="hc-year">{m.year}</span>
+                      <span class="hc-ttl">{m.title}</span>
+                    </h3>
+                    {m.text && <p class="hc-text">{m.text}</p>}
+                    {pics.length > 0 && (
+                      <div class="hc-deck" data-layout={pics.length === 1 ? 'one' : layout} style={`--n:${pics.length}`}>
+                        {pics.map((pic, j) => (
+                          <figure class="hc-pic" style={`--i:${j}`}>
+                            <Picture class="hc-img" media={pic} sizes="(min-width: 48rem) 20rem, 90vw" decorative />
+                          </figure>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              </li>
-            ))
+                </li>
+              )
+            })
           }
         </ol>
         <div class="hc-end">
           <Illustration name="church" class="hc-art" />
+          <p class="hc-end-kicker">{s('invite_kicker')}</p>
           <h3 class="hc-end-t">{s('invite_t')}</h3>
-          <p>{slot('invite')?.text ?? s('invite_p')}</p>
+          <p class="hc-end-p">{slot('invite')?.text ?? s('invite_p')}</p>
+          <ol class="hc-ways">
+            <li><span class="hc-way-n" aria-hidden="true">1</span><span><strong>{s('way1_t')}</strong>{s('way1_p')}</span></li>
+            <li><span class="hc-way-n" aria-hidden="true">2</span><span><strong>{s('way2_t')}</strong>{s('way2_p')}</span></li>
+            <li><span class="hc-way-n" aria-hidden="true">3</span><span><strong>{s('way3_t')}</strong>{s('way3_p')}</span></li>
+          </ol>
           <p class="hc-actions">
-            <Button href={path('trouver')}>{s('visit')}</Button>
-            <Button href={path('account')} variant="secondary">{s('join')}</Button>
+            <Button href={path('trouver')} size="lg">{s('visit')}</Button>
+            <Button href={path('departements')} variant="secondary" size="lg">{s('groups')}</Button>
+            <Button href={path('account')} variant="ghost" size="lg">{s('join')}</Button>
           </p>
         </div>
       </section>
@@ -193,17 +210,13 @@ Astro.response.headers.set(
     padding-inline: 3.75rem 0;
     text-align: start;
   }
-  .hc-btn {
+  .hc-head {
     display: grid;
     gap: 0.125rem;
-    width: 100%;
-    min-height: 3.5rem;
     padding: 0.75rem 1rem;
     border-radius: var(--radius-lg);
     background: var(--surface);
     box-shadow: var(--elevation-1);
-    text-align: inherit;
-    cursor: pointer;
   }
   .hc-year {
     font-size: var(--text-sm);
@@ -214,24 +227,101 @@ Astro.response.headers.set(
     font-family: var(--font-display);
     font-size: var(--text-xl);
   }
-  .hc-panel {
+  .hc-text {
+    margin-block-start: 0.75rem;
+    color: var(--ink-muted);
+  }
+  /* A step's pictures as a deck of cards. Hovering one lifts it a little and brings it to the front. */
+  .hc-deck {
+    position: relative;
     display: grid;
-    gap: 0.75rem;
-    margin-block-start: 0.5rem;
-    padding: 1rem;
-    border-radius: var(--radius-lg);
-    background: var(--surface-2);
+    margin-block-start: 1rem;
+    padding: 0.75rem;
+    isolation: isolate;
   }
-  /* Open by default without script (so nothing is hidden); the script closes them and makes them tappable. */
-  [data-js] .hc-panel[hidden] {
-    display: none;
-  }
-  .hc-list:not([data-js]) .hc-panel {
-    display: grid;
-  }
-  .hc :global(.hc-img) {
+  .hc-pic {
     overflow: hidden;
     border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-2);
+    aspect-ratio: 4 / 3;
+    transition:
+      transform var(--duration-ui, 0.28s) var(--ease-out, ease),
+      box-shadow var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hc-pic :global(img),
+  .hc :global(.hc-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hc-pic:hover {
+    z-index: 5;
+    box-shadow: var(--elevation-3, var(--elevation-2));
+  }
+  .hc-deck[data-layout='one'] .hc-pic:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+  .hc-deck[data-layout='fan'] .hc-pic,
+  .hc-deck[data-layout='stack'] .hc-pic {
+    grid-area: 1 / 1;
+  }
+  .hc-deck[data-layout='fan'] {
+    padding-block: 1.5rem;
+  }
+  .hc-deck[data-layout='fan'] .hc-pic {
+    --o: calc(var(--i) - (var(--n) - 1) / 2);
+    width: 66%;
+    justify-self: center;
+    transform: translateX(calc(var(--o) * 18%)) rotate(calc(var(--o) * 6deg));
+    transform-origin: 50% 110%;
+  }
+  .hc-deck[data-layout='fan'] .hc-pic:hover {
+    transform: translateX(calc(var(--o) * 18%)) translateY(-10px) rotate(0deg) scale(1.05);
+  }
+  .hc-deck[data-layout='stack'] .hc-pic {
+    width: 82%;
+    transform: translate(calc(var(--i) * 9%), calc(var(--i) * 9%)) rotate(calc(var(--i) * -2.5deg));
+  }
+  .hc-deck[data-layout='stack'] .hc-pic:hover {
+    transform: translate(calc(var(--i) * 9%), calc(var(--i) * 9% - 8px)) rotate(0deg) scale(1.04);
+  }
+  .hc-deck[data-layout='stack'] {
+    padding-block-end: 2.5rem;
+  }
+  .hc-deck[data-layout='bento'] {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+  }
+  .hc-deck[data-layout='bento'] .hc-pic {
+    grid-column: span 2;
+    aspect-ratio: 1;
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:first-child {
+    grid-column: span 6;
+    aspect-ratio: 16 / 9;
+  }
+  .hc-deck[data-layout='bento'] .hc-pic:hover,
+  .hc-deck[data-layout='row'] .hc-pic:hover {
+    transform: translateY(-5px) scale(1.04);
+  }
+  .hc-deck[data-layout='row'] {
+    grid-auto-flow: column;
+    grid-auto-columns: 70%;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .hc-deck[data-layout='row'] .hc-pic {
+    scroll-snap-align: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hc-pic {
+      transition: none;
+    }
+    .hc-pic:hover {
+      transform: none !important;
+    }
   }
   @media (max-width: 47.99rem) {
     .hc-list::before {
@@ -255,16 +345,62 @@ Astro.response.headers.set(
   .hc-end {
     display: grid;
     justify-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border-radius: var(--radius-xl);
+    background: var(--primary-soft);
     text-align: center;
   }
   .hc :global(.hc-art) {
     width: min(100%, 14rem);
     height: auto;
   }
+  .hc-end-kicker {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
   .hc-end-t {
+    max-width: 22ch;
     font-family: var(--font-display);
-    font-size: var(--text-3xl, 2rem);
+    font-size: var(--text-4xl);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .hc-end-p {
+    max-width: 52ch;
+    font-size: var(--text-lg);
+  }
+  .hc-ways {
+    display: grid;
+    gap: 0.75rem;
+    width: min(100%, 44rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    text-align: start;
+  }
+  .hc-ways li {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .hc-ways strong {
+    display: block;
+  }
+  .hc-way-n {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
   }
   .hc-actions {
     display: flex;

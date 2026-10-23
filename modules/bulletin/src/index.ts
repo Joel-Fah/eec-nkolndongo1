@@ -32,7 +32,7 @@ export const bulletinModule = defineModule({
         group: 'content',
         label: { fr: 'Bulletin', en: 'Bulletin' },
         path: '/m/bulletin',
-        icon: 'newspaper',
+        icon: 'receipt',
         order: 17,
         permission: 'bulletin:read',
       },

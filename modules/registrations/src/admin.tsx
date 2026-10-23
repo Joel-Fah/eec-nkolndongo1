@@ -3,7 +3,7 @@
  * adding someone by hand, a one-handed check-in view that shows names only, and the CSV export for those who may.
  */
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
-import { ConfirmDialog } from '@eec/content-kit'
+import { ConfirmDialog, TagInput, ViewToggle } from '@eec/content-kit'
 import { AGE_BANDS, type AgeBand, daysLeft, normalizePhone, type RetentionLevel } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
 import {
@@ -19,7 +19,7 @@ import {
   toastManager,
 } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { looksSensitive } from './rules.ts'
 import { FIELD_KINDS, type FieldKind, type FormField } from './schema.ts'
 
@@ -116,6 +116,7 @@ export default function RegistrationsPage() {
     history.replaceState(null, '', id ? `#${id}` : location.pathname + location.search)
     setOpenId(id)
   }
+  if (openId?.startsWith('new:')) return <FromEvent slug={openId.slice(4)} onOpen={open} />
   return openId ? <FormView id={openId} onBack={() => open(null)} /> : <Forms onOpen={open} />
 }
 
@@ -152,15 +153,34 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
   const { t, locale } = useLocale()
   const me = useMe().data
   const qc = useQueryClient()
+  const [view, setView] = useState<'list' | 'grid'>(() => {
+    try {
+      return localStorage.getItem('reg-view') === 'list' ? 'list' : 'grid'
+    } catch {
+      return 'grid'
+    }
+  })
+  const pickView = (v: 'list' | 'grid') => {
+    setView(v)
+    try {
+      localStorage.setItem('reg-view', v)
+    } catch {}
+  }
+  const [creating, setCreating] = useState(false)
+  const [event, setEvent] = useState('')
+  const events = useEvents(locale)
   const list = useQuery({
     queryKey: ['reg-forms'],
     queryFn: () => api<{ items: Form[] }>('/registrations/forms'),
   })
+  const items = list.data?.items ?? []
+  const taken = new Set(items.map((f) => f.eventSlug))
+  const free = (events.data ?? []).filter((e) => !taken.has(e.slug))
   const create = useMutation({
-    mutationFn: () =>
+    mutationFn: (e: EventChoice) =>
       api<{ id: string }>('/registrations/forms', {
         method: 'POST',
-        body: { titleFr: t(k('new_title')), eventDate: today(), state: 'draft' },
+        body: { titleFr: e.title, eventSlug: e.slug, eventDate: e.date, state: 'draft' },
       }),
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ['reg-forms'] })
@@ -168,7 +188,47 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
     },
     onError: () => say(t(k('error')), 'danger'),
   })
-  const items = list.data?.items ?? []
+  const tile = (f: Form) => (
+    <button type="button" className="admin-panel plan-tile" onClick={() => onOpen(f.id)}>
+      <span className="flex flex-wrap items-center gap-2">
+        <Badge tone={f.state === 'published' ? 'success' : 'warning'}>
+          {t(k(`state_${f.state}`))}
+        </Badge>
+        <Badge>{t(k(`audience_${f.audience}`))}</Badge>
+      </span>
+      <strong className="font-display text-2xl">
+        {(locale === 'en' && f.titleEn) || f.titleFr}
+      </strong>
+      <span className="text-sm text-ink-muted">{dayText(f.eventDate, locale)}</span>
+      <span className="text-sm">
+        {t(k('counts'), {
+          n: String(f.counts.confirmed),
+          cap: f.capacity == null ? '∞' : String(f.capacity),
+          w: String(f.counts.waitlist),
+        })}
+      </span>
+      {f.counts.registrations > 0 && <RetentionChip r={f.retention} />}
+    </button>
+  )
+  const row = (f: Form) => (
+    <button type="button" className="admin-row reg-form-row" onClick={() => onOpen(f.id)}>
+      <span className="grid text-start">
+        <strong>{(locale === 'en' && f.titleEn) || f.titleFr}</strong>
+        <span className="text-sm text-ink-muted">
+          {dayText(f.eventDate, locale)} ·{' '}
+          {t(k('counts'), {
+            n: String(f.counts.confirmed),
+            cap: f.capacity == null ? '∞' : String(f.capacity),
+            w: String(f.counts.waitlist),
+          })}
+        </span>
+      </span>
+      {f.counts.registrations > 0 && <RetentionChip r={f.retention} />}
+      <Badge tone={f.state === 'published' ? 'success' : 'warning'}>
+        {t(k(`state_${f.state}`))}
+      </Badge>
+    </button>
+  )
   return (
     <div className="grid gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -176,45 +236,110 @@ function Forms({ onOpen }: { onOpen: (id: string) => void }) {
           <h1 className="text-4xl">{t(k('title'))}</h1>
           <p className="text-ink-muted">{t(k('lead'))}</p>
         </div>
-        {hasPermission(me, 'registrations:edit') && (
-          <Button loading={create.isPending} onClick={() => create.mutate()}>
-            <Icon name="plus" size={20} />
-            {t(k('new_form'))}
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <ViewToggle
+            value={view}
+            onChange={pickView}
+            label={t(k('view'))}
+            options={[
+              { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
+              { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
+            ]}
+          />
+          {hasPermission(me, 'registrations:edit') && !creating && (
+            <Button onClick={() => setCreating(true)}>
+              <Icon name="plus" size={20} />
+              {t(k('new_form'))}
+            </Button>
+          )}
+        </div>
       </header>
-      {list.data && items.length === 0 ? (
+      {creating && (
+        <div className="admin-panel grid gap-3">
+          <h2 className="text-xl">{t(k('new_from_event'))}</h2>
+          <p className="text-sm text-ink-muted">{t(k('new_from_event_help'))}</p>
+          {events.data && free.length === 0 ? (
+            <p className="text-sm text-ink-muted">{t(k('new_no_event'))}</p>
+          ) : (
+            <SelectField
+              label={t(k('f_event_pick'))}
+              value={event}
+              placeholder={t(k('f_event_none'))}
+              onValueChange={(x) => x && setEvent(x)}
+              options={free.map((e) => ({
+                value: e.slug,
+                label: `${e.title} · ${dayText(e.date, locale)}`,
+              }))}
+            />
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              loading={create.isPending}
+              disabled={!event}
+              onClick={() => {
+                const e = free.find((x) => x.slug === event)
+                if (e) create.mutate(e)
+              }}
+            >
+              {t(k('new_go'))}
+            </Button>
+            <Button variant="ghost" onClick={() => setCreating(false)}>
+              {t(k('cancel'))}
+            </Button>
+          </div>
+        </div>
+      )}
+      {list.data && items.length === 0 && !creating ? (
         <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />
-      ) : (
+      ) : view === 'grid' ? (
         <ul className="grid gap-3 sm:grid-cols-2">
           {items.map((f) => (
-            <li key={f.id}>
-              <button type="button" className="admin-panel plan-tile" onClick={() => onOpen(f.id)}>
-                <span className="flex flex-wrap items-center gap-2">
-                  <Badge tone={f.state === 'published' ? 'success' : 'warning'}>
-                    {t(k(`state_${f.state}`))}
-                  </Badge>
-                  <Badge>{t(k(`audience_${f.audience}`))}</Badge>
-                </span>
-                <strong className="font-display text-2xl">
-                  {(locale === 'en' && f.titleEn) || f.titleFr}
-                </strong>
-                <span className="text-sm text-ink-muted">{dayText(f.eventDate, locale)}</span>
-                <span className="text-sm">
-                  {t(k('counts'), {
-                    n: String(f.counts.confirmed),
-                    cap: f.capacity == null ? '∞' : String(f.capacity),
-                    w: String(f.counts.waitlist),
-                  })}
-                </span>
-                {f.counts.registrations > 0 && <RetentionChip r={f.retention} />}
-              </button>
-            </li>
+            <li key={f.id}>{tile(f)}</li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="grid gap-2">
+          {items.map((f) => (
+            <li key={f.id}>{row(f)}</li>
           ))}
         </ul>
       )}
     </div>
   )
+}
+
+/** « #new:<event> »: an event's own « Inscriptions » link creates its form (or opens the one it already has) and goes there. */
+function FromEvent({ slug, onOpen }: { slug: string; onOpen: (id: string) => void }) {
+  const { t, locale } = useLocale()
+  const events = useEvents(locale)
+  const started = useRef(false)
+  useEffect(() => {
+    if (started.current || !events.data) return
+    started.current = true
+    ;(async () => {
+      try {
+        const existing = await api<{ items: Form[] }>('/registrations/forms')
+        const have = existing.items.find((f) => f.eventSlug === slug)
+        if (have) return onOpen(have.id)
+        const e = events.data.find((x) => x.slug === slug)
+        const r = await api<{ id: string }>('/registrations/forms', {
+          method: 'POST',
+          body: {
+            titleFr: e?.title ?? slug,
+            eventSlug: slug,
+            eventDate: e?.date ?? today(),
+            state: 'draft',
+          },
+        })
+        onOpen(r.id)
+      } catch {
+        say(t(k('error')), 'danger')
+        history.replaceState(null, '', location.pathname)
+        location.reload()
+      }
+    })()
+  }, [events.data])
+  return <div className="admin-panel" aria-busy="true" />
 }
 
 /* ── One form ─────────────────────────────────────────────────────────── */
@@ -860,6 +985,39 @@ function Checkin({ id }: { id: string }) {
 }
 
 /* ── The form itself ──────────────────────────────────────────────────── */
+type EventChoice = { slug: string; title: string; date: string }
+/** The upcoming events of the calendar, one entry per event (its next date): what a form can be attached to. */
+function useEvents(locale: string) {
+  return useQuery({
+    queryKey: ['reg-events', locale],
+    queryFn: async () => {
+      const from = today()
+      const to = new Date(Date.now() + 400 * 86_400_000).toISOString().slice(0, 10)
+      const r = await api<{
+        items: {
+          slug: string
+          title: string
+          startsAt: string
+          allDay: boolean
+          cancelled: boolean
+        }[]
+      }>(`/events/public?locale=${locale}&from=${from}&to=${to}`)
+      const seen = new Map<string, EventChoice>()
+      for (const o of r.items) {
+        if (o.cancelled || seen.has(o.slug)) continue
+        const date = o.allDay
+          ? o.startsAt.slice(0, 10)
+          : new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(
+              new Date(o.startsAt),
+            )
+        seen.set(o.slug, { slug: o.slug, title: o.title, date })
+      }
+      return [...seen.values()]
+    },
+    staleTime: 60_000,
+  })
+}
+
 function FormEditor({
   form,
   canEdit,
@@ -869,7 +1027,8 @@ function FormEditor({
   canEdit: boolean
   onChange: () => void
 }) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
+  const events = useEvents(locale)
   const [v, setV] = useState(form)
   useEffect(() => setV(form), [form])
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
@@ -883,6 +1042,8 @@ function FormEditor({
   const optionsBad = v.fields.some(
     (f) => (f.kind === 'choice' || f.kind === 'multi') && f.options.length < 2,
   )
+  const choices = events.data ?? []
+  const current = choices.find((e) => e.slug === v.eventSlug)
   const save = useMutation({
     mutationFn: (state?: 'draft' | 'published') =>
       api(`/registrations/forms/${form.id}`, {
@@ -936,71 +1097,99 @@ function FormEditor({
     />
   )
   return (
-    <div className="grid gap-5">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-6">
+      <div className="reg-grid reg-grid-2">
         {text('titleFr', t(k('f_title_fr')))}
         {text('titleEn', t(k('f_title_en')))}
         {text('introFr', t(k('f_intro_fr')), true)}
         {text('introEn', t(k('f_intro_en')), true)}
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <TextField
-          label={t(k('f_event_date'))}
-          type="date"
-          placeholder=""
-          hint={t(k('f_event_date_help'))}
-          value={v.eventDate}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('eventDate', e.target.value)}
-        />
-        <TextField
-          label={t(k('f_opens'))}
-          type="datetime-local"
-          placeholder=""
-          value={toLocalInput(v.opensAt)}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('opensAt', toIso(e.target.value))}
-        />
-        <TextField
-          label={t(k('f_closes'))}
-          type="datetime-local"
-          placeholder=""
-          value={toLocalInput(v.closesAt)}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('closesAt', toIso(e.target.value))}
-        />
-        <TextField
-          label={t(k('f_capacity'))}
-          type="number"
-          min={1}
-          placeholder="∞"
-          hint={t(k('f_capacity_help'))}
-          value={v.capacity == null ? '' : String(v.capacity)}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) =>
-            set('capacity', e.target.value === '' ? null : Math.max(Number(e.target.value) || 1, 1))
-          }
-        />
-        <TextField
-          label={t(k('f_event_slug'))}
-          placeholder=""
-          hint={t(k('f_event_slug_help'))}
-          value={v.eventSlug ?? ''}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) =>
-            set('eventSlug', e.target.value.trim() || null)
-          }
-        />
-        <SelectField
-          label={t(k('f_audience'))}
-          value={v.audience}
-          onValueChange={(x) => x && set('audience', x as Form['audience'])}
-          options={[
-            { value: 'open', label: t(k('audience_open')) },
-            { value: 'members', label: t(k('audience_members')) },
-          ]}
-        />
-      </div>
+
+      <section className="grid gap-2">
+        <h3 className="text-lg">{t(k('f_event'))}</h3>
+        <div className="reg-grid reg-grid-2">
+          <SelectField
+            label={t(k('f_event_pick'))}
+            value={v.eventSlug ?? ''}
+            placeholder={t(k('f_event_none'))}
+            onValueChange={(slug) => {
+              const ev = choices.find((e) => e.slug === slug)
+              if (!slug || !ev) return
+              setV((x) => ({
+                ...x,
+                eventSlug: slug,
+                eventDate: ev.date,
+                titleFr: x.titleFr.trim() && x.titleFr !== t(k('new_title')) ? x.titleFr : ev.title,
+              }))
+            }}
+            options={[
+              ...(v.eventSlug && !current ? [{ value: v.eventSlug, label: v.eventSlug }] : []),
+              ...choices.map((e) => ({
+                value: e.slug,
+                label: `${e.title} · ${dayText(e.date, locale)}`,
+              })),
+            ]}
+          />
+          <TextField
+            label={t(k('f_event_date'))}
+            type="date"
+            placeholder=""
+            value={v.eventDate}
+            disabled={!canEdit}
+            onChange={(e: { target: { value: string } }) => set('eventDate', e.target.value)}
+          />
+        </div>
+        <p className="text-sm text-ink-muted">
+          {v.eventSlug ? t(k('f_event_help')) : t(k('f_event_missing'))}
+        </p>
+      </section>
+
+      <section className="grid gap-2">
+        <h3 className="text-lg">{t(k('f_when'))}</h3>
+        <div className="reg-grid reg-grid-3">
+          <TextField
+            label={t(k('f_opens'))}
+            type="datetime-local"
+            placeholder=""
+            value={toLocalInput(v.opensAt)}
+            disabled={!canEdit}
+            onChange={(e: { target: { value: string } }) => set('opensAt', toIso(e.target.value))}
+          />
+          <TextField
+            label={t(k('f_closes'))}
+            type="datetime-local"
+            placeholder=""
+            value={toLocalInput(v.closesAt)}
+            disabled={!canEdit}
+            onChange={(e: { target: { value: string } }) => set('closesAt', toIso(e.target.value))}
+          />
+          <TextField
+            label={t(k('f_capacity'))}
+            type="number"
+            min={1}
+            placeholder="∞"
+            value={v.capacity == null ? '' : String(v.capacity)}
+            disabled={!canEdit}
+            onChange={(e: { target: { value: string } }) =>
+              set(
+                'capacity',
+                e.target.value === '' ? null : Math.max(Number(e.target.value) || 1, 1),
+              )
+            }
+          />
+          <SelectField
+            label={t(k('f_audience'))}
+            value={v.audience}
+            onValueChange={(x) => x && set('audience', x as Form['audience'])}
+            options={[
+              { value: 'open', label: t(k('audience_open')) },
+              { value: 'members', label: t(k('audience_members')) },
+            ]}
+          />
+        </div>
+        <p className="text-sm text-ink-muted">{t(k('f_capacity_help'))}</p>
+      </section>
+
       <div className="grid gap-2">
         <SwitchField
           label={t(k('f_waitlist'))}
@@ -1027,22 +1216,18 @@ function FormEditor({
         <h3 className="text-lg">{t(k('f_fields'))}</h3>
         <p className="max-w-[70ch] text-sm text-ink-muted">{t(k('f_fields_help'))}</p>
         <p className="reg-always">{t(k('f_always'))}</p>
-        {v.fields.map((f, i) => (
-          <div
-            key={f.id}
-            className="reading-box"
-            data-invalid={looksSensitive(f.labelFr) || looksSensitive(f.labelEn) ? '' : undefined}
-          >
-            <div className="reading-row">
-              <div className="reading-kind">
+        {v.fields.map((f, i) => {
+          const bad = looksSensitive(f.labelFr) || looksSensitive(f.labelEn)
+          const multi = f.kind === 'choice' || f.kind === 'multi'
+          return (
+            <div key={f.id} className="reading-box" data-invalid={bad ? '' : undefined}>
+              <div className="reg-q-row">
                 <SelectField
                   label={t(k('f_kind'))}
                   value={f.kind}
                   onValueChange={(x) => x && setField(i, { kind: x as FieldKind })}
                   options={FIELD_KINDS.map((x) => ({ value: x, label: t(k(`kind_${x}`)) }))}
                 />
-              </div>
-              <div className="reading-book">
                 <TextField
                   label={t(k('f_label_fr'))}
                   placeholder=""
@@ -1052,8 +1237,6 @@ function FormEditor({
                     setField(i, { labelFr: e.target.value })
                   }
                 />
-              </div>
-              <div className="reading-book">
                 <TextField
                   label={t(k('f_label_en'))}
                   placeholder=""
@@ -1063,70 +1246,70 @@ function FormEditor({
                     setField(i, { labelEn: e.target.value })
                   }
                 />
+                {canEdit && (
+                  <Button
+                    variant="secondary"
+                    className="reading-remove"
+                    aria-label={t(k('remove'))}
+                    onClick={() =>
+                      set(
+                        'fields',
+                        v.fields.filter((_, j) => j !== i),
+                      )
+                    }
+                  >
+                    <Icon name="close" size={20} />
+                  </Button>
+                )}
               </div>
-              {canEdit && (
-                <Button
-                  variant="secondary"
-                  className="reading-remove"
-                  aria-label={t(k('remove'))}
-                  onClick={() =>
-                    set(
-                      'fields',
-                      v.fields.filter((_, j) => j !== i),
-                    )
-                  }
-                >
-                  <Icon name="close" size={20} />
-                </Button>
+              {multi && (
+                <div className="reg-grid reg-grid-2">
+                  <TagInput
+                    id={`${f.id}-fr`}
+                    label={t(k('f_options_fr'))}
+                    placeholder={t(k('f_options_ph'))}
+                    hint={t(k('f_options_help'))}
+                    min={2}
+                    disabled={!canEdit}
+                    value={f.options.map((o) => o.fr)}
+                    onChange={(fr) =>
+                      setField(i, {
+                        options: fr.map((x, n) => ({ fr: x, en: f.options[n]?.en ?? '' })),
+                      })
+                    }
+                  />
+                  <TagInput
+                    id={`${f.id}-en`}
+                    label={t(k('f_options_en'))}
+                    placeholder={t(k('f_options_ph'))}
+                    hint={t(k('f_options_en_help'))}
+                    disabled={!canEdit}
+                    max={f.options.length}
+                    value={f.options.map((o) => o.en).filter(Boolean)}
+                    onChange={(en) =>
+                      setField(i, { options: f.options.map((o, n) => ({ ...o, en: en[n] ?? '' })) })
+                    }
+                  />
+                </div>
+              )}
+              <CheckboxField
+                label={t(k('f_required'))}
+                checked={f.required}
+                disabled={!canEdit}
+                onCheckedChange={(x: boolean) => setField(i, { required: x })}
+              />
+              {bad && (
+                <p className="field-error" role="alert">
+                  {t(k('f_sensitive'))}
+                </p>
               )}
             </div>
-            {(f.kind === 'choice' || f.kind === 'multi') && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                <TextField
-                  label={t(k('f_options_fr'))}
-                  hint={t(k('f_options_help'))}
-                  placeholder=""
-                  textarea
-                  value={f.options.map((o) => o.fr).join('\n')}
-                  disabled={!canEdit}
-                  onChange={(e: { target: { value: string } }) => {
-                    const fr = e.target.value.split('\n')
-                    setField(i, {
-                      options: fr.map((x, n) => ({ fr: x, en: f.options[n]?.en ?? '' })),
-                    })
-                  }}
-                />
-                <TextField
-                  label={t(k('f_options_en'))}
-                  placeholder=""
-                  textarea
-                  value={f.options.map((o) => o.en).join('\n')}
-                  disabled={!canEdit}
-                  onChange={(e: { target: { value: string } }) => {
-                    const en = e.target.value.split('\n')
-                    setField(i, { options: f.options.map((o, n) => ({ ...o, en: en[n] ?? '' })) })
-                  }}
-                />
-              </div>
-            )}
-            <CheckboxField
-              label={t(k('f_required'))}
-              checked={f.required}
-              disabled={!canEdit}
-              onCheckedChange={(x: boolean) => setField(i, { required: x })}
-            />
-            {(looksSensitive(f.labelFr) || looksSensitive(f.labelEn)) && (
-              <p className="field-error" role="alert">
-                {t(k('f_sensitive'))}
-              </p>
-            )}
-          </div>
-        ))}
+          )
+        })}
         {canEdit && v.fields.length < 8 && (
-          <div>
+          <div className="reg-add">
             <Button
               variant="secondary"
-              size="sm"
               onClick={() =>
                 set('fields', [
                   ...v.fields,
@@ -1141,7 +1324,7 @@ function FormEditor({
                 ])
               }
             >
-              <Icon name="plus" size={16} />
+              <Icon name="plus" size={20} />
               {t(k('f_add_field'))}
             </Button>
           </div>
@@ -1149,7 +1332,19 @@ function FormEditor({
       </section>
 
       {canEdit && (
-        <div className="flex flex-wrap gap-2">
+        <div className="reg-actions">
+          <Button
+            variant="secondary"
+            disabled={
+              save.isPending ||
+              sensitive ||
+              optionsBad ||
+              (!v.eventSlug && form.state !== 'published')
+            }
+            onClick={() => save.mutate(form.state === 'published' ? 'draft' : 'published')}
+          >
+            {t(k(form.state === 'published' ? 'unpublish' : 'publish'))}
+          </Button>
           <Button
             loading={save.isPending}
             disabled={
@@ -1162,13 +1357,6 @@ function FormEditor({
             onClick={() => save.mutate(undefined)}
           >
             {t(k('save'))}
-          </Button>
-          <Button
-            variant={form.state === 'published' ? 'secondary' : 'primary'}
-            disabled={save.isPending || sensitive || optionsBad}
-            onClick={() => save.mutate(form.state === 'published' ? 'draft' : 'published')}
-          >
-            {t(k(form.state === 'published' ? 'unpublish' : 'publish'))}
           </Button>
         </div>
       )}
