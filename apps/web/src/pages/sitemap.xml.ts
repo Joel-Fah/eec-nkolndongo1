@@ -30,6 +30,7 @@ const BUILT = [
   'dimanche',
   'nouvelles',
   'predications',
+  'meditations',
   'give',
   'privacy',
   'legal',

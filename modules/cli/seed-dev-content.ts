@@ -3,9 +3,16 @@
  * be judged with realistic lengths and photos. No parish facts: no names, dates, times or places. `--clear` removes them.
  * Refuses to run on any branch but `dev`.
  */
+
+import { readFileSync } from 'node:fs'
 import { bumpContentVersion } from '@eec/api-kit'
-import type { BibleRef } from '@eec/core'
-import { cleanDoc, nthWeekdayOfMonth, zonedToUtc } from '@eec/core'
+import {
+  type BibleRef,
+  cleanDoc,
+  nthWeekdayOfMonth,
+  readMeditationCsv,
+  zonedToUtc,
+} from '@eec/core'
 import { assertBranch, connectDirect } from '@eec/db/node'
 import { groups, mediaFiles } from '@eec/db/schema'
 import { contactMessages } from '@eec/module-contact/schema'
@@ -13,6 +20,7 @@ import { departmentPages, departmentPeople } from '@eec/module-departments/schem
 import { eventsItems } from '@eec/module-events/schema'
 import { guideSteps, guides } from '@eec/module-guides/schema'
 import { liturgySundays, liturgyVerses } from '@eec/module-liturgy/schema'
+import { meditationDays, meditationPlans } from '@eec/module-meditations/schema'
 import { newsPosts } from '@eec/module-news/schema'
 import { scheduleExceptions, scheduleSlots } from '@eec/module-schedule/schema'
 import { sermonSeries, sermons } from '@eec/module-sermons/schema'
@@ -24,6 +32,7 @@ assertBranch(['dev'])
 const { db, close } = await connectDirect()
 
 if (process.argv.includes('--clear')) {
+  await db.delete(meditationPlans).where(eq(meditationPlans.slug, 'meditations-2026-exemple'))
   await db.delete(sermons).where(like(sermons.slug, 'exemple-%'))
   await db.delete(sermonSeries).where(like(sermonSeries.slug, 'exemple-%'))
   await db.delete(newsPosts).where(like(newsPosts.slug, 'exemple-%'))
@@ -100,6 +109,31 @@ for (const [i, title] of titles.entries()) {
     })
     .onConflictDoNothing()
 }
+// Meditations: the parish's real 2026 calendar (July–December), published, so the public pages can be judged with real data.
+const plan2026 = readMeditationCsv(
+  readFileSync(new URL('../meditations/fixtures/meditations-2026.csv', import.meta.url), 'utf8'),
+)
+const [medPlan] = await db
+  .insert(meditationPlans)
+  .values({
+    slug: 'meditations-2026-exemple',
+    titleFr: 'Méditations 2026',
+    titleEn: 'Meditations 2026',
+    startsOn: '2026-01-01',
+    endsOn: '2026-12-31',
+    state: 'published',
+  })
+  .onConflictDoNothing()
+  .returning()
+if (medPlan)
+  for (const r of plan2026.rows)
+    await db.insert(meditationDays).values({
+      planId: medPlan.id,
+      date: r.date,
+      headlineFr: r.headline,
+      readings: r.readings,
+      psalm: r.psalm,
+    })
 // Sermons: fictional titles and links (example.org), to judge the listening room. No real preacher, no real recording.
 const [exSeries] = await db
   .insert(sermonSeries)

@@ -9,6 +9,7 @@ import JsonLd from '../../components/JsonLd.astro'
 import Site from '../../layouts/Site.astro'
 import { eventsListHref } from '../../lib/events-routes'
 import { localeOf, localePaths, useT } from '../../lib/i18n'
+import { meditationsHref } from '../../lib/meditations-routes'
 import { href, pages as navPages, pages } from '../../lib/nav'
 import { newsListHref } from '../../lib/news-routes'
 import { organization } from '../../lib/seo'
@@ -165,6 +166,22 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
     <ul class="ln-list" data-latest-list role="list"></ul>
     <p class="ln-all"><a data-latest-all href={newsListHref(locale)}>{t('news.site.latest_all')}</a></p>
   </section>
+  <section class="home-section" aria-labelledby="med-title" data-meditation-today data-locale={locale} data-base={meditationsHref(locale)} hidden>
+    <div class="home-section-head">
+      <h2 id="med-title" class="text-4xl">{t('meditations.site.latest_t')}</h2>
+    </div>
+    <a class="ls-card" href={meditationsHref(locale)} data-med-card>
+      <span class="ls-icon" aria-hidden="true"><Icon name="book" size={24} /></span>
+      <span class="ls-body">
+        <span class="ls-meta" data-med-date></span>
+        <strong class="ls-title" data-med-headline hidden></strong>
+        <ul class="ls-passages" data-med-list></ul>
+      </span>
+      <span class="ls-go" aria-hidden="true"><Icon name="arrowRight" size={20} /></span>
+    </a>
+    <p class="ln-all"><a href={meditationsHref(locale)}>{t('meditations.site.see_all')}</a></p>
+  </section>
+
   <section class="home-section" aria-labelledby="sermon-title" data-latest-sermon data-locale={locale} data-base={sermonsListHref(locale)} data-more={t('sermons.site.back')} hidden>
     <div class="home-section-head">
       <h2 id="sermon-title" class="text-4xl">{t('sermons.site.latest_t')}</h2>
@@ -186,15 +203,18 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 <script>
   import { showLatestNews } from '../../lib/latest-news-client'
   import { showLatestSermon } from '../../lib/latest-sermon-client'
+  import { showMeditation } from '../../lib/latest-meditation-client'
   import { showSunday } from '../../lib/sunday-client'
   import { showUpcoming } from '../../lib/upcoming-client'
   showSunday()
   document.addEventListener('astro:page-load', showSunday)
   showLatestNews()
   showLatestSermon()
+  showMeditation()
   showUpcoming()
   document.addEventListener('astro:page-load', showLatestNews)
   document.addEventListener('astro:page-load', showLatestSermon)
+  document.addEventListener('astro:page-load', showMeditation)
   document.addEventListener('astro:page-load', showUpcoming)
 </script>
 
@@ -417,6 +437,7 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
 <style is:global>
   [data-latest-news][hidden],
   [data-latest-sermon][hidden],
+  [data-meditation-today][hidden],
   [data-upcoming][hidden],
   [data-sunday][hidden] {
     display: none;
@@ -466,6 +487,19 @@ const groups = ['choirs', 'youth', 'women', 'men', 'children', 'readers', 'welco
   }
   .ls-sum {
     color: var(--ink-muted);
+  }
+  .ls-passages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  .ls-passages li {
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: var(--text-sm);
   }
   .ls-go {
     color: var(--primary);

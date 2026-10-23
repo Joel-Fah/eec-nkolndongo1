@@ -539,7 +539,7 @@ export const sermonsApi = new Hono<AppEnv>()
     const rows = await db
       .select({
         s: sermonSeries,
-        n: sql<number>`(select count(*)::int from sermons where series_id = ${sermonSeries.id})`,
+        n: sql<number>`(select count(*)::int from sermons x where x.series_id = sermon_series.id)`,
       })
       .from(sermonSeries)
       .orderBy(asc(sermonSeries.titleFr))

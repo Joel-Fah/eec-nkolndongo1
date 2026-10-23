@@ -2438,3 +2438,92 @@ html[data-nav-open] {
   text-transform: uppercase;
   color: var(--ink-muted);
 }
+
+/* ── Meditations admin: a row a day, opened in place ────────────────────────────────────── */
+.plan-tile {
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  text-align: start;
+  cursor: pointer;
+}
+.plan-tile:hover {
+  box-shadow: var(--elevation-2);
+}
+.med-days {
+  display: grid;
+  gap: 0.375rem;
+}
+.med-row {
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+}
+.med-row[data-open] {
+  box-shadow: var(--elevation-2);
+}
+.med-head {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
+  gap: 0.25rem 0.75rem;
+  align-items: center;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.5rem 1rem;
+  text-align: start;
+  border-radius: inherit;
+}
+.med-head:hover {
+  background: var(--surface-2);
+}
+.med-date {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.med-headline {
+  grid-column: 2;
+  font-size: var(--text-sm);
+  color: var(--primary);
+  font-weight: 600;
+}
+.med-headline:empty {
+  display: none;
+}
+.med-readings {
+  grid-column: 2;
+}
+.med-psalm {
+  grid-column: 2;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.med-psalm:empty {
+  display: none;
+}
+.med-head > svg,
+.med-head > span:last-child {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+}
+@media (min-width: 64rem) {
+  .med-head {
+    grid-template-columns: 5rem 11rem minmax(0, 1fr) 11rem auto;
+  }
+  .med-headline,
+  .med-readings,
+  .med-psalm {
+    grid-column: auto;
+  }
+  .med-head > svg,
+  .med-head > span:last-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+.med-form {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem 1rem 1.25rem;
+}

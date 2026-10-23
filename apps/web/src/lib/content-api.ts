@@ -140,3 +140,19 @@ export type SermonFilters = {
   books: { id: string; label: string }[]
   years: string[]
 }
+
+export type MeditationDay = {
+  date: string
+  headline: string
+  readings: { label: string; ref: string }[]
+  psalm: string
+  reflection: string
+  verse: { ref: string; text: string; translation: string } | null
+}
+export type MeditationPlan = {
+  slug: string
+  title: string
+  description: string
+  startsOn: string
+  endsOn: string
+}

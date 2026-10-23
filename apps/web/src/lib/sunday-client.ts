@@ -107,7 +107,8 @@ export async function showSunday() {
   if (verse && !verse.dataset.loaded) {
     verse.dataset.loaded = '1'
     const v = (await getJson<Verse>(`/api/liturgy/public/verse?locale=${locale}`))?.verse
-    if (v) {
+    // Today's meditation verse, when it has one, wins over the general verse of the day.
+    if (v && !verse.dataset.meditation) {
       const text = verse.querySelector<HTMLElement>('.bento-verse-text')
       const cite = verse.querySelector<HTMLElement>('.bento-verse-cite')
       if (text) text.textContent = v.text

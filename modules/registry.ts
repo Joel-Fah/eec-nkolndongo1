@@ -12,6 +12,7 @@ import { guidesModule } from '@eec/module-guides'
 import { legalModule } from '@eec/module-legal'
 import { liturgyModule } from '@eec/module-liturgy'
 import { mediaModule } from '@eec/module-media'
+import { meditationsModule } from '@eec/module-meditations'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
 import { scheduleModule } from '@eec/module-schedule'
@@ -27,6 +28,7 @@ export const modules: readonly DefinedModule[] = [
   membersModule,
   newsModule,
   sermonsModule,
+  meditationsModule,
   eventsModule,
   scheduleModule,
   liturgyModule,
