@@ -150,6 +150,7 @@ Astro.response.headers.set(
 <style>
   .hc,
   .co {
+    overflow-x: clip; /* pictures may run past the column, never past the screen */
     display: grid;
     gap: 1.5rem;
     width: min(100% - 2rem, 64rem);
