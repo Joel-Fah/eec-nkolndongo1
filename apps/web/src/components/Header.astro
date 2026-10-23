@@ -142,7 +142,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
           tabs.map((tab) => {
             const slug = tab.slug[locale]
             return tab.children.length ? (
-              <details class="accordion-item mobile-card" name="mobile-nav" open={active(slug)}>
+              <details class="accordion-item mobile-card" name="mobile-nav" open={active(slug)} data-current={active(slug) ? '' : undefined}>
                 <summary class="accordion-trigger">
                   <span class="mobile-row"><span class="mega-icon"><Icon name={tab.icon} /></span>{t(tabKey(tab.id))}</span>
                   <span class="eec-chevron" aria-hidden="true" />
@@ -150,7 +150,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                 <ul class="mobile-sub" role="list">
                   {tab.children.map((child) => (
                     <li>
-                      <a class="mega-item" href={href(locale, `${slug}/${child.slug[locale]}`)}>
+                      <a class="mega-item" href={href(locale, `${slug}/${child.slug[locale]}`)} aria-current={current.startsWith(href(locale, `${slug}/${child.slug[locale]}`)) ? 'page' : undefined}>
                         <span class="mega-icon"><Icon name={child.icon} size={20} /></span>
                         <span class="mega-text"><span class="mega-label">{t(labelKey(child.id))}</span><span class="mega-desc">{t(descKey(child.id))}</span></span>
                       </a>
@@ -159,7 +159,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                 </ul>
               </details>
             ) : (
-              <a class="mobile-card mobile-link" href={href(locale, slug)}>
+              <a class="mobile-card mobile-link" href={href(locale, slug)} aria-current={active(slug) ? 'page' : undefined}>
                 <span class="mobile-row"><span class="mega-icon"><Icon name={tab.icon} /></span>{t(tabKey(tab.id))}</span>
               </a>
             )
@@ -825,6 +825,30 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
   .mobile-card .accordion-trigger {
     min-height: 3.75rem;
     border-radius: var(--radius-lg);
+  }
+  /* The current section in the phone menu, as in the admin: a soft green tint, green label and icon. */
+  .mobile-card[data-current],
+  .mobile-card[aria-current] {
+    background: var(--primary-soft);
+  }
+  .mobile-card[data-current] > .accordion-trigger,
+  .mobile-card[aria-current] {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .mobile-card[data-current] .mobile-sub {
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .mobile-card[data-current] .mega-item[aria-current='page'] {
+    background: var(--surface);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .mobile-card[data-current] > .accordion-trigger .mega-icon,
+  .mobile-card[aria-current] .mega-icon {
+    background: var(--surface);
+    color: var(--primary);
   }
   .mobile-link {
     display: flex;

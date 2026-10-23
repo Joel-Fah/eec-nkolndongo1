@@ -219,59 +219,63 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
     }`
   return (
     <div className="grid gap-6">
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-56 flex-1">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-3">
+          <div className="min-w-56 flex-1">
+            <TextField
+              label={t(k('search'))}
+              placeholder={t(k('search_ph'))}
+              icon="search"
+              type="search"
+              value={q}
+              onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
+            />
+          </div>
+          <div className="media-select">
+            <SelectField
+              label={t(k('filter'))}
+              value={status || 'all'}
+              onValueChange={(v) => setStatus(!v || v === 'all' ? '' : v)}
+              options={[
+                { value: 'all', label: t(k('all')) },
+                ...(['draft', 'scheduled', 'published', 'archived'] as const).map((s) => ({
+                  value: s,
+                  label: `${t(`content.status.${s}`)}${counts ? ` (${counts[s]})` : ''}`,
+                })),
+              ]}
+            />
+          </div>
           <TextField
-            label={t(k('search'))}
-            placeholder={t(k('search_ph'))}
-            icon="search"
-            type="search"
-            value={q}
-            onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
+            label={t(k('date_from'))}
+            type="date"
+            placeholder=""
+            value={from}
+            onChange={(e: { target: { value: string } }) => setFrom(e.target.value)}
+          />
+          <TextField
+            label={t(k('date_to'))}
+            type="date"
+            placeholder=""
+            value={to}
+            onChange={(e: { target: { value: string } }) => setTo(e.target.value)}
           />
         </div>
-        <div className="media-select">
-          <SelectField
-            label={t(k('filter'))}
-            value={status || 'all'}
-            onValueChange={(v) => setStatus(!v || v === 'all' ? '' : v)}
+        <div className="flex items-end gap-3">
+          <ViewToggle
+            value={view}
+            onChange={setView}
+            label={t(k('view'))}
             options={[
-              { value: 'all', label: t(k('all')) },
-              ...(['draft', 'scheduled', 'published', 'archived'] as const).map((s) => ({
-                value: s,
-                label: `${t(`content.status.${s}`)}${counts ? ` (${counts[s]})` : ''}`,
-              })),
+              { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
+              { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
             ]}
           />
+          {hasPermission(me, 'sermons:edit') && (
+            <Button loading={create.isPending} onClick={() => create.mutate({})}>
+              {t(k('write'))}
+            </Button>
+          )}
         </div>
-        <TextField
-          label={t(k('date_from'))}
-          type="date"
-          placeholder=""
-          value={from}
-          onChange={(e: { target: { value: string } }) => setFrom(e.target.value)}
-        />
-        <TextField
-          label={t(k('date_to'))}
-          type="date"
-          placeholder=""
-          value={to}
-          onChange={(e: { target: { value: string } }) => setTo(e.target.value)}
-        />
-        <ViewToggle
-          value={view}
-          onChange={setView}
-          label={t(k('view'))}
-          options={[
-            { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
-            { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
-          ]}
-        />
-        {hasPermission(me, 'sermons:edit') && (
-          <Button loading={create.isPending} onClick={() => create.mutate({})}>
-            {t(k('write'))}
-          </Button>
-        )}
       </div>
       {list.data && list.data.items.length === 0 ? (
         <EmptyState

@@ -1,7 +1,7 @@
 import { api, useLocale } from '@eec/admin-kit'
 import { Badge, Button, SwitchField } from '@eec/ui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../../components/Icon'
 import { Gate } from '../../components/kit'
 
@@ -23,9 +23,18 @@ function DesignBanner() {
   const { t, locale } = useLocale()
   // A random abstract Pexels photo on every visit (nothing is stored); without one the banner keeps its soft gradient.
   const [photo, setPhoto] = useState<{ src: string; photographer: string } | null>(null)
+  // Asked once per visit (a ref survives the double run of effects in development, which used to draw two photos, one after the
+  // other), and shown only once it has loaded, fading in, so there is never a flash of a first picture.
+  const asked = useRef(false)
   useEffect(() => {
+    if (asked.current) return
+    asked.current = true
     api<{ src: string; photographer: string }>('/banner')
-      .then((j) => setPhoto(j))
+      .then((j) => {
+        const img = new Image()
+        img.onload = () => setPhoto(j)
+        img.src = j.src
+      })
       .catch(() => {})
   }, [])
   const cards: { icon: 'sparkles' | 'bookText' | 'checklist'; text: string; at: string }[] = [
