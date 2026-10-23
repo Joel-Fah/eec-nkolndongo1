@@ -12,6 +12,7 @@ import {
   SaveIndicator,
   StatusBadge,
   useAutosave,
+  ViewToggle,
 } from '@eec/content-kit'
 import {
   type BibleRef,
@@ -19,6 +20,7 @@ import {
   compareVerses,
   type Doc,
   EMPTY_DOC,
+  formatRef,
   publishProblems,
   type Status,
   shortDate,
@@ -53,7 +55,9 @@ type Item = {
   preacherName: string
   updatedAt: string
 }
-type Link = { label: string; url: string }
+type LinkKind = (typeof LINK_KINDS)[number]
+const LINK_KINDS = ['audio', 'notes', 'slides', 'other'] as const
+type Link = { kind?: LinkKind; label: string; url: string }
 type Full = Item & {
   summaryFr: string
   summaryEn: string
@@ -146,15 +150,34 @@ function Home({ onOpen }: { onOpen: (id: string) => void }) {
   )
 }
 
+const VIEW_KEY = 'eec-sermons-view'
+
 function List({ onOpen }: { onOpen: (id: string) => void }) {
   const { t, locale } = useLocale()
   const me = useMe().data
   const qc = useQueryClient()
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [view, setViewState] = useState<'list' | 'grid'>(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'list'
+    } catch {
+      return 'list'
+    }
+  })
+  const setView = (v: 'list' | 'grid') => {
+    setViewState(v)
+    try {
+      localStorage.setItem(VIEW_KEY, v)
+    } catch {}
+  }
   const params = new URLSearchParams()
   if (q) params.set('q', q)
   if (status) params.set('status', status)
+  if (from) params.set('from', from)
+  if (to) params.set('to', to)
   const list = useQuery({
     queryKey: ['sermons', params.toString()],
     queryFn: () => api<{ items: Item[]; counts: Record<Status, number> }>(`/sermons?${params}`),
@@ -168,8 +191,33 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
     onError: () => say(t(k('error')), 'danger'),
   })
   const counts = list.data?.counts
+  const filtered = !!(q || status || from || to)
+  // Grouped by the month it was preached (or last edited, for a sermon with no date yet), newest first.
+  const groups = new Map<string, Item[]>()
+  for (const n of list.data?.items ?? []) {
+    const key = (n.preachedOn ?? n.updatedAt).slice(0, 7)
+    groups.set(key, [...(groups.get(key) ?? []), n])
+  }
+  const monthName = (ym: string) => {
+    const name = new Intl.DateTimeFormat(locale, {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${ym}-01T00:00:00Z`))
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  }
+  const dateOf = (n: Item) =>
+    n.preachedOn
+      ? shortDate(`${n.preachedOn}T12:00:00Z`, locale)
+      : t(k('updated'), { date: shortDate(n.updatedAt, locale) })
+  const meta = (n: Item) =>
+    `${dateOf(n)}${n.seriesTitle ? ` · ${n.seriesTitle}` : ''}${
+      n.status === 'scheduled' && n.publishAt
+        ? ` · ${t(k('scheduled_for'), { date: shortDate(n.publishAt, locale) })}`
+        : ''
+    }`
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-6">
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-56 flex-1">
           <TextField
@@ -195,6 +243,29 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
             ]}
           />
         </div>
+        <TextField
+          label={t(k('date_from'))}
+          type="date"
+          placeholder=""
+          value={from}
+          onChange={(e: { target: { value: string } }) => setFrom(e.target.value)}
+        />
+        <TextField
+          label={t(k('date_to'))}
+          type="date"
+          placeholder=""
+          value={to}
+          onChange={(e: { target: { value: string } }) => setTo(e.target.value)}
+        />
+        <ViewToggle
+          value={view}
+          onChange={setView}
+          label={t(k('view'))}
+          options={[
+            { id: 'list', label: t(k('view_list')), icon: 'layoutList' },
+            { id: 'grid', label: t(k('view_grid')), icon: 'gridView' },
+          ]}
+        />
         {hasPermission(me, 'sermons:edit') && (
           <Button loading={create.isPending} onClick={() => create.mutate({})}>
             {t(k('write'))}
@@ -203,31 +274,56 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
       </div>
       {list.data && list.data.items.length === 0 ? (
         <EmptyState
-          title={t(k(q || status ? 'empty_filter_t' : 'empty_t'))}
-          text={t(k(q || status ? 'empty_filter_p' : 'empty_p'))}
+          title={t(k(filtered ? 'empty_filter_t' : 'empty_t'))}
+          text={t(k(filtered ? 'empty_filter_p' : 'empty_p'))}
         />
       ) : (
-        <ul className="grid gap-2">
-          {(list.data?.items ?? []).map((n) => (
-            <li key={n.id}>
-              <button type="button" className="admin-row news-row" onClick={() => onOpen(n.id)}>
-                <span className="grid text-start">
-                  <strong>{n.titleFr || t(k('untitled'))}</strong>
-                  <span className="text-sm text-ink-muted">
-                    {n.preachedOn
-                      ? shortDate(`${n.preachedOn}T12:00:00Z`, locale)
-                      : t(k('updated'), { date: shortDate(n.updatedAt, locale) })}
-                    {n.seriesTitle ? ` · ${n.seriesTitle}` : ''}
-                    {n.status === 'scheduled' && n.publishAt
-                      ? ` · ${t(k('scheduled_for'), { date: shortDate(n.publishAt, locale) })}`
-                      : ''}
-                  </span>
-                </span>
-                <StatusBadge status={n.status} />
-              </button>
-            </li>
-          ))}
-        </ul>
+        [...groups.entries()].map(([ym, items]) => (
+          <section key={ym} className="grid gap-3" aria-label={monthName(ym)}>
+            <h2 className="sermon-month">
+              {monthName(ym)}
+              <span>{items.length}</span>
+            </h2>
+            {view === 'list' ? (
+              <ul className="grid gap-2">
+                {items.map((n) => (
+                  <li key={n.id}>
+                    <button
+                      type="button"
+                      className="admin-row news-row"
+                      onClick={() => onOpen(n.id)}
+                    >
+                      <span className="grid text-start">
+                        <strong>{n.titleFr || t(k('untitled'))}</strong>
+                        <span className="text-sm text-ink-muted">{meta(n)}</span>
+                      </span>
+                      <StatusBadge status={n.status} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {items.map((n) => (
+                  <li key={n.id}>
+                    <button
+                      type="button"
+                      className="admin-panel sermon-tile"
+                      onClick={() => onOpen(n.id)}
+                    >
+                      <StatusBadge status={n.status} />
+                      <strong className="font-display text-xl">
+                        {n.titleFr || t(k('untitled'))}
+                      </strong>
+                      <span className="text-sm text-ink-muted">{meta(n)}</span>
+                      {n.preacherName && <span className="text-sm">{n.preacherName}</span>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))
       )}
     </div>
   )
@@ -492,6 +588,14 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
       }>('/liturgy/sundays'),
   })
 
+  const pastors = useQuery({
+    queryKey: ['sermon-preachers'],
+    enabled: canEdit,
+    retry: false,
+    queryFn: () => api<{ names: string[] }>('/sermons/preachers'),
+  })
+  const [otherPreacher, setOtherPreacher] = useState(false)
+
   if (!draft || !meta) return <div className="admin-panel" aria-busy="true" />
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => (d ? { ...d, [key]: value } : d))
@@ -505,6 +609,24 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
   const fmt = (iso: string) =>
     `${shortDate(iso, locale)} · ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Douala' }).format(new Date(iso))}`
   const siteUrl = `/${locale}/${locale === 'fr' ? 'actualites/predications' : 'news/sermons'}/${draft.slug}/`
+  const today = new Date().toISOString().slice(0, 10)
+  const pastorNames = pastors.data?.names ?? []
+  // A name of a pastor is picked from the list; anything else (a guest) is typed. The consent was for one person: it resets.
+  const preacherPick =
+    otherPreacher || (draft.preacherName && !pastorNames.includes(draft.preacherName))
+      ? 'other'
+      : draft.preacherName || 'none'
+  const setPreacher = (name: string) =>
+    setDraft((d) =>
+      d
+        ? {
+            ...d,
+            preacherName: name,
+            preacherConsent: name === d.preacherName ? d.preacherConsent : false,
+          }
+        : d,
+    )
+  const linkedSunday = sundays.data?.items.find((x) => x.date === draft.sundayDate)
   const setRef = (i: number, patch: Partial<BibleRef>) =>
     set(
       'refs',
@@ -515,17 +637,17 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
       'links',
       draft.links.map((l, j) => (j === i ? { ...l, ...patch } : l)),
     )
-  const fromSunday = (date: string) => {
-    const s = sundays.data?.items.find((x) => x.date === date)
+  // Fills what is still empty from the linked Sunday: the date, the passages, the name. The Sunday's consent for a name was for
+  // that Sunday only: it is never copied (decision 0031).
+  const copyFromSunday = (date: string) => {
+    const e = sundays.data?.items.find((x) => x.date === date)?.entry
     setDraft((d) =>
       d
         ? {
             ...d,
-            sundayDate: date,
             preachedOn: d.preachedOn ?? date,
-            refs: s?.entry?.readings?.length ? s.entry.readings : d.refs,
-            preacherName: d.preacherName || (s?.entry?.preacherName ?? ''),
-            // The Sunday's consent was for that Sunday: it is never copied (decision 0031).
+            refs: d.refs.length === 0 && e?.readings?.length ? e.readings : d.refs,
+            preacherName: d.preacherName || (e?.preacherName ?? ''),
           }
         : d,
     )
@@ -593,48 +715,114 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
 
           <div className="admin-panel grid gap-4">
             <h2 className="text-lg">{t(k('when'))}</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextField
-                label={t(k('preached_on'))}
-                type="date"
-                placeholder=""
-                value={draft.preachedOn ?? ''}
-                disabled={!canEdit}
-                onChange={(e: { target: { value: string } }) =>
-                  set('preachedOn', e.target.value || null)
-                }
-              />
-              {sundays.data && sundays.data.items.length > 0 && (
-                <SelectField
-                  label={t(k('from_sunday'))}
-                  value={draft.sundayDate ?? 'none'}
-                  onValueChange={(v) =>
-                    v && (v === 'none' ? set('sundayDate', null) : fromSunday(v))
-                  }
-                  options={[
-                    { value: 'none', label: t(k('pick_sunday')) },
-                    ...sundays.data.items.map((s) => ({
-                      value: s.date,
-                      label: shortDate(`${s.date}T12:00:00Z`, locale),
-                    })),
-                  ]}
-                />
-              )}
-            </div>
             <TextField
-              label={t(k('preacher'))}
-              hint={t(k('preacher_help'))}
+              label={t(k('preached_on'))}
+              type="date"
               placeholder=""
-              value={draft.preacherName}
+              value={draft.preachedOn ?? ''}
               disabled={!canEdit}
-              onChange={(e: { target: { value: string } }) => set('preacherName', e.target.value)}
+              onChange={(e: { target: { value: string } }) =>
+                set('preachedOn', e.target.value || null)
+              }
             />
+            <SelectField
+              label={t(k('preacher'))}
+              value={preacherPick}
+              onValueChange={(v) => {
+                if (!v) return
+                if (v === 'none') {
+                  setOtherPreacher(false)
+                  setPreacher('')
+                } else if (v === 'other') {
+                  setOtherPreacher(true)
+                  if (pastorNames.includes(draft.preacherName)) setPreacher('')
+                } else {
+                  setOtherPreacher(false)
+                  setPreacher(v)
+                }
+              }}
+              options={[
+                { value: 'none', label: t(k('preacher_none')) },
+                ...pastorNames.map((n) => ({ value: n, label: n })),
+                { value: 'other', label: t(k('preacher_other')) },
+              ]}
+            />
+            {preacherPick === 'other' && (
+              <TextField
+                label={t(k('preacher_other_label'))}
+                placeholder=""
+                value={draft.preacherName}
+                disabled={!canEdit}
+                onChange={(e: { target: { value: string } }) => setPreacher(e.target.value)}
+              />
+            )}
             <SwitchField
               label={t(k('preacher_consent'))}
+              hint={t(k('preacher_help'))}
               checked={draft.preacherConsent}
               disabled={!canEdit || !draft.preacherName.trim()}
               onCheckedChange={(v: boolean) => set('preacherConsent', v)}
             />
+          </div>
+
+          <div className="admin-panel grid gap-3">
+            <h2 className="text-lg">{t(k('sunday_h'))}</h2>
+            <p className="text-sm text-ink-muted">{t(k('sunday_help'))}</p>
+            {sundays.data && sundays.data.items.length > 0 ? (
+              <>
+                <SelectField
+                  label={t(k('sunday_pick'))}
+                  value={draft.sundayDate ?? 'none'}
+                  onValueChange={(v) => v && set('sundayDate', v === 'none' ? null : v)}
+                  options={[
+                    { value: 'none', label: t(k('sunday_none')) },
+                    ...sundays.data.items.map((s) => ({
+                      value: s.date,
+                      label: `${shortDate(`${s.date}T12:00:00Z`, locale)}${s.date > today ? ` · ${t(k('sunday_upcoming'))}` : ''}`,
+                    })),
+                  ]}
+                />
+                {linkedSunday && (
+                  <div className="sunday-card">
+                    <p className="font-medium">
+                      {t(k('sunday_linked'), {
+                        date: shortDate(`${linkedSunday.date}T12:00:00Z`, locale),
+                      })}
+                    </p>
+                    {linkedSunday.entry ? (
+                      <dl className="sunday-facts">
+                        <div>
+                          <dt>{t(k('passages'))}</dt>
+                          <dd>
+                            {linkedSunday.entry.readings.length
+                              ? linkedSunday.entry.readings
+                                  .map((r) => formatRef(r, locale))
+                                  .join(' · ')
+                              : '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>{t(k('preacher'))}</dt>
+                          <dd>{linkedSunday.entry.preacherName || '—'}</dd>
+                        </div>
+                      </dl>
+                    ) : (
+                      <p className="text-sm text-ink-muted">{t(k('sunday_empty'))}</p>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => copyFromSunday(linkedSunday.date)}
+                    >
+                      {t(k('sunday_copy'))}
+                    </Button>
+                    <p className="text-xs text-ink-muted">{t(k('sunday_copy_help'))}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-ink-muted">{t(k('from_sunday_none'))}</p>
+            )}
           </div>
 
           <div className="admin-panel grid gap-3">
@@ -698,8 +886,8 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
                       />
                     </label>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="secondary"
+                      className="reading-remove"
                       aria-label={t(k('remove'))}
                       onClick={() =>
                         set(
@@ -708,7 +896,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
                         )
                       }
                     >
-                      <Icon name="close" size={16} />
+                      <Icon name="close" size={20} />
                     </Button>
                   </div>
                 </div>
@@ -743,49 +931,64 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
           <div className="admin-panel grid gap-3">
             <h2 className="text-lg">{t(k('links'))}</h2>
             <p className="text-sm text-ink-muted">{t(k('links_help'))}</p>
-            {draft.links.map((l, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: the list is edited in place
-              <div key={i} className="grid items-end gap-3 sm:grid-cols-[1fr_1.6fr_auto]">
-                <TextField
-                  label={t(k('link_label'))}
-                  placeholder={t(k('link_label_ph'))}
-                  value={l.label}
-                  disabled={!canEdit}
-                  onChange={(e: { target: { value: string } }) =>
-                    setLink(i, { label: e.target.value })
-                  }
-                />
-                <TextField
-                  label={t(k('link_url'))}
-                  placeholder="https://…"
-                  hint={l.url && !urlOk(l.url) ? t(k('link_bad')) : undefined}
-                  value={l.url}
-                  disabled={!canEdit}
-                  onChange={(e: { target: { value: string } }) =>
-                    setLink(i, { url: e.target.value })
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  aria-label={t(k('remove'))}
-                  onClick={() =>
-                    set(
-                      'links',
-                      draft.links.filter((_, j) => j !== i),
-                    )
-                  }
-                >
-                  <Icon name="close" size={16} />
-                </Button>
-              </div>
-            ))}
+            {draft.links.map((l, i) => {
+              const kind = l.kind ?? 'other'
+              return (
+                // biome-ignore lint/suspicious/noArrayIndexKey: the list is edited in place
+                <div key={i} className="reading-box">
+                  <div className="link-row" data-other={kind === 'other' ? '' : undefined}>
+                    <SelectField
+                      label={t(k('link_kind'))}
+                      value={kind}
+                      onValueChange={(v) => v && setLink(i, { kind: v as LinkKind })}
+                      options={LINK_KINDS.map((x) => ({ value: x, label: t(k(`kind_${x}`)) }))}
+                    />
+                    {kind === 'other' && (
+                      <TextField
+                        label={t(k('link_label'))}
+                        placeholder={t(k('link_label_ph'))}
+                        value={l.label}
+                        disabled={!canEdit}
+                        onChange={(e: { target: { value: string } }) =>
+                          setLink(i, { label: e.target.value })
+                        }
+                      />
+                    )}
+                    <TextField
+                      label={t(k('link_url'))}
+                      placeholder="https://…"
+                      hint={l.url && !urlOk(l.url) ? t(k('link_bad')) : undefined}
+                      value={l.url}
+                      disabled={!canEdit}
+                      onChange={(e: { target: { value: string } }) =>
+                        setLink(i, { url: e.target.value })
+                      }
+                    />
+                    <Button
+                      variant="secondary"
+                      className="reading-remove"
+                      aria-label={t(k('remove'))}
+                      onClick={() =>
+                        set(
+                          'links',
+                          draft.links.filter((_, j) => j !== i),
+                        )
+                      }
+                    >
+                      <Icon name="close" size={20} />
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
             {draft.links.length < 4 && canEdit && (
               <div>
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => set('links', [...draft.links, { label: '', url: '' }])}
+                  onClick={() =>
+                    set('links', [...draft.links, { kind: 'audio', label: '', url: '' }])
+                  }
                 >
                   {t(k('add_link'))}
                 </Button>
@@ -879,14 +1082,11 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
                 ]}
               />
             )}
-            <TextField
-              label={t(k('side_slug'))}
-              placeholder={t(k('side_slug_ph'))}
-              hint={t(k('side_slug_help'))}
-              value={draft.slug}
-              disabled={!canEdit}
-              onChange={(e: { target: { value: string } }) => set('slug', e.target.value)}
-            />
+            <div className="grid gap-1">
+              <span className="field-label">{t(k('side_slug'))}</span>
+              <code className="admin-link-box">{siteUrl}</code>
+              <p className="text-xs text-ink-muted">{t(k('side_slug_help'))}</p>
+            </div>
           </div>
 
           <div className="admin-panel">

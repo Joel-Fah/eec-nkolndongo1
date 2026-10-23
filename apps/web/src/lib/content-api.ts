@@ -125,10 +125,16 @@ export type SermonDetail = SermonItem & {
   text: string
   transcriptHtml: string
   youtubeId: string
-  links: { label: string; url: string; host: string }[]
+  links: {
+    kind: 'audio' | 'notes' | 'slides' | 'other'
+    label: string
+    url: string
+    host: string
+  }[]
   sundayDate: string | null
 }
 export type SermonFilters = {
+  months: string[]
   series: { slug: string; title: string; description: string; count: number }[]
   preachers: string[]
   books: { id: string; label: string }[]

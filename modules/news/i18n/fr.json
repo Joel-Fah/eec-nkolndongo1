@@ -35,7 +35,7 @@
   "side_group": "Groupe concerné",
   "side_group_help": "Un responsable de groupe ne peut écrire que pour son groupe.",
   "side_slug": "Adresse de la page",
-  "side_slug_help": "Elle suit le titre tant que l’actualité n’est pas publiée. Après, l’ancienne adresse redirige vers la nouvelle.",
+  "side_slug_help": "Créée automatiquement à partir du titre, toujours unique ; elle ne change plus une fois l’actualité publiée.",
   "side_pin": "Épingler en haut de la liste",
   "side_status": "État",
   "preview": "Aperçu",

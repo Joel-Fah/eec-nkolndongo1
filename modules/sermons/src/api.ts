@@ -33,11 +33,11 @@ import {
   uniqueSlug,
 } from '@eec/core'
 import type { Db } from '@eec/db'
-import { contentRedirects, mediaFiles } from '@eec/db/schema'
+import { contentRedirects, mediaFiles, roles, user, userRoles } from '@eec/db/schema'
 import { and, asc, desc, eq, ilike, isNull, lte, or, type SQL, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { type SermonLink, sermonSeries, sermons } from './schema.ts'
+import { LINK_KINDS, type SermonLink, sermonSeries, sermons } from './schema.ts'
 
 const AREA = 'sermons'
 const ENTITY = 'sermon'
@@ -82,12 +82,21 @@ export function cleanUrl(input: string): string | null {
 }
 
 const link = z
-  .object({ label: z.string().trim().max(80), url: z.string().trim().max(500) })
+  .object({
+    kind: z.enum(LINK_KINDS).default('other'),
+    label: z.string().trim().max(80),
+    url: z.string().trim().max(500),
+  })
   .strict()
   .transform((l, ctx) => {
     const url = cleanUrl(l.url)
     if (!url) ctx.addIssue({ code: 'custom', message: 'bad_url' })
-    return { label: l.label, url: url ?? '' } satisfies SermonLink
+    // Only « other » has a name of its own; the others are named by the site, in the visitor's language.
+    return {
+      kind: l.kind,
+      label: l.kind === 'other' ? l.label : '',
+      url: url ?? '',
+    } satisfies SermonLink
   })
 
 const date = z
@@ -228,6 +237,7 @@ type PublicFilters = {
   preacher?: string | null
   book?: string | null
   year?: string | null
+  month?: string | null
 }
 
 async function publicItems(
@@ -245,6 +255,7 @@ async function publicItems(
     conds.push(and(eq(sermons.preacherConsent, true), eq(sermons.preacherName, f.preacher)))
   if (f.book) conds.push(sql`${sermons.refs} @> ${JSON.stringify([{ book: f.book }])}::jsonb`)
   if (f.year) conds.push(sql`${sermons.preachedOn} like ${`${f.year}-%`}`)
+  if (f.month) conds.push(sql`substr(${sermons.preachedOn}, 6, 2) = ${f.month}`)
   const rows = await db
     .select({ s: sermons, series: sermonSeries })
     .from(sermons)
@@ -320,6 +331,7 @@ async function publicDetail(db: Db, row: Row, locale: Locale) {
     youtubeId: row.youtubeId,
     // The host is shown so people know where a link leads; the site never loads anything from it.
     links: row.links.map((l) => ({
+      kind: l.kind ?? 'other',
       label: l.label,
       url: l.url,
       host: new URL(l.url).hostname.replace(/^www\./, ''),
@@ -330,7 +342,7 @@ async function publicDetail(db: Db, row: Row, locale: Locale) {
 
 async function publicFilters(db: Db, locale: Locale) {
   const live = liveNow()
-  const [series, preachers, books, years] = await Promise.all([
+  const [series, preachers, books, years, months] = await Promise.all([
     db
       .select({
         slug: sermonSeries.slug,
@@ -355,6 +367,11 @@ async function publicFilters(db: Db, locale: Locale) {
       .from(sermons)
       .where(and(live, sql`${sermons.preachedOn} is not null`))
       .orderBy(desc(sql`left(${sermons.preachedOn}, 4)`)),
+    db
+      .selectDistinct({ m: sql<string>`substr(${sermons.preachedOn}, 6, 2)` })
+      .from(sermons)
+      .where(and(live, sql`${sermons.preachedOn} is not null`))
+      .orderBy(sql`substr(${sermons.preachedOn}, 6, 2)`),
   ])
   const used = new Set(books.flatMap((b) => b.refs.map((r) => r.book)))
   return {
@@ -366,6 +383,7 @@ async function publicFilters(db: Db, locale: Locale) {
     })),
     preachers: preachers.map((p) => p.name),
     books: BOOKS.filter((b) => used.has(b.id)).map((b) => ({ id: b.id, label: b[locale] })),
+    months: months.map((m) => m.m),
     years: years.map((y) => y.y),
   }
 }
@@ -424,11 +442,13 @@ const filterQuery = (c: { req: { query: (k: string) => string | undefined } }): 
   const slug = (v?: string) => (v && /^[a-z0-9-]{1,80}$/.test(v) ? v : null)
   const b = c.req.query('book')
   const y = c.req.query('year')
+  const mo = c.req.query('month')
   const p = c.req.query('preacher')
   return {
     series: slug(c.req.query('series')),
     book: b && /^[a-z0-9]{2,12}$/.test(b) ? b : null,
     year: y && /^\d{4}$/.test(y) ? y : null,
+    month: mo && /^(0[1-9]|1[0-2])$/.test(mo) ? mo : null,
     preacher: p ? p.slice(0, 120) : null,
   }
 }
@@ -442,7 +462,7 @@ export const sermonsApi = new Hono<AppEnv>()
     const f = filterQuery(c)
     const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
     return cachedJson(c, {
-      key: `sermons/list/${locale}/${page}/${limit}/${f.series ?? '-'}/${f.book ?? '-'}/${f.year ?? '-'}/${encodeURIComponent(f.preacher ?? '-')}/v${version}`,
+      key: `sermons/list/${locale}/${page}/${limit}/${f.series ?? '-'}/${f.book ?? '-'}/${f.year ?? '-'}/${f.month ?? '-'}/${encodeURIComponent(f.preacher ?? '-')}/v${version}`,
       ttl: 60,
       keep: 60 * 60 * 24 * 7,
       load: (db) => publicItems(db, locale, (page - 1) * limit, limit, f),
@@ -497,6 +517,20 @@ export const sermonsApi = new Hono<AppEnv>()
     if (!row) return fail(c, 404, 'not_found')
     const s = await publicDetail(db, row, localeOf(c.req.query('locale')))
     return c.json(s, 200, { 'cache-control': 'no-store', 'x-robots-tag': 'noindex' })
+  })
+
+  // Names to suggest for the preacher: people given the « Pasteur » role. Free text stays possible (a guest).
+  .get('/preachers', requirePermission('sermons:read'), async (c) => {
+    const db = await c.var.deps.db()
+    const rows = await db
+      .select({ name: user.name })
+      .from(userRoles)
+      .innerJoin(roles, eq(roles.id, userRoles.roleId))
+      .innerJoin(user, eq(user.id, userRoles.userId))
+      .where(eq(roles.key, 'pasteur'))
+      .orderBy(asc(user.name))
+      .limit(100)
+    return c.json({ names: [...new Set(rows.map((r) => r.name).filter(Boolean))] })
   })
 
   // ——— Staff: series ——————————————————————————————————————————
@@ -581,6 +615,10 @@ export const sermonsApi = new Hono<AppEnv>()
     const where: (SQL | undefined)[] = []
     if (q.q) where.push(or(ilike(sermons.titleFr, `%${q.q}%`), ilike(sermons.titleEn, `%${q.q}%`)))
     if (q.series) where.push(eq(sermons.seriesId, q.series))
+    // A window on the day it was preached (YYYY-MM-DD, both ends included).
+    if (q.from && /^\d{4}-\d{2}-\d{2}$/.test(q.from))
+      where.push(sql`${sermons.preachedOn} >= ${q.from}`)
+    if (q.to && /^\d{4}-\d{2}-\d{2}$/.test(q.to)) where.push(sql`${sermons.preachedOn} <= ${q.to}`)
     const rows = await db
       .select({ s: sermons, seriesTitle: sermonSeries.titleFr })
       .from(sermons)

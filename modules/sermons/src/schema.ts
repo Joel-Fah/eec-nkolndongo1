@@ -20,7 +20,10 @@ export const sermonSeries = pgTable(
   (t) => [uniqueIndex('sermon_series_slug_idx').on(t.slug)],
 )
 
-export type SermonLink = { label: string; url: string }
+/** What a link is, so the public page can name and draw it; « other » carries its own name. */
+export const LINK_KINDS = ['audio', 'notes', 'slides', 'other'] as const
+export type LinkKind = (typeof LINK_KINDS)[number]
+export type SermonLink = { kind?: LinkKind; label: string; url: string }
 
 export const sermons = pgTable(
   'sermons',

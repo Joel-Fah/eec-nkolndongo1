@@ -8,6 +8,7 @@ import { shortDate } from '@eec/core/dates'
 import Button from '@eec/ui/astro/Button.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Illustration from '@eec/ui/astro/Illustration.astro'
+import Select from '@eec/ui/astro/Select.astro'
 import Site from '../../layouts/Site.astro'
 import { publicJson, type SermonFilters, type SermonItem } from '../../lib/content-api'
 import { localeOf, useT } from '../../lib/i18n'
@@ -28,6 +29,7 @@ const f = {
   series: q.get('series') ?? '',
   preacher: q.get('preacher') ?? '',
   book: q.get('book') ?? '',
+  month: q.get('month') ?? '',
   year: q.get('year') ?? '',
 }
 const api = new URLSearchParams({ locale, page: String(page) })
@@ -37,7 +39,9 @@ const [filtersRes, result] = await Promise.all([
   publicJson<{ items: SermonItem[]; more: boolean }>(Astro, `/api/sermons/public?${api}`),
 ])
 const filters =
-  filtersRes.state === 'ok' ? filtersRes.data : { series: [], preachers: [], books: [], years: [] }
+  filtersRes.state === 'ok'
+    ? filtersRes.data
+    : { series: [], preachers: [], books: [], months: [], years: [] }
 const items = result.state === 'ok' ? result.data.items : []
 const more = result.state === 'ok' && result.data.more
 const active = Object.values(f).some(Boolean)
@@ -51,8 +55,41 @@ Astro.response.headers.set(
   'cache-control',
   result.state === 'ok' ? 'public, max-age=30, stale-while-revalidate=120' : 'no-store',
 )
-const hasFilters =
-  filters.series.length + filters.preachers.length + filters.books.length + filters.years.length > 0
+const monthName = (m: string) => {
+  const n = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' }).format(
+    new Date(`2026-${m}-15T00:00:00Z`),
+  )
+  return n.charAt(0).toUpperCase() + n.slice(1)
+}
+// One field per kind of filter that has something to choose; the month comes before the year.
+const fields = [
+  {
+    name: 'series' as const,
+    label: s('series'),
+    options: filters.series.map((x) => ({ value: x.slug, label: `${x.title} (${x.count})` })),
+  },
+  {
+    name: 'preacher' as const,
+    label: s('preacher'),
+    options: filters.preachers.map((x) => ({ value: x, label: x })),
+  },
+  {
+    name: 'book' as const,
+    label: s('book'),
+    options: filters.books.map((x) => ({ value: x.id, label: x.label })),
+  },
+  {
+    name: 'month' as const,
+    label: s('month'),
+    options: filters.months.map((x) => ({ value: x, label: monthName(x) })),
+  },
+  {
+    name: 'year' as const,
+    label: s('year'),
+    options: filters.years.map((x) => ({ value: x, label: x })),
+  },
+].filter((fd) => fd.options.length > 0)
+const hasFilters = fields.length > 0
 ---
 
 <Site title={t(labelKey('predications'))} description={t('pages.predications.lead')}>
@@ -61,43 +98,13 @@ const hasFilters =
     {
       hasFilters && (
         <form class="sl-filters" method="get" action={sermonsListHref(locale)} data-live-form role="search" aria-label={s('filters')}>
-          {filters.series.length > 0 && (
-            <label>
-              <span>{s('series')}</span>
-              <select name="series" data-autosubmit>
-                <option value="">{s('all')}</option>
-                {filters.series.map((x) => <option value={x.slug} selected={f.series === x.slug}>{x.title} ({x.count})</option>)}
-              </select>
-            </label>
-          )}
-          {filters.preachers.length > 0 && (
-            <label>
-              <span>{s('preacher')}</span>
-              <select name="preacher" data-autosubmit>
-                <option value="">{s('all')}</option>
-                {filters.preachers.map((x) => <option value={x} selected={f.preacher === x}>{x}</option>)}
-              </select>
-            </label>
-          )}
-          {filters.books.length > 0 && (
-            <label>
-              <span>{s('book')}</span>
-              <select name="book" data-autosubmit>
-                <option value="">{s('all')}</option>
-                {filters.books.map((x) => <option value={x.id} selected={f.book === x.id}>{x.label}</option>)}
-              </select>
-            </label>
-          )}
-          {filters.years.length > 0 && (
-            <label>
-              <span>{s('year')}</span>
-              <select name="year" data-autosubmit>
-                <option value="">{s('all')}</option>
-                {filters.years.map((x) => <option value={x} selected={f.year === x}>{x}</option>)}
-              </select>
-            </label>
-          )}
-          <button type="submit" class="btn btn-secondary">{s('apply')}</button>
+          {fields.map((fd) => (
+            <div class="sl-field">
+              <label for={`f-${fd.name}`}>{fd.label}</label>
+              <Select id={`f-${fd.name}`} name={fd.name} value={f[fd.name]} options={[{ value: '', label: s('all') }, ...fd.options]} />
+            </div>
+          ))}
+          <noscript><button type="submit" class="btn btn-secondary">{s('apply')}</button></noscript>
           {active && <a class="sl-reset" data-live-nav href={sermonsListHref(locale)}>{s('reset')}</a>}
         </form>
       )
@@ -160,12 +167,12 @@ const hasFilters =
   import { initLiveNav } from '../../scripts/live-nav'
   const bind = () => {
     initLiveNav()
-    // A change in a filter applies it at once (the button stays for people without JavaScript).
-    for (const el of document.querySelectorAll<HTMLSelectElement>('select[data-autosubmit]'))
-      if (!el.dataset.bound) {
-        el.dataset.bound = '1'
-        el.addEventListener('change', () => el.form?.requestSubmit())
-      }
+    // Choosing in a filter applies it at once (the custom select fires a change on its hidden native select).
+    const form = document.querySelector<HTMLFormElement>('.sl-filters')
+    if (form && !form.dataset.bound) {
+      form.dataset.bound = '1'
+      form.addEventListener('change', () => form.requestSubmit())
+    }
   }
   bind()
   document.addEventListener('astro:page-load', bind)
@@ -188,20 +195,16 @@ const hasFilters =
     border-radius: var(--radius-lg);
     background: var(--surface-2);
   }
-  .sl-filters label {
+  .sl-field {
     display: grid;
     gap: 0.25rem;
+    min-width: min(100%, 11.5rem);
+    flex: 1 1 11.5rem;
+    max-width: 16rem;
+  }
+  .sl-field > label {
     font-size: var(--text-sm);
     color: var(--ink-muted);
-  }
-  .sl-filters select {
-    min-height: 2.75rem;
-    min-width: 11rem;
-    padding-inline: 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--surface);
-    color: var(--ink);
-    box-shadow: inset 0 0 0 1px var(--line);
   }
   .sl-reset {
     align-self: center;

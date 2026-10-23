@@ -197,5 +197,6 @@
   "period_range": "Choisir des dates",
   "from": "Du",
   "until_date": "Au",
-  "untitled_full": "Événement sans titre"
+  "untitled_full": "Événement sans titre",
+  "side_slug_help": "Créée automatiquement à partir du titre, toujours unique ; elle ne change plus une fois l’événement publié."
 }

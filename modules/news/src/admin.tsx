@@ -426,14 +426,11 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
                 ]}
               />
             )}
-            <TextField
-              label={t(k('side_slug'))}
-              placeholder={t(k('side_slug_ph'))}
-              hint={t(k('side_slug_help'))}
-              value={draft.slug}
-              disabled={!canEdit}
-              onChange={(e: { target: { value: string } }) => set('slug', e.target.value)}
-            />
+            <div className="grid gap-1">
+              <span className="field-label">{t(k('side_slug'))}</span>
+              <code className="admin-link-box">{draft.slug}</code>
+              <p className="text-xs text-ink-muted">{t(k('side_slug_help'))}</p>
+            </div>
             <SwitchField
               label={t(k('side_pin'))}
               checked={draft.pinned}
