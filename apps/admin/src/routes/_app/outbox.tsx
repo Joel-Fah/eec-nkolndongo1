@@ -19,7 +19,7 @@ type Message = {
   id: string
   toEmail: string
   template: string
-  payload: { url?: string }
+  payload: { url?: string; phone?: string; firstName?: string; form?: string; code?: string }
   createdAt: string
   status: string
 }
@@ -43,7 +43,7 @@ function Outbox() {
       })
       .catch(() => notify(t('admin.common.error'), { tone: 'danger' }))
   const templateName = (k: string) =>
-    ['password-reset', 'invitation'].includes(k)
+    ['password-reset', 'invitation', 'registration-promoted'].includes(k)
       ? t(`admin.outbox.templates.${k}` as MessageKey)
       : k
   return (
@@ -79,8 +79,21 @@ function Outbox() {
               </div>
               <p className="flex flex-wrap gap-2">
                 <span className="text-ink-muted">{t('admin.outbox.to')}</span>
-                <span className="font-medium">{m.toEmail}</span>
+                <span className="font-medium">{m.toEmail || m.payload.firstName}</span>
+                {m.payload.phone && (
+                  <a href={`tel:${m.payload.phone}`} className="font-medium">
+                    {m.payload.phone}
+                  </a>
+                )}
               </p>
+              {m.template === 'registration-promoted' && (
+                <p className="text-sm text-ink-muted">
+                  {t('admin.outbox.registration_note', {
+                    form: m.payload.form ?? '',
+                    code: m.payload.code ?? '',
+                  })}
+                </p>
+              )}
               {m.payload.url && tab === 'pending' && (
                 <CopyLink url={m.payload.url} note={t('admin.outbox.link')} />
               )}

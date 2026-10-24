@@ -31,6 +31,8 @@ export const slotBody = z
   .object({ valueFr: text(2000), valueEn: text(2000), bodyFr: doc, bodyEn: doc })
   .partial()
   .strict()
+/** How a step's pictures sit: auto picks one by the number of pictures. */
+export const MILESTONE_LAYOUTS = ['auto', 'fan', 'stack', 'bento', 'scatter'] as const
 export const milestoneBody = z
   .object({
     year: text(40),
@@ -39,6 +41,8 @@ export const milestoneBody = z
     textFr: text(800),
     textEn: text(800),
     mediaId: z.string().uuid().nullable(),
+    extraMediaIds: z.array(z.string().uuid()).max(5),
+    layout: z.enum(MILESTONE_LAYOUTS),
     sortOrder: z.number().int().min(0).max(999),
   })
   .partial()
@@ -93,7 +97,9 @@ async function publicData(db: Db, locale: Locale) {
     const out =
       def.type === 'rich'
         ? { text: plainText(body), html: renderHtml(cleanDoc(body)) }
-        : { text: value, html: '' }
+        : def.type === 'number'
+          ? { text: /^\d{1,6}$/.test(r.valueFr.trim()) ? r.valueFr.trim() : '', html: '' }
+          : { text: value, html: '' }
     if (!out.text.trim()) continue
     const forPage = slots[r.pageKey] ?? {}
     forPage[r.slotKey] = out
@@ -109,7 +115,7 @@ async function publicData(db: Db, locale: Locale) {
     .from(councilMembers)
     .orderBy(asc(councilMembers.sortOrder), asc(councilMembers.name))
   const media = await mediaMap(db, [
-    ...ms.map((m) => m.mediaId),
+    ...ms.flatMap((m) => [m.mediaId, ...m.extraMediaIds]),
     ...members.filter((m) => m.publicConsent).map((m) => m.photoMediaId),
   ])
   return {
@@ -120,6 +126,8 @@ async function publicData(db: Db, locale: Locale) {
       title: pick(locale, m.titleFr, m.titleEn),
       text: pick(locale, m.textFr, m.textEn),
       image: media(m.mediaId),
+      images: [m.mediaId, ...m.extraMediaIds].map((x) => media(x)).filter((x) => x !== null),
+      layout: m.layout,
     })),
     // Names and photos only with consent; without it, the card carries the role alone.
     council: COUNCIL_ROLES.map((r) => ({
@@ -141,9 +149,10 @@ async function syncUsage(
   db: Db,
   entityType: string,
   entityId: string,
-  mediaId: string | null,
+  mediaIds: (string | null)[] | string | null,
   field: string,
 ) {
+  const ids = (Array.isArray(mediaIds) ? mediaIds : [mediaIds]).filter((x): x is string => !!x)
   await db
     .delete(mediaUsages)
     .where(
@@ -153,13 +162,14 @@ async function syncUsage(
         eq(mediaUsages.field, field),
       ),
     )
-  if (!mediaId) return
-  const [m] = await db
-    .select({ id: mediaFiles.id })
-    .from(mediaFiles)
-    .where(eq(mediaFiles.id, mediaId))
-    .limit(1)
-  if (m) await db.insert(mediaUsages).values({ mediaId, entityType, entityId, field })
+  for (const mediaId of ids) {
+    const [m] = await db
+      .select({ id: mediaFiles.id })
+      .from(mediaFiles)
+      .where(eq(mediaFiles.id, mediaId))
+      .limit(1)
+    if (m) await db.insert(mediaUsages).values({ mediaId, entityType, entityId, field })
+  }
 }
 
 const mayPublish = async (c: Parameters<typeof audit>[0]) => {
@@ -197,6 +207,13 @@ export const storyApi = new Hono<AppEnv>()
       ((p.valueFr?.length ?? 0) > def.max || (p.valueEn?.length ?? 0) > def.max)
     )
       return fail(c, 400, 'invalid')
+    // A figure is digits only, the same in both languages.
+    if (def.type === 'number') {
+      const n = (p.valueFr ?? '').trim()
+      if (n !== '' && !/^\d{1,6}$/.test(n)) return fail(c, 400, 'invalid')
+      p.valueFr = n
+      p.valueEn = n
+    }
     const db = await c.var.deps.db()
     const actor = await c.var.deps.actor()
     const publisher = await mayPublish(c)
@@ -258,12 +275,14 @@ export const storyApi = new Hono<AppEnv>()
         textFr: p.textFr ?? '',
         textEn: p.textEn ?? '',
         mediaId: p.mediaId ?? null,
+        extraMediaIds: p.extraMediaIds ?? [],
+        layout: p.layout ?? 'auto',
         sortOrder: p.sortOrder ?? 0,
         updatedBy: actor?.userId,
       })
       .returning()
     if (!row) return fail(c, 400, 'invalid')
-    await syncUsage(db, 'history_milestone', row.id, row.mediaId, 'image')
+    await syncUsage(db, 'history_milestone', row.id, [row.mediaId, ...row.extraMediaIds], 'image')
     await audit(c, {
       action: 'create',
       entityType: 'history_milestone',
@@ -289,6 +308,8 @@ export const storyApi = new Hono<AppEnv>()
         ...(p.textFr !== undefined && { textFr: p.textFr }),
         ...(p.textEn !== undefined && { textEn: p.textEn }),
         ...(p.mediaId !== undefined && { mediaId: p.mediaId }),
+        ...(p.extraMediaIds !== undefined && { extraMediaIds: p.extraMediaIds }),
+        ...(p.layout !== undefined && { layout: p.layout }),
         ...(p.sortOrder !== undefined && { sortOrder: p.sortOrder }),
         ...(!(await mayPublish(c)) && { state: 'draft' }),
         updatedBy: actor?.userId,
@@ -297,7 +318,7 @@ export const storyApi = new Hono<AppEnv>()
       .where(eq(historyMilestones.id, id))
       .returning()
     if (!row) return fail(c, 404, 'not_found')
-    await syncUsage(db, 'history_milestone', row.id, row.mediaId, 'image')
+    await syncUsage(db, 'history_milestone', row.id, [row.mediaId, ...row.extraMediaIds], 'image')
     await audit(c, {
       action: 'update',
       entityType: 'history_milestone',

@@ -3,7 +3,16 @@
  * - Public: POST /submit — honeypot, minimum fill time, rate limit per hashed address, length limits, explicit consent.
  * - Staff: the inbox (prayer requests only with contact:read-sensitive), status, assignment, internal notes, counts.
  */
-import { type AppEnv, audit, clientIp, fail, publicRoute, requirePermission } from '@eec/api-kit'
+import {
+  type AppEnv,
+  audit,
+  clientIp,
+  fail,
+  publicRoute,
+  requirePermission,
+  signPreview,
+  verifyPreview,
+} from '@eec/api-kit'
 import { allow, can, type Principal } from '@eec/auth'
 import { user } from '@eec/db/schema'
 import { and, count, desc, eq, gte, lt } from 'drizzle-orm'
@@ -20,6 +29,8 @@ export const CATEGORIES = [
 ] as const
 const MIN_FILL_MS = 4000
 const MAX_FILL_MS = 6 * 60 * 60 * 1000
+/** The form token is signed by the server when the form is shown, so the fill time cannot be forged by the client. */
+const TOKEN_ENTITY = 'contactform'
 
 export const submitBody = z
   .object({
@@ -32,8 +43,8 @@ export const submitBody = z
     consent: z.literal(true),
     /** Honeypot: hidden from people; bots fill it. */
     website: z.string().max(200).default(''),
-    /** When the form was shown (ms since epoch), for the minimum fill time. */
-    openedAt: z.number().int(),
+    /** Signed by `GET /token` when the form was shown; its age is the fill time. */
+    token: z.string().min(10).max(300),
   })
   .strict()
   .refine((b) => b.email !== '' || b.phone !== '', { path: ['email'], message: 'email_or_phone' })
@@ -62,6 +73,16 @@ const mayReadSensitive = async (c: Parameters<typeof audit>[0]) => {
 
 export const contactApi = new Hono<AppEnv>()
   // ——— Public ————————————————————————————————————————————————
+  .get('/token', async (c) => {
+    const token = await signPreview(
+      c.env.AUTH_SECRET,
+      TOKEN_ENTITY,
+      String(Math.floor(Date.now() / 1000)),
+      MAX_FILL_MS / 1000,
+    )
+    c.header('cache-control', 'no-store')
+    return c.json({ token })
+  })
   .post(
     '/submit',
     publicRoute(
@@ -73,8 +94,10 @@ export const contactApi = new Hono<AppEnv>()
       const b = parsed.data
       // A filled honeypot is a bot: say « ok » and keep nothing, so it learns nothing.
       if (b.website.trim() !== '') return c.json({ ok: true })
-      const age = Date.now() - b.openedAt
-      if (age < MIN_FILL_MS || age > MAX_FILL_MS) return fail(c, 400, 'too_fast')
+      const issued = await verifyPreview(c.env.AUTH_SECRET, b.token, TOKEN_ENTITY)
+      if (!issued) return fail(c, 400, 'too_fast')
+      const age = Date.now() - Number(issued) * 1000
+      if (!(age >= MIN_FILL_MS)) return fail(c, 400, 'too_fast')
       const db = await c.var.deps.db()
       const key = await addressKey(c.env.AUTH_SECRET, clientIp(c) ?? 'unknown')
       if (!(await allow(db, `contact:${key}`, 5, 3600))) return fail(c, 429, 'rate_limited')

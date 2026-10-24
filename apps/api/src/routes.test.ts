@@ -40,6 +40,8 @@ describe('route table', () => {
       'POST /api/invitations/:token/accept',
       'POST /api/members/google',
       'POST /api/members/signup',
+      'POST /api/registrations/cancel',
+      'POST /api/registrations/submit',
       'POST /api/reset/:token',
     ])
   })

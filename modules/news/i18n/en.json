@@ -35,7 +35,7 @@
   "side_group": "Group concerned",
   "side_group_help": "A group leader can only write for their own group.",
   "side_slug": "Page address",
-  "side_slug_help": "It follows the title until the post is published. Afterwards the old address redirects to the new one.",
+  "side_slug_help": "Created automatically from the title, always unique; it no longer changes once the post is published.",
   "side_pin": "Pin at the top of the list",
   "side_status": "Status",
   "preview": "Preview",

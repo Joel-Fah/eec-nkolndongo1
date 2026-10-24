@@ -383,6 +383,33 @@ export default function RichTextEditor({
     // biome-ignore lint/correctness/useExhaustiveDependencies: toggleFull is stable enough for one listener per mode
   }, [full])
 
+  // Phones and tablets, full screen: the tools live in one line just above the keyboard (or at the foot of the screen when
+  // there is no keyboard). The page does not resize under the keyboard, so the editor's bottom edge follows the visible area.
+  useEffect(() => {
+    if (!full) return
+    const el = wrap.current
+    const vv = window.visualViewport
+    if (!el || !vv) return
+    const touch = window.matchMedia('(max-width: 64rem), (pointer: coarse)')
+    const update = () => {
+      if (!touch.matches) {
+        el.style.bottom = ''
+        return
+      }
+      const keyboard = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      el.style.bottom = `${keyboard}px`
+      if (keyboard > 0) editor?.commands.scrollIntoView()
+    }
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    update()
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+      el.style.bottom = ''
+    }
+  }, [full, editor])
+
   const plain = (state?.text ?? '').replace(/\s+/g, ' ').trim()
   const words = plain ? plain.split(' ').length : 0
   const chars = plain.length

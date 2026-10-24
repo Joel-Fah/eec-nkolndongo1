@@ -696,6 +696,21 @@
   flex: 1 1 11rem;
   min-width: 0;
 }
+.reading-kind {
+  flex: 0 1 12rem;
+  min-width: 9rem;
+}
+.reading-until {
+  align-self: center;
+  padding-block-start: 1.25rem;
+  color: var(--ink-muted);
+}
+.reading-part-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+}
 .reading-num {
   display: grid;
   gap: 0.25rem;
@@ -1142,4 +1157,125 @@ html[data-rte-full] .eec-popover {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-muted);
+}
+
+/* Full screen on phones and tablets (Samsung Notes style): the title on top, the text in the middle, and the tools in ONE
+   scrolling line at the bottom, just above the keyboard. Icons only, no labels. */
+@media (max-width: 64rem), (pointer: coarse) {
+  .rte[data-full] .rte-fullhead {
+    order: 0;
+  }
+  .rte[data-full] .rte-scroll {
+    order: 1;
+  }
+  .rte[data-full] .rte-count {
+    display: none;
+  }
+  .rte[data-full] .rte-bar {
+    order: 2;
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem calc(0.375rem + env(safe-area-inset-bottom, 0px));
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    box-shadow:
+      0 -1px 0 var(--line),
+      0 -4px 12px color-mix(in oklab, var(--ink) 8%, transparent);
+  }
+  .rte[data-full] .rte-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .rte[data-full] .rte-group {
+    flex: none;
+    flex-wrap: nowrap;
+    gap: 0.125rem;
+    padding: 0.125rem;
+  }
+  .rte[data-full] .rte-gap {
+    display: none;
+  }
+  .rte[data-full] .rte-btn {
+    flex: none;
+    flex-direction: row;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+  }
+  .rte[data-full] .rte-btn-label {
+    display: none;
+  }
+  .rte[data-full] .rte-content {
+    padding: 1.25rem 1rem 2rem;
+    font-size: 1.0625rem;
+  }
+}
+
+/* Tag-style entries (TagInput): chips you can click to edit or delete, and a field to type the next one. */
+.tag-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  justify-content: flex-start;
+  text-align: start;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.5rem;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: text;
+}
+.tag-box:focus-within {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.tag-box[data-invalid] {
+  border-color: var(--danger);
+}
+.tag {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--ink);
+}
+.tag-text {
+  min-height: 2rem;
+  padding: 0.125rem 0.25rem 0.125rem 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tag-x {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.tag-x:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.tag-new,
+.tag-edit {
+  min-width: 8rem;
+  flex: 1 1 8rem;
+  min-height: 2rem;
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+.tag-edit {
+  flex: none;
+  min-width: 4rem;
+  padding-inline: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }

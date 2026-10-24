@@ -12,8 +12,9 @@
   "scripts": {
     "lint": "biome check .",
     "typecheck": "tsc",
-    "test": "vitest run boundaries",
-    "db:seed": "node --env-file-if-exists=../.env.local cli/seed.ts",
+    "test": "vitest run",
+    "db:seed": "node --env-file-if-exists=../.env.local --dns-result-order=ipv4first cli/seed.ts",
+    "bible:seed": "node --env-file-if-exists=../.env.local --dns-result-order=ipv4first cli/seed-bible.ts",
     "content:seed-dev": "node --env-file-if-exists=../.env.local cli/seed-dev-content.ts"
   },
   "dependencies": {
@@ -30,6 +31,11 @@
     "@eec/module-events": "workspace:*",
     "@eec/module-members": "workspace:*",
     "@eec/module-news": "workspace:*",
+    "@eec/module-sermons": "workspace:*",
+    "@eec/module-meditations": "workspace:*",
+    "@eec/module-bulletin": "workspace:*",
+    "@eec/module-registrations": "workspace:*",
+    "@eec/module-campaigns": "workspace:*",
     "@eec/module-story": "workspace:*",
     "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",

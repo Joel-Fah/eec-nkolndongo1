@@ -42,7 +42,7 @@ export const storyModule = defineModule({
         group: 'parish',
         label: { fr: 'Pages du site', en: 'Site pages' },
         path: '/m/story',
-        icon: 'book',
+        icon: 'files',
         order: 60,
         permission: 'story:read',
       },

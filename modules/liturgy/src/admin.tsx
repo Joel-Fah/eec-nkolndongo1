@@ -3,7 +3,7 @@
  * they show) and the verses. People's names on a Sunday are public only when the consent box is ticked.
  */
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
-import { GuardedDialog, ViewToggle } from '@eec/content-kit'
+import { GuardedDialog, RefEditor, ViewToggle } from '@eec/content-kit'
 import {
   type BibleRef,
   BOOKS,
@@ -455,99 +455,24 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
                   <Icon name="bookText" size={20} />
                   {t(k('section_readings'))}
                 </h3>
-                {form.readings.map((r, i) => {
-                  const bad =
-                    r.from != null && r.to != null && r.to !== '' && compareVerses(r.to, r.from) < 0
-                  return (
-                    <div
-                      key={`${r.book}-${i}`}
-                      className="reading-box"
-                      data-invalid={bad ? '' : undefined}
-                    >
-                      <div className="reading-row">
-                        <div className="reading-book">
-                          <SelectField
-                            label={t(k('book'))}
-                            value={r.book}
-                            onValueChange={(v) =>
-                              v && setReading(i, { book: v as BibleRef['book'] })
-                            }
-                            options={BOOKS.map((b) => ({
-                              value: b.id,
-                              label: locale === 'en' ? b.en : b.fr,
-                            }))}
-                          />
-                        </div>
-                        <label className="reading-num">
-                          <span className="field-label">{t(k('chapter'))}</span>
-                          <input
-                            className="input"
-                            inputMode="numeric"
-                            maxLength={3}
-                            value={r.chapter}
-                            onChange={(e) =>
-                              setReading(i, {
-                                chapter: Math.min(
-                                  150,
-                                  Number(e.target.value.replace(/\D/g, '')) || 1,
-                                ),
-                              })
-                            }
-                          />
-                        </label>
-                        <label className="reading-num">
-                          <span className="field-label">{t(k('from_short'))}</span>
-                          <input
-                            className="input"
-                            maxLength={4}
-                            placeholder="1b"
-                            aria-invalid={bad}
-                            value={r.from ?? ''}
-                            onChange={(e) => setReading(i, { from: verseInput(e.target.value) })}
-                          />
-                        </label>
-                        <label className="reading-num">
-                          <span className="field-label">{t(k('to_short'))}</span>
-                          <input
-                            className="input"
-                            maxLength={4}
-                            placeholder="20"
-                            aria-invalid={bad}
-                            value={r.to ?? ''}
-                            onChange={(e) => setReading(i, { to: verseInput(e.target.value) })}
-                          />
-                        </label>
-                        <ShortcutTip label={t(k('remove'))}>
-                          <Button
-                            type="button"
-                            variant="danger"
-                            iconOnly
-                            className="reading-remove"
-                            aria-label={t(k('remove'))}
-                            onClick={() =>
-                              setForm({
-                                ...form,
-                                readings: form.readings.filter((_, j) => j !== i),
-                              })
-                            }
-                          >
-                            <Icon name="trash" size={20} />
-                          </Button>
-                        </ShortcutTip>
-                      </div>
-                      {bad ? (
-                        <p className="field-error" role="alert">
-                          {t(k('from_after_to'))}
-                        </p>
-                      ) : (
-                        <p className="reading-preview">
-                          <Icon name="bookText" size={16} />
-                          {formatRef(r, locale)}
-                        </p>
-                      )}
-                    </div>
-                  )
-                })}
+                {form.readings.map((r, i) => (
+                  <RefEditor
+                    // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
+                    key={i}
+                    idPrefix={`reading-${i}`}
+                    value={r}
+                    disabled={!canEdit}
+                    onChange={(next) =>
+                      setForm({
+                        ...form,
+                        readings: form.readings.map((x, j) => (j === i ? next : x)),
+                      })
+                    }
+                    onRemove={() =>
+                      setForm({ ...form, readings: form.readings.filter((_, j) => j !== i) })
+                    }
+                  />
+                ))}
                 {canEdit && form.readings.length < 6 && (
                   <div>
                     <Button
@@ -891,68 +816,11 @@ function Verses() {
               }}
             >
               <h2 className="dialog-title">{t(k('add_verse'))}</h2>
-              <SelectField
-                label={t(k('book'))}
-                value={form.ref.book}
-                onValueChange={(v) =>
-                  v && setForm({ ...form, ref: { ...form.ref, book: v as BibleRef['book'] } })
-                }
-                options={BOOKS.map((b) => ({
-                  value: b.id,
-                  label: locale === 'en' ? b.en : b.fr,
-                }))}
+              <RefEditor
+                idPrefix="verse"
+                value={form.ref}
+                onChange={(ref) => setForm({ ...form, ref })}
               />
-              <div className="grid grid-cols-3 gap-3">
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('chapter'))}</span>
-                  <input
-                    className="input"
-                    type="number"
-                    min={1}
-                    max={150}
-                    value={form.ref.chapter}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        ref: { ...form.ref, chapter: Number(e.target.value) || 1 },
-                      })
-                    }
-                  />
-                </label>
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('from'))}</span>
-                  <input
-                    className="input"
-                    type="number"
-                    min={1}
-                    value={form.ref.from ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        ref: {
-                          ...form.ref,
-                          from: e.target.value ? Number(e.target.value) : null,
-                        },
-                      })
-                    }
-                  />
-                </label>
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('to'))}</span>
-                  <input
-                    className="input"
-                    type="number"
-                    min={1}
-                    value={form.ref.to ?? ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        ref: { ...form.ref, to: e.target.value ? Number(e.target.value) : null },
-                      })
-                    }
-                  />
-                </label>
-              </div>
               <TextField
                 label={t(k('text_fr'))}
                 placeholder=""

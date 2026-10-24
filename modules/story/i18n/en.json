@@ -56,9 +56,24 @@
   "member_delete_p": "They will no longer appear on the page.",
   "site": {
     "climb_t": "Climbing the hill",
-    "invite_t": "And you?",
-    "invite_p": "Come and see us on a Sunday: you are expected.",
+    "invite_t": "What if the next chapter carried your name?",
+    "invite_p": "Every stone on this hill was laid by someone who came one day, knowing nothing in advance. You are not just another visitor: you are expected, and your place is already kept.",
     "visit": "Find us",
-    "join": "Create my space"
-  }
+    "join": "Create my space",
+    "invite_kicker": "The next part is written with you",
+    "way1_t": "Come on a Sunday. ",
+    "way1_p": "Sit down, listen, sing if you feel like it.",
+    "way2_t": "Meet a group. ",
+    "way2_p": "Choir, youth, women… find where to settle in.",
+    "way3_t": "Be part of the story. ",
+    "way3_p": "Create your space and follow the life of the parish.",
+    "groups": "Meet a group"
+  },
+  "ms_more_pictures": "Add a picture",
+  "ms_layout": "Picture layout",
+  "ms_layout_auto": "Automatic",
+  "ms_layout_fan": "Fan",
+  "ms_layout_stack": "Card stack",
+  "ms_layout_bento": "Bento grid",
+  "ms_layout_scatter": "Scattered polaroids"
 }

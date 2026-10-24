@@ -25,7 +25,7 @@ Each item becomes a module (`modules/<id>`). Phases are indicative; order inside
 | `legal` ✅ | Privacy policy, mentions légales, consent | Edit texts, data-request log |
 
 ## Phase 2 — Grow
-- `sermons`: archive (audio on R2, video on YouTube), series/speaker/book filters, podcast RSS
+- `sermons` ✅ (links only, decision 0034): series, preacher with consent, passages, YouTube facade, any https links; podcast RSS parked until a host with direct file URLs exists
 - `bulletin`: weekly bulletin & meditation programme (web + PDF)
 - `registrations`: forms for events (retreats, concerts, catechism)
 - `newsletter`: Brevo lists, email templates (needs domain)

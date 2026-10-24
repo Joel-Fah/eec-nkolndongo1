@@ -80,6 +80,7 @@ type Full = Item & {
   locationFr: string
   locationEn: string
   registrationUrl: string | null
+  acceptsRegistrations: boolean
   coverMediaId: string | null
 }
 type Draft = Pick<
@@ -101,6 +102,7 @@ type Draft = Pick<
   | 'coverMediaId'
   | 'groupId'
   | 'featured'
+  | 'acceptsRegistrations'
   | 'kind'
   | 'slug'
 >
@@ -619,6 +621,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
       coverMediaId: r.coverMediaId,
       groupId: r.groupId,
       featured: r.featured,
+      acceptsRegistrations: r.acceptsRegistrations,
       kind: r.kind,
       slug: r.slug,
     }
@@ -719,6 +722,7 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
     ).slice(0, 10)
   }, [draft])
 
+  const canRegister = hasPermission(useMe().data, 'registrations:edit')
   if (!draft || !meta) return <div className="admin-panel" aria-busy="true" />
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => (d ? { ...d, [key]: value } : d))
@@ -1176,6 +1180,15 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                   {t(k('duplicate'))}
                 </Button>
               )}
+              {canRegister && draft.acceptsRegistrations && (
+                <a
+                  className="btn btn-secondary btn-sm"
+                  href={`${location.pathname.split('/m/')[0]}/m/registrations#new:${draft.slug}`}
+                >
+                  <Icon name="taskDaily" size={16} />
+                  {t(k('registrations'))}
+                </a>
+              )}
               {live && (
                 <a className="btn btn-ghost btn-sm" href={siteUrl} target="_blank" rel="noreferrer">
                   {t(k('view_site'))}
@@ -1232,13 +1245,17 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                 set('registrationUrl', e.target.value || null)
               }
             />
-            <TextField
-              label={t(k('side_slug'))}
-              placeholder={t(k('side_slug_ph'))}
-              value={draft.slug}
-              disabled={!canEdit}
-              onChange={(e: { target: { value: string } }) => set('slug', e.target.value)}
+            <div className="grid gap-1">
+              <span className="field-label">{t(k('side_slug'))}</span>
+              <code className="admin-link-box">{draft.slug}</code>
+              <p className="text-xs text-ink-muted">{t(k('side_slug_help'))}</p>
+            </div>
+            <SwitchField
+              label={t(k('side_registrations'))}
+              checked={draft.acceptsRegistrations}
+              onCheckedChange={(v: boolean) => set('acceptsRegistrations', v)}
             />
+            <p className="text-xs text-ink-muted">{t(k('side_registrations_help'))}</p>
             <SwitchField
               label={t(k('side_feature'))}
               checked={draft.featured}

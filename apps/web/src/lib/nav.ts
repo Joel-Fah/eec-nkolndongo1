@@ -186,9 +186,21 @@ export function alternates(pathname: string): Record<Locale, string> {
     const rest = segments.startsWith(`${parent.path.fr}/`)
       ? segments.slice(parent.path.fr.length + 1)
       : segments.slice(parent.path.en.length + 1)
+    // The registration pages sit below Events with a word of their own per language (inscription · register, annuler · cancel).
+    const words: Record<string, [string, string]> = {
+      inscription: ['inscription', 'register'],
+      register: ['inscription', 'register'],
+      annuler: ['annuler', 'cancel'],
+      cancel: ['annuler', 'cancel'],
+    }
+    const local = (l: 0 | 1) =>
+      rest
+        .split('/')
+        .map((part) => words[part]?.[l] ?? part)
+        .join('/')
     return {
-      fr: href('fr', `${parent.path.fr}/${rest}`),
-      en: href('en', `${parent.path.en}/${rest}`),
+      fr: href('fr', `${parent.path.fr}/${local(0)}`),
+      en: href('en', `${parent.path.en}/${local(1)}`),
     }
   }
   return { fr: href('fr', segments), en: href('en', segments) }

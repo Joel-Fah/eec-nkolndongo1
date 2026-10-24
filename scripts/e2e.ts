@@ -172,13 +172,19 @@ const stamp = Date.now().toString(36)
       headers: { 'content-type': 'application/json', origin: base },
       body: JSON.stringify({ ...body, ...extra }),
     })
-  const fast = await post({ openedAt: Date.now() })
+  const mint = async () =>
+    ((await (await fetch(`${base}/api/contact/token`)).json()) as { token: string }).token
+  const early = await mint()
+  const fast = await post({ token: early })
   ok('contact: too fast is refused', fast.status === 400)
-  const bot = await post({ website: 'http://spam.example', openedAt: Date.now() - 20_000 })
+  const forged = await post({ token: `${early.slice(0, -2)}xx` })
+  ok('contact: a forged token is refused', forged.status === 400)
+  await new Promise((r) => setTimeout(r, 4200))
+  const bot = await post({ website: 'http://spam.example', token: early })
   ok('contact: honeypot is quietly accepted but not stored', bot.status === 200)
-  const noConsent = await post({ consent: false, openedAt: Date.now() - 20_000 })
+  const noConsent = await post({ consent: false, token: early })
   ok('contact: no consent is refused', noConsent.status === 400)
-  const good = await post({ openedAt: Date.now() - 20_000 })
+  const good = await post({ token: early })
   const inbox = await api('/contact')
   const mine = (inbox.json.items as { id: string; preview: string }[] | undefined)?.find((m) =>
     m.preview.includes(`e2e ${stamp}`),
@@ -191,6 +197,101 @@ const stamp = Date.now().toString(36)
     ),
   )
   if (mine) await api(`/contact/${mine.id}`, { method: 'DELETE' })
+}
+
+// 6. registration → waitlist → cancellation promotes   7. campaign: only validated totals are public   8. bulletin assembly source
+{
+  const f = await api('/registrations/forms', {
+    method: 'POST',
+    body: JSON.stringify({
+      titleFr: `E2E — inscription ${stamp}`,
+      eventSlug: `e2e-${stamp}`,
+      eventDate: '2099-01-01',
+      capacity: 1,
+      waitlist: true,
+    }),
+  })
+  const id = f.json.id as string
+  await api(`/registrations/forms/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ state: 'published' }),
+  })
+  const slug = ((await api(`/registrations/forms/${id}`)).json.slug as string) ?? ''
+  const sign = async () =>
+    ((await (await fetch(`${base}/api/registrations/token`)).json()) as { token: string }).token
+  const token = await sign()
+  await sleep(4300)
+  const submit = (n: number) =>
+    fetch(`${base}/api/registrations/submit`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: base },
+      body: JSON.stringify({
+        slug,
+        name: `E2E ${n}`,
+        phone: `65500010${n}`,
+        partySize: 1,
+        consent: true,
+        website: '',
+        token,
+        answers: {},
+        children: [],
+        guardian: false,
+      }),
+    }).then(async (r) => ({ status: r.status, json: (await r.json()) as Record<string, any> }))
+  const first = await submit(1)
+  const second = await submit(2)
+  ok('registration: the first person is confirmed', first.json.status === 'confirmed')
+  ok('registration: the second goes on the waitlist', second.json.status === 'waitlist')
+  const cancelled = await fetch(`${base}/api/registrations/cancel`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: base },
+    body: JSON.stringify({ token: first.json.cancelToken }),
+  })
+  const people = await api(`/registrations/forms/${id}/registrations`)
+  const statuses = (people.json.items as { name: string; status: string }[]).map(
+    (r) => `${r.name}:${r.status}`,
+  )
+  ok(
+    'registration: cancelling promotes the next person',
+    cancelled.status === 200 && statuses.includes('E2E 2:confirmed'),
+    statuses.join(' '),
+  )
+  await api(`/registrations/forms/${id}`, { method: 'DELETE' })
+
+  const c = await api('/campaigns', {
+    method: 'POST',
+    body: JSON.stringify({
+      titleFr: `E2E — moissons ${stamp}`,
+      startsOn: '2099-01-01',
+      endsOn: '2099-01-08',
+    }),
+  })
+  const cid = c.json.id as string
+  await api(`/campaigns/${cid}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ goalXaf: 1000, state: 'published' }),
+  })
+  const e1 = await api(`/campaigns/${cid}/progress`, {
+    method: 'POST',
+    body: JSON.stringify({
+      amountXaf: 400,
+      receivedOn: new Date().toISOString().slice(0, 10),
+      note: 'E2E secret',
+    }),
+  })
+  const before = (await api('/campaigns/public/current?locale=fr&asOf=2099-01-05')).json.campaign
+  ok('campaign: an amount not yet validated is not public', before?.raised === 0)
+  await api(`/campaigns/progress/${e1.json.id}/validate`, {
+    method: 'POST',
+    body: JSON.stringify({ validated: true }),
+  })
+  const after = (await api('/campaigns/public/current?locale=fr&asOf=2099-01-05')).json.campaign
+  ok('campaign: once validated it is in the total', after?.raised === 400 && after?.percent === 40)
+  ok(
+    'campaign: no row or note reaches the public JSON',
+    !JSON.stringify(after).includes('E2E secret'),
+  )
+  await api(`/campaigns/${cid}`, { method: 'DELETE' })
 }
 
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')

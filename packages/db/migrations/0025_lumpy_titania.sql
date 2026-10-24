@@ -1,0 +1,2 @@
+ALTER TABLE "history_milestones" ADD COLUMN "extra_media_ids" jsonb DEFAULT '[]'::jsonb NOT NULL;--> statement-breakpoint
+ALTER TABLE "history_milestones" ADD COLUMN "layout" text DEFAULT 'auto' NOT NULL;

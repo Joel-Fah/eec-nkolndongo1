@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "biome check .",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test": "vitest run"
   },
   "dependencies": {
     "@eec/api": "workspace:*",
@@ -27,12 +28,12 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@astrojs/cloudflare": "14.4.0",
-    "@astrojs/sitemap": "3.7.4",
     "@cloudflare/workers-types": "5.20261016.1",
     "@eec/config": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "4.151.1"
   }
 }

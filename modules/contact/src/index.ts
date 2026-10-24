@@ -38,7 +38,7 @@ export const contactModule = defineModule({
         group: 'parish',
         label: { fr: 'Messages', en: 'Messages' },
         path: '/m/contact',
-        icon: 'mail',
+        icon: 'message',
         order: 70,
         permission: 'contact:read',
       },

@@ -17,7 +17,8 @@ export function ThemeButton() {
       className="btn btn-ghost btn-icon"
       onClick={cycle}
       aria-label={label}
-      title={t('common.theme.toggle')}
+      data-tip={t('common.theme.toggle')}
+      data-tip-end
     >
       <Icon name={choice === 'light' ? 'sun' : choice === 'dark' ? 'moon' : 'system'} />
     </button>
@@ -34,6 +35,7 @@ export function LocaleSwitch() {
       lang={next}
       onClick={() => setLocale(next)}
       aria-label={t('common.language.switch_label')}
+      data-tip={t('common.language.switch_label')}
     >
       <Icon name="language" size={16} />
       {t('common.language.switch_to')}

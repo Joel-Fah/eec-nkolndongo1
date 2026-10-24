@@ -56,9 +56,24 @@
   "member_delete_p": "Elle ne figurera plus sur la page.",
   "site": {
     "climb_t": "Gravir la colline",
-    "invite_t": "Et vous ?",
-    "invite_p": "Venez nous voir un dimanche : vous êtes attendu.",
+    "invite_t": "Et si le prochain chapitre portait votre nom ?",
+    "invite_p": "Chaque pierre de cette colline a été posée par quelqu’un qui est venu un jour, sans rien savoir d’avance. Vous n’êtes pas un visiteur de plus : vous êtes attendu, et votre place est déjà gardée.",
     "visit": "Nous trouver",
-    "join": "Créer mon espace"
-  }
+    "join": "Créer mon espace",
+    "invite_kicker": "La suite s’écrit avec vous",
+    "way1_t": "Venez un dimanche. ",
+    "way1_p": "Asseyez-vous, écoutez, chantez si vous en avez envie.",
+    "way2_t": "Rencontrez un groupe. ",
+    "way2_p": "Chorale, jeunesse, femmes… trouvez où vous poser.",
+    "way3_t": "Faites partie de l’histoire. ",
+    "way3_p": "Créez votre espace et suivez la vie de la paroisse.",
+    "groups": "Rencontrer un groupe"
+  },
+  "ms_more_pictures": "Ajouter une photo",
+  "ms_layout": "Disposition des photos",
+  "ms_layout_auto": "Automatique",
+  "ms_layout_fan": "Éventail",
+  "ms_layout_stack": "Pile de cartes",
+  "ms_layout_bento": "Mosaïque",
+  "ms_layout_scatter": "Polaroids éparpillés"
 }

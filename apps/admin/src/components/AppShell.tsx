@@ -2,10 +2,12 @@ import { Menu } from '@base-ui/react/menu'
 import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { guideForPath } from '../lib/help'
 import { labelOf, navFor } from '../lib/nav'
 import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
+import { HelpSheet } from './HelpSheet'
 import { Icon } from './Icon'
 import { LeavingScreen } from './LeavingScreen'
 import { NavProgress } from './Loading'
@@ -15,6 +17,7 @@ export function AppShell() {
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   useEffect(() => {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
@@ -111,10 +114,27 @@ export function AppShell() {
             <kbd className="admin-kbd">⌘K</kbd>
           </button>
           <div className="admin-topbar-tools">
+            {guideForPath(path) && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-icon"
+                aria-label={t('admin.help.here')}
+                data-tip={t('admin.help.here')}
+                aria-haspopup="dialog"
+                onClick={() => setHelpOpen(true)}
+              >
+                <Icon name="help" size={20} />
+              </button>
+            )}
             <LocaleSwitch />
             <ThemeButton />
             <Menu.Root>
-              <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
+              <Menu.Trigger
+                className="avatar admin-avatar"
+                aria-label={t('admin.user.menu')}
+                data-tip={t('admin.user.menu')}
+                data-tip-end
+              >
                 {initials}
               </Menu.Trigger>
               <Menu.Portal>
@@ -152,6 +172,10 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      <HelpSheet
+        slug={helpOpen ? (guideForPath(path)?.slug ?? null) : null}
+        onOpenChange={setHelpOpen}
+      />
       {leaving && <LeavingScreen />}
     </div>
   )

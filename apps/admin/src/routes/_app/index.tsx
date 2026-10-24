@@ -7,6 +7,7 @@ import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
 import { TodoPanel } from '../../components/TodoPanel'
 import { TrendsSection } from '../../components/Trends'
+import { VisitsSection } from '../../components/Visits'
 import { WelcomeBanner } from '../../components/WelcomeBanner'
 import { labelOf, navFor } from '../../lib/nav'
 
@@ -42,6 +43,7 @@ function Dashboard() {
         ))}
       </div>
       <TrendsSection />
+      <VisitsSection />
     </div>
   )
 }

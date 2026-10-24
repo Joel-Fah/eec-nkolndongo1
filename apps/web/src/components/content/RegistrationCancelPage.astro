@@ -1,0 +1,113 @@
+---
+/**
+ * Cancelling a registration with the signed link from the confirmation page (decision 0035): no account, nothing but the first
+ * name and the activity shown. Asking first, then cancelling on a POST, so a link opened by a chat preview cancels nothing.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { apiPost, publicJson } from '../../lib/content-api'
+import { eventsListHref } from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`registrations.site.${key}` as 'registrations.site.title', vars)
+Astro.response.headers.set('cache-control', 'no-store')
+Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+
+const token = Astro.url.searchParams.get('t') ?? ''
+let cancelled = false
+let failed = false
+if (Astro.request.method === 'POST') {
+  const r = await apiPost(Astro, '/api/registrations/cancel', { token })
+  cancelled = r.status === 200
+  failed = !cancelled
+}
+const info = await publicJson<{
+  title: string
+  eventDate: string
+  firstName: string
+  code: string
+  status: string
+}>(Astro, `/api/registrations/public/cancel?t=${encodeURIComponent(token)}&locale=${locale}`)
+const unavailable = info.state === 'unavailable'
+const data = info.state === 'ok' ? info.data : null
+const already = data?.status === 'cancelled'
+---
+
+<Site title={s('cancel_title')} noindex>
+  <section class="rc">
+    <div class="rc-card">
+      {
+        unavailable ? (
+          <UnavailableState />
+        ) : cancelled || (already && data) ? (
+          <>
+            <span class="rc-icon" aria-hidden="true"><Icon name="check" size={24} /></span>
+            <h1>{s('cancelled_t')}</h1>
+            <p>{s('cancelled_p')}</p>
+            <Button href={eventsListHref(locale)} variant="secondary">{s('back_events')}</Button>
+          </>
+        ) : !data ? (
+          <>
+            <h1>{s('link_bad_t')}</h1>
+            <p>{s('link_bad_p')}</p>
+            <Button href={eventsListHref(locale)} variant="secondary">{s('back_events')}</Button>
+          </>
+        ) : (
+          <>
+            <h1>{s('cancel_title')}</h1>
+            <p>{s('cancel_ask', { name: data.firstName, title: data.title })}</p>
+            {failed && <p class="field-error" role="alert"><span aria-hidden="true">⚠</span>{s('err_error')}</p>}
+            <form method="post" class="rc-actions">
+              <Button type="submit" variant="danger" size="lg">{s('cancel_go')}</Button>
+              <Button href={eventsListHref(locale)} variant="ghost" size="lg">{s('cancel_keep')}</Button>
+            </form>
+          </>
+        )
+      }
+    </div>
+  </section>
+</Site>
+
+<style>
+  .rc {
+    display: grid;
+    width: min(100% - 2rem, 36rem);
+    margin-inline: auto;
+    padding-block: 3rem 5rem;
+  }
+  .rc-card {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    text-align: center;
+  }
+  .rc-card h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  .rc-icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--success-soft);
+    color: var(--success);
+  }
+  .rc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+</style>

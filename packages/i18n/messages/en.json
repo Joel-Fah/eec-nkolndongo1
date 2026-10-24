@@ -832,7 +832,7 @@
       },
       "mapillustration": {
         "name": "Drawn map",
-        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded.",
+        "desc": "An illustrated map, not a real one: the hill’s contour lines, a stream, roads, blocks and the parish marker, with the Google Maps button on top. No third-party data loaded. Once the drawing is complete, a click on the building makes it bounce (the building only); no effect with “reduce motion”.",
         "use": "<MapIllustration name href label /> on Find us.",
         "a11y": "Decorative (aria-hidden); the address and the button carry the information."
       },
@@ -841,6 +841,186 @@
         "desc": "In the admin, a full banner: an illustration, cards and UI pieces floating at three depths (near and blurred, far and blurred, sharp) and one call to action to the guide.",
         "use": "The admin’s Design guide tab.",
         "a11y": "The floating pieces are decorative (hidden from screen readers and the pointer); the button is an ordinary link."
+      },
+      "validatecard": {
+        "name": "“To validate” card",
+        "desc": "A piece of information waiting to be checked: its current value, then Validate, Ask for a correction or Leave a note, with links to the field and to the public page. Open corrections stay visible until they are handled.",
+        "use": "Admin → À valider; .admin-panel with primary, secondary and ghost buttons; grouped by page.",
+        "a11y": "Each group is a named section; buttons have written labels; the message box has a hint; validation is announced by a toast."
+      },
+      "helplayout": {
+        "name": "Help guide",
+        "desc": "A narrow reading column for step-by-step guides: Erode title, numbered steps, a note box, and for cheat sheets a Print button (the printed sheet keeps only the text, no menu).",
+        "use": "Admin → Aide; .help-article, .help-body, .help-note; the top-bar “?” leads to the guide for the current screen.",
+        "a11y": "Ordered headings, real lists, underlined links; the “?” has a name (“Help for this screen”); print is black on white."
+      },
+      "healthcard": {
+        "name": "Health card",
+        "desc": "A check with its state as a green, orange or red badge, a figure in words (“12 MB of 512 MB (2 %)”) and, when not green, a sentence saying what to do.",
+        "use": "Admin → Santé; <Badge tone=\"success|warning|danger\">; orange starts at 70 % of a free limit.",
+        "a11y": "The state is written (“All good”, “Keep an eye on it”, “Action needed”), never colour alone; the summary is announced (role=status)."
+      },
+      "visitscharts": {
+        "name": "Visits without tracking",
+        "desc": "Thirty days of page views by language (soft area chart), phone or computer (donut) and the most read pages, with the sentence saying no cookie, IP address or identifier is used. Until the counter is switched on, a single box says so.",
+        "use": "Dashboard; <AreaChart> with days (“15 Oct”), <Donut>, ordered list; decision 0038.",
+        "a11y": "Each chart has its table of numbers and a name; the page list is an ordered list."
+      },
+      "sharecard": {
+        "name": "Share card",
+        "desc": "The image shown when a link is shared (WhatsApp, Facebook): the mark, the parish name and the section title, in Erode, in our colours. One card per section and language; a post or event uses its own photo.",
+        "use": "apps/web/public/og/*.jpg, 1200×630, drawn by scripts/og-generate.ts (rerun if the name or tagline changes); og:* tags in Base.astro.",
+        "a11y": "The image has alt text (the parish name); it carries nothing that is not also on the page."
+      },
+      "tooltip": {
+        "name": "Tooltip",
+        "desc": "The small dark bubble naming an icon button: it appears after a short pause on mouse hover and as soon as the button gets keyboard focus, instead of the browser’s grey tooltip.",
+        "use": "A data-tip=\"text\" attribute on the button (data-tip-end at the right edge, data-tip-start at the left, data-tip-above to open upwards); keep aria-label. No JavaScript, public site and admin.",
+        "a11y": "The accessible name stays the aria-label; the bubble is a visual aid (never the only information). No bubble on touch; reduced motion: no transition."
+      },
+      "helpsheet": {
+        "name": "Help sheet",
+        "desc": "The guide for the current screen in a side sheet over it: nothing moves behind, so closing it leaves you exactly where you were. An abstract banner (different each time) carries the title, the reading time and “For you”. Top: “All help” on the left, close on the right.",
+        "use": "Admin: the top-bar “?”; <HelpSheet>, <AbstractBanner seed>; the Help page remains a page of its own.",
+        "a11y": "Modal dialog (focus trapped, Escape closes, focus returns to the “?”); title and description linked; the banner is decorative (aria-hidden)."
+      },
+      "abstractbanner": {
+        "name": "Abstract banner",
+        "desc": "A header image drawn on the fly, no photo: waves, rings, dots, blocks, arcs or stripes, in a palette taken from our colours (light and dark follow). Each opening draws another composition; nothing is stored.",
+        "use": "<AbstractBanner seed> (React, admin); six compositions, five palettes; colours by tokens only.",
+        "a11y": "Decorative (aria-hidden); text over it sits on a veil that keeps contrast in both themes."
+      },
+      "healthstrip": {
+        "name": "Health strip",
+        "desc": "Seven bars, one a day, green, orange or red (grey: no check), like a service status page, with the large status banner and, per check, a week curve or gauge.",
+        "use": "Admin → Santé, as cards or a list (remembered view toggle); .health-strip, .health-meter, .health-banner.",
+        "a11y": "Each bar has text (day and state) for screen readers and a tooltip; the state is written, never colour alone."
+      },
+      "prioritychip": {
+        "name": "Priority chip",
+        "desc": "A small label with an icon, words and a colour (high, keep an eye, not urgent) to say what matters first; the most urgent card also carries a soft red frame.",
+        "use": ".prio .prio-high|medium|low; To validate, modelled on the “To do” cards.",
+        "a11y": "Icon + text + colour: never colour alone; contrast checked in both themes."
+      },
+      "helpgrid": {
+        "name": "Help grid",
+        "desc": "The Help page as cards: one icon per guide in a tinted tile, the title in Erode and a summary line; guides matching your rights come first.",
+        "use": ".help-grid-card, .help-grid-icon; three columns on large screens.",
+        "a11y": "Each card is a link with its title; the icon is decorative."
+      },
+      "sermoncard": {
+        "name": "Sermon card",
+        "desc": "A card for a sermon: an image (the chosen photo, else a drawn banner), the date, series, title in Erode, passages, the preacher (only with consent) and “Video” / “Listen” tags. The whole card is one link.",
+        "use": "Public → Sermons; .sc; series, preacher, book and year filters in a GET form (no JavaScript needed; with it, only the results change).",
+        "a11y": "The title is the link (stretched over the card); tags have an icon and text; reduced motion: no lift."
+      },
+      "videofacade": {
+        "name": "Video “facade”",
+        "desc": "A “Play the video” button on our own image. Nothing is requested from YouTube before the press; then only the privacy-enhanced player (youtube-nocookie.com) loads, in place.",
+        "use": "<div data-sermon-video data-id> + scripts/sermon-video.ts; the security policy only allows youtube-nocookie.com as a frame.",
+        "a11y": "A real button, keyboard operable; the frame has a title; the note says where the video comes from."
+      },
+      "outboundlinks": {
+        "name": "Outbound links",
+        "desc": "“Listen or download” links: an icon, the name the team gave and, below, the site the link leads to (“Opens on drive.google.com”). The link opens in a new tab; the page loads nothing from that site.",
+        "use": ".sd-link; https addresses only, never required; decision 0034.",
+        "a11y": "The link name is visible and so is the host; rel=\"noopener noreferrer\"; 56 px tall target."
+      },
+      "meditationcard": {
+        "name": "Meditation of the day",
+        "desc": "The day’s card: the date, the feast’s title if any, each reading in its tile (Old Testament, Epistle, Gospel), the psalm apart, and the verse of the day when its text was typed. Previous / next day without reloading.",
+        "use": "Public → Meditations and bulletin; .md-today; references only (decision 0032).",
+        "a11y": "A list of readings; the date is a heading; navigation buttons are written; the current day is marked aria-current."
+      },
+      "weekstrip": {
+        "name": "Week strip",
+        "desc": "Seven days, Monday to Sunday, each with its weekday, number and first reading; the chosen day is filled, today is ringed in gold.",
+        "use": ".md-week-grid, .md-day; links that only change the results area.",
+        "a11y": "Each day is a link; aria-current=\"date\"; colour is never the only signal."
+      },
+      "csvimport": {
+        "name": "Checked CSV import",
+        "desc": "A file or pasted text is read in the browser; a report says how many days, which lines have an error (blocking) or a warning, and shows the first days before anything is written.",
+        "use": "Admin → Meditations → Import; readMeditationCsv in @eec/core; the server checks each row again.",
+        "a11y": "The report is announced (role=status); each problem has an icon, text and its line."
+      },
+      "printbulletin": {
+        "name": "Printable bulletin",
+        "desc": "The week’s bulletin as a reading page, with an A4 or A5 choice: when printing, the menu, footer and buttons disappear and the page takes the chosen size (no PDF made by the server).",
+        "use": ".bl, @page a4 / a5 (named page); ?format=a5; the browser’s “Save as PDF”.",
+        "a11y": "Ordered headings, sections as lists; print is black on white; actions are not printed."
+      },
+      "segmented": {
+        "name": "@eec/ui/astro/Segmented.astro ; <nav aria-label>, aria-current=\"true\" sur le choix actif ; hauteur 44 px.",
+        "desc": "@eec/ui/astro/Segmented.astro; <nav aria-label>, aria-current=\"true\" on the active choice; 44 px tall.",
+        "use": "Navigation par liens : Tab puis Entrée ; le choix actif est annoncé « page courante ».",
+        "a11y": "Link navigation: Tab then Enter; the active choice is announced as the current page."
+      },
+      "passagefields": {
+        "name": "RefEditor, ChapterVerseFields (@eec/content-kit) ; ReadingEditor, PsalmEditor (modules/meditations) ; limites : @eec/core (chapterCount, verseCount).",
+        "desc": "RefEditor, ChapterVerseFields (@eec/content-kit); ReadingEditor, PsalmEditor (modules/meditations); limits: @eec/core (chapterCount, verseCount).",
+        "use": "Chaque champ est étiqueté ; l’erreur est annoncée (role=\"alert\") ; les limites sont écrites en placeholder (1–21).",
+        "a11y": "Every field is labelled; the error is announced (role=\"alert\"); the limits are written as placeholders (1–21)."
+      },
+      "printletterhead": {
+        "name": ".print-letterhead (Site.astro) ; .help-letterhead (admin) ; toujours le Lockup, jamais le logomark seul.",
+        "desc": ".print-letterhead (Site.astro); .help-letterhead (admin); always the Lockup, never the logomark alone.",
+        "use": "Décoratif pour les lecteurs d’écran (aria-hidden) ; le titre du document reste le premier titre.",
+        "a11y": "Decorative for screen readers (aria-hidden); the document title stays the first heading."
+      },
+      "sourcepicker": {
+        "name": "CheckboxField + .bulletin-nodata (modules/bulletin).",
+        "desc": "CheckboxField + .bulletin-nodata (modules/bulletin).",
+        "use": "Cases à cocher natives de la charte ; le message vide est un paragraphe suivi d’un lien.",
+        "a11y": "Design-system checkboxes; the empty message is a paragraph followed by a link."
+      },
+      "foldrow": {
+        "name": ".med-row, .med-collapse[data-open] (grid-template-rows 0fr → 1fr) ; aria-expanded sur le bouton ; contenu replié en inert.",
+        "desc": ".med-row, .med-collapse[data-open] (grid-template-rows 0fr → 1fr); aria-expanded on the button; folded content is inert.",
+        "use": "Le bouton annonce son état ; le contenu replié n’est pas atteignable au clavier.",
+        "a11y": "The button announces its state; folded content cannot be reached by keyboard."
+      },
+      "retentionchip": {
+        "name": ".reg-retention[data-level] ; retentionLevel() dans @eec/core.",
+        "desc": ".reg-retention[data-level]; retentionLevel() in @eec/core.",
+        "use": "Texte complet lu tel quel ; icône décorative.",
+        "a11y": "Full text is read as is; the icon is decorative."
+      },
+      "checkinlist": {
+        "name": ".reg-checkin, aria-pressed.",
+        "desc": ".reg-checkin, aria-pressed.",
+        "use": "Boutons à bascule (aria-pressed) ; l’état est écrit (« Présent »).",
+        "a11y": "Toggle buttons (aria-pressed); the state is written (“Present”)."
+      },
+      "registerform": {
+        "name": "RegistrationPage.astro, RegistrationCancelPage.astro ; Choice, Field.",
+        "desc": "RegistrationPage.astro, RegistrationCancelPage.astro; Choice, Field.",
+        "use": "Libellés liés, erreurs en role=\"alert\", groupes radio nommés.",
+        "a11y": "Linked labels, errors with role=\"alert\", named radio groups."
+      },
+      "basket": {
+        "name": "CampaignPage.astro (.cp-basket, --fill) ; role=\"img\" + aria-label.",
+        "desc": "CampaignPage.astro (.cp-basket, --fill); role=\"img\" + aria-label.",
+        "use": "Équivalent texte : légende « La corbeille se remplit : n % de l’objectif » et le montant en toutes lettres.",
+        "a11y": "Text equivalent: the caption “The basket is filling: n% of the goal” and the amount in full."
+      },
+      "offlinepage": {
+        "name": "src/sw/sw.js, OfflinePage.astro, scripts/pwa.ts ; /fr/hors-ligne/ · /en/offline/.",
+        "desc": "src/sw/sw.js, OfflinePage.astro, scripts/pwa.ts; /fr/hors-ligne/ · /en/offline/.",
+        "use": "La mention est un status ; la liste est une liste de liens.",
+        "a11y": "The notice is a status; the list is a list of links."
+      },
+      "installentry": {
+        "name": "[data-install], [data-install-ios] ; beforeinstallprompt.",
+        "desc": "[data-install], [data-install-ios]; beforeinstallprompt.",
+        "use": "Un vrai bouton, nommé par son texte.",
+        "a11y": "A real button, named by its text."
+      },
+      "taginput": {
+        "name": "TagInput (@eec/content-kit).",
+        "desc": "TagInput (@eec/content-kit).",
+        "use": "Les pastilles sont des boutons ; l’erreur est annoncée (role=\"alert\").",
+        "a11y": "Chips are buttons; the error is announced (role=\"alert\")."
       }
     },
     "rules": {
@@ -888,7 +1068,7 @@
       "figures": {
         "name": "Key figures",
         "desc": "Large figures in Erode that count up once when they enter the screen.",
-        "use": "These are facts: the value stays null until validated (lib/stats.ts). In development an example is shown, tagged “example”; in production an unvalidated figure is not shown.",
+        "use": "These are facts: they come from home page texts (Site pages → Home) and only appear once published, that is validated (decision 0039). An unpublished figure stays hidden everywhere.",
         "a11y": "Definition list (dl); the count-up is not announced and doesn’t play with reduced motion."
       },
       "account": {
@@ -1044,7 +1224,10 @@
       "audit": "Activity log",
       "outbox": "Outbox",
       "ui": "Design guide",
-      "account": "My account"
+      "account": "My account",
+      "validate": "To validate",
+      "help": "Help",
+      "health": "Health"
     },
     "user": {
       "menu": "Account menu",
@@ -1251,7 +1434,8 @@
       "template": "Message",
       "templates": {
         "password-reset": "Password reset",
-        "invitation": "Invitation"
+        "invitation": "Invitation",
+        "registration-promoted": "A place opened up (registration)"
       },
       "link": "Link to pass on",
       "relayed": "Mark as relayed",
@@ -1259,7 +1443,8 @@
       "done_relayed": "Marked as relayed.",
       "done_dismissed": "Message dismissed.",
       "empty_title": "Nothing to relay",
-      "empty_text": "All caught up. New requests will appear here."
+      "empty_text": "All caught up. New requests will appear here.",
+      "registration_note": "A place opened up for “{form}”: tell this person by phone or WhatsApp (code {code})."
     },
     "account": {
       "title": "My account",
@@ -1299,7 +1484,97 @@
       "broke_text": "Something went wrong. Please try again in a moment.",
       "retry": "Try again"
     },
-    "loading": "Loading"
+    "loading": "Loading",
+    "validate": {
+      "title": "To validate",
+      "lead": "Information waiting to be checked before it appears on the site: times, address, numbers, figures, texts. Validate what is right, or ask for a correction.",
+      "empty_title": "Nothing to validate",
+      "empty_text": "Everything ready has been checked. New information will appear here.",
+      "count": "{n} to validate",
+      "approve": "Validate",
+      "approved": "Validated. The public site updates within about two minutes.",
+      "approve_error": "Validation failed. Nothing was changed.",
+      "ask": "Ask for a correction",
+      "note": "Leave a note",
+      "write": "Your message",
+      "write_help": "Simply say what is not right and, if you know it, the correct information.",
+      "send": "Send",
+      "sent": "Message saved.",
+      "send_error": "The message could not be saved.",
+      "open": "Open in the admin",
+      "see_public": "See on the site",
+      "current": "Current value",
+      "corrections": "Corrections requested",
+      "resolve": "Mark as handled",
+      "resolved": "Marked as handled.",
+      "by": "by {name}",
+      "cannot": "You can review and comment, but not validate this.",
+      "kind_correction": "Correction",
+      "kind_note": "Note",
+      "cancel": "Cancel",
+      "prio_high": "High priority",
+      "prio_medium": "Keep an eye",
+      "prio_low": "Not urgent",
+      "prio_count": "{n} · {label}",
+      "view": "View",
+      "view_list": "List",
+      "view_grid": "Cards"
+    },
+    "help": {
+      "title": "Help",
+      "lead": "Short step-by-step guides for everyday tasks. The ones that match your rights come first.",
+      "guides": "Guides",
+      "memos": "Cheat sheets to print",
+      "memos_help": "One page per role, to keep next to the computer. Open one, then click Print.",
+      "here": "Help for this screen",
+      "back": "All help",
+      "print": "Print",
+      "not_found": "This guide does not exist.",
+      "close": "Close help",
+      "minutes": "{n} min read",
+      "for_you": "For you",
+      "not_for_you": "For another role"
+    },
+    "health": {
+      "title": "Site health",
+      "lead": "A check every night, and on demand. Green: all good. Orange: keep an eye on it. Red: act. Orange alerts start at 70 % of a free limit.",
+      "run": "Check now",
+      "running": "Checking…",
+      "last": "Last check: {date}",
+      "never": "No check yet. Run one.",
+      "status_ok": "All good",
+      "status_warn": "Keep an eye on it",
+      "status_fail": "Action needed",
+      "database": "Database",
+      "bucket": "File storage",
+      "backup": "Last backup",
+      "outbox": "Outbox",
+      "dbSize": "Database space",
+      "mediaSize": "Files space",
+      "database_v": "Answered in {n} ms",
+      "bucket_ok": "Reachable",
+      "bucket_fail": "Unreachable: photos will stop showing",
+      "backup_v": "{n} day(s) ago",
+      "backup_none": "No backup recorded",
+      "outbox_v": "{n} message(s) to relay",
+      "size_v": "{used} of {limit} ({pct} %)",
+      "help_database": "If it is slow or red, the database may be asleep: try again in a minute.",
+      "help_bucket": "If red, tell Joël: the storage keys may need renewing.",
+      "help_backup": "The automatic backup runs every Sunday. Red: see the procedure in the runbook.",
+      "help_outbox": "Open the outbox and relay the waiting messages.",
+      "help_dbSize": "Free limit: 0.5 GB. At 70 %, tell Joël.",
+      "help_mediaSize": "Free limit: 5 GB. Archive or delete unused files in the media library.",
+      "elsewhere_title": "To read elsewhere",
+      "elsewhere": "Outgoing traffic (Neon) is read in the Neon console, and requests per day (100,000 at most) in the Cloudflare dashboard. The site cannot read them itself.",
+      "insight": "The site health needs attention.",
+      "insight_do": "See health",
+      "error": "The check failed. Try again.",
+      "week": "Last 7 days",
+      "no_check": "no check",
+      "view": "View",
+      "view_grid": "Cards",
+      "view_list": "List"
+    }
   },
   "login": {
     "title": "Sign in",
@@ -1873,7 +2148,19 @@
     "series_media": "Photos",
     "view_numbers": "View the numbers",
     "month": "Month",
-    "total": "in all"
+    "total": "in all",
+    "insight_health": "The site health needs attention.",
+    "insight_health_do": "See health",
+    "visits_title": "Visits",
+    "visits_lead": "{n} page views in the last 30 days, counted without any tracking: no cookie, no IP address, no identifier.",
+    "visits_off": "The visit counter is not switched on yet. It is set up once, with Joël (see the launch guide). Until then no visit is counted.",
+    "visits_chart": "Page views per day",
+    "visits_day": "Day",
+    "visits_device": "Phone or computer",
+    "visits_mobile": "Phone",
+    "visits_desktop": "Computer",
+    "visits_top": "Most read pages",
+    "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not."
   },
   "content": {
     "status": {
@@ -1989,6 +2276,14 @@
       "text": "What you filled in is not saved. If you leave now, you will lose it.",
       "stay": "Keep filling",
       "leave": "Discard"
+    },
+    "passage": {
+      "book": "Book",
+      "chapter": "Chapter",
+      "from": "From",
+      "to": "To",
+      "remove": "Remove the passage",
+      "order": "The last verse must come after the first."
     }
   },
   "search": {
@@ -2038,6 +2333,19 @@
     "sug_news": "Latest news",
     "sug_event": "Next event",
     "did_you_mean": "Did you mean:",
-    "related": "Suggested actions"
+    "related": "Suggested actions",
+    "type_sermons": "Sermons"
+  },
+  "pwa": {
+    "description": "The EEC Nkolndongo 1 parish site: times, calendar, sermons, meditations.",
+    "offline_t": "You are offline",
+    "offline_p": "This page could not be loaded and was not saved on this device. Reconnect, or open a page you have already read below.",
+    "retry": "Try again",
+    "saved_h": "Available offline",
+    "saved_none": "No page is saved yet: the ones you read will be saved automatically.",
+    "from_cache": "Copy saved on this device",
+    "install": "Install the app",
+    "install_ios": "On iPhone: tap “Share”, then “Add to Home Screen”.",
+    "install_done": "App installed"
   }
 }

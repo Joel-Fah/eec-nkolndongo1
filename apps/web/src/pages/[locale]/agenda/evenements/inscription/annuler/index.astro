@@ -1,0 +1,10 @@
+---
+import RegistrationCancelPage from '../../../../../../components/content/RegistrationCancelPage.astro'
+import { rightRegistrationPath } from '../../../../../../lib/registrations-routes'
+
+export const prerender = false
+if (!rightRegistrationPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<RegistrationCancelPage />

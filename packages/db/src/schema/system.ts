@@ -118,3 +118,50 @@ export const contentVersions = pgTable('content_versions', {
   version: integer('version').notNull().default(1),
   updatedAt: updatedAt(),
 })
+
+/**
+ * Review comments on content waiting for validation (« À valider »): a content partner asks for a correction or leaves a
+ * note on one item (a settings field, a schedule slot, a page text). `item_kind` + `item_ref` name the item; nothing here
+ * is public. A comment is open until someone marks it resolved.
+ */
+export const contentReviews = pgTable(
+  'content_reviews',
+  {
+    id: id(),
+    itemKind: text('item_kind', { enum: ['settings', 'schedule', 'page_slot'] }).notNull(),
+    itemRef: text('item_ref').notNull(),
+    /** correction: asks for a change before validating. note: just a remark. */
+    kind: text('kind', { enum: ['correction', 'note'] })
+      .notNull()
+      .default('correction'),
+    body: text('body').notNull(),
+    status: text('status', { enum: ['open', 'resolved'] })
+      .notNull()
+      .default('open'),
+    createdBy: uuid('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    resolvedAt: tz('resolved_at'),
+    resolvedBy: uuid('resolved_by').references(() => user.id, { onDelete: 'set null' }),
+  },
+  (t) => [index('content_reviews_item_idx').on(t.itemKind, t.itemRef, t.status)],
+)
+
+/** The daily health check (« Santé »): one row per run, the checks as data. Kept 90 days. */
+export const systemHealth = pgTable(
+  'system_health',
+  {
+    id: id(),
+    checkedAt: tz('checked_at').notNull().defaultNow(),
+    /** The worst of the checks: ok | warn | fail. */
+    status: text('status', { enum: ['ok', 'warn', 'fail'] }).notNull(),
+    checks: jsonb('checks').notNull(),
+  },
+  (t) => [index('system_health_at_idx').on(t.checkedAt)],
+)
+
+/** Small facts the Worker cannot learn by itself (for example when the last backup finished). One row per key. */
+export const systemMarks = pgTable('system_marks', {
+  key: text('key').primaryKey(),
+  at: tz('at').notNull().defaultNow(),
+  note: text('note').notNull().default(''),
+})

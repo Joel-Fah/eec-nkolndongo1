@@ -24,7 +24,7 @@ meaningful**. Content publishing never triggers CI (edge cache purge instead —
 |---|---|---|
 | `.github/workflows/check.yml` | `pull_request` → `main` (ready, code paths only) | Rule 2. Also fetches the Fontshare fonts (cached by script hash) because their licence forbids committing them (see decision 0015). |
 | `.github/workflows/deploy.yml` | push to `main` (code paths only) + manual | Rule 4. Lint, test, build (`pnpm build:site`), migrate the production database, `wrangler deploy`. Environment `production`. |
-| `.github/workflows/preview.yml` | manual only | Rule 6. Uploads a Worker version (not deployed) for a preview URL. |
+| `.github/workflows/preview.yml` | manual only | Rule 6. Deploys the branch to the separate preview Worker (dev data), never production. |
 | `.github/workflows/backup.yml` | weekly (Sunday 02:23 UTC) + manual | The one scheduled GitHub job: a Worker cannot run the database dump. Short (< 2 min); decision 0022. |
 
 Retention (daily) is **not** a workflow: it is a Cloudflare Cron Trigger on the Worker (rule 7).

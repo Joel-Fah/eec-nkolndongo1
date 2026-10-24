@@ -15,9 +15,23 @@ interface Props {
   /** Path of this page in each locale, for hreflang and the language switcher. */
   alternates?: Partial<Record<(typeof locales)[number], string>>
   season?: string
+  /** Share image: an absolute or root-relative URL. Default: the brand card for this kind of page (apps/web/public/og). */
+  image?: string
+  /** Alt text of the share image. */
+  imageAlt?: string
+  type?: 'website' | 'article'
 }
 
-const { title, description, noindex: asked = false, alternates = {}, season } = Astro.props
+const {
+  title,
+  description,
+  noindex: asked = false,
+  alternates = {},
+  season,
+  image,
+  imageAlt,
+  type = 'website',
+} = Astro.props
 // Until launch (SITE_INDEXABLE=1 at build time) nothing is indexable, and a small ribbon says so.
 const launched = import.meta.env.PUBLIC_SITE_INDEXABLE === '1'
 const noindex = asked || !launched
@@ -27,6 +41,22 @@ const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const siteName = t('site.name')
 const canonical = new URL(Astro.url.pathname, Astro.site)
+// Default share card by section (decouvrir / discover, vivre / live…); the home and everything else get the general one.
+const SECTIONS: Record<string, string> = {
+  decouvrir: 'discover',
+  discover: 'discover',
+  vivre: 'live',
+  live: 'live',
+  agenda: 'calendar',
+  calendar: 'calendar',
+  actualites: 'news',
+  news: 'news',
+  donner: 'give',
+  give: 'give',
+}
+const section = SECTIONS[Astro.url.pathname.split('/')[2] ?? ''] ?? 'default'
+const shareImage = new URL(image ?? `/og/${section}-${locale}.jpg`, Astro.site)
+const shareTitle = title === siteName ? title : `${title} · ${siteName}`
 ---
 
 <!doctype html>
@@ -43,10 +73,24 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
         <link rel="alternate" hreflang={lang} href={new URL(path, Astro.site)} />
       ))
     }
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={shareTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale === 'fr' ? 'fr_CM' : 'en_GB'} />
+    <meta property="og:image" content={shareImage} />
+    {!image && <meta property="og:image:width" content="1200" />}
+    {!image && <meta property="og:image:height" content="630" />}
+    <meta property="og:image:alt" content={imageAlt ?? t('site.parish')} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href={`/${locale}/manifest.webmanifest`} />
+    <meta name="theme-color" content="#FBF8F1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E1612" media="(prefers-color-scheme: dark)" />
     <link rel="preload" href={switzer} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={erode} as="font" type="font/woff2" crossorigin />
     <slot name="head" />

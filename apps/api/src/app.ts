@@ -9,6 +9,7 @@ import { authRoutes } from './routes/auth.ts'
 import { bannerRoutes } from './routes/banner.ts'
 import { flagRoutes, flagsFor } from './routes/flags.ts'
 import { groupRoutes } from './routes/groups.ts'
+import { healthRoutes } from './routes/health.ts'
 import { invitationRoutes } from './routes/invitations.ts'
 import { meRoutes } from './routes/me.ts'
 import { memberRoutes } from './routes/members.ts'
@@ -18,6 +19,8 @@ import { searchRoutes } from './routes/search.ts'
 import { todoRoutes } from './routes/todo.ts'
 import { trendsRoutes } from './routes/trends.ts'
 import { userRoutes } from './routes/users.ts'
+import { validationRoutes } from './routes/validation.ts'
+import { visitsRoutes } from './routes/visits.ts'
 
 export function createApp() {
   const app = new Hono<AppEnv>().basePath('/api')
@@ -38,6 +41,9 @@ export function createApp() {
   app.route('/search', searchRoutes)
   app.route('/todo', todoRoutes)
   app.route('/trends', trendsRoutes)
+  app.route('/system-health', healthRoutes)
+  app.route('/visits', visitsRoutes)
+  app.route('/validation', validationRoutes)
   app.route('/banner', bannerRoutes)
   // Modules from the registry, at /api/<id>. A switched-off module answers 404 (Phase 02 §6.5).
   for (const m of modules) {

@@ -23,7 +23,7 @@ no admin action required. Gives a reason to "rediscover" the site through the ye
 | **Année liturgique** | A circular dial of the year | Drag/rotate; each season shows colour + meaning |
 | **Agenda** | Calendar + list, filter by department | Add to calendar, share |
 | **Actualités** | Editorial magazine layout | Share to WhatsApp, read time |
-| **Prédications** (P2) | Listening room — mini player persists across pages | Filter by series/speaker/book |
+| **Prédications** | Listening room: cards with a drawn banner or photo, a YouTube facade and links to listen (no hosted audio, decision 0034) | Filter by series, preacher (consented), book, year |
 | **Donner** | Gratitude-first; how gifts are used | Copy MoMo/OM number, (P3) pay in-page |
 | **Fête des Moissons** (P2) | Harvest basket fills toward the goal | Share, give |
 | **Nous trouver** | Illustrated map of the hill | Tap to load the real map; directions |

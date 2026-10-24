@@ -16,6 +16,8 @@ export const eventsItems = pgTable(
     unpublishAt: tz('unpublish_at'),
     firstPublishedAt: tz('first_published_at'),
     featured: boolean('featured').notNull().default(false),
+    /** Whether this event takes registrations (the Inscriptions module only offers such events). */
+    acceptsRegistrations: boolean('accepts_registrations').notNull().default(false),
     /** What kind of event (culte, étude, fête…): one icon and colour per kind. */
     kind: text('kind').notNull().default('autre'),
     titleFr: text('title_fr').notNull().default(''),

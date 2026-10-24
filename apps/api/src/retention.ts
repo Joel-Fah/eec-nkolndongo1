@@ -8,6 +8,8 @@
  *   - audit entries older than 24 months
  *   - contact messages: 12 months after « handled » (at most 24 after receipt); prayer requests 3 months after « handled »
  *     (at most 6 after receipt)
+ *   - registrations (module `registrations`, decision 0035): 6 months after the event, at most 12 months after the form closed;
+ *     the anonymous totals per form are written first and kept
  *   - member accounts whose deletion was requested more than 30 days ago (team accounts are never purged here)
  */
 import { dbUrl, type Env } from '@eec/api-kit'
@@ -35,6 +37,7 @@ export type RetentionResult = {
   outbox: number
   audit: number
   contact: number
+  registrations: number
   accountsPurged: number
   accountsSkipped: number
 }
@@ -86,6 +89,7 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
           .returning({ id: t.auditLog.id }),
       ),
       contact: 0,
+      registrations: 0,
       accountsPurged: 0,
       accountsSkipped: 0,
     }
@@ -100,8 +104,36 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
     )
     result.contact = (await db.execute(cm)).rows.length
 
+    // Registrations (module `registrations`, read by name). The deletion day is the one the admin counts down to
+    // (`purgeOn` in @eec/core): 6 months after the event, and at most 12 months after the form closed. The totals are
+    // written first and survive; the people (and the children, by cascade) go.
+    const due = `least((f.event_date::date + interval '6 months')::date, coalesce((f.closes_at + interval '12 months')::date, 'infinity'::date)) <= current_date`
+    await db.execute(
+      sql.raw(
+        `insert into registration_counts (form_id, title_fr, event_date, registered, waitlisted, cancelled, present, recorded_at)
+         select f.id, f.title_fr, f.event_date,
+           coalesce(sum(r.party_size) filter (where r.status = 'confirmed'), 0)::int,
+           coalesce(sum(r.party_size) filter (where r.status = 'waitlist'), 0)::int,
+           (count(*) filter (where r.status = 'cancelled'))::int,
+           (count(*) filter (where r.checked_in_at is not null))::int,
+           now()
+         from registration_forms f join registrations r on r.form_id = f.id
+         where ${due}
+         group by f.id
+         on conflict (form_id) do update set registered = excluded.registered, waitlisted = excluded.waitlisted,
+           cancelled = excluded.cancelled, present = excluded.present, recorded_at = excluded.recorded_at`,
+      ),
+    )
+    result.registrations = (
+      await db.execute(
+        sql.raw(
+          `delete from registrations r using registration_forms f where r.form_id = f.id and ${due} returning r.id`,
+        ),
+      )
+    ).rows.length
+
     // Accounts past their grace period. Anyone holding a role other than « membre » is a team account: skipped.
-    const due = await db
+    const dueAccounts = await db
       .select({ userId: t.profiles.userId })
       .from(t.profiles)
       .where(
@@ -113,7 +145,7 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
           ),
         ),
       )
-    for (const { userId } of due) {
+    for (const { userId } of dueAccounts) {
       const team = await db
         .select({ id: t.userRoles.id })
         .from(t.userRoles)

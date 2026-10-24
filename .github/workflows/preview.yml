@@ -1,5 +1,7 @@
-# A manual preview: uploads a version of the Worker WITHOUT deploying it (a preview URL), pointed at the dev
-# database branch. Run it from the Actions tab when you want someone to see a branch. Never automatic.
+# A manual preview: deploys the branch to a SEPARATE Worker (eec-nkolndongo1-preview) whose secrets point at the dev
+# database branch and the dev bucket, never production's (a version of the production Worker would reuse production's
+# secrets and Hyperdrive). Run it from the Actions tab when you want someone to see a branch. Never automatic.
+# One-time setup by Joël: docs/ops/runbook.md « Safe preview ».
 name: preview
 
 on:
@@ -43,8 +45,10 @@ jobs:
           key: storyset-${{ hashFiles('packages/ui/illustrations/storyset.json', 'scripts/illos-fetch.ts', 'packages/ui/src/tokens.ts') }}
       - run: pnpm illos:fetch
       - run: pnpm build:site
-      - name: Upload a preview version (not deployed)
-        run: pnpm --filter @eec/web exec wrangler versions upload --config dist/server/wrangler.json
+        env:
+          PREVIEW_WORKER: '1'
+      - name: Deploy the preview Worker (not production)
+        run: pnpm --filter @eec/web exec wrangler deploy --config dist/server/wrangler.json
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

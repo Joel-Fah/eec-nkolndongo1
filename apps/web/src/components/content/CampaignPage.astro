@@ -1,0 +1,403 @@
+---
+/**
+ * « Fête des Moissons » (decision 0041): the harvest basket filling toward the parish's goal, from VALIDATED totals only (never a
+ * single amount, never a name), days left, groups listed as encouragement (alphabetical, no ranking), how to give (approved
+ * giving values), the programme of the season and a share card. Without a published campaign the page falls back to the
+ * original text. `?simule=YYYY-MM-DD` replays a season, on localhost only.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { type EventOcc, publicJson } from '../../lib/content-api'
+import { eventHref } from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
+import PageView from '../PageView.astro'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`campaigns.site.${key}` as 'campaigns.site.kicker', vars)
+const simulated =
+  ['localhost', '127.0.0.1'].includes(Astro.url.hostname) &&
+  /^\d{4}-\d{2}-\d{2}$/.test(Astro.url.searchParams.get('simule') ?? '')
+    ? (Astro.url.searchParams.get('simule') as string)
+    : ''
+type Camp = {
+  slug: string
+  title: string
+  description: string
+  startsOn: string
+  endsOn: string
+  phase: 'before' | 'during' | 'after'
+  daysLeft: number
+  daysUntil: number
+  goal: number
+  raised: number
+  percent: number
+  groups: { name: string; goal: number; raised: number }[]
+}
+const res = await publicJson<{ campaign: Camp | null }>(
+  Astro,
+  `/api/campaigns/public/current?locale=${locale}${simulated ? `&asOf=${simulated}` : ''}`,
+)
+const c = res.state === 'ok' ? res.data.campaign : null
+const unavailable = res.state === 'unavailable'
+const events = c
+  ? await publicJson<{ items: EventOcc[] }>(
+      Astro,
+      `/api/events/public?locale=${locale}&from=${c.startsOn}&to=${c.endsOn}`,
+    )
+  : null
+const program = (events?.state === 'ok' ? events.data.items : [])
+  .filter((o) => !o.cancelled)
+  .slice(0, 12)
+const settings = c
+  ? await publicJson<{ giving?: Record<string, string> }>(Astro, '/api/settings/public')
+  : null
+const g = settings?.state === 'ok' ? (settings.data.giving ?? {}) : {}
+const methods = [
+  { id: 'momo', label: t('settings.site.momo' as 'settings.site.copy'), number: g.momoNumber },
+  { id: 'om', label: t('settings.site.om' as 'settings.site.copy'), number: g.omNumber },
+].filter((m) => m.number)
+const giveHref = href(locale, pages.find((p) => p.id === 'give')?.path[locale] ?? '')
+Astro.response.headers.set(
+  'cache-control',
+  simulated || unavailable ? 'no-store' : 'public, max-age=30, stale-while-revalidate=120',
+)
+
+const fmt = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-GB')
+const money = (n: number) => `${fmt.format(n).replace(/ /g, ' ')} FCFA`
+const dateText = (d: string, o: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat(locale, { ...o, timeZone: 'UTC' }).format(new Date(`${d}T12:00:00Z`))
+const fill = c ? Math.min(c.percent, 100) : 0
+const shareUrl = c ? new URL(Astro.url.pathname, Astro.site ?? Astro.url).href : ''
+const wa = c
+  ? `https://wa.me/?text=${encodeURIComponent(`${c.title} — ${s('raised', { a: money(c.raised) })}\n${shareUrl}`)}`
+  : ''
+---
+
+<Site title={t(labelKey('moissons'))} description={t('pages.moissons.lead')}>
+  <PageHero id="moissons" />
+  {
+    unavailable ? (
+      <UnavailableState />
+    ) : !c ? (
+      <PageView id="moissons" />
+    ) : (
+      <div class="cp">
+        {simulated && <p class="cp-sim" role="note">{s('simulated', { d: simulated })}</p>}
+        <section class="cp-main" aria-labelledby="cp-t">
+          <div class="cp-text">
+            <p class="cp-kicker">{s('kicker')}</p>
+            <h2 id="cp-t">{c.phase === 'before' ? s('before_t') : c.phase === 'after' ? s('after_t') : c.title}</h2>
+            <p class="cp-dates">{dateText(c.startsOn, { day: 'numeric', month: 'long' })} → {dateText(c.endsOn, { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            {c.phase === 'before' && <p>{s('before_p', { n: String(c.daysUntil) })}</p>}
+            {c.phase === 'after' && <p>{s('after_p')}</p>}
+            {c.description && c.description.split(/\n{2,}/).map((p) => <p class="cp-desc">{p}</p>)}
+            {c.goal > 0 && (
+              <div class="cp-figures">
+                <p class="cp-amount">{s('raised', { a: money(c.raised) })}</p>
+                <p class="cp-goal">{s('of_goal', { b: money(c.goal) })} · {s('percent', { p: String(c.percent) })}</p>
+                {c.percent >= 100 && <p class="cp-thanks">{s('goal_passed')}</p>}
+                {c.phase === 'during' && <p class="cp-days">{c.daysLeft === 1 ? s('last_day') : s('days_left', { n: String(c.daysLeft) })}</p>}
+              </div>
+            )}
+          </div>
+          <figure class="cp-basket" style={`--fill:${fill}`}>
+            <svg viewBox="0 0 320 300" role="img" aria-label={s('basket', { p: String(c.percent) })} focusable="false">
+              <defs>
+                <clipPath id="cp-inside"><path d="M52 118h216l-24 146a16 16 0 0 1-16 14H92a16 16 0 0 1-16-14z" /></clipPath>
+              </defs>
+              <path class="cp-handle" d="M72 120C72 28 248 28 248 120" fill="none" />
+              <g clip-path="url(#cp-inside)">
+                <rect class="cp-back" x="40" y="100" width="240" height="190" />
+                <g class="cp-harvest">
+                  <rect class="cp-level" x="40" y="100" width="240" height="190" />
+                  <g class="cp-pile">
+                  <circle class="cp-fruit a" cx="110" cy="128" r="22" />
+                  <circle class="cp-fruit b" cx="160" cy="116" r="24" />
+                  <circle class="cp-fruit c" cx="212" cy="130" r="21" />
+                  <path class="cp-leaf" d="M150 92c10-24 36-30 44-26-4 18-24 32-44 26z" />
+                  </g>
+                </g>
+                <path class="cp-weave" d="M40 150h240M40 188h240M40 226h240M96 118v170M148 118v170M200 118v170M252 118v170" fill="none" />
+              </g>
+              <path class="cp-rim" d="M44 118h232" fill="none" />
+            </svg>
+            <figcaption class="cp-cap">{s('basket', { p: String(c.percent) })}</figcaption>
+          </figure>
+        </section>
+
+        {c.groups.length > 0 && (
+          <section class="cp-groups" aria-labelledby="cp-g">
+            <h2 id="cp-g">{s('groups_h')}</h2>
+            <p>{s('groups_p')}</p>
+            <ul>
+              {c.groups.map((x) => (
+                <li>
+                  <strong>{x.name}</strong>
+                  <span class="cp-gbar" role="img" aria-label={`${x.goal > 0 ? Math.floor((x.raised / x.goal) * 100) : 0} %`}><span style={`width:${x.goal > 0 ? Math.min(Math.floor((x.raised / x.goal) * 100), 100) : 0}%`}></span></span>
+                  <span class="cp-gnum">{money(x.raised)} / {money(x.goal)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section class="cp-how" aria-labelledby="cp-h">
+          <h2 id="cp-h">{s('how_h')}</h2>
+          <p>{s('how_p')}</p>
+          {methods.length > 0 && <ul class="cp-methods">{methods.map((m) => <li><strong>{m.label}</strong> {m.number}</li>)}</ul>}
+          <Button href={giveHref} variant="secondary"><Icon name="gift" size={20} />{s('how_go')}</Button>
+        </section>
+
+        <section class="cp-program" aria-labelledby="cp-p">
+          <h2 id="cp-p">{s('program_h')}</h2>
+          {program.length === 0 ? <p>{s('program_none')}</p> : (
+            <ul>
+              {program.map((o) => (
+                <li><a href={eventHref(locale, o.slug)}><span>{dateText(o.date, { weekday: 'long', day: 'numeric', month: 'long' })}</span> {o.title}</a></li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section class="cp-share" aria-label={s('share_card')}>
+          <img src={`/api/campaigns/public/share.svg?locale=${locale}`} alt={s('basket', { p: String(c.percent) })} width="1200" height="630" loading="lazy" />
+          <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share')}<Icon name="external" size={16} /></Button>
+        </section>
+      </div>
+    )
+  }
+</Site>
+
+<style>
+  .cp {
+    display: grid;
+    gap: 2.5rem;
+    width: min(100% - 2rem, 64rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .cp-sim {
+    justify-self: start;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--info-soft);
+    color: var(--info);
+    font-weight: 600;
+  }
+  .cp-main {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 48rem) {
+    .cp-main {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+  .cp-text {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .cp-kicker {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .cp h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  .cp-dates {
+    font-weight: 600;
+  }
+  .cp-desc {
+    max-width: 60ch;
+    color: var(--ink-muted);
+  }
+  .cp-figures {
+    display: grid;
+    gap: 0.25rem;
+    margin-block-start: 0.5rem;
+  }
+  .cp-amount {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--primary);
+  }
+  .cp-goal {
+    color: var(--ink-muted);
+  }
+  .cp-thanks {
+    font-weight: 700;
+  }
+  .cp-days {
+    justify-self: start;
+    padding: 0.125rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--gold-soft, var(--primary-soft));
+    font-weight: 700;
+  }
+  /* The basket: the harvest rises from the bottom by --fill %, once, when the page opens. Static when motion is reduced. */
+  .cp-basket {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: center;
+  }
+  .cp-basket svg {
+    width: min(100%, 22rem);
+    height: auto;
+  }
+  .cp-handle {
+    stroke: var(--clay, var(--ink-muted));
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+  .cp-back {
+    fill: var(--surface-2);
+  }
+  .cp-level {
+    fill: var(--gold);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: scaleY(calc(var(--fill) / 100));
+    animation: cp-rise 1.6s var(--ease-out, ease) both;
+  }
+  /* The fruit rides on top of the rising level, and only shows once the basket has something to carry. */
+  .cp-pile {
+    opacity: clamp(0, calc((var(--fill) - 8) / 15), 1);
+    transform: translateY(calc((100 - var(--fill)) * 1.9px));
+    animation: cp-pile 1.6s var(--ease-out, ease) both;
+  }
+  .cp-fruit {
+    fill: var(--clay, var(--season));
+    stroke: var(--surface);
+    stroke-width: 3;
+  }
+  .cp-fruit.b {
+    fill: var(--primary);
+  }
+  .cp-fruit.c {
+    fill: var(--gold);
+  }
+  .cp-leaf {
+    fill: var(--primary);
+  }
+  .cp-weave {
+    stroke: color-mix(in oklab, var(--clay, var(--ink)) 70%, transparent);
+    stroke-width: 6;
+  }
+  .cp-rim {
+    stroke: var(--clay, var(--ink-muted));
+    stroke-width: 12;
+    stroke-linecap: round;
+  }
+  .cp-cap {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  @keyframes cp-rise {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes cp-pile {
+    from {
+      transform: translateY(190px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cp-level,
+    .cp-pile {
+      animation: none;
+    }
+  }
+  .cp-groups,
+  .cp-how,
+  .cp-program {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .cp-groups ul {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+  .cp-groups li {
+    display: grid;
+    gap: 0.375rem;
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .cp-gbar {
+    display: block;
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .cp-gbar > span {
+    display: block;
+    height: 100%;
+    background: var(--gold);
+  }
+  .cp-gnum {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .cp-how {
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--primary-soft);
+    justify-items: start;
+  }
+  .cp-methods {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .cp-program ul {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .cp-program a {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    min-height: 2.75rem;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    color: inherit;
+    text-decoration: none;
+  }
+  .cp-program a:hover {
+    background: var(--surface-2);
+  }
+  .cp-program a span {
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+  .cp-share {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .cp-share img {
+    width: min(100%, 30rem);
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elevation-1);
+  }
+</style>

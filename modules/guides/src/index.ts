@@ -30,7 +30,7 @@ export const guidesModule = defineModule({
         group: 'parish',
         label: { fr: 'Vie pratique', en: 'Practical life' },
         path: '/m/guides',
-        icon: 'checklist',
+        icon: 'careHands',
         order: 50,
         permission: 'guides:read',
       },

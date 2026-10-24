@@ -16,6 +16,7 @@ import Marquee from '@eec/ui/astro/Marquee.astro'
 import Menu from '@eec/ui/astro/Menu.astro'
 import Ornament from '@eec/ui/astro/Ornament.astro'
 import Pagination from '@eec/ui/astro/Pagination.astro'
+import Segmented from '@eec/ui/astro/Segmented.astro'
 import Skeleton from '@eec/ui/astro/Skeleton.astro'
 import Tabs from '@eec/ui/astro/Tabs.astro'
 import Tooltip from '@eec/ui/astro/Tooltip.astro'
@@ -97,6 +98,36 @@ type Id =
   | 'areachart'
   | 'mapillustration'
   | 'designbanner'
+  | 'validatecard'
+  | 'helplayout'
+  | 'healthcard'
+  | 'visitscharts'
+  | 'sharecard'
+  | 'tooltip'
+  | 'helpsheet'
+  | 'abstractbanner'
+  | 'healthstrip'
+  | 'prioritychip'
+  | 'helpgrid'
+  | 'sermoncard'
+  | 'videofacade'
+  | 'outboundlinks'
+  | 'meditationcard'
+  | 'weekstrip'
+  | 'csvimport'
+  | 'printbulletin'
+  | 'segmented'
+  | 'passagefields'
+  | 'printletterhead'
+  | 'sourcepicker'
+  | 'foldrow'
+  | 'retentionchip'
+  | 'checkinlist'
+  | 'registerform'
+  | 'basket'
+  | 'offlinepage'
+  | 'installentry'
+  | 'taginput'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -281,6 +312,82 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('searchhints')}><p class="text-sm text-ink-muted">{t('brand.components.searchhints.use')}</p></DocBlock>
 
     <DocBlock {...doc('areachart')}><p class="text-sm text-ink-muted">{t('brand.components.areachart.use')}</p></DocBlock>
+
+    <DocBlock {...doc('validatecard')}><p class="text-sm text-ink-muted">{t('brand.components.validatecard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('helplayout')}><p class="text-sm text-ink-muted">{t('brand.components.helplayout.use')}</p></DocBlock>
+
+    <DocBlock {...doc('healthcard')}><p class="text-sm text-ink-muted">{t('brand.components.healthcard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('visitscharts')}><p class="text-sm text-ink-muted">{t('brand.components.visitscharts.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sharecard')}>
+      <img class="max-w-md rounded-lg ring-1 ring-line" src={`/og/default-${locale}.jpg`} width="1200" height="630" alt={t('site.parish')} loading="lazy" />
+    </DocBlock>
+
+    <DocBlock {...doc('tooltip')}>
+      <div class="flex flex-wrap gap-4 py-6">
+        <button type="button" class="btn btn-ghost btn-icon" aria-label={t('nav.search')} data-tip={t('nav.search')}><Icon name="search" /></button>
+        <button type="button" class="btn btn-secondary btn-icon" aria-label={t('nav.account')} data-tip={t('nav.account')}><Icon name="account" /></button>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('helpsheet')}><p class="text-sm text-ink-muted">{t('brand.components.helpsheet.use')}</p></DocBlock>
+
+    <DocBlock {...doc('abstractbanner')}><p class="text-sm text-ink-muted">{t('brand.components.abstractbanner.use')}</p></DocBlock>
+
+    <DocBlock {...doc('healthstrip')}><p class="text-sm text-ink-muted">{t('brand.components.healthstrip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('prioritychip')}><p class="text-sm text-ink-muted">{t('brand.components.prioritychip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('helpgrid')}><p class="text-sm text-ink-muted">{t('brand.components.helpgrid.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sermoncard')}><p class="text-sm text-ink-muted">{t('brand.components.sermoncard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('videofacade')}><p class="text-sm text-ink-muted">{t('brand.components.videofacade.use')}</p></DocBlock>
+
+    <DocBlock {...doc('outboundlinks')}><p class="text-sm text-ink-muted">{t('brand.components.outboundlinks.use')}</p></DocBlock>
+
+    <DocBlock {...doc('meditationcard')}><p class="text-sm text-ink-muted">{t('brand.components.meditationcard.use')}</p></DocBlock>
+
+    <DocBlock {...doc('weekstrip')}><p class="text-sm text-ink-muted">{t('brand.components.weekstrip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('csvimport')}><p class="text-sm text-ink-muted">{t('brand.components.csvimport.use')}</p></DocBlock>
+
+    <DocBlock {...doc('printbulletin')}><p class="text-sm text-ink-muted">{t('brand.components.printbulletin.use')}</p></DocBlock>
+
+    <DocBlock {...doc('segmented')}>
+      <Segmented
+        label={t('brand.components.segmented.name')}
+        current="a4"
+        options={[
+          { value: 'a4', label: 'A4', href: '#components' },
+          { value: 'a5', label: 'A5', href: '#components' },
+        ]}
+      />
+    </DocBlock>
+
+    <DocBlock {...doc('passagefields')}><p class="text-sm text-ink-muted">{t('brand.components.passagefields.use')}</p></DocBlock>
+
+    <DocBlock {...doc('printletterhead')}><p class="text-sm text-ink-muted">{t('brand.components.printletterhead.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sourcepicker')}><p class="text-sm text-ink-muted">{t('brand.components.sourcepicker.use')}</p></DocBlock>
+
+    <DocBlock {...doc('foldrow')}><p class="text-sm text-ink-muted">{t('brand.components.foldrow.use')}</p></DocBlock>
+
+    <DocBlock {...doc('retentionchip')}><p class="text-sm text-ink-muted">{t('brand.components.retentionchip.use')}</p></DocBlock>
+
+    <DocBlock {...doc('checkinlist')}><p class="text-sm text-ink-muted">{t('brand.components.checkinlist.use')}</p></DocBlock>
+
+    <DocBlock {...doc('registerform')}><p class="text-sm text-ink-muted">{t('brand.components.registerform.use')}</p></DocBlock>
+
+    <DocBlock {...doc('basket')}><p class="text-sm text-ink-muted">{t('brand.components.basket.use')}</p></DocBlock>
+
+    <DocBlock {...doc('offlinepage')}><p class="text-sm text-ink-muted">{t('brand.components.offlinepage.use')}</p></DocBlock>
+
+    <DocBlock {...doc('installentry')}><p class="text-sm text-ink-muted">{t('brand.components.installentry.use')}</p></DocBlock>
+
+    <DocBlock {...doc('taginput')}><p class="text-sm text-ink-muted">{t('brand.components.taginput.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

@@ -35,7 +35,15 @@ export const coreModule = defineModule({
     p('audit-read', 'Lire le journal d’activité', 'Read the activity log'),
     p('audit-export', 'Exporter le journal d’activité', 'Export the activity log', true),
     p('system-outbox', 'Gérer la boîte d’envoi', 'Manage the outbox'),
+    p('system-health', 'Voir la santé du site', 'See the site health'),
+    p('visits-read', 'Voir les visites du site', 'See the site visits'),
     p('system-design', 'Voir le guide de design', 'View the design guide'),
+    p('validation-read', 'Voir ce qui attend une validation', 'See what is waiting for validation'),
+    p(
+      'validation-comment',
+      'Demander une correction ou laisser une remarque',
+      'Ask for a correction or leave a note',
+    ),
   ],
 })
 
@@ -62,6 +70,7 @@ export const systemRoles = [
       'core:users-reset-link',
       'core:groups-read',
       'core:system-outbox',
+      'core:validation-read',
       'settings:read',
       'settings:edit',
       'news:read',
@@ -72,6 +81,15 @@ export const systemRoles = [
       'departments:publish',
       'contact:read',
       'contact:handle',
+      'registrations:read',
+      'registrations:edit',
+      'registrations:manage',
+      // The CSV export is for the super admin and the secretariat only (decision 0035).
+      'registrations:export',
+      // Moissons: the secretariat defines campaigns and validates what the treasurer entered (decision 0041).
+      'campaigns:read',
+      'campaigns:edit',
+      'campaigns:validate',
     ],
   },
   {
@@ -81,6 +99,31 @@ export const systemRoles = [
     descFr: 'Écrit et publie les contenus.',
     descEn: 'Writes and publishes content.',
     grants: ['core:groups-read', 'news:read', 'news:edit', 'news:publish'],
+  },
+  {
+    key: 'validateur',
+    fr: 'Validateur de contenu',
+    en: 'Content validator',
+    descFr:
+      'Relit et valide les informations avant qu’elles soient publiques (horaires, adresse, chiffres, textes). Ne publie pas d’actualités et ne change pas les rôles.',
+    descEn:
+      'Reviews and validates information before it goes public (times, address, figures, texts). Cannot publish news or change roles.',
+    grants: [
+      'core:validation-read',
+      'core:validation-comment',
+      'core:groups-read',
+      'settings:read',
+      'settings:validate',
+      'schedule:read',
+      'schedule:validate',
+      'liturgy:read',
+      'story:read',
+      'story:publish',
+      'news:read',
+      'events:read',
+      'guides:read',
+      'departments:read',
+    ],
   },
   {
     key: 'pasteur',
@@ -103,6 +146,9 @@ export const systemRoles = [
       'news:edit',
       'departments:read',
       'departments:update',
+      'registrations:read',
+      'registrations:edit',
+      'registrations:manage',
     ],
   },
   {
@@ -111,7 +157,8 @@ export const systemRoles = [
     en: 'Treasurer',
     descFr: 'Suit les dons et les finances.',
     descEn: 'Follows gifts and finances.',
-    grants: [],
+    // Enters the amounts of the Moissons; someone else validates them.
+    grants: ['campaigns:read', 'campaigns:progress'],
   },
   {
     key: 'membre',

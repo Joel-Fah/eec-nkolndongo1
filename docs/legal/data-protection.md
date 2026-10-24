@@ -61,6 +61,53 @@
   change and asked to accept again only when the purposes changed (decision 0033).
 - **Giving**: no payment integration, no amounts, no donor data; only the parish's approved merchant details are shown.
 
+## Added in Phase 04a (2026-10)
+- **Visit counts** (decision 0038, **dormant until Joël enables it**): one data point per page view served by the Worker:
+  day, page address, language, phone/desktop. **No cookie, no IP address, no user agent stored, no identifier**; two visits by
+  one person cannot be linked. Skipped when the browser sends « do not track ». Kept 3 months at Cloudflare, shown to staff as
+  aggregates. If Analytics Engine is not available on the free plan, nothing is counted and no other analytics is used.
+- **Health check**: the daily check stores technical measures only (response time, storage used, backup age, outbox count),
+  no personal data. Kept 90 days.
+- **Content reviews** (« À valider », decision 0040): comments between staff about a text or figure, linked to the item, no
+  visitor data. The audit log records that a correction was asked, never its text.
+- **Contact form**: the minimum fill time now relies on a token signed by the server when the form is shown (it carries
+  only the time and a signature, no identifier), instead of a time sent by the browser.
+
+## Added in Phase 04b (2026-10)
+- **Sermons** (module `sermons`, decision 0034): text, passages, a YouTube address and up to 4 links typed by staff. **The preacher's
+  name is public only with a recorded consent** (who confirmed and when; unticking clears it; « reprendre depuis un dimanche » never
+  copies the consent, decision 0031). A name without consent is never sent to the public API and cannot be used as a filter. The
+  site **hosts no audio and loads nothing from the links**; the YouTube video loads only when a visitor presses play, from
+  youtube-nocookie.com (YouTube then sees that visitor, under its own policy: stated in the privacy policy). The audit log records
+  which fields changed, never the name or a link.
+
+## Added in Phase 04c — event registrations (decision 0035, accepted)
+- **Event registrations** (module `registrations`): name, **phone (required, with or without +237)**, optional WhatsApp number and
+  e-mail, number of people, and optional questions chosen per form from a short list (group, short text, one or several choices,
+  yes/no). **No sensitive question can be added**: the builder and the API refuse labels about health, origin, religion, politics
+  or money. **Children** only through a parent or guardian (required, unticked box), as a **first name and an age band**.
+  One unticked consent box per registration, stored with the time and the privacy-policy version (« +oral » when staff typed it
+  for someone who agreed by phone). Forms are open to anyone or to members only.
+- **Retention**: deleted 6 months after the event, at most 12 months after the form closed, by the daily job, which first writes
+  anonymous totals per form (registered, waitlisted, cancelled, present: no name, no contact). The admin shows the days left and
+  the deletion date on every form, in calm / warning (≤ 60 days) / critical (< 15 days) colours.
+- **Access**: `read`, `edit`, `manage`, `export`, `delete` are separate permissions, group-scoped. The **CSV export is for the super
+  admin and the secretariat only**, audited with the number of rows. The check-in view shows names, never phone numbers.
+- **Waitlist**: a cancellation promotes the next person; the notice (first name + phone) goes to the outbox (deleted after 90 days).
+- **Cancel link**: signed, expires two days after the event, shows only the first name and the activity. No IP address is stored;
+  a salted hash is the rate-limit key only.
+- The privacy policy needs a new version when this ships (decision 0033); members are informed.
+
+## Added in Phase 04d — Fête des Moissons campaigns and the offline copy (decisions 0041, 0037)
+- **Campaigns** (module `campaigns`): a goal, and **amounts received** entered by the treasurer with a date, an optional group and
+  an internal note. **No donor is recorded** (no field for one; the form forbids names in the note). **Only validated totals are
+  public**, as sums, never rows. Entering and validating are two different people (the API refuses validating one's own entry);
+  editing a validated amount removes its validation; the audit log carries neither amount nor note. Retention: the totals are the
+  parish's accounts of the festival and are kept with the campaign until staff delete it.
+- **Offline copy** (service worker): public pages you read are kept **on your own device** (up to 40) so they open without network.
+  Nothing private is kept: no admin, no Mon espace, no registration or cancel page, no search, no preview, no `/api` response.
+  Clearing the site's data in the browser removes it. No push notification, no tracking.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

@@ -5,6 +5,8 @@
  * Data only — no server or browser code here, so both the API and the admin can import it.
  */
 import { coreModule } from '@eec/auth/core-module'
+import { bulletinModule } from '@eec/module-bulletin'
+import { campaignsModule } from '@eec/module-campaigns'
 import { contactModule } from '@eec/module-contact'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
@@ -12,9 +14,12 @@ import { guidesModule } from '@eec/module-guides'
 import { legalModule } from '@eec/module-legal'
 import { liturgyModule } from '@eec/module-liturgy'
 import { mediaModule } from '@eec/module-media'
+import { meditationsModule } from '@eec/module-meditations'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
+import { registrationsModule } from '@eec/module-registrations'
 import { scheduleModule } from '@eec/module-schedule'
+import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
 import { storyModule } from '@eec/module-story'
 import type { DefinedModule } from '@eec/modules-kit'
@@ -25,6 +30,11 @@ export const modules: readonly DefinedModule[] = [
   mediaModule,
   membersModule,
   newsModule,
+  sermonsModule,
+  meditationsModule,
+  bulletinModule,
+  registrationsModule,
+  campaignsModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

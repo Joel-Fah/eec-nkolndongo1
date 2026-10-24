@@ -1,0 +1,11 @@
+---
+import BulletinPage from '../../../../../components/content/BulletinPage.astro'
+import { rightMeditationsPath } from '../../../../../lib/meditations-routes'
+
+export const prerender = false
+if (!rightMeditationsPath(Astro.currentLocale === 'en' ? 'en' : 'fr', Astro.url.pathname))
+  return Astro.rewrite('/404')
+const { week } = Astro.params
+---
+
+<BulletinPage week={week} />

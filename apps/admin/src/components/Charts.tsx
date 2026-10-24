@@ -1,5 +1,5 @@
 import { useLocale } from '@eec/admin-kit'
-import { type ReactNode, useId } from 'react'
+import { type PointerEvent, type ReactNode, useId, useRef, useState } from 'react'
 
 /**
  * Small SVG charts, no library: smooth (monotone) curves with a gradient under the line and rounded joins and caps, rounded
@@ -17,8 +17,38 @@ const TONE: Record<Tone, string> = {
   success: 'var(--success)',
 }
 
+/**
+ * Our tooltip for charts (instead of the browser's grey title): a dark bubble that follows the pointer over a point, bar or
+ * slice. Keyboard and screen-reader users read the same numbers in the table under every chart.
+ */
+function useChartTip() {
+  const wrap = useRef<HTMLDivElement>(null)
+  const [tip, setTip] = useState<{ x: number; y: number; text: string } | null>(null)
+  const show = (text: string) => (e: PointerEvent) => {
+    const box = wrap.current?.getBoundingClientRect()
+    if (box) setTip({ x: e.clientX - box.left, y: e.clientY - box.top, text })
+  }
+  const hide = () => setTip(null)
+  const bubble = tip && (
+    <div className="chart-tip" style={{ left: tip.x, top: tip.y }} role="presentation">
+      {tip.text}
+    </div>
+  )
+  return { wrap, show, hide, bubble }
+}
+
 /** « 2026-01 » → « janvier 2026 » (full, for tables) or « janv. » (short, for the axis). */
 export function monthName(ym: string, locale: string, style: 'long' | 'short' = 'long') {
+  // « 2026-01-15 » (a day, for the visits chart) → « 15 oct. » / « 15 octobre 2026 ».
+  if (ym.length === 10) {
+    const day = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: style,
+      ...(style === 'long' ? { year: 'numeric' as const } : {}),
+      timeZone: 'UTC',
+    }).format(new Date(`${ym}T00:00:00Z`))
+    return day
+  }
   const d = new Date(`${ym}-01T00:00:00Z`)
   const f = new Intl.DateTimeFormat(locale, {
     month: style,
@@ -95,62 +125,87 @@ export function AreaChart({
 }) {
   const { locale } = useLocale()
   const uid = useId().replace(/:/g, '')
+  const tip = useChartTip()
   const top = scale(series)
   const x = (i: number) => PAD.l + (i * (W - PAD.l - PAD.r)) / Math.max(1, months.length - 1)
   const y = (n: number) => H - PAD.b - (n / top) * (H - PAD.b - PAD.t)
   return (
-    <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
-      <defs>
-        {series.map((s) => (
-          <linearGradient key={s.key} id={`${uid}-${s.key}`} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={TONE[s.tone]} stopOpacity="0.38" />
-            <stop offset="100%" stopColor={TONE[s.tone]} stopOpacity="0" />
-          </linearGradient>
+    <div className="chart-wrap" ref={tip.wrap}>
+      <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+        <defs>
+          {series.map((s) => (
+            <linearGradient key={s.key} id={`${uid}-${s.key}`} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor={TONE[s.tone]} stopOpacity="0.38" />
+              <stop offset="100%" stopColor={TONE[s.tone]} stopOpacity="0" />
+            </linearGradient>
+          ))}
+        </defs>
+        {[0, 0.5, 1].map((f) => (
+          <line
+            key={f}
+            className="chart-grid"
+            x1={PAD.l}
+            x2={W - PAD.r}
+            y1={y(top * f)}
+            y2={y(top * f)}
+          />
         ))}
-      </defs>
-      {[0, 0.5, 1].map((f) => (
-        <line
-          key={f}
-          className="chart-grid"
-          x1={PAD.l}
-          x2={W - PAD.r}
-          y1={y(top * f)}
-          y2={y(top * f)}
-        />
-      ))}
-      <text className="chart-y" x={W - PAD.r} y={y(top) - 3} textAnchor="end">
-        {top}
-      </text>
-      {series.map((s) => {
-        const pts = s.values.map((v, i) => [x(i), y(v)] as [number, number])
-        const line = smoothPath(pts)
-        const last = pts[pts.length - 1] as [number, number] | undefined
-        return (
-          <g key={s.key}>
-            <path
-              d={`${line}L${x(months.length - 1)} ${H - PAD.b}L${x(0)} ${H - PAD.b}Z`}
-              fill={`url(#${uid}-${s.key})`}
-            />
-            <path className="chart-line" d={line} stroke={TONE[s.tone]} />
-            {last && (
-              <circle className="chart-dot" cx={last[0]} cy={last[1]} r="4" fill={TONE[s.tone]} />
-            )}
-            {pts.map((p, i) => (
-              <circle key={months[i]} className="chart-hit" cx={p[0]} cy={p[1]} r="8">
-                <title>{`${monthName(months[i] ?? '', locale)} — ${s.label}: ${s.values[i]}`}</title>
-              </circle>
-            ))}
-          </g>
-        )
-      })}
-      {months.map((m, i) =>
-        i % 2 === (months.length % 2 === 0 ? 1 : 0) || i === months.length - 1 ? (
-          <text key={m} className="chart-x" x={x(i)} y={H - 6} textAnchor="middle">
-            {monthName(m, locale, 'short').replace('.', '')}
-          </text>
-        ) : null,
-      )}
-    </svg>
+        <text className="chart-y" x={W - PAD.r} y={y(top) - 3} textAnchor="end">
+          {top}
+        </text>
+        {series.map((s) => {
+          const pts = s.values.map((v, i) => [x(i), y(v)] as [number, number])
+          const line = smoothPath(pts)
+          const last = pts[pts.length - 1] as [number, number] | undefined
+          return (
+            <g key={s.key}>
+              <path
+                d={`${line}L${x(months.length - 1)} ${H - PAD.b}L${x(0)} ${H - PAD.b}Z`}
+                fill={`url(#${uid}-${s.key})`}
+                className="chart-area"
+              />
+              <path className="chart-line" d={line} stroke={TONE[s.tone]} pathLength={1} />
+              {last && (
+                <circle
+                  className="chart-dot chart-pop"
+                  cx={last[0]}
+                  cy={last[1]}
+                  r="4"
+                  fill={TONE[s.tone]}
+                />
+              )}
+              {pts.map((p, i) => (
+                <circle
+                  key={months[i]}
+                  className="chart-hit"
+                  cx={p[0]}
+                  cy={p[1]}
+                  r="10"
+                  onPointerEnter={tip.show(
+                    `${monthName(months[i] ?? '', locale)} — ${s.label}: ${s.values[i]}`,
+                  )}
+                  onPointerMove={tip.show(
+                    `${monthName(months[i] ?? '', locale)} — ${s.label}: ${s.values[i]}`,
+                  )}
+                  onPointerLeave={tip.hide}
+                />
+              ))}
+            </g>
+          )
+        })}
+        {months.map((m, i) =>
+          // Twelve months: every other label. A month of days: every fifth.
+          (months.length > 14
+            ? i % 5 === 0 && i < months.length - 2
+            : i % 2 === (months.length % 2 === 0 ? 1 : 0)) || i === months.length - 1 ? (
+            <text key={m} className="chart-x" x={x(i)} y={H - 6} textAnchor="middle">
+              {monthName(m, locale, 'short').replace('.', '')}
+            </text>
+          ) : null,
+        )}
+      </svg>
+      {tip.bubble}
+    </div>
   )
 }
 
@@ -165,61 +220,82 @@ export function BarChart({
 }) {
   const { locale } = useLocale()
   const uid = useId().replace(/:/g, '')
+  const tip = useChartTip()
   const top = scale([series])
   const slot = (W - PAD.l - PAD.r) / months.length
   const bw = Math.min(26, slot * 0.62)
   const y = (n: number) => H - PAD.b - (n / top) * (H - PAD.b - PAD.t)
   return (
-    <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
-      <defs>
-        <linearGradient id={`${uid}-bar`} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={TONE[series.tone]} stopOpacity="0.95" />
-          <stop offset="100%" stopColor={TONE[series.tone]} stopOpacity="0.35" />
-        </linearGradient>
-      </defs>
-      {[0, 0.5, 1].map((f) => (
-        <line
-          key={f}
-          className="chart-grid"
-          x1={PAD.l}
-          x2={W - PAD.r}
-          y1={y(top * f)}
-          y2={y(top * f)}
-        />
-      ))}
-      <text className="chart-y" x={W - PAD.r} y={y(top) - 3} textAnchor="end">
-        {top}
-      </text>
-      {series.values.map((v, i) => {
-        const h = Math.max(v > 0 ? 4 : 0, H - PAD.b - y(v))
-        return (
+    <div className="chart-wrap" ref={tip.wrap}>
+      <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+        <defs>
+          <linearGradient id={`${uid}-bar`} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={TONE[series.tone]} stopOpacity="0.95" />
+            <stop offset="100%" stopColor={TONE[series.tone]} stopOpacity="0.35" />
+          </linearGradient>
+        </defs>
+        {[0, 0.5, 1].map((f) => (
+          <line
+            key={f}
+            className="chart-grid"
+            x1={PAD.l}
+            x2={W - PAD.r}
+            y1={y(top * f)}
+            y2={y(top * f)}
+          />
+        ))}
+        <text className="chart-y" x={W - PAD.r} y={y(top) - 3} textAnchor="end">
+          {top}
+        </text>
+        {series.values.map((v, i) => {
+          const h = Math.max(v > 0 ? 4 : 0, H - PAD.b - y(v))
+          return (
+            <rect
+              key={months[i]}
+              x={PAD.l + slot * i + (slot - bw) / 2}
+              y={H - PAD.b - h}
+              width={bw}
+              height={h}
+              rx={Math.min(8, bw / 2)}
+              fill={`url(#${uid}-bar)`}
+              className="chart-bar"
+              style={{ animationDelay: `${i * 45}ms` }}
+            />
+          )
+        })}
+        {series.values.map((v, i) => (
           <rect
-            key={months[i]}
-            x={PAD.l + slot * i + (slot - bw) / 2}
-            y={H - PAD.b - h}
-            width={bw}
-            height={h}
-            rx={Math.min(8, bw / 2)}
-            fill={`url(#${uid}-bar)`}
-          >
-            <title>{`${monthName(months[i] ?? '', locale)} — ${series.label}: ${v}`}</title>
-          </rect>
-        )
-      })}
-      {months.map((m, i) =>
-        i % 2 === (months.length % 2 === 0 ? 1 : 0) || i === months.length - 1 ? (
-          <text
-            key={m}
-            className="chart-x"
-            x={PAD.l + slot * i + slot / 2}
-            y={H - 6}
-            textAnchor="middle"
-          >
-            {monthName(m, locale, 'short').replace('.', '')}
-          </text>
-        ) : null,
-      )}
-    </svg>
+            key={`hit-${months[i]}`}
+            className="chart-hit"
+            x={PAD.l + slot * i}
+            y={PAD.t}
+            width={slot}
+            height={H - PAD.b - PAD.t}
+            onPointerEnter={tip.show(
+              `${monthName(months[i] ?? '', locale)} — ${series.label}: ${v}`,
+            )}
+            onPointerMove={tip.show(
+              `${monthName(months[i] ?? '', locale)} — ${series.label}: ${v}`,
+            )}
+            onPointerLeave={tip.hide}
+          />
+        ))}
+        {months.map((m, i) =>
+          i % 2 === (months.length % 2 === 0 ? 1 : 0) || i === months.length - 1 ? (
+            <text
+              key={m}
+              className="chart-x"
+              x={PAD.l + slot * i + slot / 2}
+              y={H - 6}
+              textAnchor="middle"
+            >
+              {monthName(m, locale, 'short').replace('.', '')}
+            </text>
+          ) : null,
+        )}
+      </svg>
+      {tip.bubble}
+    </div>
   )
 }
 
@@ -232,13 +308,14 @@ export function Donut({
   label: string
   total: string
 }) {
+  const tip = useChartTip()
   const sum = parts.reduce((a, p) => a + p.n, 0) || 1
   const r = 52
   const c = 2 * Math.PI * r
   const gap = parts.length > 1 ? 6 : 0
   let acc = 0
   return (
-    <div className="donut">
+    <div className="donut chart-wrap" ref={tip.wrap}>
       <svg viewBox="0 0 140 140" role="img" aria-label={label}>
         <circle className="donut-track" cx="70" cy="70" r={r} />
         {parts.map((p) => {
@@ -253,9 +330,10 @@ export function Donut({
               stroke={TONE[p.tone]}
               strokeDasharray={`${len} ${c - len}`}
               strokeDashoffset={-acc}
-            >
-              <title>{`${p.label}: ${p.n}`}</title>
-            </circle>
+              onPointerEnter={tip.show(`${p.label}: ${p.n}`)}
+              onPointerMove={tip.show(`${p.label}: ${p.n}`)}
+              onPointerLeave={tip.hide}
+            />
           )
           acc += (p.n / sum) * c
           return el
@@ -280,6 +358,7 @@ export function Donut({
           </li>
         ))}
       </ul>
+      {tip.bubble}
     </div>
   )
 }

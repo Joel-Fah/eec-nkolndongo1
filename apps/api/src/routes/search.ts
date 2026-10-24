@@ -7,7 +7,7 @@ import { allow } from '@eec/auth'
 import { closestTitles, normaliseQuery, searchPublic, suggestions } from '@eec/modules/search'
 import { Hono } from 'hono'
 
-const AREAS = ['news', 'events', 'guides', 'departments']
+const AREAS = ['news', 'events', 'sermons', 'guides', 'departments']
 
 export const searchRoutes = new Hono<AppEnv>()
   .get(
