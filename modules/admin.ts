@@ -14,6 +14,7 @@ export const moduleAdmin: Record<string, LazyExoticComponent<ComponentType>> = {
   sermons: lazy(() => import('@eec/module-sermons/admin')),
   meditations: lazy(() => import('@eec/module-meditations/admin')),
   bulletin: lazy(() => import('@eec/module-bulletin/admin')),
+  campaigns: lazy(() => import('@eec/module-campaigns/admin')),
   registrations: lazy(() => import('@eec/module-registrations/admin')),
   story: lazy(() => import('@eec/module-story/admin')),
   schedule: lazy(() => import('@eec/module-schedule/admin')),

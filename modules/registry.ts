@@ -6,6 +6,7 @@
  */
 import { coreModule } from '@eec/auth/core-module'
 import { bulletinModule } from '@eec/module-bulletin'
+import { campaignsModule } from '@eec/module-campaigns'
 import { contactModule } from '@eec/module-contact'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
@@ -33,6 +34,7 @@ export const modules: readonly DefinedModule[] = [
   meditationsModule,
   bulletinModule,
   registrationsModule,
+  campaignsModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

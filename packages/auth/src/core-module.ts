@@ -86,6 +86,10 @@ export const systemRoles = [
       'registrations:manage',
       // The CSV export is for the super admin and the secretariat only (decision 0035).
       'registrations:export',
+      // Moissons: the secretariat defines campaigns and validates what the treasurer entered (decision 0041).
+      'campaigns:read',
+      'campaigns:edit',
+      'campaigns:validate',
     ],
   },
   {
@@ -153,7 +157,8 @@ export const systemRoles = [
     en: 'Treasurer',
     descFr: 'Suit les dons et les finances.',
     descEn: 'Follows gifts and finances.',
-    grants: [],
+    // Enters the amounts of the Moissons; someone else validates them.
+    grants: ['campaigns:read', 'campaigns:progress'],
   },
   {
     key: 'membre',
