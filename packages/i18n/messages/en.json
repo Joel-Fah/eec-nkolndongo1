@@ -997,6 +997,30 @@
         "desc": "RegistrationPage.astro, RegistrationCancelPage.astro; Choice, Field.",
         "use": "Libellés liés, erreurs en role=\"alert\", groupes radio nommés.",
         "a11y": "Linked labels, errors with role=\"alert\", named radio groups."
+      },
+      "basket": {
+        "name": "CampaignPage.astro (.cp-basket, --fill) ; role=\"img\" + aria-label.",
+        "desc": "CampaignPage.astro (.cp-basket, --fill); role=\"img\" + aria-label.",
+        "use": "Équivalent texte : légende « La corbeille se remplit : n % de l’objectif » et le montant en toutes lettres.",
+        "a11y": "Text equivalent: the caption “The basket is filling: n% of the goal” and the amount in full."
+      },
+      "offlinepage": {
+        "name": "src/sw/sw.js, OfflinePage.astro, scripts/pwa.ts ; /fr/hors-ligne/ · /en/offline/.",
+        "desc": "src/sw/sw.js, OfflinePage.astro, scripts/pwa.ts; /fr/hors-ligne/ · /en/offline/.",
+        "use": "La mention est un status ; la liste est une liste de liens.",
+        "a11y": "The notice is a status; the list is a list of links."
+      },
+      "installentry": {
+        "name": "[data-install], [data-install-ios] ; beforeinstallprompt.",
+        "desc": "[data-install], [data-install-ios]; beforeinstallprompt.",
+        "use": "Un vrai bouton, nommé par son texte.",
+        "a11y": "A real button, named by its text."
+      },
+      "taginput": {
+        "name": "TagInput (@eec/content-kit).",
+        "desc": "TagInput (@eec/content-kit).",
+        "use": "Les pastilles sont des boutons ; l’erreur est annoncée (role=\"alert\").",
+        "a11y": "Chips are buttons; the error is announced (role=\"alert\")."
       }
     },
     "rules": {
@@ -2311,5 +2335,17 @@
     "did_you_mean": "Did you mean:",
     "related": "Suggested actions",
     "type_sermons": "Sermons"
+  },
+  "pwa": {
+    "description": "The EEC Nkolndongo 1 parish site: times, calendar, sermons, meditations.",
+    "offline_t": "You are offline",
+    "offline_p": "This page could not be loaded and was not saved on this device. Reconnect, or open a page you have already read below.",
+    "retry": "Try again",
+    "saved_h": "Available offline",
+    "saved_none": "No page is saved yet: the ones you read will be saved automatically.",
+    "from_cache": "Copy saved on this device",
+    "install": "Install the app",
+    "install_ios": "On iPhone: tap “Share”, then “Add to Home Screen”.",
+    "install_done": "App installed"
   }
 }

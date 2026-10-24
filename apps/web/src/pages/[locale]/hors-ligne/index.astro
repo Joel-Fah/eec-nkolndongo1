@@ -1,0 +1,8 @@
+---
+import OfflinePage from '../../../components/content/OfflinePage.astro'
+
+// One address per language: /fr/hors-ligne/ and /en/offline/ (static, so the service worker can keep it at install).
+export const getStaticPaths = () => [{ params: { locale: 'fr' } }]
+---
+
+<OfflinePage />

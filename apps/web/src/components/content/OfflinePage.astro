@@ -1,0 +1,113 @@
+---
+/**
+ * The page shown when the network is down and the page asked for was not saved (decision 0037). It lists, from this device's own
+ * cache, the pages that can still be read. Static: no data, nothing private.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { localeOf, useT } from '../../lib/i18n'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string) => t(`pwa.${key}` as 'site.name')
+---
+
+<Site title={s('offline_t')} noindex letterhead={false}>
+  <section class="off">
+    <Illustration name="news" class="off-art" />
+    <h1>{s('offline_t')}</h1>
+    <p>{s('offline_p')}</p>
+    <div class="off-actions">
+      <Button type="button" data-retry>{s('retry')}</Button>
+    </div>
+    <section class="off-saved" data-saved hidden data-loc={locale} aria-labelledby="off-h">
+      <h2 id="off-h">{s('saved_h')}</h2>
+      <ul data-saved-list></ul>
+    </section>
+    <p class="off-none" data-none hidden>{s('saved_none')}</p>
+  </section>
+</Site>
+
+<script>
+  document.querySelector('[data-retry]')?.addEventListener('click', () => location.reload())
+  const root = document.querySelector<HTMLElement>('[data-saved]')
+  const list = document.querySelector<HTMLElement>('[data-saved-list]')
+  const none = document.querySelector<HTMLElement>('[data-none]')
+  ;(async () => {
+    if (!root || !list || !('caches' in window)) return none && (none.hidden = false)
+    const loc = root.dataset.loc ?? 'fr'
+    const names = (await caches.keys()).filter((n) => n.startsWith('pages-'))
+    const found: { url: string; title: string }[] = []
+    for (const n of names) {
+      const cache = await caches.open(n)
+      for (const req of await cache.keys()) {
+        const path = new URL(req.url).pathname
+        if (!path.startsWith(`/${loc}/`)) continue
+        const res = await cache.match(req)
+        const html = res ? await res.text() : ''
+        const title = /<title>([^<]*)<\/title>/.exec(html)?.[1]?.trim() || path
+        found.push({ url: path, title })
+      }
+    }
+    if (!found.length) return none && (none.hidden = false)
+    for (const f of found) {
+      const li = document.createElement('li')
+      const a = document.createElement('a')
+      a.href = f.url
+      a.textContent = f.title.replace(/&amp;/g, '&').replace(/&#39;/g, '’')
+      li.append(a)
+      list.append(li)
+    }
+    root.hidden = false
+  })()
+</script>
+
+<style>
+  .off {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    width: min(100% - 2rem, 36rem);
+    margin-inline: auto;
+    padding-block: 3rem 5rem;
+    text-align: center;
+  }
+  .off h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  .off :global(.off-art) {
+    width: min(100%, 14rem);
+    height: auto;
+  }
+  .off-saved {
+    display: grid;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: start;
+  }
+  .off-saved h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .off-saved ul {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .off-saved a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    text-decoration: none;
+  }
+  .off-none {
+    color: var(--ink-muted);
+  }
+</style>

@@ -997,6 +997,30 @@
         "desc": "Un formulaire HTML ordinaire qui envoie vers sa propre page : il marche sans JavaScript. Téléphone obligatoire (avec ou sans +237), case d’accord jamais cochée, enfants par prénom et tranche d’âge, page de confirmation avec code, partage WhatsApp et lien d’annulation.",
         "use": "Public registration form",
         "a11y": "A plain HTML form that posts to its own page: it works without JavaScript. Phone required (with or without +237), agreement box never pre-ticked, children by first name and age band, a confirmation page with code, WhatsApp share and cancel link."
+      },
+      "basket": {
+        "name": "Corbeille de la récolte",
+        "desc": "Une corbeille qui se remplit vers l’objectif, à partir des seuls totaux validés : le niveau monte une fois à l’ouverture de la page, les fruits montent avec lui. Sans animation si le mouvement est réduit. Le pourcentage est aussi écrit (légende et étiquette).",
+        "use": "Harvest basket",
+        "a11y": "A basket that fills toward the goal from validated totals only: the level rises once when the page opens and the fruit rides with it. No animation if motion is reduced. The percentage is also written (caption and label)."
+      },
+      "offlinepage": {
+        "name": "Page hors ligne et copie enregistrée",
+        "desc": "Quand le réseau manque, une page déjà lue s’ouvre depuis l’appareil avec la mention « Copie enregistrée sur cet appareil ». Une page jamais lue affiche « Vous êtes hors ligne » et la liste de celles qui sont disponibles. Rien de privé n’est jamais gardé.",
+        "use": "Offline page and saved copy",
+        "a11y": "When the network fails, a page already read opens from the device with “Copy saved on this device”. A page never read shows “You are offline” and the list of those available. Nothing private is ever kept."
+      },
+      "installentry": {
+        "name": "Entrée « Installer l’application »",
+        "desc": "Pas de bannière : une entrée discrète du pied de page, visible seulement quand l’installation est possible ; sur iPhone, une phrase d’explication. Cachée une fois l’application installée.",
+        "use": "“Install the app” entry",
+        "a11y": "No banner: a quiet entry in the footer, visible only when installing is possible; on iPhone, a sentence of instructions. Hidden once the app is installed."
+      },
+      "taginput": {
+        "name": "Saisie par pastilles",
+        "desc": "Des choix tapés un par un : Entrée (ou une virgule) en fait une pastille ; un clic la modifie ; × la supprime ; Retour arrière reprend la dernière. Au moins deux choix peuvent être exigés ; les pastilles s’alignent à gauche.",
+        "use": "Tag entry",
+        "a11y": "Choices typed one by one: Enter (or a comma) makes a chip; a click edits it; × deletes it; Backspace takes the last one back. A minimum of two can be required; chips align left."
       }
     },
     "rules": {
@@ -2311,5 +2335,17 @@
     "did_you_mean": "Vouliez-vous dire :",
     "related": "Actions suggérées",
     "type_sermons": "Prédications"
+  },
+  "pwa": {
+    "description": "Le site de la paroisse EEC Nkolndongo 1 : horaires, agenda, prédications, méditations.",
+    "offline_t": "Vous êtes hors ligne",
+    "offline_p": "Cette page n’a pas pu être chargée et n’a pas été enregistrée sur cet appareil. Reconnectez-vous, ou ouvrez une page déjà lue ci-dessous.",
+    "retry": "Réessayer",
+    "saved_h": "Disponible hors ligne",
+    "saved_none": "Aucune page n’est encore enregistrée : celles que vous lisez le seront automatiquement.",
+    "from_cache": "Copie enregistrée sur cet appareil",
+    "install": "Installer l’application",
+    "install_ios": "Sur iPhone : touchez « Partager », puis « Sur l’écran d’accueil ».",
+    "install_done": "Application installée"
   }
 }

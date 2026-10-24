@@ -98,6 +98,16 @@
   a salted hash is the rate-limit key only.
 - The privacy policy needs a new version when this ships (decision 0033); members are informed.
 
+## Added in Phase 04d — Fête des Moissons campaigns and the offline copy (decisions 0041, 0037)
+- **Campaigns** (module `campaigns`): a goal, and **amounts received** entered by the treasurer with a date, an optional group and
+  an internal note. **No donor is recorded** (no field for one; the form forbids names in the note). **Only validated totals are
+  public**, as sums, never rows. Entering and validating are two different people (the API refuses validating one's own entry);
+  editing a validated amount removes its validation; the audit log carries neither amount nor note. Retention: the totals are the
+  parish's accounts of the festival and are kept with the campaign until staff delete it.
+- **Offline copy** (service worker): public pages you read are kept **on your own device** (up to 40) so they open without network.
+  Nothing private is kept: no admin, no Mon espace, no registration or cancel page, no search, no preview, no `/api` response.
+  Clearing the site's data in the browser removes it. No push notification, no tracking.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.

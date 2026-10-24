@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "biome check .",
-    "typecheck": "astro check"
+    "typecheck": "astro check",
+    "test": "vitest run"
   },
   "dependencies": {
     "@eec/api": "workspace:*",
@@ -32,6 +33,7 @@
     "@tailwindcss/vite": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "4.151.1"
   }
 }

@@ -19,6 +19,17 @@ export type Guide = {
 
 export const GUIDES: Guide[] = [
   {
+    slug: 'campagne-moissons',
+    icon: 'gift',
+    summary: {
+      fr: 'Objectif, sommes saisies puis validées, corbeille publique.',
+      en: 'Goal, amounts entered then validated, public basket.',
+    },
+    title: { fr: 'Suivre la Fête des Moissons', en: 'Follow the Harvest festival' },
+    permission: 'campaigns:read',
+    screens: ['/m/campaigns'],
+  },
+  {
     slug: 'inscriptions',
     icon: 'checklist',
     summary: {

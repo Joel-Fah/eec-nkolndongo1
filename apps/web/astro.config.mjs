@@ -10,6 +10,8 @@ import { headersFile } from '../../packages/api-kit/src/security-headers.ts'
 const site = 'https://eec-nkolndongo1.joelfah2003.workers.dev'
 // `SITE_INDEXABLE=1` at build time = launched. Until then every page, file and header says « do not index ».
 const indexable = process.env.SITE_INDEXABLE === '1'
+// Stamps the service worker so every deploy gets a new one (the commit when CI builds it, the time otherwise).
+const buildId = (process.env.GITHUB_SHA ?? Date.now().toString(36)).slice(0, 12)
 
 export default defineConfig({
   site,
@@ -55,6 +57,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
-    define: { 'import.meta.env.PUBLIC_SITE_INDEXABLE': JSON.stringify(indexable ? '1' : '0') },
+    define: {
+      'import.meta.env.PUBLIC_SITE_INDEXABLE': JSON.stringify(indexable ? '1' : '0'),
+      'import.meta.env.PUBLIC_BUILD_ID': JSON.stringify(buildId),
+    },
   },
 })

@@ -124,6 +124,10 @@ type Id =
   | 'retentionchip'
   | 'checkinlist'
   | 'registerform'
+  | 'basket'
+  | 'offlinepage'
+  | 'installentry'
+  | 'taginput'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -376,6 +380,14 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('checkinlist')}><p class="text-sm text-ink-muted">{t('brand.components.checkinlist.use')}</p></DocBlock>
 
     <DocBlock {...doc('registerform')}><p class="text-sm text-ink-muted">{t('brand.components.registerform.use')}</p></DocBlock>
+
+    <DocBlock {...doc('basket')}><p class="text-sm text-ink-muted">{t('brand.components.basket.use')}</p></DocBlock>
+
+    <DocBlock {...doc('offlinepage')}><p class="text-sm text-ink-muted">{t('brand.components.offlinepage.use')}</p></DocBlock>
+
+    <DocBlock {...doc('installentry')}><p class="text-sm text-ink-muted">{t('brand.components.installentry.use')}</p></DocBlock>
+
+    <DocBlock {...doc('taginput')}><p class="text-sm text-ink-muted">{t('brand.components.taginput.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 
