@@ -1021,6 +1021,18 @@
         "desc": "TagInput (@eec/content-kit).",
         "use": "Les pastilles sont des boutons ; l’erreur est annoncée (role=\"alert\").",
         "a11y": "Chips are buttons; the error is announced (role=\"alert\")."
+      },
+      "sundaychips": {
+        "name": ".sun-chip (modules/sundays) ; SUNDAY_PURPOSES (@eec/core).",
+        "desc": ".sun-chip (modules/sundays); SUNDAY_PURPOSES (@eec/core).",
+        "use": "Radio nommé « Objet » ; la pastille cochée est surlignée et en gras.",
+        "a11y": "Radio group named “Purpose”; the checked chip is highlighted and bold."
+      },
+      "trendbars": {
+        "name": ".sun-bar, .sun-num (apps/admin).",
+        "desc": ".sun-bar, .sun-num (apps/admin).",
+        "use": "Chaque barre a un équivalent texte (role=\"img\" + aria-label) et ses chiffres.",
+        "a11y": "Each bar has a text equivalent (role=\"img\" + aria-label) and its numbers."
       }
     },
     "rules": {

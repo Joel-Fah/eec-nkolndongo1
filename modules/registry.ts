@@ -22,6 +22,7 @@ import { scheduleModule } from '@eec/module-schedule'
 import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
 import { storyModule } from '@eec/module-story'
+import { sundaysModule } from '@eec/module-sundays'
 import type { DefinedModule } from '@eec/modules-kit'
 
 export const modules: readonly DefinedModule[] = [
@@ -35,6 +36,7 @@ export const modules: readonly DefinedModule[] = [
   bulletinModule,
   registrationsModule,
   campaignsModule,
+  sundaysModule,
   eventsModule,
   scheduleModule,
   liturgyModule,

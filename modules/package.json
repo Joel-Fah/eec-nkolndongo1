@@ -36,6 +36,7 @@
     "@eec/module-bulletin": "workspace:*",
     "@eec/module-registrations": "workspace:*",
     "@eec/module-campaigns": "workspace:*",
+    "@eec/module-sundays": "workspace:*",
     "@eec/module-story": "workspace:*",
     "@eec/module-schedule": "workspace:*",
     "@eec/module-settings": "workspace:*",

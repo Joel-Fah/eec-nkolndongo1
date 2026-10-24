@@ -294,5 +294,61 @@ const stamp = Date.now().toString(36)
   await api(`/campaigns/${cid}`, { method: 'DELETE' })
 }
 
+// 9. Sunday report: attendance, an offering line, a Moissons line feeds ONE unvalidated campaign entry, closing locks the Sunday
+{
+  const hints = (await api('/sundays/hints')).json as { lastSunday: string }
+  const day = hints.lastSunday
+  const c = await api('/campaigns', {
+    method: 'POST',
+    body: JSON.stringify({
+      titleFr: `E2E — dimanche ${stamp}`,
+      startsOn: '2099-01-01',
+      endsOn: '2099-01-08',
+    }),
+  })
+  const cid = c.json.id as string
+  const att = await api(`/sundays/reports/${day}/attendance`, {
+    method: 'PUT',
+    body: JSON.stringify({ men: 10, women: 12, children: 5 }),
+  })
+  ok('sundays: attendance is saved', att.status === 200)
+  const bad = await api('/sundays/reports/2026-10-24/attendance', {
+    method: 'PUT',
+    body: JSON.stringify({ men: 1 }),
+  })
+  ok('sundays: a date that is not a Sunday is refused', bad.status === 400)
+  const line = await api(`/sundays/reports/${day}/offerings`, {
+    method: 'POST',
+    body: JSON.stringify({ purpose: 'moissons', amountXaf: 7777, groupId: null, campaignId: cid }),
+  })
+  const entries = (await api(`/campaigns/${cid}/progress`)).json.items as {
+    amountXaf: number
+    validated: boolean
+  }[]
+  ok(
+    'sundays: a Moissons line creates one unvalidated campaign entry',
+    line.status === 201 && entries.length === 1 && entries[0]?.validated === false,
+  )
+  await api(`/sundays/reports/${day}/close`, {
+    method: 'POST',
+    body: JSON.stringify({ closed: true }),
+  })
+  const locked = await api(`/sundays/reports/${day}/attendance`, {
+    method: 'PUT',
+    body: JSON.stringify({ men: 11 }),
+  })
+  ok('sundays: a closed Sunday refuses changes', locked.status === 409)
+  await api(`/sundays/reports/${day}/close`, {
+    method: 'POST',
+    body: JSON.stringify({ closed: false }),
+  })
+  await api(`/sundays/offerings/${line.json.id}`, { method: 'DELETE' })
+  ok(
+    'sundays: deleting the line removes the unvalidated entry',
+    ((await api(`/campaigns/${cid}/progress`)).json.items as unknown[]).length === 0,
+  )
+  await api(`/campaigns/${cid}`, { method: 'DELETE' })
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

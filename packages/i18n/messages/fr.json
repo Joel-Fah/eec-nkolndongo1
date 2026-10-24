@@ -1021,6 +1021,18 @@
         "desc": "Des choix tapés un par un : Entrée (ou une virgule) en fait une pastille ; un clic la modifie ; × la supprime ; Retour arrière reprend la dernière. Au moins deux choix peuvent être exigés ; les pastilles s’alignent à gauche.",
         "use": "Tag entry",
         "a11y": "Choices typed one by one: Enter (or a comma) makes a chip; a click edits it; × deletes it; Backspace takes the last one back. A minimum of two can be required; chips align left."
+      },
+      "sundaychips": {
+        "name": "Choix de l’objet par pastilles",
+        "desc": "L’objet d’une offrande se choisit parmi des pastilles (les objets récurrents d’abord, puis ceux déjà saisis, puis « Autre… » pour un texte libre). Une pastille est un vrai bouton radio : clavier et lecteur d’écran fonctionnent.",
+        "use": "Purpose chips",
+        "a11y": "The purpose of an offering is chosen among chips (recurring purposes first, then those already used, then “Other…” for free text). A chip is a real radio button: keyboard and screen readers work."
+      },
+      "trendbars": {
+        "name": "Barres de tendance avec leurs chiffres",
+        "desc": "Une barre par période, les chiffres écrits à côté (jamais la barre seule), la variation par rapport à la période d’avant. Présences en trois couleurs (hommes, femmes, enfants), offrandes en or.",
+        "use": "Trend bars with their numbers",
+        "a11y": "One bar per period with the numbers written beside it (never the bar alone) and the change from the period before. Attendance in three colours (men, women, children), offerings in gold."
       }
     },
     "rules": {

@@ -128,6 +128,8 @@ type Id =
   | 'offlinepage'
   | 'installentry'
   | 'taginput'
+  | 'sundaychips'
+  | 'trendbars'
 const demoPhotos = peoplePhotos().slice(0, 3)
 const shapeIds = Object.keys(shapes) as ShapeId[]
 const chartMonths = Array.from({ length: 12 }, (_, i) =>
@@ -388,6 +390,10 @@ const doc = (id: Id) => ({
     <DocBlock {...doc('installentry')}><p class="text-sm text-ink-muted">{t('brand.components.installentry.use')}</p></DocBlock>
 
     <DocBlock {...doc('taginput')}><p class="text-sm text-ink-muted">{t('brand.components.taginput.use')}</p></DocBlock>
+
+    <DocBlock {...doc('sundaychips')}><p class="text-sm text-ink-muted">{t('brand.components.sundaychips.use')}</p></DocBlock>
+
+    <DocBlock {...doc('trendbars')}><p class="text-sm text-ink-muted">{t('brand.components.trendbars.use')}</p></DocBlock>
 
     <DocBlock {...doc('mapillustration')}><p class="text-sm text-ink-muted">{t('brand.components.mapillustration.use')}</p></DocBlock>
 

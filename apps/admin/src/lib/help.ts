@@ -19,6 +19,17 @@ export type Guide = {
 
 export const GUIDES: Guide[] = [
   {
+    slug: 'bilan-dimanche',
+    icon: 'chart',
+    summary: {
+      fr: 'Présences et offrandes de chaque dimanche, puis les tendances.',
+      en: 'Each Sunday’s attendance and offerings, then the trends.',
+    },
+    title: { fr: 'Saisir le bilan du dimanche', en: 'Enter the Sunday report' },
+    permission: 'sundays:read',
+    screens: ['/m/sundays'],
+  },
+  {
     slug: 'campagne-moissons',
     icon: 'gift',
     summary: {

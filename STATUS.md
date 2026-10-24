@@ -20,6 +20,8 @@ in the admin, open and members-only forms, CSV export for super admin + secretar
 works without JavaScript). Migration 0024 (additive) applied on dev only. Everything printed carries the logomark and full names.
 **Checkpoint D built on dev (2026-10-24):** campaigns (decision 0041, migration 0028), PWA (decision 0037), scope-matrix and e2e
 extensions; details in `docs/phases/PHASE_04_REPORT.md`. Production steps and real-phone tests are Joël's.
+**Checkpoint E (2026-10-24):** the Moissons page for members in season (0042), Sunday reports with trends (module `sundays`, 0043, migration 0029),
+the site opening on Ce dimanche on Sundays. Details in the report. Dashboard card for Sunday reports not done.
 **Known gaps:** « Mes inscriptions » in Mon espace; per-event `.ics` on the confirmation page (the event page has it); the
 Hébreux 8, 19 typo in the parish's 2026 calendar (real error, flagged by the new checks).
 **Next:** Joël's review of A, B and C → PR 04a (merge = production deploy, after a Neon backup branch) → Checkpoint B (sermons + podcast:

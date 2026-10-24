@@ -90,6 +90,11 @@ export const systemRoles = [
       'campaigns:read',
       'campaigns:edit',
       'campaigns:validate',
+      // Sunday reports: the secretariat enters attendance and closes the Sunday (decision 0043).
+      'sundays:read',
+      'sundays:attendance',
+      'sundays:close',
+      'sundays:export',
     ],
   },
   {
@@ -132,7 +137,8 @@ export const systemRoles = [
     descFr:
       'Un pasteur ou une pasteure. Sans droit d’administration : sert à proposer les noms pour la prédication.',
     descEn: 'A pastor. No admin rights: used to suggest names for preaching.',
-    grants: [] as string[],
+    // Reads the Sunday reports and trends (decision 0043).
+    grants: ['sundays:read'] as string[],
   },
   {
     key: 'responsable-groupe',
@@ -146,6 +152,7 @@ export const systemRoles = [
       'news:edit',
       'departments:read',
       'departments:update',
+      'sundays:read',
       'registrations:read',
       'registrations:edit',
       'registrations:manage',
@@ -158,7 +165,7 @@ export const systemRoles = [
     descFr: 'Suit les dons et les finances.',
     descEn: 'Follows gifts and finances.',
     // Enters the amounts of the Moissons; someone else validates them.
-    grants: ['campaigns:read', 'campaigns:progress'],
+    grants: ['campaigns:read', 'campaigns:progress', 'sundays:read', 'sundays:offerings'],
   },
   {
     key: 'membre',

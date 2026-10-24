@@ -128,3 +128,29 @@ is plain text/links; chips are buttons. Not done: TalkBack and real-phone keyboa
 **Still open (Joël):** real-phone offline/install/LCP/TalkBack passes; production steps (backup branch, `db:seed`, `bible:seed`,
 role grants, `CF_ANALYTICS_TOKEN`), PR #6 merge decision, CPU readings on production (0027), egress projection (sermons are links
 only, so media egress is unchanged), Rich Results test.
+
+
+## Checkpoint E — Moissons experience, Sunday reports, open on Sundays (built on dev, 2026-10-24)
+
+**Moissons page (decision 0042).** Members only, in season only (two weeks before to a week after; menu/footer entries and the Donner
+block appear only then, from an amount-free teaser JSON). Visitors get a warm teaser with no amount; out of season a « see you next year »
+page. Under the unchanged hero, one calm story: the basket fills and the fruit land while the amount counts up (the only place progress
+appears), groups as small drifting baskets (a word on hover, never compared), the week's events as a ribbon, giving simply, a closing
+invitation with the share card. `/api/me/membership`; the page is `private, no-store`, `noindex`, and added to the service worker's
+private list (tested). Static under reduced motion; no motion library (IntersectionObserver + rAF + CSS). Checked: visitor sees no
+amount, member sees the story (screenshots at 1280 and 390, no overflow), out-of-season state.
+
+**Sunday reports (decision 0043, module `sundays`, migration 0029).** Attendance (men, women, children) and offering lines (preset or free
+purpose, amount, group or the congregation) per Sunday; the secretariat enters attendance and closes the Sunday, the treasurer enters
+offerings, a group leader only their group's lines (and no attendance). A « moissons » line may name a campaign and then keeps ONE
+unvalidated entry there (raw SQL by table name, no cross-module import): editing the amount un-validates it, deleting the line removes it
+while unvalidated. Trends by week or month with change vs the previous period, totals by purpose and by group, CSV export (secretariat +
+super admin, audited by row count, no figures in the audit). Never public. Tests: rules (9), scope matrix picks the module up, e2e (5 new
+checks, all pass). **Not done:** the « Dimanche dernier » card on the main dashboard (the module has its own Trends tab; the admin charts
+live in the app and modules may not import the app: moving them to a shared package is the clean way).
+
+**Open on Sunday.** `/` redirects to « Ce dimanche » the first time each Sunday (parish time) and sets a cookie until that night, so later
+visits open the home; `/fr/` and `/en/` are never redirected (`openOnSunday`, unit-tested).
+
+**Grants to give on every environment (Rôles):** treasurer `campaigns:read/progress`, `sundays:read/offerings`; secretariat `campaigns:read/edit/validate`,
+`sundays:read/attendance/close/export`, `registrations:*`; pastor `sundays:read`; group leader `sundays:read` (+ `sundays:offerings` for their group if wanted).

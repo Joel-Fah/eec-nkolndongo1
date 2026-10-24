@@ -1,0 +1,23 @@
+# Saisir le bilan du dimanche
+
+## Ce que c'est
+
+Le **bilan du dimanche** garde, pour chaque dimanche, le **nombre de personnes** (hommes, femmes, enfants) et les **offrandes** avec leur **objet** (offrande ordinaire, dîme, travaux, Moissons, ou un objet libre comme la Réformation). Ce sont des **totaux** : jamais un nom, jamais un donateur. **Rien n'est public.** Ces chiffres servent à voir les **tendances**, par semaine ou par mois.
+
+## Pas à pas
+
+1. Ouvrez **Bilan du dimanche**, puis **Dimanche dernier** (ou choisissez une autre date : ce doit être un dimanche).
+2. **Secrétariat** : dans **Présences**, saisissez hommes, femmes, enfants. Pour un dimanche particulier, cochez **Dimanche spécial** et donnez son nom.
+3. **Trésorier** : dans **Offrandes**, choisissez l'**objet** (ou « Autre… » pour un objet libre, proposé ensuite à chaque fois), le montant et, si l'offrande est pour un groupe, le groupe. **Sans groupe, c'est l'assemblée.**
+4. Pour une offrande **Moissons**, choisissez la campagne : la somme est aussi proposée à la **validation** dans la campagne et ne compte dans le total public qu'une fois validée.
+5. **Secrétariat** : **Clôturer ce dimanche** quand tout est vérifié. On peut le rouvrir.
+
+## Les tendances
+
+Onglet **Tendances** : présences et offrandes par mois ou par semaine, avec la variation par rapport à la période précédente, le total par objet et par groupe. **Exporter (CSV)** est réservé au secrétariat et au super administrateur.
+
+## Bon à savoir
+
+- Un responsable de groupe ne voit que les offrandes de **son** groupe, et pas les présences.
+- La note interne ne doit nommer personne.
+- Les droits se donnent dans **Rôles** (secrétariat : lire, présences, clôturer, exporter ; trésorier : lire, offrandes).
