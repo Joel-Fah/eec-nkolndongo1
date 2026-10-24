@@ -69,7 +69,7 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
           <ul class="grid gap-1" role="list">
             {tab.children.map((child) => (
               <li>
-                <a class="footer-link" href={href(locale, `${tab.slug[locale]}/${child.slug[locale]}`)}>
+                <a class="footer-link" href={href(locale, `${tab.slug[locale]}/${child.slug[locale]}`)} data-season-link={child.id === 'moissons' ? 'moissons' : undefined}>
                   {t(labelKey(child.id))}
                 </a>
               </li>
@@ -104,9 +104,12 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 <script>
   import { applyHomeSlots } from '../lib/home-slots-client'
   import { applyPublicSettings } from '../lib/settings-client'
+  import { applySeasonLinks } from '../lib/season-client'
   import { initPwa } from '../scripts/pwa'
   initPwa()
   applyPublicSettings()
+  applySeasonLinks()
+  document.addEventListener('astro:page-load', applySeasonLinks)
   applyHomeSlots()
   document.addEventListener('astro:page-load', applyPublicSettings)
   document.addEventListener('astro:page-load', applyHomeSlots)

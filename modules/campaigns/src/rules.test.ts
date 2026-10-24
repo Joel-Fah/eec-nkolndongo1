@@ -4,6 +4,7 @@ import {
   daysLeft,
   daysUntil,
   fillOf,
+  inSeason,
   mayValidate,
   percentOf,
   phaseOf,
@@ -59,5 +60,14 @@ describe('money and who may validate', () => {
     })
     expect(svg).not.toContain('<script>')
     expect(svg).toContain('50 %')
+  })
+})
+
+describe('the season of the page', () => {
+  it('starts two weeks before and ends a week after', () => {
+    expect(inSeason('2026-11-01', '2026-11-08', '2026-10-17')).toBe(false)
+    expect(inSeason('2026-11-01', '2026-11-08', '2026-10-18')).toBe(true)
+    expect(inSeason('2026-11-01', '2026-11-08', '2026-11-15')).toBe(true)
+    expect(inSeason('2026-11-01', '2026-11-08', '2026-11-16')).toBe(false)
   })
 })

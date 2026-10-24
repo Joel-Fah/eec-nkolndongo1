@@ -25,13 +25,15 @@ const [settings, story, camp] = await Promise.all([
     '/api/settings/public',
   ),
   publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
-  publicJson<{ campaign: { title: string; phase: string; percent: number } | null }>(
+  publicJson<{ campaign: { title: string; inSeason: boolean; phase: string } | null }>(
     Astro,
     `/api/campaigns/public/current?locale=${locale}`,
   ),
 ])
 const campaign =
-  camp.state === 'ok' && camp.data.campaign?.phase === 'during' ? camp.data.campaign : null
+  camp.state === 'ok' && camp.data.campaign?.phase === 'during' && camp.data.campaign.inSeason
+    ? camp.data.campaign
+    : null
 const moissonsPath = href(locale, pages.find((p) => p.id === 'moissons')?.path[locale] ?? '')
 const g = settings.state === 'ok' ? (settings.data.giving ?? {}) : {}
 const season = settings.state === 'ok' ? (settings.data.season ?? {}) : {}
@@ -74,7 +76,7 @@ Astro.response.headers.set(
           <a class="gv-camp" href={moissonsPath}>
             <span class="gv-camp-k">{t('campaigns.site.give_block_k' as 'campaigns.site.kicker')}</span>
             <strong>{campaign.title}</strong>
-            <span>{t('campaigns.site.percent' as 'campaigns.site.kicker', { p: String(campaign.percent) })} · {t('campaigns.site.give_block_go' as 'campaigns.site.kicker')}</span>
+            <span>{t('campaigns.site.give_block_go' as 'campaigns.site.kicker')}</span>
           </a>
         )}
         <section class="gv-thanks">

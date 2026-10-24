@@ -32,6 +32,27 @@ export async function publicJson<T>({ url, locals }: Ctx, path: string): Promise
   }
 }
 
+/** Is this visitor a signed-in member? Asked with their own cookies (the page that uses it must be `private, no-store`). */
+export async function isMember({
+  url,
+  locals,
+  request,
+}: Ctx & { request: Request }): Promise<boolean> {
+  try {
+    const headers = new Headers({ origin: url.origin })
+    for (const name of ['cookie', 'cf-connecting-ip', 'x-forwarded-for', 'user-agent'])
+      if (request.headers.has(name)) headers.set(name, request.headers.get(name) as string)
+    const res = await app.fetch(
+      new Request(new URL('/api/me/membership', url), { headers }),
+      env as unknown as Env,
+      (locals as { cfContext?: ExecutionContext }).cfContext,
+    )
+    return res.ok && ((await res.json()) as { member?: boolean }).member === true
+  } catch {
+    return false
+  }
+}
+
 /**
  * A form posted to the page (a registration, a cancellation) goes to the same API, in the same Worker, with what the API's
  * checks need: the page's origin (CSRF), the visitor's address (rate limit) and cookies (a signed-in member). No JavaScript needed.

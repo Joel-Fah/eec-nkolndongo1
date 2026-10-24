@@ -25,6 +25,7 @@ import {
   amountOk,
   daysLeft,
   daysUntil,
+  inSeason,
   mayValidate,
   percentOf,
   phaseOf,
@@ -156,6 +157,7 @@ async function publicCurrent(db: Db, locale: Locale, today: string, asOf?: strin
       startsOn: c.startsOn,
       endsOn: c.endsOn,
       phase,
+      inSeason: inSeason(c.startsOn, c.endsOn, today),
       daysLeft: phase === 'during' ? daysLeft(c.endsOn, today) : 0,
       daysUntil: phase === 'before' ? daysUntil(c.startsOn, today) : 0,
       goal: c.goalXaf,
@@ -230,6 +232,33 @@ export const campaignsApi = new Hono<AppEnv>()
       ttl: 60,
       keep: 60 * 60 * 24 * 3,
       load: (db) => publicCurrent(db, locale, today),
+    })
+  })
+  // For visitors and the menu: is there a campaign to show, and its name and dates. NO amount (decision 0042).
+  .get('/public/teaser', async (c) => {
+    const locale = localeOf(c.req.query('locale'))
+    const today = todayLocal()
+    const version = await versionFor(c.var.deps.db, AREA, c.var.deps.timeoutMs)
+    return cachedJson(c, {
+      key: `campaigns/teaser/${locale}/${today}/v${version}`,
+      ttl: 120,
+      keep: 60 * 60 * 24 * 3,
+      load: async (db) => {
+        const k = (await publicCurrent(db, locale, today)).campaign
+        if (!k) return { campaign: null }
+        return {
+          campaign: {
+            title: k.title,
+            startsOn: k.startsOn,
+            endsOn: k.endsOn,
+            phase: k.phase,
+            inSeason: k.inSeason,
+            daysUntil: k.daysUntil,
+            daysLeft: k.daysLeft,
+            cover: k.cover,
+          },
+        }
+      },
     })
   })
   .get('/public/share.svg', async (c) => {

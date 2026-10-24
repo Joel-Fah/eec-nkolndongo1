@@ -68,7 +68,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                             const to = href(locale, `${slug}/${child.slug[locale]}`)
                             return (
                               <li>
-                                <a class="mega-item" data-i={i} href={to} aria-current={current.startsWith(to) ? 'page' : undefined}>
+                                <a class="mega-item" data-i={i} href={to} data-season-link={child.id === 'moissons' ? 'moissons' : undefined} aria-current={current.startsWith(to) ? 'page' : undefined}>
                                   <span class="mega-icon"><Icon name={child.icon} size={20} /></span>
                                   <span class="mega-text">
                                     <span class="mega-label">{t(labelKey(child.id))}</span>
@@ -150,7 +150,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
                 <ul class="mobile-sub" role="list">
                   {tab.children.map((child) => (
                     <li>
-                      <a class="mega-item" href={href(locale, `${slug}/${child.slug[locale]}`)} aria-current={current.startsWith(href(locale, `${slug}/${child.slug[locale]}`)) ? 'page' : undefined}>
+                      <a class="mega-item" data-season-link={child.id === 'moissons' ? 'moissons' : undefined} href={href(locale, `${slug}/${child.slug[locale]}`)} aria-current={current.startsWith(href(locale, `${slug}/${child.slug[locale]}`)) ? 'page' : undefined}>
                         <span class="mega-icon"><Icon name={child.icon} size={20} /></span>
                         <span class="mega-text"><span class="mega-label">{t(labelKey(child.id))}</span><span class="mega-desc">{t(descKey(child.id))}</span></span>
                       </a>
@@ -633,6 +633,9 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
     display: grid;
     align-content: start;
     gap: 0.125rem;
+  }
+  [data-season-link]:not([data-on]) {
+    display: none !important;
   }
   .mega-item {
     display: flex;

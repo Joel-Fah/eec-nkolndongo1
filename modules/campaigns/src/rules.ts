@@ -5,6 +5,18 @@ const ms = (d: string) => Date.parse(`${d}T00:00:00Z`)
 
 export const phaseOf = (startsOn: string, endsOn: string, today: string): Phase =>
   today < startsOn ? 'before' : today > endsOn ? 'after' : 'during'
+/** Is the campaign's page to be shown? From two weeks before it starts to a week after it ends (decision 0042). */
+export function inSeason(
+  startsOn: string,
+  endsOn: string,
+  today: string,
+  lead = 14,
+  grace = 7,
+): boolean {
+  const day = (d: string, n: number) =>
+    new Date(Date.parse(`${d}T12:00:00Z`) + n * DAY).toISOString().slice(0, 10)
+  return today >= day(startsOn, -lead) && today <= day(endsOn, grace)
+}
 /** Whole days left including the last day (0 once it is over); before the start, days until it begins are `daysUntil`. */
 export const daysLeft = (endsOn: string, today: string) =>
   Math.max(Math.round((ms(endsOn) - ms(today)) / DAY) + 1, 0)
