@@ -204,6 +204,13 @@
       "when": 1792852080149,
       "tag": "0028_lowly_sharon_ventura",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792877922153,
+      "tag": "0029_careless_bug",
+      "breakpoints": true
     }
   ]
 }
