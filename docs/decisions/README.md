@@ -45,3 +45,5 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0040 | A role and a screen for the content partner to validate and comment | Accepted |
 | 0037 | PWA: manifest and a small hand-written service worker, nothing private cached | Accepted |
 | 0041 | Campaigns (Moissons): validated totals only, entered and validated by two people | Accepted |
+| 0042 | The Moissons page: members only, in season, one immersive story | Accepted |
+| 0043 | Sunday reports: attendance and offerings as aggregates, two roles | Accepted |

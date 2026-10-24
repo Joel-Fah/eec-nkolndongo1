@@ -108,6 +108,17 @@
   Nothing private is kept: no admin, no Mon espace, no registration or cancel page, no search, no preview, no `/api` response.
   Clearing the site's data in the browser removes it. No push notification, no tracking.
 
+## Added in Phase 04e — Sunday reports and the members' Moissons page (decisions 0043, 0042)
+- **Sunday reports** (module `sundays`): three attendance counts (men, women, children) and offering lines (purpose, amount, optional
+  group, optional campaign) per Sunday. **Aggregates only**: no name, no donor, no link to a member. The internal note must not name
+  anyone. Entered by the secretariat (attendance) and the treasurer (offerings); group leaders see only their group's lines; the CSV
+  export is for the super admin and the secretariat and is audited by row count. **Never public.** The audit log carries no figures.
+  A Moissons offering linked to a campaign becomes an unvalidated campaign entry, public only as part of a validated total.
+- **Moissons page for members**: shown only to signed-in members and only in season; visitors see no amounts. `private, no-store`,
+  `noindex`, never kept by the offline copy.
+- **Opening on Sunday**: a session cookie `eec-sun` (the day's date, expires that night) remembers that the visitor was already
+  taken to « Ce dimanche » today. It holds no identifier.
+
 ## Explicitly out of scope until a decision record exists
 Baptism/marriage registers, counselling/délivrance notes, health information, minors' data beyond
 what a parent provides for a specific activity.
