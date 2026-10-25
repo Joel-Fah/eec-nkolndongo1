@@ -10,8 +10,8 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import sharp from 'sharp'
-import { abstractArt } from '../packages/ui/src/abstract-art.ts'
 import { AVATAR_VARIANTS, AVATARS, BANNERS } from '../apps/web/src/lib/social-kit.ts'
+import { abstractArt } from '../packages/ui/src/abstract-art.ts'
 
 const root = join(import.meta.dirname, '..')
 const require = createRequire(join(root, 'scripts/.cache/pw/'))
@@ -88,7 +88,12 @@ async function avatar(size: number, variant: (typeof AVATAR_VARIANTS)[number]) {
     .png()
     .toBuffer()
   return sharp({
-    create: { width: size, height: size, channels: 4, background: variant === 'green' ? '#1F5C3A' : '#FBF8F1' },
+    create: {
+      width: size,
+      height: size,
+      channels: 4,
+      background: variant === 'green' ? '#1F5C3A' : '#FBF8F1',
+    },
   })
     .composite([{ input: art, gravity: 'center' }])
     .png({ compressionLevel: 9 })
