@@ -196,7 +196,7 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                           {periodText(ym, 'month', locale)}
                           <span>{items.length}</span>
                         </h2>
-                        <ul className="admin-grid-3">
+                        <ul className="admin-grid-4">
                           {items.map((r) => (
                             <li key={r.id}>
                               <button
