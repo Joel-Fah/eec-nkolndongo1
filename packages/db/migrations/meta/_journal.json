@@ -232,6 +232,13 @@
       "when": 1792927315259,
       "tag": "0032_right_korvac",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792930016227,
+      "tag": "0033_sticky_the_call",
+      "breakpoints": true
     }
   ]
 }

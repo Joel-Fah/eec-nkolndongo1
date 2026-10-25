@@ -203,3 +203,16 @@ export const notifications = pgTable(
     index('notifications_user_idx').on(t.userId, t.createdAt),
   ],
 )
+
+/** Notification kinds a person has silenced (decision 0046). One row per person and kind; no row = not muted. */
+export const notificationMutes = pgTable(
+  'notification_mutes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('notification_mutes_idx').on(t.userId, t.kind)],
+)
