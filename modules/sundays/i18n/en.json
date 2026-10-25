@@ -67,5 +67,8 @@
   "year_pick": "Choose the year",
   "month_h": "Month",
   "view_numbers": "View the chart’s numbers",
-  "vs_previous": "vs previous Sunday"
+  "vs_previous": "vs previous Sunday",
+  "trend_up": "up",
+  "trend_down": "down",
+  "trend_flat": "steady"
 }

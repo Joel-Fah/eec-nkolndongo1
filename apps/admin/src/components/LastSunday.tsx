@@ -15,10 +15,10 @@ type Item = {
   services: number
 }
 const k = (key: string) => `sundays.${key}` as MessageKey
-const xaf = (n: number) =>
-  `${Math.round(n)
+const grouped = (n: number) =>
+  Math.round(n)
     .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} FCFA`
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f')
 
 /** The last Sunday's report on the dashboard: attendance and offerings with their change from the Sunday before (decision 0043). */
 export function LastSunday() {
@@ -46,10 +46,17 @@ export function LastSunday() {
             n: now.attendance,
             prev: before?.attendance ?? 0,
             text: String(now.attendance),
+            unit: '',
           },
         ]
       : []),
-    { key: 'offerings', n: now.offerings, prev: before?.offerings ?? 0, text: xaf(now.offerings) },
+    {
+      key: 'offerings',
+      n: now.offerings,
+      prev: before?.offerings ?? 0,
+      text: grouped(now.offerings),
+      unit: 'FCFA',
+    },
   ]
   return (
     <section className="grid gap-4" aria-labelledby="lastsun-title">
@@ -69,7 +76,10 @@ export function LastSunday() {
       <div className="grid gap-4 sm:grid-cols-3">
         {cards.map((c) => (
           <div key={c.key} className="stat-card">
-            <p className={`stat-number${c.key === 'offerings' ? ' sun-money' : ''}`}>{c.text}</p>
+            <p className="stat-number">
+              {c.text}
+              {c.unit && <small className="stat-unit">{c.unit}</small>}
+            </p>
             <p className="text-sm text-ink-muted">{t(k(c.key))}</p>
             {before && <TrendBadge current={c.n} previous={c.prev} label={t(k('vs_previous'))} />}
           </div>

@@ -2,7 +2,15 @@
  * Bilan du dimanche (admin, /m/sundays): each Sunday's attendance (men, women, children: aggregates only) and offering lines
  * (a purpose, an amount, a group or the congregation), then the weekly and monthly trends. Nothing here is ever public (decision 0043).
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import {
+  AreaChart,
+  api,
+  ChartCard,
+  hasPermission,
+  type Series,
+  useLocale,
+  useMe,
+} from '@eec/admin-kit'
 import { ConfirmDialog } from '@eec/content-kit'
 import { purposeLabel, SUNDAY_PURPOSES } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
@@ -106,8 +114,26 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
     queryKey: ['sun-reports'],
     queryFn: () => api<{ items: Report[] }>('/sundays/reports'),
   })
+  const me = useMe().data
   const [pick, setPick] = useState('')
   const last = hints.data?.lastSunday
+  // The Sundays, a month at a time (newest first).
+  const months = [
+    ...(list.data?.items ?? []).reduce(
+      (m, r) => m.set(r.date.slice(0, 7), [...(m.get(r.date.slice(0, 7)) ?? []), r]),
+      new Map<string, Report[]>(),
+    ),
+  ]
+  const exportCsv = async () => {
+    const res = await fetch('/api/sundays/export.csv', { credentials: 'include' })
+    if (!res.ok) return say(t(k('error')), 'danger')
+    const url = URL.createObjectURL(await res.blob())
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'bilans-dimanche.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
   return (
     <div className="grid gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -115,12 +141,20 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
           <h1 className="text-4xl">{t(k('title'))}</h1>
           <p className="text-ink-muted">{t(k('lead'))}</p>
         </div>
-        {last && (
-          <Button onClick={() => onOpen(last)}>
-            <Icon name="plus" size={20} />
-            {t(k('last_sunday'), { date: dayText(last, locale, false) })}
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {hasPermission(me, 'sundays:export') && (
+            <Button variant="secondary" onClick={exportCsv}>
+              <Icon name="download" size={20} />
+              {t(k('export'))}
+            </Button>
+          )}
+          {last && (
+            <Button onClick={() => onOpen(last)}>
+              <Icon name="plus" size={20} />
+              {t(k('last_sunday'), { date: dayText(last, locale, false) })}
+            </Button>
+          )}
+        </div>
       </header>
       <TabsBox
         tabs={[
@@ -150,36 +184,50 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                 {list.data && list.data.items.length === 0 ? (
                   <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />
                 ) : (
-                  <ul className="admin-grid-3">
-                    {(list.data?.items ?? []).map((r) => (
-                      <li key={r.id}>
-                        <button
-                          type="button"
-                          className="admin-panel plan-tile"
-                          onClick={() => onOpen(r.date)}
-                        >
-                          <span className="flex flex-wrap items-center gap-2">
-                            {r.closed && <Badge tone="success">{t(k('closed'))}</Badge>}
-                            {r.serviceKind === 'special' && (
-                              <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
-                            )}
-                            {r.services > 1 && (
-                              <Badge>{t(k('services_n'), { n: String(r.services) })}</Badge>
-                            )}
-                          </span>
-                          <strong className="font-display text-2xl">
-                            {dayText(r.date, locale)}
-                          </strong>
-                          {r.attendance !== null && (
-                            <span className="text-sm">
-                              {t(k('present_n'), { n: String(r.attendance) })}
-                            </span>
-                          )}
-                          <span className="text-sm text-ink-muted">{xaf(r.offerings)}</span>
-                        </button>
-                      </li>
+                  <div className="grid gap-6">
+                    {months.map(([ym, items]) => (
+                      <section
+                        key={ym}
+                        className="grid gap-3"
+                        aria-label={periodText(ym, 'month', locale)}
+                      >
+                        <h2 className="sermon-month">
+                          {periodText(ym, 'month', locale)}
+                          <span>{items.length}</span>
+                        </h2>
+                        <ul className="admin-grid-3">
+                          {items.map((r) => (
+                            <li key={r.id}>
+                              <button
+                                type="button"
+                                className="admin-panel plan-tile"
+                                onClick={() => onOpen(r.date)}
+                              >
+                                <span className="flex flex-wrap items-center gap-2">
+                                  {r.closed && <Badge tone="success">{t(k('closed'))}</Badge>}
+                                  {r.serviceKind === 'special' && (
+                                    <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
+                                  )}
+                                  {r.services > 1 && (
+                                    <Badge>{t(k('services_n'), { n: String(r.services) })}</Badge>
+                                  )}
+                                </span>
+                                <strong className="font-display text-2xl">
+                                  {dayText(r.date, locale)}
+                                </strong>
+                                {r.attendance !== null && (
+                                  <span className="text-sm">
+                                    {t(k('present_n'), { n: String(r.attendance) })}
+                                  </span>
+                                )}
+                                <span className="text-sm text-ink-muted">{xaf(r.offerings)}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             ),
@@ -202,6 +250,25 @@ type Period = {
   offerings: number
   byPurpose: Record<string, number>
 }
+/** « ▲ +12 % »: the change with its arrow (green up, red down), written out for screen readers too. */
+function Delta({ value }: { value: number | null | undefined }) {
+  const { t } = useLocale()
+  if (value === null || value === undefined) return null
+  const dir = value > 0 ? 'up' : value < 0 ? 'down' : 'flat'
+  return (
+    <span className="trend-badge sun-delta" data-direction={dir}>
+      {dir !== 'flat' && <Icon name={dir === 'up' ? 'trendUp' : 'trendDown'} size={16} />}
+      <span aria-hidden="true">
+        {value > 0 ? '+' : ''}
+        {value} %
+      </span>
+      <span className="sr-only">
+        {t(k(`trend_${dir}`))} {Math.abs(value)} %
+      </span>
+    </span>
+  )
+}
+
 /** One measure: its bar, and right under it what it is and how much (the label always sits under its own progress). */
 function Meter({
   tone,
@@ -227,144 +294,179 @@ function Meter({
         {icon && <Icon name={icon} size={16} />}
         <span>{label}</span>
         <strong>{value}</strong>
-        {change != null && change !== undefined && (
-          <em data-up={change >= 0 ? '' : undefined}>
-            {change > 0 ? '+' : ''}
-            {change} %
-          </em>
-        )}
+        <Delta value={change} />
       </span>
     </div>
   )
 }
 
+/** Every month between the first and the last that has data (a month with nothing is zero, not missing). */
+const monthsBetween = (first: string, last: string) => {
+  const out: string[] = []
+  let [y, m] = first.split('-').map(Number) as [number, number]
+  const [ly, lm] = last.split('-').map(Number) as [number, number]
+  while (y < ly || (y === ly && m <= lm)) {
+    out.push(`${y}-${String(m).padStart(2, '0')}`)
+    m++
+    if (m > 12) {
+      m = 1
+      y++
+    }
+  }
+  return out
+}
+
 function Trends() {
   const { t, locale } = useLocale()
-  const me = useMe().data
   const q = useQuery({
-    queryKey: ['sun-analytics', 'month'],
+    queryKey: ['sun-analytics', 'all'],
     queryFn: () =>
       api<{
         attendance: boolean
         periods: Period[]
         purposes: { purpose: string; amount: number }[]
         groups: { groupId: string | null; amount: number; name: string | null }[]
-      }>('/sundays/analytics?grain=month'),
+      }>(`/sundays/analytics?grain=month&from=2000-01-01`),
   })
   const d = q.data
+  const periods = d?.periods ?? []
   // The three attendance bars share one scale, so they can be compared; the offerings have their own.
-  const maxA = Math.max(1, ...(d?.periods ?? []).flatMap((p) => [p.men, p.women, p.children]))
-  const maxO = Math.max(1, ...(d?.periods ?? []).map((p) => p.offerings))
-  const exportCsv = async () => {
-    const res = await fetch('/api/sundays/export.csv', { credentials: 'include' })
-    if (!res.ok) return say(t(k('error')), 'danger')
-    const url = URL.createObjectURL(await res.blob())
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'bilans-dimanche.csv'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const maxA = Math.max(1, ...periods.flatMap((p) => [p.men, p.women, p.children]))
+  const maxO = Math.max(1, ...periods.map((p) => p.offerings))
+  const months = periods.length
+    ? monthsBetween(periods[0]?.period as string, periods.at(-1)?.period as string)
+    : []
+  const at = (key: 'men' | 'women' | 'children' | 'offerings') =>
+    months.map((m) => periods.find((p) => p.period === m)?.[key] ?? 0)
+  const people: Series[] = [
+    { key: 'men', label: t(k('men')), values: at('men'), tone: 'primary' },
+    { key: 'women', label: t(k('women')), values: at('women'), tone: 'gold' },
+    { key: 'children', label: t(k('children')), values: at('children'), tone: 'clay' },
+  ]
+  const money: Series[] = [
+    { key: 'money', label: t(k('offerings')), values: at('offerings'), tone: 'gold' },
+  ]
+  // The cards, a year at a time (newest year first, months in order inside it); the change is against the month before.
+  const years = [...new Set(periods.map((p) => p.period.slice(0, 4)))].sort().reverse()
   return (
-    <div className="grid gap-5">
-      {hasPermission(me, 'sundays:export') && (
-        <div className="flex justify-end">
-          <Button variant="secondary" onClick={exportCsv}>
-            <Icon name="download" size={20} />
-            {t(k('export'))}
-          </Button>
-        </div>
-      )}
-      {d && d.periods.length === 0 ? (
+    <div className="grid gap-8">
+      {d && periods.length === 0 ? (
         <EmptyState title={t(k('trends_empty_t'))} text={t(k('trends_empty_p'))} />
       ) : (
-        <ul className="sun-months">
-          {(d?.periods ?? []).map((p, i, all) => {
-            const prev = all[i - 1]
-            return (
-              <li key={p.period} className="sun-month admin-panel">
-                <h3 className="sun-month-h">
-                  {periodText(p.period, 'month', locale)}
-                  <small>{t(k('sundays_n'), { n: String(p.sundays) })}</small>
-                </h3>
-                <div className="sun-month-grid">
-                  {d?.attendance && (
-                    <>
-                      <Meter
-                        tone="men"
-                        icon="male"
-                        label={t(k('men'))}
-                        value={String(p.men)}
-                        ratio={p.men / maxA}
-                      />
-                      <Meter
-                        tone="women"
-                        icon="female"
-                        label={t(k('women'))}
-                        value={String(p.women)}
-                        ratio={p.women / maxA}
-                      />
-                      <Meter
-                        tone="children"
-                        icon="baby"
-                        label={t(k('children'))}
-                        value={String(p.children)}
-                        ratio={p.children / maxA}
-                      />
-                    </>
-                  )}
-                  <Meter
-                    tone="money"
-                    icon="gift"
-                    label={t(k('offerings'))}
-                    value={xaf(p.offerings)}
-                    ratio={p.offerings / maxO}
-                    change={prev ? trend(p.offerings, prev.offerings) : null}
-                  />
-                </div>
-                {d?.attendance && (
-                  <p className="sun-total">
-                    {t(k('present_n'), { n: String(p.attendance) })}
-                    {prev && trend(p.attendance, prev.attendance) !== null && (
-                      <em
-                        data-up={(trend(p.attendance, prev.attendance) ?? 0) >= 0 ? '' : undefined}
-                      >
-                        {(trend(p.attendance, prev.attendance) ?? 0) > 0 ? '+' : ''}
-                        {trend(p.attendance, prev.attendance)} %
-                      </em>
-                    )}
-                  </p>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
-      {d && d.purposes.length > 0 && (
-        <div className="reg-grid reg-grid-2">
-          <section className="admin-panel grid gap-2">
-            <h3 className="text-lg">{t(k('by_purpose'))}</h3>
-            <ul className="grid gap-1">
-              {d.purposes.map((p) => (
-                <li key={p.purpose} className="flex justify-between gap-3">
-                  <span>{purposeLabel(p.purpose, locale === 'en' ? 'en' : 'fr')}</span>
-                  <strong>{xaf(p.amount)}</strong>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section className="admin-panel grid gap-2">
-            <h3 className="text-lg">{t(k('by_group'))}</h3>
-            <ul className="grid gap-1">
-              {d.groups.map((g) => (
-                <li key={g.groupId ?? 'all'} className="flex justify-between gap-3">
-                  <span>{g.name ?? t(k('congregation'))}</span>
-                  <strong>{xaf(g.amount)}</strong>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+        <>
+          <div className="reg-grid reg-grid-2">
+            {d?.attendance && (
+              <ChartCard
+                title={t(k('attendance'))}
+                legend={people}
+                table={{ months, series: people, monthHeader: t(k('month_h')) }}
+                summary={t(k('view_numbers'))}
+              >
+                <AreaChart months={months} series={people} label={t(k('attendance'))} />
+              </ChartCard>
+            )}
+            <ChartCard
+              title={t(k('offerings'))}
+              table={{ months, series: money, monthHeader: t(k('month_h')) }}
+              summary={t(k('view_numbers'))}
+            >
+              <AreaChart months={months} series={money} label={t(k('offerings'))} />
+            </ChartCard>
+          </div>
+          {years.map((y) => (
+            <section key={y} className="grid gap-3" aria-label={y}>
+              <h2 className="sermon-month">
+                {y}
+                <span>{periods.filter((p) => p.period.startsWith(y)).length}</span>
+              </h2>
+              <ul className="sun-months">
+                {periods
+                  .filter((p) => p.period.startsWith(y))
+                  .map((p) => {
+                    const prev = periods[periods.indexOf(p) - 1]
+                    return (
+                      <li key={p.period} className="sun-month admin-panel">
+                        <h3 className="sun-month-h">
+                          {periodText(p.period, 'month', locale).replace(/\s\d{4}$/, '')}
+                          <small>{t(k('sundays_n'), { n: String(p.sundays) })}</small>
+                        </h3>
+                        <div className="sun-month-grid">
+                          {d?.attendance && (
+                            <>
+                              <Meter
+                                tone="men"
+                                icon="male"
+                                label={t(k('men'))}
+                                value={String(p.men)}
+                                ratio={p.men / maxA}
+                                change={prev ? trend(p.men, prev.men) : null}
+                              />
+                              <Meter
+                                tone="women"
+                                icon="female"
+                                label={t(k('women'))}
+                                value={String(p.women)}
+                                ratio={p.women / maxA}
+                                change={prev ? trend(p.women, prev.women) : null}
+                              />
+                              <Meter
+                                tone="children"
+                                icon="baby"
+                                label={t(k('children'))}
+                                value={String(p.children)}
+                                ratio={p.children / maxA}
+                                change={prev ? trend(p.children, prev.children) : null}
+                              />
+                            </>
+                          )}
+                          <Meter
+                            tone="money"
+                            icon="gift"
+                            label={t(k('offerings'))}
+                            value={xaf(p.offerings)}
+                            ratio={p.offerings / maxO}
+                            change={prev ? trend(p.offerings, prev.offerings) : null}
+                          />
+                        </div>
+                        {d?.attendance && (
+                          <p className="sun-total">
+                            {t(k('present_n'), { n: String(p.attendance) })}
+                            <Delta value={prev ? trend(p.attendance, prev.attendance) : null} />
+                          </p>
+                        )}
+                      </li>
+                    )
+                  })}
+              </ul>
+            </section>
+          ))}
+          {d && d.purposes.length > 0 && (
+            <div className="reg-grid reg-grid-2">
+              <section className="admin-panel grid gap-2">
+                <h3 className="text-lg">{t(k('by_purpose'))}</h3>
+                <ul className="grid gap-1">
+                  {d.purposes.map((p) => (
+                    <li key={p.purpose} className="flex justify-between gap-3">
+                      <span>{purposeLabel(p.purpose, locale === 'en' ? 'en' : 'fr')}</span>
+                      <strong>{xaf(p.amount)}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section className="admin-panel grid gap-2">
+                <h3 className="text-lg">{t(k('by_group'))}</h3>
+                <ul className="grid gap-1">
+                  {d.groups.map((g) => (
+                    <li key={g.groupId ?? 'all'} className="flex justify-between gap-3">
+                      <span>{g.name ?? t(k('congregation'))}</span>
+                      <strong>{xaf(g.amount)}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

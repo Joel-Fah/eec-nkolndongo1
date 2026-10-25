@@ -1,5 +1,6 @@
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
+import { SelectField } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { AreaChart, ChartCard, type Series } from './Charts'
@@ -63,19 +64,14 @@ export function SundayYear() {
           {t(k('year_t'))}
         </h2>
         {years.length > 1 && (
-          <fieldset className="seg" aria-label={t(k('year_pick'))}>
-            {years.map((y) => (
-              <button
-                key={y}
-                type="button"
-                className="seg-btn"
-                aria-pressed={y === year}
-                onClick={() => setPicked(y)}
-              >
-                {y}
-              </button>
-            ))}
-          </fieldset>
+          <div className="media-select">
+            <SelectField
+              label={t(k('year_pick'))}
+              value={year ?? ''}
+              onValueChange={(v) => v && setPicked(v)}
+              options={[...years].reverse().map((y) => ({ value: y, label: y }))}
+            />
+          </div>
         )}
       </div>
       {!d ? (

@@ -67,5 +67,8 @@
   "year_pick": "Choisir l’année",
   "month_h": "Mois",
   "view_numbers": "Voir les chiffres du graphique",
-  "vs_previous": "vs dimanche précédent"
+  "vs_previous": "vs dimanche précédent",
+  "trend_up": "en hausse de",
+  "trend_down": "en baisse de",
+  "trend_flat": "stable"
 }
