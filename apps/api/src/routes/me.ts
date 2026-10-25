@@ -262,6 +262,15 @@ export const meRoutes = new Hono<AppEnv>()
         theme: profiles.theme,
         status: profiles.status,
         deletionRequestedAt: profiles.deletionRequestedAt,
+        // The optional details (decision 0047): the right of access covers them too; the picture is not included, it is yours already.
+        birthDate: profiles.birthDate,
+        gender: profiles.gender,
+        neighbourhood: profiles.neighbourhood,
+        city: profiles.city,
+        maritalStatus: profiles.maritalStatus,
+        profession: profiles.profession,
+        photoLevel: profiles.photoLevel,
+        hasPhoto: sql<boolean>`${profiles.photoKey} is not null`,
       })
       .from(profiles)
       .where(eq(profiles.userId, actor.userId))

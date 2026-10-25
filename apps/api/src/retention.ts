@@ -16,6 +16,7 @@ import { dbUrl, type Env } from '@eec/api-kit'
 import { writeAudit } from '@eec/auth'
 import { connect, schema } from '@eec/db'
 import { and, eq, inArray, isNotNull, lt, ne, sql } from 'drizzle-orm'
+import { createPrivateStore } from './lib/private-store.ts'
 
 const DAY = 86_400_000
 export const RETENTION = {
@@ -165,6 +166,15 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
         summaryFr: 'Compte supprimé après le délai de grâce',
         summaryEn: 'Account deleted after the grace period',
       })
+      // The private photo goes with the account.
+      const [photo] = await db
+        .select({ key: t.profiles.photoKey })
+        .from(t.profiles)
+        .where(eq(t.profiles.userId, userId))
+      if (photo?.key)
+        await createPrivateStore(env)
+          .delete(photo.key)
+          .catch(() => {})
       await db.delete(t.user).where(inArray(t.user.id, [userId]))
       result.accountsPurged++
     }

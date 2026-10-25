@@ -1,5 +1,7 @@
 import { Menu } from '@base-ui/react/menu'
-import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
+import { api, useLocale, useMe, useSessionActions } from '@eec/admin-kit'
+import { identiconSvg } from '@eec/ui/identicon'
+import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { guideForPath } from '../lib/help'
@@ -26,6 +28,23 @@ export function AppShell() {
   const me = useMe().data
   const { signOut } = useSessionActions()
   const navigate = useNavigate()
+  // The avatar: the generated abstract one (or the person's own picture only if they shared it), with a warning mark while the
+  // profile is incomplete (decision 0047). Staff are members of the congregation too.
+  const badge = useQuery({
+    queryKey: ['badge'],
+    queryFn: () =>
+      api<{
+        signedIn: boolean
+        seed?: number
+        incomplete?: boolean
+        photo?: boolean
+        photoV?: number
+      }>('/me/badge'),
+    staleTime: 5 * 60_000,
+    enabled: !!me,
+  })
+  const b = badge.data
+  const space = locale === 'fr' ? '/fr/mon-espace/' : '/en/my-space/'
   const initials = (me?.user.name ?? '??')
     .split(/\s+/)
     .map((w) => w[0] ?? '')
@@ -133,11 +152,33 @@ export function AppShell() {
             <Menu.Root>
               <Menu.Trigger
                 className="avatar admin-avatar"
-                aria-label={t('admin.user.menu')}
-                data-tip={t('admin.user.menu')}
+                aria-label={b?.incomplete ? t('admin.user.menu_incomplete') : t('admin.user.menu')}
+                data-tip={b?.incomplete ? t('admin.user.menu_incomplete') : t('admin.user.menu')}
                 data-tip-end
               >
-                {initials}
+                {b?.signedIn ? (
+                  b.photo ? (
+                    <img
+                      className="admin-avatar-img"
+                      src={`/api/me/photo?v=${b.photoV ?? 0}`}
+                      alt=""
+                    />
+                  ) : (
+                    <span
+                      className="admin-avatar-img"
+                      aria-hidden="true"
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
+                      dangerouslySetInnerHTML={{ __html: identiconSvg(b.seed ?? 0) }}
+                    />
+                  )
+                ) : (
+                  initials
+                )}
+                {b?.incomplete && (
+                  <span className="acct-badge" aria-hidden="true">
+                    !
+                  </span>
+                )}
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">
@@ -148,6 +189,9 @@ export function AppShell() {
                     </div>
                     <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
                       {t('admin.items.account')}
+                    </Menu.LinkItem>
+                    <Menu.LinkItem className="menu-item" render={<a href={space} />}>
+                      {b?.incomplete ? t('admin.user.complete_profile') : t('admin.user.my_space')}
                     </Menu.LinkItem>
                     <Menu.Item
                       className="menu-item menu-item-danger"

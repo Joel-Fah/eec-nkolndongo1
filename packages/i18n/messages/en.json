@@ -149,7 +149,8 @@
         "text": "News, messages to listen to, and meditations to take along."
       }
     },
-    "language_short": "Change language"
+    "language_short": "Change language",
+    "account_incomplete": "My space — your profile needs completing"
   },
   "season": {
     "avent": "Advent",
@@ -1055,6 +1056,24 @@
         "desc": "Same family: two columns, hours and minutes (every 5), the chosen value in green. Time-02 icon.",
         "use": "Admin: <TimeField label value onChange step />. Site: <input type=\"time\" data-picker=\"…\">. Value = HH:mm. <DateTimeField /> pairs the two (YYYY-MM-DDTHH:mm).",
         "a11y": "Named columns (Hours, Minutes), 44 px buttons, up/down arrows, Esc closes."
+      },
+      "identicon": {
+        "name": "Generated avatar",
+        "desc": "For someone with no photo (or whose photo is private): a symmetric 5 × 5 grid of rounded cells in one of our colours on a tinted background. Always the same for the same person; the colour follows the theme.",
+        "use": "identiconSvg(seed) from @eec/ui/identicon; the seed comes from avatarSeed(accountId) in @eec/core. Rounded with CSS (border-radius: 50%).",
+        "a11y": "Decorative (aria-hidden): the person's name is always next to it."
+      },
+      "membercard": {
+        "name": "Member card",
+        "desc": "A virtual card in the parish's colours: green, abstract shapes, the mark, name, a short code and the year of joining. It leans gently toward the mouse, with a light that follows the pointer; still with “reduce motion” and on touch. On screen only: no download for now.",
+        "use": "<MemberCard label parish name since code avatar />; the tilt comes from initMemberCards() (scripts/member-card.ts), transform only.",
+        "a11y": "The content is plain text; the animation is never needed and respects prefers-reduced-motion."
+      },
+      "profilebadge": {
+        "name": "Account avatar and warning mark",
+        "desc": "In the top bar the account button shows the person's avatar; while their profile is incomplete a red dot with an exclamation mark is added (also in the admin, since the team belongs to the congregation too). We warn, we never block.",
+        "use": "Site: scripts/account-badge.ts (asks /api/me/badge, kept 5 minutes). Admin: AppShell. Classes .nav-avatar and .acct-badge.",
+        "a11y": "The button's label says the profile needs completing; the dot is decorative (aria-hidden)."
       }
     },
     "rules": {
@@ -1298,7 +1317,10 @@
     "user": {
       "menu": "Account menu",
       "profile": "My profile",
-      "signout": "Sign out"
+      "signout": "Sign out",
+      "menu_incomplete": "Account menu — your profile needs completing",
+      "my_space": "My space (public)",
+      "complete_profile": "Complete my profile"
     },
     "palette": {
       "open": "Open quick search",
@@ -2163,7 +2185,67 @@
     "devices_unknown": "Device",
     "policy_changed_t": "The privacy policy has changed",
     "policy_read": "Read the new policy",
-    "policy_accept": "I accept the new policy"
+    "policy_accept": "I accept the new policy",
+    "profile": {
+      "title": "Complete your profile",
+      "lead": "A few optional details help the parish know and care for the community better. You stay in control: everything can be changed, and you can erase it all.",
+      "progress": "{n} of {total} details",
+      "done_t": "Your profile is complete",
+      "done_p": "Thank you: the parish knows you a little better. Your member card is waiting below.",
+      "step_consent": "Accept the full profile",
+      "step_details": "Fill in your details",
+      "step_photo": "Add a photo (optional)",
+      "optional": "optional",
+      "cta": "Complete my profile",
+      "panel": "My full profile",
+      "consent_t": "What we ask, and why",
+      "why_birth": "Birth date: to think about the parish's age groups. The team only sees a band (for example 26–35), never your date.",
+      "why_gender": "Gender: for statistics about the community, nothing else.",
+      "why_place": "Neighbourhood and city: to know where members live. No address, no location.",
+      "why_life": "Marital status and profession: to understand the community's life and skills.",
+      "consent_label": "I agree that the parish records this optional information and, if I wish, a photo.",
+      "consent_help": "I can withdraw my agreement at any time: it erases this information and the photo.",
+      "consent_go": "Turn on my full profile",
+      "consent_need": "Tick the box to continue.",
+      "birth": "Birth date",
+      "gender": "Gender",
+      "gender_woman": "Woman",
+      "gender_man": "Man",
+      "neighbourhood": "Neighbourhood",
+      "city": "City",
+      "marital": "Marital status",
+      "marital_single": "Single",
+      "marital_married": "Married",
+      "marital_widowed": "Widowed",
+      "marital_divorced": "Divorced",
+      "profession": "Profession",
+      "ph_neighbourhood": "Nkolndongo",
+      "ph_city": "Yaoundé",
+      "ph_profession": "Teacher",
+      "ph_select": "Choose",
+      "error": "This could not be saved. Please try again.",
+      "withdraw": "Withdraw my agreement",
+      "withdraw_help": "Erases your details and your photo.",
+      "withdrawn": "Your agreement is withdrawn; your details and photo are erased.",
+      "photo_t": "My photo",
+      "photo_p": "It is private: only you see it, unless you choose to share it with the parish team who manage members. It is never public.",
+      "photo_generated": "Without a photo, an abstract avatar represents you.",
+      "photo_choose": "Choose a photo",
+      "photo_remove": "Delete my photo",
+      "photo_saved": "Photo saved.",
+      "photo_err": "This photo could not be saved.",
+      "photo_level": "Who can see my photo?",
+      "level_private": "Only me",
+      "level_staff": "The team who manage members",
+      "level_saved": "Setting saved.",
+      "card_t": "My member card",
+      "card_label": "Member card",
+      "card_since": "Member since {year}",
+      "card_code": "No. {code}",
+      "card_note": "For now the card is shown here: it cannot be downloaded yet.",
+      "btn_save": "Save my profile",
+      "msg_saved": "Profile saved."
+    }
   },
   "hero": {
     "stats": {

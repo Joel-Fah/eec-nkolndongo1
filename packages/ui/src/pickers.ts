@@ -100,6 +100,9 @@ function enhance(input: HTMLInputElement) {
     pop.hidePopover()
   }
   paint()
+  // A script that sets the value (loading a saved form) or a form reset changes the shown text too.
+  input.addEventListener('change', paint)
+  input.form?.addEventListener('reset', () => setTimeout(paint))
 
   let cursor = ''
   let view: 'days' | 'months' | 'years' = 'days'

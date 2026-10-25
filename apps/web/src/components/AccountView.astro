@@ -13,6 +13,7 @@ import google from '@eec/ui/brand/google-g.svg?raw'
 import { localeOf, useT } from '../lib/i18n'
 import { href, pages } from '../lib/nav'
 import { peoplePhotos, photoSrc } from '../lib/placeholders'
+import ProfileSection from './ProfileSection.astro'
 import '../styles/patterns.css'
 
 const locale = localeOf(Astro.currentLocale)
@@ -147,6 +148,7 @@ const tiles = [
         <p class="text-ink-muted">{t('member.welcome')}</p>
       </div>
     </div>
+    <ProfileSection />
     <ul class="acct-tiles" role="list">
       {
         tiles.map(([icon, key]) => (
@@ -253,6 +255,7 @@ const tiles = [
 </section>
 
 <script>
+  import { initProfile } from '../scripts/profile'
   const found = document.querySelector<HTMLElement>('[data-account]')
   if (found) {
     const root: HTMLElement = found
@@ -288,6 +291,10 @@ const tiles = [
         if (initials) initials.textContent = name.slice(0, 1).toUpperCase()
         show('in')
         loadPanels(me.json.user)
+        if (!root.dataset.profileReady) {
+          root.dataset.profileReady = '1'
+          initProfile(root, me.json.user)
+        }
       } else show('out')
     }
     const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement | null

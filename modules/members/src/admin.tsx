@@ -21,6 +21,13 @@ type Row = {
   deletionRequestedAt: string | null
   groups: Group[]
   news: boolean
+  ageBand?: string | null
+  gender?: string | null
+  neighbourhood?: string | null
+  city?: string | null
+  maritalStatus?: string | null
+  profession?: string | null
+  photo?: boolean
 }
 type Stats = { byGroup: (Group & { n: number })[] }
 type Detail = Row & {
@@ -28,7 +35,7 @@ type Detail = Row & {
   lastName: string
   lastSeenAt: string | null
   consents: {
-    kind: 'privacy' | 'news'
+    kind: 'privacy' | 'news' | 'profile'
     policyVersion: string
     grantedAt: string
     withdrawnAt: string | null
@@ -230,6 +237,54 @@ function DetailSheet({ id, onClose }: { id: string; onClose: () => void }) {
                   <p className="text-ink-muted">{d.email}</p>
                   {d.phone && <p className="text-ink-muted">{d.phone}</p>}
                 </div>
+                {d.photo && (
+                  <img
+                    className="h-24 w-24 rounded-full object-cover"
+                    src={`/api/members/${d.id}/photo`}
+                    alt=""
+                    width="96"
+                    height="96"
+                  />
+                )}
+                {(d.ageBand ||
+                  d.gender ||
+                  d.city ||
+                  d.neighbourhood ||
+                  d.maritalStatus ||
+                  d.profession) && (
+                  <dl className="grid grid-cols-2 gap-2 text-sm">
+                    {d.ageBand && (
+                      <>
+                        <dt className="text-ink-muted">{t(k('detail.age'))}</dt>
+                        <dd>{t(k(`age_${d.ageBand}`))}</dd>
+                      </>
+                    )}
+                    {d.gender && (
+                      <>
+                        <dt className="text-ink-muted">{t(k('detail.gender'))}</dt>
+                        <dd>{t(k(`gender_${d.gender}`))}</dd>
+                      </>
+                    )}
+                    {(d.neighbourhood || d.city) && (
+                      <>
+                        <dt className="text-ink-muted">{t(k('detail.place'))}</dt>
+                        <dd>{[d.neighbourhood, d.city].filter(Boolean).join(', ')}</dd>
+                      </>
+                    )}
+                    {d.maritalStatus && (
+                      <>
+                        <dt className="text-ink-muted">{t(k('detail.marital'))}</dt>
+                        <dd>{t(k(`marital_${d.maritalStatus}`))}</dd>
+                      </>
+                    )}
+                    {d.profession && (
+                      <>
+                        <dt className="text-ink-muted">{t(k('detail.profession'))}</dt>
+                        <dd>{d.profession}</dd>
+                      </>
+                    )}
+                  </dl>
+                )}
                 <dl className="grid grid-cols-2 gap-2 text-sm">
                   <dt className="text-ink-muted">{t(k('col.joined'))}</dt>
                   <dd>{date(d.joinedAt)}</dd>

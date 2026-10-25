@@ -37,7 +37,13 @@
     "granted": "given on {date}",
     "withdrawn": "withdrawn on {date}",
     "version": "version {v}",
-    "no_groups": "No groups."
+    "no_groups": "No groups.",
+    "age": "Age band",
+    "gender": "Gender",
+    "place": "Neighbourhood, city",
+    "marital": "Marital status",
+    "profession": "Profession",
+    "kind_profile": "Full profile"
   },
   "err": {
     "generic": "Something went wrong.",
@@ -56,5 +62,17 @@
     "empty": "No members yet: the numbers will appear with the first sign-ups.",
     "recent": "Recent activity",
     "no_groups": "No groups yet: create them under “Groups”."
-  }
+  },
+  "age_under18": "Under 18",
+  "age_18-25": "18–25",
+  "age_26-35": "26–35",
+  "age_36-50": "36–50",
+  "age_51-65": "51–65",
+  "age_over65": "Over 65",
+  "gender_woman": "Woman",
+  "gender_man": "Man",
+  "marital_single": "Single",
+  "marital_married": "Married",
+  "marital_widowed": "Widowed",
+  "marital_divorced": "Divorced"
 }

@@ -396,5 +396,93 @@ const stamp = Date.now().toString(36)
   await api(`/campaigns/${cid}`, { method: 'DELETE' })
 }
 
+// 10. Member profile (decision 0047): details need the consent, the photo is private, staff see it only if the member shares it,
+//     withdrawing the consent erases details and photo.
+{
+  const sharpMod = (await import('sharp')).default
+  const webp = await sharpMod({
+    create: { width: 64, height: 64, channels: 3, background: '#1F5C3A' },
+  })
+    .webp()
+    .toBuffer()
+  const photo = async (bytes: Uint8Array, name = 'p.webp', type = 'image/webp') => {
+    const form = new FormData()
+    form.append('file', new File([bytes as BlobPart], name, { type }))
+    const res = await fetch(`${base}/api/me/photo`, {
+      method: 'PUT',
+      headers: { cookie, origin: base },
+      body: form,
+    })
+    return res.status
+  }
+  const anon = await fetch(`${base}/api/me/photo`)
+  ok('profile: the photo is never served to a visitor', anon.status === 401)
+  const badge = await (await fetch(`${base}/api/me/badge`)).json()
+  ok('profile: the navbar badge says nothing about a visitor', badge.signedIn === false)
+  // Start clean.
+  await api('/me/profile/consent', { method: 'POST', body: JSON.stringify({ granted: false }) })
+  const noConsent = await api('/me/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ city: 'Yaoundé' }),
+  })
+  ok('profile: details are refused without the consent', noConsent.status === 403)
+  ok('profile: a photo is refused without the consent', (await photo(webp)) === 403)
+  await api('/me/profile/consent', { method: 'POST', body: JSON.stringify({ granted: true }) })
+  const future = await api('/me/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ birthDate: '2999-01-01' }),
+  })
+  ok('profile: a birth date in the future is refused', future.status === 400)
+  const saved = await api('/me/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ birthDate: '1990-05-01', city: 'Yaoundé', gender: 'woman' }),
+  })
+  ok('profile: details are saved with the consent', saved.status === 200)
+  const mine = (await api('/me/profile')).json as {
+    details: { city: string | null }
+    completeness: { complete: boolean }
+    memberCode: string
+  }
+  ok(
+    'profile: the details and the member code come back',
+    mine.details.city === 'Yaoundé' && /^EEC-/.test(mine.memberCode) && !mine.completeness.complete,
+  )
+  ok(
+    'profile: a file that is not a picture is refused',
+    (await photo(new TextEncoder().encode('hello world, not a picture at all'))) === 400,
+  )
+  ok('profile: a photo is accepted', (await photo(webp)) === 200)
+  const own = await fetch(`${base}/api/me/photo`, { headers: { cookie } })
+  ok(
+    'profile: the owner reads the photo, never cached',
+    own.status === 200 &&
+      own.headers.get('content-type') === 'image/webp' &&
+      /no-store/.test(own.headers.get('cache-control') ?? ''),
+  )
+  const myId = (await api('/me')).json.user.id as string
+  // Private by default: even staff cannot open it.
+  ok(
+    'profile: staff cannot open a private photo',
+    (await api(`/members/${myId}/photo`)).status === 404,
+  )
+  await api('/me/photo-level', { method: 'PUT', body: JSON.stringify({ level: 'staff' }) })
+  const shared = await fetch(`${base}/api/members/${myId}/photo`, { headers: { cookie } })
+  ok('profile: staff open it once the member shares it', shared.status === 200)
+  await api('/me/photo-level', { method: 'PUT', body: JSON.stringify({ level: 'private' }) })
+  await api('/me/profile/consent', { method: 'POST', body: JSON.stringify({ granted: false }) })
+  const erased = (await api('/me/profile')).json as {
+    details: Record<string, string | null>
+    photo: { has: boolean }
+  }
+  ok(
+    'profile: withdrawing the consent erases the details and the photo',
+    Object.values(erased.details).every((v) => v === null) && !erased.photo.has,
+  )
+  ok(
+    'profile: the erased photo is gone',
+    (await fetch(`${base}/api/me/photo`, { headers: { cookie } })).status === 404,
+  )
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

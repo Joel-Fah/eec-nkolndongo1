@@ -1,0 +1,172 @@
+---
+/**
+ * The virtual member card (decision 0047): brand green, our abstract shapes, the mark, the person's name, a short code and the year they
+ * joined. A gentle tilt follows a mouse or pen over it (scripts/profile.ts); static with reduced motion and on touch. On screen only:
+ * no download, no share. The texts that depend on the person are filled in by the script (data-mcard-*) or passed as props (the guide).
+ */
+import Mark from '@eec/ui/astro/Mark.astro'
+
+interface Props {
+  label: string
+  parish: string
+  name?: string
+  since?: string
+  code?: string
+  /** Pre-rendered avatar markup (the guide shows a generated one). */
+  avatar?: string
+}
+const { label, parish, name = '', since = '', code = '', avatar = '' } = Astro.props
+---
+
+    <div class="mcard" data-mcard>
+      <div class="mcard-art" aria-hidden="true"></div>
+      <div class="mcard-sheen" aria-hidden="true"></div>
+      <div class="mcard-top">
+        <span class="mcard-mark" aria-hidden="true"><Mark variant="mark" /></span>
+        <span class="mcard-label">{label}</span>
+      </div>
+      <div class="mcard-mid">
+        <span class="mcard-photo" data-mcard-photo aria-hidden="true" set:html={avatar}></span>
+        <div class="grid gap-1">
+          <strong class="mcard-name" data-mcard-name>{name}</strong>
+          <span class="mcard-since" data-mcard-since>{since}</span>
+        </div>
+      </div>
+      <div class="mcard-foot">
+        <span class="mcard-code" data-mcard-code>{code}</span>
+        <span class="mcard-parish">{parish}</span>
+      </div>
+    </div>
+
+<style is:global>
+  /* The member card: brand green, our abstract shapes, a gentle tilt that follows the pointer (off with reduced motion and on touch). */
+  .pf-cardwrap {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .mcard {
+    --rx: 0deg;
+    --ry: 0deg;
+    --mx: 50%;
+    --my: 50%;
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 1rem;
+    width: min(100%, 26rem);
+    aspect-ratio: 1.586;
+    padding: 1.25rem;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: var(--primary);
+    color: var(--bg);
+    box-shadow: var(--elevation-2);
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+    transition: transform var(--duration-ui) var(--ease-out), box-shadow var(--duration-ui) var(--ease-out);
+    isolation: isolate;
+  }
+  .mcard[data-tilting] {
+    transition: none;
+    box-shadow: var(--elevation-3, var(--elevation-2));
+  }
+  .mcard-art {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(circle at 88% 8%, color-mix(in oklab, var(--gold) 70%, transparent) 0 14%, transparent 15%),
+      radial-gradient(circle at 12% 110%, color-mix(in oklab, var(--clay) 55%, transparent) 0 30%, transparent 31%),
+      radial-gradient(circle at 70% 120%, color-mix(in oklab, var(--bg) 18%, transparent) 0 34%, transparent 35%);
+  }
+  .mcard-sheen {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at var(--mx) var(--my), color-mix(in oklab, var(--bg) 30%, transparent), transparent 55%);
+    opacity: 0;
+    transition: opacity var(--duration-ui) var(--ease-out);
+  }
+  .mcard[data-tilting] .mcard-sheen {
+    opacity: 1;
+  }
+  .mcard-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .mcard-mark {
+    display: block;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .mcard-mark svg {
+    width: 100%;
+    height: 100%;
+  }
+  .mcard-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+  .mcard-mid {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    align-self: center;
+  }
+  .mcard-photo {
+    display: block;
+    flex: none;
+    width: 4.5rem;
+    height: 4.5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--bg) 85%, transparent);
+  }
+  .mcard-photo > svg,
+  .mcard-photo > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .mcard-name {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .mcard-since {
+    font-size: var(--text-sm);
+    opacity: 0.85;
+  }
+  .mcard-foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: var(--text-sm);
+  }
+  .mcard-code {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .mcard-parish {
+    text-align: end;
+    opacity: 0.85;
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none) {
+    .mcard {
+      transform: none !important;
+      transition: none;
+    }
+    .mcard-sheen {
+      display: none;
+    }
+  }
+</style>

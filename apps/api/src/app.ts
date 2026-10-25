@@ -15,6 +15,7 @@ import { meRoutes } from './routes/me.ts'
 import { memberRoutes } from './routes/members.ts'
 import { notificationRoutes } from './routes/notifications.ts'
 import { outboxRoutes } from './routes/outbox.ts'
+import { profileRoutes } from './routes/profile.ts'
 import { roleRoutes } from './routes/roles.ts'
 import { searchRoutes } from './routes/search.ts'
 import { todoRoutes } from './routes/todo.ts'
@@ -30,6 +31,7 @@ export function createApp() {
   app.get('/health', (c) => c.json({ status: 'ok' }))
   app.route('/auth', authRoutes)
   app.route('/me', meRoutes)
+  app.route('/me', profileRoutes)
   app.route('/members', memberRoutes)
   app.route('/', invitationRoutes)
   // Core administration (always on).

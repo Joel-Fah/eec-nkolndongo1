@@ -149,7 +149,8 @@
         "text": "Nouvelles, messages à écouter et méditations à emporter."
       }
     },
-    "language_short": "Changer de langue"
+    "language_short": "Changer de langue",
+    "account_incomplete": "Mon espace — votre profil est à compléter"
   },
   "season": {
     "avent": "Avent",
@@ -1055,6 +1056,24 @@
         "desc": "Même famille : deux colonnes, les heures et les minutes (de 5 en 5), la valeur choisie en vert. Icône time-02.",
         "use": "Admin : <TimeField label value onChange step />. Site : <input type=\"time\" data-picker=\"…\">. Valeur = HH:mm. <DateTimeField /> assemble les deux (AAAA-MM-JJTHH:mm).",
         "a11y": "Colonnes nommées (Heures, Minutes), boutons de 44 px, flèches haut/bas, Échap ferme."
+      },
+      "identicon": {
+        "name": "Avatar généré",
+        "desc": "Pour quelqu’un sans photo (ou dont la photo est privée) : une grille symétrique de 5 × 5 cases arrondies dans l’une de nos couleurs, sur un fond teinté. Toujours la même pour la même personne ; la couleur suit le thème.",
+        "use": "identiconSvg(graine) dans @eec/ui/identicon ; la graine vient de avatarSeed(idCompte) dans @eec/core. Arrondi par CSS (border-radius: 50 %).",
+        "a11y": "Décoratif (aria-hidden) : le nom de la personne est toujours à côté."
+      },
+      "membercard": {
+        "name": "Carte de membre",
+        "desc": "Une carte virtuelle aux couleurs de la paroisse : vert, formes abstraites, logo, nom, code court et année d’inscription. Elle s’incline doucement vers la souris, avec une lumière qui suit le pointeur ; immobile avec « réduire les animations » et au toucher. À l’écran seulement : pas de téléchargement pour l’instant.",
+        "use": "<MemberCard label parish name since code avatar /> ; l’inclinaison vient de initMemberCards() (scripts/member-card.ts), transform seulement.",
+        "a11y": "Le contenu est du texte ordinaire ; l’animation n’est jamais nécessaire et respecte prefers-reduced-motion."
+      },
+      "profilebadge": {
+        "name": "Avatar du compte et marque d’alerte",
+        "desc": "Dans la barre du haut, le bouton du compte montre l’avatar de la personne ; tant que son profil est incomplet, une pastille rouge à point d’exclamation s’y ajoute (aussi dans l’administration, car l’équipe fait aussi partie de la communauté). On avertit, on ne bloque jamais.",
+        "use": "Site : scripts/account-badge.ts (demande /api/me/badge, gardé 5 minutes). Admin : AppShell. Classes .nav-avatar et .acct-badge.",
+        "a11y": "Le libellé du bouton dit que le profil est à compléter ; la pastille est décorative (aria-hidden)."
       }
     },
     "rules": {
@@ -1298,7 +1317,10 @@
     "user": {
       "menu": "Menu du compte",
       "profile": "Mon profil",
-      "signout": "Se déconnecter"
+      "signout": "Se déconnecter",
+      "menu_incomplete": "Menu du compte — votre profil est à compléter",
+      "my_space": "Mon espace (public)",
+      "complete_profile": "Compléter mon profil"
     },
     "palette": {
       "open": "Ouvrir la recherche rapide",
@@ -2163,7 +2185,67 @@
     "devices_unknown": "Appareil",
     "policy_changed_t": "La politique de confidentialité a changé",
     "policy_read": "Lire la nouvelle politique",
-    "policy_accept": "J’accepte la nouvelle politique"
+    "policy_accept": "J’accepte la nouvelle politique",
+    "profile": {
+      "title": "Complétez votre profil",
+      "lead": "Quelques informations facultatives aident la paroisse à mieux connaître et accompagner la communauté. Vous gardez la main : tout se modifie, et vous pouvez tout effacer.",
+      "progress": "{n} détail(s) sur {total}",
+      "done_t": "Votre profil est complet",
+      "done_p": "Merci : la paroisse vous connaît un peu mieux. Votre carte de membre vous attend ci-dessous.",
+      "step_consent": "Accepter le profil complet",
+      "step_details": "Renseigner vos détails",
+      "step_photo": "Ajouter une photo (facultatif)",
+      "optional": "facultatif",
+      "cta": "Compléter mon profil",
+      "panel": "Mon profil complet",
+      "consent_t": "Ce que nous demandons, et pourquoi",
+      "why_birth": "Date de naissance : pour penser aux tranches d’âge de la paroisse. L’équipe ne voit qu’une tranche (par exemple 26–35 ans), jamais votre date.",
+      "why_gender": "Genre : pour des statistiques sur la communauté, rien d’autre.",
+      "why_place": "Quartier et ville : pour savoir où vivent les membres. Pas d’adresse, pas de localisation.",
+      "why_life": "Situation matrimoniale et profession : pour comprendre la vie et les compétences de la communauté.",
+      "consent_label": "J’accepte que la paroisse enregistre ces informations facultatives et, si je le souhaite, une photo.",
+      "consent_help": "Je peux retirer mon accord à tout moment : cela efface ces informations et la photo.",
+      "consent_go": "Activer mon profil complet",
+      "consent_need": "Cochez la case pour continuer.",
+      "birth": "Date de naissance",
+      "gender": "Genre",
+      "gender_woman": "Femme",
+      "gender_man": "Homme",
+      "neighbourhood": "Quartier",
+      "city": "Ville",
+      "marital": "Situation matrimoniale",
+      "marital_single": "Célibataire",
+      "marital_married": "Marié(e)",
+      "marital_widowed": "Veuf / veuve",
+      "marital_divorced": "Divorcé(e)",
+      "profession": "Profession",
+      "ph_neighbourhood": "Nkolndongo",
+      "ph_city": "Yaoundé",
+      "ph_profession": "Enseignante",
+      "ph_select": "Choisir",
+      "error": "Cela n’a pas pu être enregistré. Réessayez.",
+      "withdraw": "Retirer mon accord",
+      "withdraw_help": "Efface vos détails et votre photo.",
+      "withdrawn": "Votre accord est retiré ; vos détails et votre photo sont effacés.",
+      "photo_t": "Ma photo",
+      "photo_p": "Elle est privée : vous seul(e) la voyez, sauf si vous choisissez de la partager avec l’équipe paroissiale qui gère les membres. Elle n’est jamais publique.",
+      "photo_generated": "Sans photo, un avatar abstrait vous représente.",
+      "photo_choose": "Choisir une photo",
+      "photo_remove": "Supprimer ma photo",
+      "photo_saved": "Photo enregistrée.",
+      "photo_err": "Cette photo n’a pas pu être enregistrée.",
+      "photo_level": "Qui peut voir ma photo ?",
+      "level_private": "Moi seul(e)",
+      "level_staff": "L’équipe qui gère les membres",
+      "level_saved": "Réglage enregistré.",
+      "card_t": "Ma carte de membre",
+      "card_label": "Carte de membre",
+      "card_since": "Membre depuis {year}",
+      "card_code": "N° {code}",
+      "card_note": "Pour l’instant, la carte se voit ici : elle ne se télécharge pas encore.",
+      "btn_save": "Enregistrer mon profil",
+      "msg_saved": "Profil enregistré."
+    }
   },
   "hero": {
     "stats": {
