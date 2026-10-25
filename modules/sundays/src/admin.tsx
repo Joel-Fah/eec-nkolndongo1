@@ -358,11 +358,11 @@ function Trends() {
             <div className="grid gap-6">
               {d?.attendance && (
                 <ChartCard title={`${t(k('attendance'))} · ${monthLabel}`} legend={people}>
-                  <AreaChart months={days} series={people} label={t(k('attendance'))} />
+                  <AreaChart wide months={days} series={people} label={t(k('attendance'))} />
                 </ChartCard>
               )}
               <ChartCard title={`${t(k('offerings'))} · ${monthLabel}`}>
-                <AreaChart months={days} series={money} label={t(k('offerings'))} />
+                <AreaChart wide months={days} series={money} label={t(k('offerings'))} />
               </ChartCard>
             </div>
           )}
@@ -414,7 +414,7 @@ function Trends() {
                           )}
                           <Meter
                             tone="money"
-                            icon="gift"
+                            icon="money"
                             label={t(k('offerings'))}
                             value={xaf(p.offerings)}
                             ratio={p.offerings / maxO}

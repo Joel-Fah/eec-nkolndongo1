@@ -118,11 +118,15 @@ export function AreaChart({
   months,
   series,
   label,
+  wide,
 }: {
   months: string[]
   series: Series[]
   label: string
+  /** A chart that spans the whole width of a screen: drawn wider so it stays low instead of tall. */
+  wide?: boolean
 }) {
+  const W = wide ? 960 : 480
   const { locale } = useLocale()
   const uid = useId().replace(/:/g, '')
   const tip = useChartTip()
