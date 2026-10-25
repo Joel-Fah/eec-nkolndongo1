@@ -225,6 +225,13 @@
       "when": 1792911161774,
       "tag": "0031_real_firebrand",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792927315259,
+      "tag": "0032_right_korvac",
+      "breakpoints": true
     }
   ]
 }

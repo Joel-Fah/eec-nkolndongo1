@@ -23,6 +23,8 @@ export const sundayReports = pgTable(
     note: text('note').notNull().default(''),
     attendanceBy: uuid('attendance_by').references(() => user.id, { onDelete: 'set null' }),
     attendanceAt: tz('attendance_at'),
+    /** Entered by a proposer (the editor, who reads the figures out): not counted anywhere until the secretariat validates it (decision 0045). */
+    attendancePending: boolean('attendance_pending').notNull().default(false),
     /** Once closed, nothing changes without reopening. */
     closed: boolean('closed').notNull().default(false),
     closedBy: uuid('closed_by').references(() => user.id, { onDelete: 'set null' }),
@@ -45,6 +47,8 @@ export const sundayOfferings = pgTable(
     /** Null = the congregation. */
     groupId: uuid('group_id').references(() => groups.id, { onDelete: 'set null' }),
     /** A « moissons » line may name a campaign; `progressId` is the unvalidated entry it created there (no foreign key: other module). */
+    /** Entered by a proposer: not counted, and not sent to the campaign, until the treasurer validates it. */
+    pending: boolean('pending').notNull().default(false),
     campaignId: uuid('campaign_id'),
     progressId: uuid('progress_id'),
     createdBy: uuid('created_by').references(() => user.id, { onDelete: 'set null' }),
