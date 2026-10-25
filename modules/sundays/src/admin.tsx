@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react'
 import { attendanceTotal, isSundayDate, trend, xaf } from './rules.ts'
 
 type Line = {
+  groupName?: { fr: string; en: string } | null
   id: string
   purpose: string
   amountXaf: number
@@ -31,6 +32,9 @@ type Line = {
 type Report = {
   id: string
   date: string
+  n: number
+  serviceName: string
+  services: number
   men: number | null
   women: number | null
   children: number | null
@@ -158,6 +162,9 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                             {r.closed && <Badge tone="success">{t(k('closed'))}</Badge>}
                             {r.serviceKind === 'special' && (
                               <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
+                            )}
+                            {r.services > 1 && (
+                              <Badge>{t(k('services_n'), { n: String(r.services) })}</Badge>
                             )}
                           </span>
                           <strong className="font-display text-2xl">
@@ -341,27 +348,59 @@ function Trends() {
 }
 
 /* ── One Sunday ───────────────────────────────────────────────────────── */
+type Sheet = { date: string; services: Report[] }
+const blankService = (date: string, n: number): Report => ({
+  id: '',
+  date,
+  n,
+  serviceName: '',
+  men: null,
+  women: null,
+  children: null,
+  attendance: 0,
+  serviceKind: 'ordinary',
+  serviceLabel: '',
+  note: '',
+  closed: false,
+  offerings: 0,
+  services: 1,
+  lines: [],
+})
+
 function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
   const { t, locale } = useLocale()
   const me = useMe().data
   const qc = useQueryClient()
+  const [extra, setExtra] = useState(1)
   const q = useQuery({
     queryKey: ['sun-report', date],
-    queryFn: () => api<Report>(`/sundays/reports/${date}`),
+    queryFn: () => api<Sheet>(`/sundays/reports/${date}`),
   })
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ['sun-report', date] })
     qc.invalidateQueries({ queryKey: ['sun-reports'] })
     qc.invalidateQueries({ queryKey: ['sun-analytics'] })
+    qc.invalidateQueries({ queryKey: ['sun-last'] })
   }
   const close = useMutation({
-    mutationFn: (closed: boolean) =>
-      api(`/sundays/reports/${date}/close`, { method: 'POST', body: { closed } }),
+    mutationFn: (x: { n: number; closed: boolean }) =>
+      api(`/sundays/reports/${date}/close?n=${x.n}`, {
+        method: 'POST',
+        body: { closed: x.closed },
+      }),
     onSuccess: refresh,
     onError: () => say(t(k('error')), 'danger'),
   })
-  const r = q.data
-  if (!r) return <div className="admin-panel" aria-busy="true" />
+  const data = q.data
+  if (!data) return <div className="admin-panel" aria-busy="true" />
+  // The services that exist, plus the ones just added and not yet saved (a new service is created by its first save).
+  const count = Math.min(Math.max(data.services.length, extra), 6)
+  const services = Array.from(
+    { length: count },
+    (_, i) => data.services.find((x) => x.n === i + 1) ?? blankService(date, i + 1),
+  )
+  const several = services.length > 1
+  const canAdd = hasPermission(me, 'sundays:attendance') || hasPermission(me, 'sundays:offerings')
   return (
     <div className="grid gap-6">
       <div>
@@ -371,34 +410,52 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
         </Button>
       </div>
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="grid gap-2">
-          <span className="flex flex-wrap items-center gap-2">
-            {r.closed ? (
-              <Badge tone="success">{t(k('closed'))}</Badge>
-            ) : (
-              <Badge tone="warning">{t(k('open_state'))}</Badge>
-            )}
-            {r.serviceKind === 'special' && (
-              <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
-            )}
-          </span>
-          <h1 className="text-4xl">{dayText(date, locale)}</h1>
-        </div>
-        {hasPermission(me, 'sundays:close') && (
-          <Button
-            variant={r.closed ? 'secondary' : 'primary'}
-            loading={close.isPending}
-            onClick={() => close.mutate(!r.closed)}
-          >
-            {t(k(r.closed ? 'reopen' : 'close'))}
+        <h1 className="text-4xl">{dayText(date, locale)}</h1>
+        {canAdd && count < 6 && (
+          <Button variant="secondary" onClick={() => setExtra(count + 1)}>
+            <Icon name="plus" size={20} />
+            {t(k('add_service'))}
           </Button>
         )}
       </header>
-      {r.closed && <p className="text-sm text-ink-muted">{t(k('closed_help'))}</p>}
-      <div className="reg-grid reg-grid-2">
-        {r.attendance !== null && <Attendance report={r} date={date} onChange={refresh} />}
-        <Offerings report={r} date={date} onChange={refresh} />
-      </div>
+      <TabsBox
+        tabs={services.map((r) => ({
+          id: `s${r.n}`,
+          label: r.serviceName || t(k('service_n'), { n: String(r.n) }),
+          content: (
+            <div className="grid gap-5" key={`${r.n}-${r.id}`}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="flex flex-wrap items-center gap-2">
+                  {r.closed ? (
+                    <Badge tone="success">{t(k('closed'))}</Badge>
+                  ) : (
+                    <Badge tone="warning">{t(k('open_state'))}</Badge>
+                  )}
+                  {r.serviceKind === 'special' && (
+                    <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
+                  )}
+                </span>
+                {r.id && hasPermission(me, 'sundays:close') && (
+                  <Button
+                    variant={r.closed ? 'secondary' : 'primary'}
+                    loading={close.isPending}
+                    onClick={() => close.mutate({ n: r.n, closed: !r.closed })}
+                  >
+                    {t(k(r.closed ? 'reopen' : 'close'))}
+                  </Button>
+                )}
+              </div>
+              {r.closed && <p className="text-sm text-ink-muted">{t(k('closed_help'))}</p>}
+              <div className="reg-grid reg-grid-2">
+                {(r.attendance !== null || !r.id) && (
+                  <Attendance report={r} date={date} several={several} onChange={refresh} />
+                )}
+                <Offerings report={r} date={date} onChange={refresh} />
+              </div>
+            </div>
+          ),
+        }))}
+      />
     </div>
   )
 }
@@ -406,10 +463,12 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
 function Attendance({
   report,
   date,
+  several,
   onChange,
 }: {
   report: Report
   date: string
+  several: boolean
   onChange: () => void
 }) {
   const { t } = useLocale()
@@ -422,15 +481,17 @@ function Attendance({
     special: report.serviceKind === 'special',
     label: report.serviceLabel,
     note: report.note,
+    name: report.serviceName,
   })
   const save = useMutation({
     mutationFn: () =>
-      api(`/sundays/reports/${date}/attendance`, {
+      api(`/sundays/reports/${date}/attendance?n=${report.n}`, {
         method: 'PUT',
         body: {
           men: num(v.men),
           women: num(v.women),
           children: num(v.children),
+          serviceName: v.name,
           serviceKind: v.special ? 'special' : 'ordinary',
           serviceLabel: v.special ? v.label : '',
           note: v.note,
@@ -463,6 +524,18 @@ function Attendance({
         {field('women')}
         {field('children')}
       </div>
+      {several && (
+        <TextField
+          label={t(k('service_name'))}
+          placeholder={t(k('service_name_ph'))}
+          maxLength={60}
+          value={v.name}
+          disabled={!can}
+          onChange={(e: { target: { value: string } }) =>
+            setV((x) => ({ ...x, name: e.target.value }))
+          }
+        />
+      )}
       <p className="font-display text-3xl">{t(k('present_n'), { n: String(total) })}</p>
       <label className="check-row">
         <input
@@ -535,7 +608,7 @@ function Offerings({
   const amount = Number(v.amount.replace(/\D/g, ''))
   const add = useMutation({
     mutationFn: () =>
-      api(`/sundays/reports/${date}/offerings`, {
+      api(`/sundays/reports/${date}/offerings?n=${report.n}`, {
         method: 'POST',
         body: {
           purpose,
@@ -559,9 +632,10 @@ function Offerings({
     },
     onError: () => say(t(k('error')), 'danger'),
   })
-  const groupName = (id: string | null) => {
-    if (!id) return t(k('congregation'))
-    const g = groups.data?.groups.find((x) => x.id === id)
+  const groupName = (l: Line) => {
+    if (!l.groupId) return t(k('congregation'))
+    if (l.groupName) return l.groupName[lang]
+    const g = groups.data?.groups.find((x) => x.id === l.groupId)
     return g ? (lang === 'en' && g.nameEn) || g.nameFr : '…'
   }
   const suggestions = hints.data?.custom ?? []
@@ -578,7 +652,7 @@ function Offerings({
               <span className="grid">
                 <strong>{purposeLabel(l.purpose, lang)}</strong>
                 <span className="text-sm text-ink-muted">
-                  {groupName(l.groupId)}
+                  {groupName(l)}
                   {l.linked ? ` · ${t(k('linked'))}` : ''}
                 </span>
               </span>

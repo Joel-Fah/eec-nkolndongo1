@@ -60,5 +60,11 @@
   "sundays_n": "{n} dimanche(s)",
   "by_purpose": "Par objet",
   "by_group": "Par groupe",
-  "save": "Enregistrer"
+  "save": "Enregistrer",
+  "add_service": "Ajouter un culte",
+  "service_n": "Culte {n}",
+  "services_n": "{n} cultes",
+  "service_name": "Nom de ce culte (facultatif)",
+  "service_name_ph": "Culte en anglais",
+  "dash_t": "Dimanche dernier"
 }

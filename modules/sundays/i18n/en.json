@@ -60,5 +60,11 @@
   "sundays_n": "{n} Sunday(s)",
   "by_purpose": "By purpose",
   "by_group": "By group",
-  "save": "Save"
+  "save": "Save",
+  "add_service": "Add a service",
+  "service_n": "Service {n}",
+  "services_n": "{n} services",
+  "service_name": "Name of this service (optional)",
+  "service_name_ph": "English service",
+  "dash_t": "Last Sunday"
 }

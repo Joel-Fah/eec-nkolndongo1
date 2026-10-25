@@ -44,6 +44,7 @@ export const attendanceBody = z
     children: z.number().int().min(0).max(100_000).nullable(),
     serviceKind: z.enum(['ordinary', 'special']),
     serviceLabel: text(80),
+    serviceName: text(60),
     // Internal; the form says it must not name anyone.
     note: text(120),
   })
@@ -62,18 +63,21 @@ export const offeringBody = z
 type Report = typeof sundayReports.$inferSelect
 type Offering = typeof sundayOfferings.$inferSelect
 
-async function getOrCreate(db: Db, date: string): Promise<Report> {
-  const [row] = await db.select().from(sundayReports).where(eq(sundayReports.sundayDate, date))
+/** Which service of the Sunday a call is about (1 to 6, default 1). */
+const serviceOf = (v: string | undefined) => Math.min(Math.max(Math.floor(Number(v)) || 1, 1), 6)
+const here = (date: string, n: number) =>
+  and(eq(sundayReports.sundayDate, date), eq(sundayReports.position, n))
+
+async function getOrCreate(db: Db, date: string, n = 1): Promise<Report> {
+  const [row] = await db.select().from(sundayReports).where(here(date, n))
   if (row) return row
   const [made] = await db
     .insert(sundayReports)
-    .values({ sundayDate: date })
+    .values({ sundayDate: date, position: n })
     .onConflictDoNothing()
     .returning()
   if (made) return made
-  return (
-    await db.select().from(sundayReports).where(eq(sundayReports.sundayDate, date))
-  )[0] as Report
+  return (await db.select().from(sundayReports).where(here(date, n)))[0] as Report
 }
 
 /** Lines the actor may see: all with a global right, otherwise only those of groups they may read. */
@@ -86,6 +90,8 @@ async function visibleLines(c: Parameters<typeof mayOn>[0], lines: Offering[]) {
 const dto = (r: Report, lines: Offering[], canAttendance: boolean) => ({
   id: r.id,
   date: r.sundayDate,
+  n: r.position ?? 1,
+  serviceName: r.serviceName ?? '',
   // Attendance is parish-wide: a group-scoped person does not see it.
   men: canAttendance ? r.men : null,
   women: canAttendance ? r.women : null,
@@ -186,29 +192,52 @@ export const sundaysApi = new Hono<AppEnv>()
           )
       : []
     const canAttendance = await mayOn(c, 'sundays:read', null)
-    const items = []
-    for (const r of reports)
-      items.push(
-        dto(
-          r,
-          await visibleLines(
-            c,
-            lines.filter((l) => l.reportId === r.id),
-          ),
-          canAttendance,
-        ),
+    // One entry per Sunday: its services added up.
+    const byDate = new Map<string, ReturnType<typeof dto>[]>()
+    for (const r of reports) {
+      const mine = await visibleLines(
+        c,
+        lines.filter((l) => l.reportId === r.id),
       )
+      byDate.set(r.sundayDate, [...(byDate.get(r.sundayDate) ?? []), dto(r, mine, canAttendance)])
+    }
+    const items = [...byDate.entries()].map(([date, svc]) => {
+      const sum = (k: 'men' | 'women' | 'children') =>
+        svc.every((x) => x[k] === null) ? null : svc.reduce((n, x) => n + (x[k] ?? 0), 0)
+      const men = sum('men')
+      const women = sum('women')
+      const children = sum('children')
+      return {
+        id: svc[0]?.id ?? '',
+        date,
+        services: svc.length,
+        men,
+        women,
+        children,
+        attendance: canAttendance ? (men ?? 0) + (women ?? 0) + (children ?? 0) : null,
+        serviceKind: svc.some((x) => x.serviceKind === 'special') ? 'special' : 'ordinary',
+        serviceLabel: svc.find((x) => x.serviceLabel)?.serviceLabel ?? '',
+        closed: svc.every((x) => x.closed),
+        offerings: svc.reduce((n, x) => n + x.offerings, 0),
+      }
+    })
     return c.json({ items })
   })
   .get('/reports/:date', requirePermissionAnywhere('sundays:read'), async (c) => {
     const date = c.req.param('date')
     if (!isSundayDate(date)) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
-    const [r] = await db.select().from(sundayReports).where(eq(sundayReports.sundayDate, date))
-    // A Sunday that has no report yet is simply an empty one (nothing is created by looking).
+    const rows = await db
+      .select()
+      .from(sundayReports)
+      .where(eq(sundayReports.sundayDate, date))
+      .orderBy(asc(sundayReports.position))
+    // A Sunday that has no report yet is simply an empty first service (nothing is created by looking).
     const empty = {
       id: '',
       sundayDate: date,
+      position: 1,
+      serviceName: '',
       men: null,
       women: null,
       children: null,
@@ -218,16 +247,47 @@ export const sundaysApi = new Hono<AppEnv>()
       closed: false,
       closedAt: null,
     } as unknown as Report
-    const lines = r
+    const all = rows.length
       ? await db
           .select()
           .from(sundayOfferings)
-          .where(eq(sundayOfferings.reportId, r.id))
+          .where(
+            inArray(
+              sundayOfferings.reportId,
+              rows.map((r) => r.id),
+            ),
+          )
           .orderBy(asc(sundayOfferings.createdAt))
       : []
-    return c.json(
-      dto(r ?? empty, await visibleLines(c, lines), await mayOn(c, 'sundays:read', null)),
+    const canAttendance = await mayOn(c, 'sundays:read', null)
+    const services = []
+    for (const r of rows.length ? rows : [empty])
+      services.push(
+        dto(
+          r,
+          await visibleLines(
+            c,
+            all.filter((l) => l.reportId === r.id),
+          ),
+          canAttendance,
+        ),
+      )
+    // Group names come with the lines, so the screen never has to guess them.
+    const names = new Map(
+      (await db.select({ id: groups.id, fr: groups.nameFr, en: groups.nameEn }).from(groups)).map(
+        (g) => [g.id, { fr: g.fr, en: g.en ?? g.fr }],
+      ),
     )
+    return c.json({
+      date,
+      services: services.map((sv) => ({
+        ...sv,
+        lines: sv.lines.map((l) => ({
+          ...l,
+          groupName: l.groupId ? (names.get(l.groupId) ?? null) : null,
+        })),
+      })),
+    })
   })
   .put('/reports/:date/attendance', requirePermission('sundays:attendance'), async (c) => {
     const date = c.req.param('date')
@@ -236,7 +296,7 @@ export const sundaysApi = new Hono<AppEnv>()
     for (const k of ['men', 'women', 'children'] as const)
       if (p.data[k] != null && !countOk(p.data[k])) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
-    const r = await getOrCreate(db, date)
+    const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     if (r.closed) return fail(c, 409, 'closed')
     const actor = await c.var.deps.actor()
     await db
@@ -272,7 +332,7 @@ export const sundaysApi = new Hono<AppEnv>()
     const groupId = p.data.groupId ?? null
     if (!(await mayOn(c, 'sundays:offerings', groupId))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
-    const r = await getOrCreate(db, date)
+    const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     if (r.closed) return fail(c, 409, 'closed')
     const actor = await c.var.deps.actor()
     const purpose = p.data.purpose
@@ -380,7 +440,7 @@ export const sundaysApi = new Hono<AppEnv>()
       .safeParse(await c.req.json().catch(() => null))
     if (!isSundayDate(date) || !p.success) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
-    const r = await getOrCreate(db, date)
+    const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     const actor = await c.var.deps.actor()
     await db
       .update(sundayReports)
@@ -468,6 +528,7 @@ export const sundaysApi = new Hono<AppEnv>()
     )
     const head = [
       'Dimanche',
+      'Culte',
       'Hommes',
       'Femmes',
       'Enfants',
@@ -482,6 +543,7 @@ export const sundaysApi = new Hono<AppEnv>()
       const mine = lines.filter((l) => l.reportId === r.id)
       const base = [
         r.sundayDate,
+        r.serviceName || `Culte ${r.position}`,
         r.men,
         r.women,
         r.children,

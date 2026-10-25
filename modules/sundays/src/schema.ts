@@ -9,6 +9,10 @@ export const sundayReports = pgTable(
     id: id(),
     /** The Sunday (YYYY-MM-DD). No foreign key to liturgy: either module can be switched off. */
     sundayDate: text('sunday_date').notNull(),
+    /** Which service of that Sunday (1, 2, 3…): a Sunday may have several, each with its own counts and offerings. */
+    position: integer('position').notNull().default(1),
+    /** A name for it when there are several (« 2e culte », « Culte en anglais »). */
+    serviceName: text('service_name').notNull().default(''),
     men: integer('men'),
     women: integer('women'),
     children: integer('children'),
@@ -25,7 +29,7 @@ export const sundayReports = pgTable(
     closedAt: tz('closed_at'),
     ...timestamps(),
   },
-  (t) => [uniqueIndex('sunday_reports_date_idx').on(t.sundayDate)],
+  (t) => [uniqueIndex('sunday_reports_date_idx').on(t.sundayDate, t.position)],
 )
 
 export const sundayOfferings = pgTable(

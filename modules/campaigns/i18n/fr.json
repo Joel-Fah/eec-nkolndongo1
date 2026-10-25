@@ -103,6 +103,8 @@
     "give_t": "Donner, simplement",
     "give_p": "Si votre cœur vous y pousse, voici comment faire. Rien n’est jamais demandé : seulement offert.",
     "close_t": "Merci d’être là",
-    "close_p": "Que vous donniez ou non, vous faites partie de cette récolte. Partagez la joie avec vos proches."
+    "close_p": "Que vous donniez ou non, vous faites partie de cette récolte. Partagez la joie avec vos proches.",
+    "card_parish": "Paroisse EEC Nkolndongo 1",
+    "of_target": "sur {b}"
   }
 }

@@ -58,6 +58,7 @@ export function rollup(
   }[],
   grain: 'week' | 'month',
 ) {
+  const seen = new Set<string>()
   const m = new Map<
     string,
     {
@@ -81,7 +82,11 @@ export function rollup(
       offerings: 0,
       byPurpose: new Map(),
     }
-    e.sundays++
+    // A Sunday with several services still counts once.
+    if (!seen.has(`${p}|${r.date}`)) {
+      seen.add(`${p}|${r.date}`)
+      e.sundays++
+    }
     e.men += r.men ?? 0
     e.women += r.women ?? 0
     e.children += r.children ?? 0

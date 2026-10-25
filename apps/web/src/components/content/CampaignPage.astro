@@ -188,7 +188,7 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
                         <path class="hv-m-rim" d="M14 40h72" fill="none" />
                       </svg>
                       <span class="hv-m-name">{x.name}</span>
-                      <span class="hv-m-says">{money(x.raised)}</span>
+                      <span class="hv-m-says">{money(x.raised)}<small>{s('of_target', { b: money(x.goal) })}</small></span>
                     </button>
                   </li>
                 )
@@ -226,7 +226,18 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
           {full.percent >= 100 && <span class="hv-cheer" aria-hidden="true">{Array.from({ length: 12 }, (_, k) => <i style={`--k:${k}`} data-shape={['star', 'dot', 'bar', 'ring'][k % 4]} />)}</span>}
           <h2 id="hv-c">{s('close_t')}</h2>
           <p class="hv-lead">{s('close_p')}</p>
-          <img class="hv-card" src={`/api/campaigns/public/share.svg?locale=${locale}`} alt={s('basket', { p: String(full.percent) })} width="1200" height="630" loading="lazy" />
+          <div class="hv-stack" role="img" aria-label={`${full.title}: ${money(full.raised)} — ${s('percent', { p: String(full.percent) })}`}>
+            <span class="hv-sheet hv-sheet-a" aria-hidden="true"></span>
+            <span class="hv-sheet hv-sheet-b" aria-hidden="true"></span>
+            <span class="hv-sheet hv-sheet-c" aria-hidden="true"></span>
+            <div class="hv-sheet hv-sheet-front" aria-hidden="true">
+              <span class="hv-s-kicker">{s('card_parish')}</span>
+              <strong class="hv-s-title">{full.title}</strong>
+              <span class="hv-s-amount">{money(full.raised)}</span>
+              <span class="hv-s-track"><span style={`width:${fill}%`}></span></span>
+              <span class="hv-s-pct">{s('percent', { p: String(full.percent) })}</span>
+            </div>
+          </div>
           <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share')}<Icon name="external" size={16} /></Button>
         </section>
       </div>
@@ -250,7 +261,8 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     gap: clamp(3rem, 8vw, 6rem);
     padding-block: clamp(2.5rem, 6vw, 5rem);
     padding-inline: max(1rem, calc((100% - 64rem) / 2));
-    background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--gold) 13%, var(--bg)) 55%, color-mix(in oklab, var(--primary) 8%, var(--bg)));
+    /* Starts and ends on the page colour, so it blends into the sections before and after. */
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in oklab, var(--gold) 11%, var(--bg)) 40%, color-mix(in oklab, var(--gold) 9%, var(--bg)) 65%, var(--bg) 100%);
   }
   .hv-dots {
     position: absolute;
@@ -442,7 +454,7 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
   .hv-field {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem 2rem;
+    gap: 1.25rem 1.5rem;
     justify-content: center;
     padding-block: 1rem;
   }
@@ -460,7 +472,7 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     display: grid;
     justify-items: center;
     gap: 0.125rem;
-    width: 7.5rem;
+    width: 9.5rem;
     padding: 0.5rem;
     border-radius: var(--radius-lg);
     text-align: center;
@@ -504,16 +516,17 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     font-weight: 700;
     font-size: var(--text-sm);
   }
-  /* A word appears on hover or focus; it never says who is ahead. */
+  /* Each group's own amount and its own target, always visible (no hover needed); no order, no ranking. */
   .hv-m-says {
-    font-size: var(--text-xs);
-    color: var(--ink-muted);
-    opacity: 0;
-    transition: opacity var(--duration-ui, 0.28s) ease;
+    display: grid;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
   }
-  .hv-mini:hover .hv-m-says,
-  .hv-mini:focus-visible .hv-m-says {
-    opacity: 1;
+  .hv-m-says small {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--ink-muted);
   }
 
   /* 3 — the week ahead: a ribbon of cards */
@@ -526,6 +539,15 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     overflow-x: auto;
     scroll-snap-type: x proximity;
     scrollbar-width: thin;
+  }
+  @media (max-width: 47.99rem) {
+    /* On a phone the ribbon runs from one screen edge to the other, then scrolls under the edges. */
+    .hv-ribbon {
+      margin-inline: -1rem;
+      padding-inline: 1rem;
+      scroll-padding-inline: 1rem;
+      grid-auto-columns: min(72%, 15rem);
+    }
   }
   .hv-ribbon li {
     scroll-snap-align: start;
@@ -584,12 +606,92 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     justify-items: center;
     text-align: center;
   }
-  .hv-card {
-    width: min(100%, 30rem);
-    height: auto;
+  /* The thanks card: a few sheets dropped on one another, each tilted its own way, tinted from the theme (no frame, no top rule). */
+  .hv-stack {
+    position: relative;
+    display: grid;
+    width: min(84%, 24rem);
+    margin-block: 1.5rem 1rem;
+    aspect-ratio: 4 / 3;
+  }
+  .hv-sheet {
+    grid-area: 1 / 1;
     border-radius: var(--radius-lg);
-    box-shadow: var(--elevation-1);
-    transform: rotate(-1.5deg);
+    box-shadow: var(--elevation-2);
+    transition: transform var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hv-sheet-a {
+    background: color-mix(in oklab, var(--gold) 38%, var(--surface));
+    transform: rotate(-9deg) translate(-4%, 3%);
+  }
+  .hv-sheet-b {
+    background: color-mix(in oklab, var(--primary) 22%, var(--surface));
+    transform: rotate(6deg) translate(5%, 1%);
+  }
+  .hv-sheet-c {
+    background: color-mix(in oklab, var(--clay, var(--season)) 26%, var(--surface));
+    transform: rotate(-3deg) translate(-1%, -3%);
+  }
+  .hv-sheet-front {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    transform: rotate(1.5deg);
+    text-align: start;
+  }
+  .hv-stack:hover .hv-sheet-a {
+    transform: rotate(-12deg) translate(-8%, 4%);
+  }
+  .hv-stack:hover .hv-sheet-b {
+    transform: rotate(9deg) translate(9%, 1%);
+  }
+  .hv-stack:hover .hv-sheet-c {
+    transform: rotate(-5deg) translate(-3%, -5%);
+  }
+  .hv-s-kicker {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .hv-s-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.15;
+  }
+  .hv-s-amount {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--primary);
+  }
+  .hv-s-track {
+    display: block;
+    width: 100%;
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .hv-s-track > span {
+    display: block;
+    height: 100%;
+    background: var(--gold);
+  }
+  .hv-s-pct {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hv-sheet {
+      transition: none;
+    }
   }
   .hv-cheer {
     position: absolute;
@@ -639,7 +741,7 @@ const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${sh
     gap: 1rem;
     padding: clamp(3rem, 8vw, 6rem) 1rem;
     text-align: center;
-    background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--gold) 13%, var(--bg)));
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in oklab, var(--gold) 11%, var(--bg)) 50%, var(--bg) 100%);
   }
   .hv-teaser-in {
     display: grid;

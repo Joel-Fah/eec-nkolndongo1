@@ -78,6 +78,10 @@ describe('weekly and monthly trends', () => {
     expect(r[0]).toMatchObject({ sundays: 2, men: 50, attendance: 50 + 20 + 10, offerings: 4000 })
     expect(r[1]?.byPurpose).toEqual({ dime: 5000 })
   })
+  it('counts a Sunday once even with two services', () => {
+    const two = [rep('2026-10-04', 20, []), rep('2026-10-04', 5, [])]
+    expect(rollup(two, 'month')[0]).toMatchObject({ sundays: 1, men: 25 })
+  })
   it('compares with the period before', () => {
     expect(trend(150, 100)).toBe(50)
     expect(trend(50, 100)).toBe(-50)

@@ -56,7 +56,6 @@ export function shareCardSvg(o: {
   const bar = Math.round((w - 160) * (fillOf(o.raised, o.goal) / 100))
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="${esc(`${o.title}: ${xaf(o.raised)} / ${xaf(o.goal)}`)}">
 <rect width="1200" height="630" fill="#FFFDF8"/>
-<rect x="0" y="0" width="1200" height="14" fill="#1E5B3A"/>
 <text x="80" y="110" font-family="Georgia, serif" font-size="30" fill="#5A6A62">${esc(o.church)}</text>
 <text x="80" y="210" font-family="Georgia, serif" font-size="68" font-weight="700" fill="#22302A">${esc(o.title)}</text>
 <text x="80" y="340" font-family="Georgia, serif" font-size="96" font-weight="700" fill="#1E5B3A">${esc(xaf(o.raised))}</text>

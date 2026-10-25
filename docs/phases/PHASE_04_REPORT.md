@@ -154,3 +154,8 @@ visits open the home; `/fr/` and `/en/` are never redirected (`openOnSunday`, un
 
 **Grants to give on every environment (Rôles):** treasurer `campaigns:read/progress`, `sundays:read/offerings`; secretariat `campaigns:read/edit/validate`,
 `sundays:read/attendance/close/export`, `registrations:*`; pastor `sundays:read`; group leader `sundays:read` (+ `sundays:offerings` for their group if wanted).
+
+**Round after Checkpoint E (2026-10-25):** the thanks card is now stacked, tilted, theme-tinted sheets (no top rule; the SVG share card lost its top bar too);
+each group shows its own amount and target at all times; the week ribbon runs edge to edge on phones; the page's background starts and ends on
+the page colour so it blends with its neighbours; a Sunday can have several services (migration 0030, tabs per service, a Sunday counts once in
+trends); « Dimanche dernier » card on the main dashboard; group names travel with the offering lines.
