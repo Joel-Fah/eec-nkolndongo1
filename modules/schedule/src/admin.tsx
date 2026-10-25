@@ -4,7 +4,7 @@
  * reason). A time can repeat weekly, every N weeks, or on given Sundays of the month, and can follow another time
  * (the preparation four days before the Holy Supper) so it moves with it. Only approved times are public.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, TimeField, useLocale, useMe } from '@eec/admin-kit'
 import { GuardedDialog, ViewToggle } from '@eec/content-kit'
 import { SLOT_KINDS, type SlotKind, type SlotRecurrence, shortDate } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
@@ -421,25 +421,17 @@ export default function SchedulePage() {
                 options={DAYS.map((wd) => ({ value: String(wd), label: dayName(wd) }))}
               />
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('start'))}</span>
-                  <input
-                    className="input"
-                    type="time"
-                    required
-                    value={editing.startTime}
-                    onChange={(e) => setEditing({ ...editing, startTime: e.target.value })}
-                  />
-                </label>
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('end'))}</span>
-                  <input
-                    className="input"
-                    type="time"
-                    value={editing.endTime}
-                    onChange={(e) => setEditing({ ...editing, endTime: e.target.value })}
-                  />
-                </label>
+                <TimeField
+                  label={t(k('start'))}
+                  required
+                  value={editing.startTime}
+                  onChange={(v: string) => setEditing({ ...editing, startTime: v })}
+                />
+                <TimeField
+                  label={t(k('end'))}
+                  value={editing.endTime}
+                  onChange={(v: string) => setEditing({ ...editing, endTime: v })}
+                />
               </div>
 
               <fieldset className="form-group">
@@ -724,16 +716,12 @@ function Exceptions({
                 label: t(k(`exc_${x}`)),
               }))}
             />
-            <label className="grid gap-1">
-              <span className="field-label">{t(k('exc_date'))}</span>
-              <input
-                className="input"
-                type="date"
-                required
-                value={f.date}
-                onChange={(e) => setF({ ...f, date: e.target.value })}
-              />
-            </label>
+            <DateField
+              label={t(k('exc_date'))}
+              required
+              value={f.date}
+              onChange={(v: string) => setF({ ...f, date: v })}
+            />
             {f.kind !== 'extra' && (
               <SelectField
                 label={t(k('exc_slot'))}
@@ -746,16 +734,12 @@ function Exceptions({
               />
             )}
             {f.kind === 'moved' && (
-              <label className="grid gap-1">
-                <span className="field-label">{t(k('exc_to'))}</span>
-                <input
-                  className="input"
-                  type="date"
-                  required
-                  value={f.toDate}
-                  onChange={(e) => setF({ ...f, toDate: e.target.value })}
-                />
-              </label>
+              <DateField
+                label={t(k('exc_to'))}
+                required
+                value={f.toDate}
+                onChange={(v: string) => setF({ ...f, toDate: v })}
+              />
             )}
             {f.kind === 'extra' && (
               <TextField
@@ -770,25 +754,17 @@ function Exceptions({
             )}
             {(f.kind === 'changed' || f.kind === 'extra') && (
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('start'))}</span>
-                  <input
-                    className="input"
-                    type="time"
-                    required
-                    value={f.startTime}
-                    onChange={(e) => setF({ ...f, startTime: e.target.value })}
-                  />
-                </label>
-                <label className="grid gap-1">
-                  <span className="field-label">{t(k('end'))}</span>
-                  <input
-                    className="input"
-                    type="time"
-                    value={f.endTime}
-                    onChange={(e) => setF({ ...f, endTime: e.target.value })}
-                  />
-                </label>
+                <TimeField
+                  label={t(k('start'))}
+                  required
+                  value={f.startTime}
+                  onChange={(v: string) => setF({ ...f, startTime: v })}
+                />
+                <TimeField
+                  label={t(k('end'))}
+                  value={f.endTime}
+                  onChange={(v: string) => setF({ ...f, endTime: v })}
+                />
               </div>
             )}
             <TextField

@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD COLUMN "photo_as_avatar" boolean DEFAULT false NOT NULL;

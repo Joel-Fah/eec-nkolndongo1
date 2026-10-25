@@ -41,6 +41,9 @@ export const historyMilestones = pgTable(
     textFr: text('text_fr').notNull().default(''),
     textEn: text('text_en').notNull().default(''),
     mediaId: uuid('media_id'),
+    /** More pictures after the first (a deck of cards on the page), and how the deck is laid out. */
+    extraMediaIds: jsonb('extra_media_ids').$type<string[]>().notNull().default([]),
+    layout: text('layout').notNull().default('auto'),
     sortOrder: integer('sort_order').notNull().default(0),
     state: text('state').notNull().default('draft'),
     updatedBy: uuid('updated_by').references(() => user.id, { onDelete: 'set null' }),

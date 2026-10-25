@@ -35,7 +35,7 @@ export const liturgyModule = defineModule({
         group: 'parish',
         label: { fr: 'Liturgie', en: 'Liturgy' },
         path: '/m/liturgy',
-        icon: 'book',
+        icon: 'notebook',
         order: 30,
         permission: 'liturgy:read',
       },

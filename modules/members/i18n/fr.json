@@ -23,7 +23,8 @@
     "phone": "Téléphone",
     "joined": "Inscrit le",
     "groups": "Groupes",
-    "news": "Nouvelles"
+    "news": "Nouvelles",
+    "sign_in": "Connexion"
   },
   "news_yes": "Oui",
   "news_no": "Non",
@@ -37,7 +38,21 @@
     "granted": "accordé le {date}",
     "withdrawn": "retiré le {date}",
     "version": "version {v}",
-    "no_groups": "Aucun groupe."
+    "no_groups": "Aucun groupe.",
+    "age": "Tranche d’âge",
+    "gender": "Genre",
+    "place": "Quartier, ville",
+    "marital": "Situation matrimoniale",
+    "profession": "Profession",
+    "kind_profile": "Profil complet",
+    "contact": "Contact",
+    "language": "Langue",
+    "profile": "Profil",
+    "profile_empty": "Cette personne n’a pas encore complété son profil.",
+    "journey": "Parcours",
+    "deleting": "Suppression demandée",
+    "state_on": "Actif",
+    "state_off": "Retiré"
   },
   "err": {
     "generic": "Une erreur est survenue.",
@@ -56,5 +71,19 @@
     "empty": "Pas encore de membres : les chiffres apparaîtront avec les premières inscriptions.",
     "recent": "Activité récente",
     "no_groups": "Aucun groupe pour l’instant : créez-les dans « Groupes »."
-  }
+  },
+  "age_under18": "Moins de 18 ans",
+  "age_18-25": "18–25 ans",
+  "age_26-35": "26–35 ans",
+  "age_36-50": "36–50 ans",
+  "age_51-65": "51–65 ans",
+  "age_over65": "Plus de 65 ans",
+  "gender_woman": "Femme",
+  "gender_man": "Homme",
+  "marital_single": "Célibataire",
+  "marital_married": "Marié(e)",
+  "marital_widowed": "Veuf / veuve",
+  "marital_divorced": "Divorcé(e)",
+  "sign_google": "Google",
+  "sign_email": "E-mail et mot de passe"
 }

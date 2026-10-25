@@ -1,20 +1,26 @@
 import { Menu } from '@base-ui/react/menu'
-import { useLocale, useMe, useSessionActions } from '@eec/admin-kit'
+import { api, useLocale, useMe, useSessionActions } from '@eec/admin-kit'
+import { avatarSvg } from '@eec/ui/avatar-art'
+import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { guideForPath } from '../lib/help'
 import { labelOf, navFor } from '../lib/nav'
 import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
+import { HelpSheet } from './HelpSheet'
 import { Icon } from './Icon'
 import { LeavingScreen } from './LeavingScreen'
 import { NavProgress } from './Loading'
+import { NotificationsBell } from './Notifications'
 
 export function AppShell() {
   const { t, locale } = useLocale()
   const [palette, setPalette] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   useEffect(() => {
     document.documentElement.toggleAttribute('data-nav-open', mobileOpen)
     return () => document.documentElement.removeAttribute('data-nav-open')
@@ -22,6 +28,21 @@ export function AppShell() {
   const me = useMe().data
   const { signOut } = useSessionActions()
   const navigate = useNavigate()
+  // The avatar: the generated abstract one (or the person's own picture only if they shared it), with a warning mark while the
+  // profile is incomplete (decision 0047). Staff are members of the congregation too.
+  const badge = useQuery({
+    queryKey: ['badge'],
+    queryFn: () =>
+      api<{
+        signedIn: boolean
+        seed?: number
+        incomplete?: boolean
+        photo?: string | null
+      }>('/me/badge'),
+    staleTime: 5 * 60_000,
+    enabled: !!me,
+  })
+  const b = badge.data
   const initials = (me?.user.name ?? '??')
     .split(/\s+/)
     .map((w) => w[0] ?? '')
@@ -111,11 +132,47 @@ export function AppShell() {
             <kbd className="admin-kbd">⌘K</kbd>
           </button>
           <div className="admin-topbar-tools">
+            <NotificationsBell />
+            {guideForPath(path) && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-icon"
+                aria-label={t('admin.help.here')}
+                data-tip={t('admin.help.here')}
+                aria-haspopup="dialog"
+                onClick={() => setHelpOpen(true)}
+              >
+                <Icon name="help" size={20} />
+              </button>
+            )}
             <LocaleSwitch />
             <ThemeButton />
             <Menu.Root>
-              <Menu.Trigger className="avatar admin-avatar" aria-label={t('admin.user.menu')}>
-                {initials}
+              <Menu.Trigger
+                className="avatar admin-avatar"
+                aria-label={b?.incomplete ? t('admin.user.menu_incomplete') : t('admin.user.menu')}
+                data-tip={b?.incomplete ? t('admin.user.menu_incomplete') : t('admin.user.menu')}
+                data-tip-end
+              >
+                {b?.signedIn ? (
+                  b.photo ? (
+                    <img className="admin-avatar-img" src={b.photo} alt="" />
+                  ) : (
+                    <span
+                      className="admin-avatar-img"
+                      aria-hidden="true"
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
+                      dangerouslySetInnerHTML={{ __html: avatarSvg(b.seed ?? 0) }}
+                    />
+                  )
+                ) : (
+                  initials
+                )}
+                {b?.incomplete && (
+                  <span className="acct-badge" aria-hidden="true">
+                    !
+                  </span>
+                )}
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">
@@ -126,6 +183,9 @@ export function AppShell() {
                     </div>
                     <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
                       {t('admin.items.account')}
+                      {b?.incomplete && (
+                        <span className="menu-flag">{t('admin.user.to_complete')}</span>
+                      )}
                     </Menu.LinkItem>
                     <Menu.Item
                       className="menu-item menu-item-danger"
@@ -152,6 +212,10 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      <HelpSheet
+        slug={helpOpen ? (guideForPath(path)?.slug ?? null) : null}
+        onOpenChange={setHelpOpen}
+      />
       {leaving && <LeavingScreen />}
     </div>
   )

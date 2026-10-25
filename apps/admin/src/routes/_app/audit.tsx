@@ -1,4 +1,4 @@
-import { api, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, useLocale, useMe } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
 import { Button, EmptyState, SelectField, TextField } from '@eec/ui/react'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -98,20 +98,12 @@ function Audit() {
             })),
           ]}
         />
-        <TextField
+        <DateField
           label={t('admin.audit.from')}
-          placeholder="AAAA-MM-JJ"
-          type="date"
           value={from}
-          onChange={(e: { target: { value: string } }) => setFrom(e.target.value)}
+          onChange={(v: string) => setFrom(v)}
         />
-        <TextField
-          label={t('admin.audit.to')}
-          placeholder="AAAA-MM-JJ"
-          type="date"
-          value={to}
-          onChange={(e: { target: { value: string } }) => setTo(e.target.value)}
-        />
+        <DateField label={t('admin.audit.to')} value={to} onChange={(v: string) => setTo(v)} />
       </div>
       {log.data && entries.length === 0 ? (
         <EmptyState

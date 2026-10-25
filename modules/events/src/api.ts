@@ -130,6 +130,7 @@ export const patchSchema = z
     coverMediaId: z.string().uuid().nullable(),
     groupId: z.string().uuid().nullable(),
     featured: z.boolean(),
+    acceptsRegistrations: z.boolean(),
     kind: z.enum(EVENT_KINDS),
     slug: z.string().max(120),
   })
@@ -164,6 +165,7 @@ const snapshotOf = (r: Row) => ({
   registrationUrl: r.registrationUrl,
   coverMediaId: r.coverMediaId,
   featured: r.featured,
+  acceptsRegistrations: r.acceptsRegistrations,
   kind: r.kind,
   slug: r.slug,
 })
@@ -204,6 +206,7 @@ const lifecycle = contentRoutes<Row>({
     registrationUrl: s.registrationUrl,
     coverMediaId: s.coverMediaId,
     featured: s.featured,
+    acceptsRegistrations: s.acceptsRegistrations ?? false,
     kind: s.kind ?? 'autre',
   }),
   problems: (row, dates) => publishProblems({ title: row.titleFr, bodyEmpty: false, ...dates }),
@@ -300,6 +303,7 @@ type PublicOcc = {
   locationKind: string
   fallback: boolean
   featured: boolean
+  acceptsRegistrations: boolean
   kind: string
   group: string | null
   groupKey: string | null
@@ -346,6 +350,7 @@ function toPublic(
       locationKind: r.locationKind,
       fallback: locale === 'en' && !en,
       featured: r.featured,
+      acceptsRegistrations: r.acceptsRegistrations,
       kind: r.kind,
       group: g ? (locale === 'en' && g.nameEn ? g.nameEn : g.nameFr) : null,
       groupKey: g?.key ?? null,
@@ -745,6 +750,7 @@ export const eventsApi = new Hono<AppEnv>()
       'coverMediaId',
       'groupId',
       'featured',
+      'acceptsRegistrations',
     ] as const)
       if (patch[k] !== undefined) set[k] = patch[k]
     // The address follows the title until the first publication; after that only an explicit change moves it.

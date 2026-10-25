@@ -3,12 +3,14 @@
  * Names and contacts are personal data: this screen needs `members:read`, the export `members:export`.
  */
 import { Dialog } from '@base-ui/react/dialog'
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
-import { shortDate } from '@eec/core'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { avatarSeed, shortDate } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
-import { Avatar, Badge, Button, SelectField, TextField, toastManager } from '@eec/ui/react'
+import { avatarSvg } from '@eec/ui/avatar-art'
+import type { IconName } from '@eec/ui/icons'
+import { Avatar, Badge, Button, Icon, SelectField, TextField, toastManager } from '@eec/ui/react'
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 
 type Group = { key: string; nameFr: string; nameEn: string | null }
 type Row = {
@@ -21,14 +23,23 @@ type Row = {
   deletionRequestedAt: string | null
   groups: Group[]
   news: boolean
+  signIn?: ('google' | 'email')[]
+  ageBand?: string | null
+  gender?: string | null
+  neighbourhood?: string | null
+  city?: string | null
+  maritalStatus?: string | null
+  profession?: string | null
+  photoUrl?: string | null
 }
 type Stats = { byGroup: (Group & { n: number })[] }
 type Detail = Row & {
   firstName: string
   lastName: string
   lastSeenAt: string | null
+  locale?: string
   consents: {
-    kind: 'privacy' | 'news'
+    kind: 'privacy' | 'news' | 'profile'
     policyVersion: string
     grantedAt: string
     withdrawnAt: string | null
@@ -132,13 +143,7 @@ export default function MembersPage() {
             { value: 'deactivated', label: t(k('status_deactivated')) },
           ]}
         />
-        <TextField
-          label={t(k('since'))}
-          placeholder="2026-01-01"
-          type="date"
-          value={since}
-          onChange={(e: { target: { value: string } }) => setSince(e.target.value)}
-        />
+        <DateField label={t(k('since'))} value={since} onChange={(v: string) => setSince(v)} />
       </div>
 
       {list.isPending ? (
@@ -155,6 +160,7 @@ export default function MembersPage() {
                   <th scope="col">{t(k('col.name'))}</th>
                   <th scope="col">{t(k('col.email'))}</th>
                   <th scope="col">{t(k('col.phone'))}</th>
+                  <th scope="col">{t(k('col.sign_in'))}</th>
                   <th scope="col">{t(k('col.joined'))}</th>
                   <th scope="col">{t(k('col.groups'))}</th>
                   <th scope="col">{t(k('col.news'))}</th>
@@ -185,6 +191,15 @@ export default function MembersPage() {
                     </td>
                     <td>{m.email}</td>
                     <td>{m.phone ?? '—'}</td>
+                    <td>
+                      <span className="flex flex-wrap gap-1">
+                        {(m.signIn ?? []).map((x) => (
+                          <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                            {t(k(`sign_${x}`))}
+                          </Badge>
+                        ))}
+                      </span>
+                    </td>
                     <td>{date(m.joinedAt)}</td>
                     <td>{m.groups.map(gname).join(', ') || '—'}</td>
                     <td>{t(k(m.news ? 'news_yes' : 'news_no'))}</td>
@@ -220,59 +235,157 @@ function DetailSheet({ id, onClose }: { id: string; onClose: () => void }) {
   })
   const d = data.data
   const date = (v: string) => shortDate(v, locale)
+  const row = (icon: IconName, label: string, value: ReactNode) => (
+    <div className="mem-row">
+      <span className="mem-row-ico" aria-hidden="true">
+        <Icon name={icon} size={16} />
+      </span>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  )
+  const place = d ? [d.neighbourhood, d.city].filter(Boolean).join(', ') : ''
+  const hasProfile = !!d && !!(d.ageBand || d.gender || place || d.maritalStatus || d.profession)
   return (
     <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>
         <Dialog.Backdrop className="eec-backdrop eec-overlay" />
-        <Dialog.Popup className="sheet eec-sheet" data-side="end">
-          <div className="dialog-body">
-            <Dialog.Title className="dialog-title">{t(k('detail.title'))}</Dialog.Title>
+        <Dialog.Popup className="sheet eec-sheet mem-sheet" data-side="end">
+          <div className="dialog-body mem-body">
+            <Dialog.Title className="sr-only">{t(k('detail.title'))}</Dialog.Title>
             {!d ? (
               <span className="skeleton h-48" aria-busy="true" />
             ) : (
-              <div className="grid gap-4">
-                <div>
-                  <p className="text-2xl">{d.name}</p>
-                  <p className="text-ink-muted">{d.email}</p>
-                  {d.phone && <p className="text-ink-muted">{d.phone}</p>}
-                </div>
-                <dl className="grid grid-cols-2 gap-2 text-sm">
-                  <dt className="text-ink-muted">{t(k('col.joined'))}</dt>
-                  <dd>{date(d.joinedAt)}</dd>
-                  <dt className="text-ink-muted">{t(k('detail.last_seen'))}</dt>
-                  <dd>{d.lastSeenAt ? date(d.lastSeenAt) : '—'}</dd>
-                  <dt className="text-ink-muted">{t(k('status'))}</dt>
-                  <dd>{t(k(`status_${d.status}`))}</dd>
-                </dl>
-                <div>
-                  <h3 className="text-lg">{t(k('col.groups'))}</h3>
+              <>
+                <header className="mem-hero">
+                  <span className="mem-photo" aria-hidden="true">
+                    {d.photoUrl ? (
+                      <img src={d.photoUrl} alt="" referrerPolicy="no-referrer" />
+                    ) : (
+                      <span
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
+                        dangerouslySetInnerHTML={{ __html: avatarSvg(avatarSeed(d.id)) }}
+                      />
+                    )}
+                  </span>
+                  <div className="grid gap-2">
+                    <p className="mem-name">{d.name}</p>
+                    <p className="text-ink-muted">{d.email}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge tone={d.status === 'active' ? 'success' : 'warning'}>
+                        {t(k(`status_${d.status}`))}
+                      </Badge>
+                      {d.ageBand && <Badge tone="info">{t(k(`age_${d.ageBand}`))}</Badge>}
+                      {d.city && <Badge tone="gold">{d.city}</Badge>}
+                      {d.deletionRequestedAt && (
+                        <Badge tone="danger">{t(k('detail.deleting'))}</Badge>
+                      )}
+                    </div>
+                  </div>
+                </header>
+
+                <section className="mem-card" aria-labelledby="mem-contact">
+                  <h3 id="mem-contact" className="mem-card-t">
+                    {t(k('detail.contact'))}
+                  </h3>
+                  <dl className="mem-rows">
+                    {row('mail', t(k('col.email')), d.email)}
+                    {row('phone', t(k('col.phone')), d.phone ?? '—')}
+                    {row(
+                      'shield',
+                      t(k('col.sign_in')),
+                      <span className="flex flex-wrap gap-1">
+                        {(d.signIn ?? []).map((x) => (
+                          <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                            {t(k(`sign_${x}`))}
+                          </Badge>
+                        ))}
+                      </span>,
+                    )}
+                    {row(
+                      'language',
+                      t(k('detail.language')),
+                      d.locale === 'en' ? 'English' : 'Français',
+                    )}
+                  </dl>
+                </section>
+
+                <section className="mem-card" aria-labelledby="mem-profile">
+                  <h3 id="mem-profile" className="mem-card-t">
+                    {t(k('detail.profile'))}
+                  </h3>
+                  {hasProfile ? (
+                    <dl className="mem-rows">
+                      {d.ageBand && row('calendar', t(k('detail.age')), t(k(`age_${d.ageBand}`)))}
+                      {d.gender &&
+                        row('account', t(k('detail.gender')), t(k(`gender_${d.gender}`)))}
+                      {place && row('location', t(k('detail.place')), place)}
+                      {d.maritalStatus &&
+                        row('couple', t(k('detail.marital')), t(k(`marital_${d.maritalStatus}`)))}
+                      {d.profession && row('checklist', t(k('detail.profession')), d.profession)}
+                    </dl>
+                  ) : (
+                    <p className="mem-empty">{t(k('detail.profile_empty'))}</p>
+                  )}
+                </section>
+
+                <section className="mem-card" aria-labelledby="mem-journey">
+                  <h3 id="mem-journey" className="mem-card-t">
+                    {t(k('detail.journey'))}
+                  </h3>
+                  <dl className="mem-rows">
+                    {row('calendar', t(k('col.joined')), date(d.joinedAt))}
+                    {row(
+                      'clock',
+                      t(k('detail.last_seen')),
+                      d.lastSeenAt ? date(d.lastSeenAt) : '—',
+                    )}
+                  </dl>
+                </section>
+
+                <section className="mem-card" aria-labelledby="mem-groups">
+                  <h3 id="mem-groups" className="mem-card-t">
+                    {t(k('col.groups'))}
+                  </h3>
                   {d.groups.length ? (
-                    <ul className="text-sm">
+                    <ul className="mem-chips">
                       {d.groups.map((g) => (
-                        <li key={g.key}>{locale === 'en' ? (g.nameEn ?? g.nameFr) : g.nameFr}</li>
+                        <li key={g.key}>
+                          <Badge>{locale === 'en' ? (g.nameEn ?? g.nameFr) : g.nameFr}</Badge>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-ink-muted">{t(k('detail.no_groups'))}</p>
+                    <p className="mem-empty">{t(k('detail.no_groups'))}</p>
                   )}
-                </div>
-                <div>
-                  <h3 className="text-lg">{t(k('detail.consents'))}</h3>
-                  <ul className="grid gap-1 text-sm">
+                </section>
+
+                <section className="mem-card" aria-labelledby="mem-consents">
+                  <h3 id="mem-consents" className="mem-card-t">
+                    {t(k('detail.consents'))}
+                  </h3>
+                  <ul className="mem-consents">
                     {d.consents.map((c) => (
                       <li key={`${c.kind}${c.grantedAt}`}>
-                        {t(k(`detail.kind_${c.kind}`))} —{' '}
-                        {c.withdrawnAt
-                          ? t(k('detail.withdrawn'), { date: date(c.withdrawnAt) })
-                          : t(k('detail.granted'), { date: date(c.grantedAt) })}{' '}
-                        · {t(k('detail.version'), { v: c.policyVersion })}
+                        <span className="grid gap-0.5">
+                          <strong>{t(k(`detail.kind_${c.kind}`))}</strong>
+                          <span className="text-xs text-ink-muted">
+                            {c.withdrawnAt
+                              ? t(k('detail.withdrawn'), { date: date(c.withdrawnAt) })
+                              : t(k('detail.granted'), { date: date(c.grantedAt) })}{' '}
+                            · {t(k('detail.version'), { v: c.policyVersion })}
+                          </span>
+                        </span>
+                        <Badge tone={c.withdrawnAt ? 'warning' : 'success'}>
+                          {t(k(c.withdrawnAt ? 'detail.state_off' : 'detail.state_on'))}
+                        </Badge>
                       </li>
                     ))}
                   </ul>
-                </div>
-              </div>
+                </section>
+              </>
             )}
-            <div className="dialog-actions">
+            <div className="dialog-actions mem-actions">
               <Dialog.Close className="btn btn-secondary">
                 {locale === 'fr' ? 'Fermer' : 'Close'}
               </Dialog.Close>

@@ -15,7 +15,10 @@
     "illos:fetch": "node illos-fetch.ts",
     "backup": "node backup/backup.ts",
     "restore": "node backup/restore.ts",
-    "media:sync": "node backup/media-sync.ts"
+    "media:sync": "node backup/media-sync.ts",
+    "jsonld:check": "node jsonld-check.ts",
+    "og:generate": "node og-generate.ts",
+    "social:kit": "node social-kit.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",

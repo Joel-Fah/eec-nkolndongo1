@@ -1,6 +1,16 @@
 /** Platform tables: audit log, invitations/reset links, mail outbox, rate limits, feature flags. */
 import { sql } from 'drizzle-orm'
-import { bigint, boolean, index, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { createdAt, id, tz, updatedAt } from '../columns.ts'
 import { user } from './auth.ts'
 
@@ -100,8 +110,8 @@ export const consents = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    /** privacy (required to hold an account) | news (optional, parish news later) */
-    kind: text('kind', { enum: ['privacy', 'news'] }).notNull(),
+    /** privacy (required to hold an account) | news (optional, parish news later) | profile (optional details and photo, 0047) */
+    kind: text('kind', { enum: ['privacy', 'news', 'profile'] }).notNull(),
     policyVersion: text('policy_version').notNull(),
     grantedAt: tz('granted_at').notNull().defaultNow(),
     withdrawnAt: tz('withdrawn_at'),
@@ -118,3 +128,91 @@ export const contentVersions = pgTable('content_versions', {
   version: integer('version').notNull().default(1),
   updatedAt: updatedAt(),
 })
+
+/**
+ * Review comments on content waiting for validation (« À valider »): a content partner asks for a correction or leaves a
+ * note on one item (a settings field, a schedule slot, a page text). `item_kind` + `item_ref` name the item; nothing here
+ * is public. A comment is open until someone marks it resolved.
+ */
+export const contentReviews = pgTable(
+  'content_reviews',
+  {
+    id: id(),
+    itemKind: text('item_kind', { enum: ['settings', 'schedule', 'page_slot'] }).notNull(),
+    itemRef: text('item_ref').notNull(),
+    /** correction: asks for a change before validating. note: just a remark. */
+    kind: text('kind', { enum: ['correction', 'note'] })
+      .notNull()
+      .default('correction'),
+    body: text('body').notNull(),
+    status: text('status', { enum: ['open', 'resolved'] })
+      .notNull()
+      .default('open'),
+    createdBy: uuid('created_by').references(() => user.id, { onDelete: 'set null' }),
+    createdAt: createdAt(),
+    resolvedAt: tz('resolved_at'),
+    resolvedBy: uuid('resolved_by').references(() => user.id, { onDelete: 'set null' }),
+  },
+  (t) => [index('content_reviews_item_idx').on(t.itemKind, t.itemRef, t.status)],
+)
+
+/** The daily health check (« Santé »): one row per run, the checks as data. Kept 90 days. */
+export const systemHealth = pgTable(
+  'system_health',
+  {
+    id: id(),
+    checkedAt: tz('checked_at').notNull().defaultNow(),
+    /** The worst of the checks: ok | warn | fail. */
+    status: text('status', { enum: ['ok', 'warn', 'fail'] }).notNull(),
+    checks: jsonb('checks').notNull(),
+  },
+  (t) => [index('system_health_at_idx').on(t.checkedAt)],
+)
+
+/** Small facts the Worker cannot learn by itself (for example when the last backup finished). One row per key. */
+export const systemMarks = pgTable('system_marks', {
+  key: text('key').primaryKey(),
+  at: tz('at').notNull().defaultNow(),
+  note: text('note').notNull().default(''),
+})
+
+/**
+ * In-app notifications (decision 0044): one row per person and per thing to do. `kind` + `params` are labelled on screen
+ * (never stored as text), `href` is the deep link, `weekOf` (the Monday) groups them. `ref` makes a notification unique per
+ * person so it is never created twice; `resolvedAt` is set when the thing is done, `dismissedAt` when the person hides it.
+ */
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    ref: text('ref').notNull(),
+    params: jsonb('params').notNull().default({}),
+    href: text('href').notNull(),
+    weekOf: text('week_of').notNull(),
+    readAt: tz('read_at'),
+    resolvedAt: tz('resolved_at'),
+    dismissedAt: tz('dismissed_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('notifications_ref_idx').on(t.userId, t.kind, t.ref),
+    index('notifications_user_idx').on(t.userId, t.createdAt),
+  ],
+)
+
+/** Notification kinds a person has silenced (decision 0046). One row per person and kind; no row = not muted. */
+export const notificationMutes = pgTable(
+  'notification_mutes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('notification_mutes_idx').on(t.userId, t.kind)],
+)

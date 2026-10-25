@@ -1,0 +1,407 @@
+---
+/**
+ * Registering for an activity (decision 0035). A plain HTML form that posts to this very page, so it works without
+ * JavaScript: the page sends it to the API (honeypot, fill-time token, rate limit, consent) and shows the answer.
+ * Phone is required and may be typed with or without +237. Children (when the activity is for minors) are a first name and
+ * an age band, entered by their parent or guardian. Nothing here is paid for or shared.
+ */
+import { AGE_BANDS, normalizePhone } from '@eec/core'
+import Button from '@eec/ui/astro/Button.astro'
+import Choice from '@eec/ui/astro/Choice.astro'
+import Field from '@eec/ui/astro/Field.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { apiPost, type PublicRegForm, publicJson } from '../../lib/content-api'
+import { eventHref, eventsListHref } from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { cancelHref, registrationHref } from '../../lib/registrations-routes'
+import UnavailableState from './UnavailableState.astro'
+
+interface Props {
+  slug: string
+}
+const { slug } = Astro.props
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`registrations.site.${key}` as 'registrations.site.title', vars)
+Astro.response.headers.set('cache-control', 'no-store')
+Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+
+const loaded = await publicJson<{ form: PublicRegForm | null }>(
+  Astro,
+  `/api/registrations/public/form/${encodeURIComponent(slug)}?locale=${locale}`,
+)
+const form = loaded.state === 'ok' ? loaded.data.form : null
+if (loaded.state === 'ok' && !form) Astro.response.status = 404
+const unavailable = loaded.state === 'unavailable'
+
+const SLOTS = 5
+type Values = Record<string, string | string[]>
+let values: Values = {}
+let error = ''
+let done: {
+  status: 'confirmed' | 'waitlist'
+  code: string
+  position: number
+  cancelToken: string
+} | null = null
+
+// A fresh, signed fill-time token on every render: the API refuses a form sent in under four seconds.
+const tokenRes = form
+  ? await publicJson<{ token: string }>(Astro, '/api/registrations/token')
+  : null
+let token = tokenRes?.state === 'ok' ? tokenRes.data.token : ''
+
+if (form && Astro.request.method === 'POST') {
+  const fd = await Astro.request.formData()
+  const str = (k: string) => String(fd.get(k) ?? '').trim()
+  values = {
+    name: str('name'),
+    phone: str('phone'),
+    whatsapp: str('whatsapp'),
+    email: str('email'),
+    partySize: str('partySize') || '1',
+  }
+  const children: { firstName: string; ageBand: string }[] = []
+  for (let i = 0; i < SLOTS; i++) {
+    values[`child${i}`] = str(`child${i}`)
+    values[`age${i}`] = str(`age${i}`)
+    if (values[`child${i}`])
+      children.push({ firstName: str(`child${i}`), ageBand: str(`age${i}`) || '6-9' })
+  }
+  const answers: Record<string, string | string[] | boolean> = {}
+  for (const f of form.fields) {
+    if (f.kind === 'yesno') answers[f.id] = fd.get(f.id) === 'on'
+    else if (f.kind === 'multi') {
+      values[f.id] = fd.getAll(f.id).map(String)
+      answers[f.id] = values[f.id] as string[]
+    } else {
+      values[f.id] = str(f.id)
+      answers[f.id] = values[f.id] as string
+    }
+    if (f.kind === 'yesno') values[f.id] = fd.get(f.id) === 'on' ? 'on' : ''
+  }
+  values.guardian = fd.get('guardian') === 'on' ? 'on' : ''
+  values.consent = fd.get('consent') === 'on' ? 'on' : ''
+  const body = {
+    slug: form.slug,
+    name: values.name,
+    phone: values.phone,
+    whatsapp: values.whatsapp,
+    email: values.email,
+    partySize: Number(values.partySize) || 1,
+    children,
+    guardian: values.guardian === 'on',
+    answers,
+    consent: values.consent === 'on',
+    website: str('website'),
+    token: str('token'),
+  }
+  if (!body.consent) error = s('err_consent')
+  else {
+    const r = await apiPost<{
+      status: 'confirmed' | 'waitlist'
+      code: string
+      position: number
+      cancelToken: string
+      error?: { code?: string }
+    }>(Astro, '/api/registrations/submit', body)
+    if (r.status === 201 && r.data) done = r.data
+    else {
+      const code = r.data?.error?.code ?? 'error'
+      const known = [
+        'bad_phone',
+        'bad_whatsapp',
+        'guardian_required',
+        'children_required',
+        'answers',
+        'full',
+        'duplicate',
+        'too_fast',
+        'rate_limited',
+        'members_only',
+        'closed',
+        'not_yet',
+      ]
+      error = s(`err_${known.includes(code) ? code : 'error'}`)
+    }
+    // A used token is spent (or too fresh): take a new one for the form shown again.
+    const again = await publicJson<{ token: string }>(Astro, '/api/registrations/token')
+    token = again.state === 'ok' ? again.data.token : token
+  }
+}
+
+const dateText = form
+  ? new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${form.eventDate}T12:00:00Z`))
+  : ''
+const v = (k: string) => (typeof values[k] === 'string' ? (values[k] as string) : '')
+const phoneHint = v('phone') && !normalizePhone(v('phone')) ? s('err_bad_phone') : undefined
+const open = form?.state === 'open'
+const pageUrl = form
+  ? new URL(registrationHref(locale, form.slug), Astro.site ?? Astro.url).href
+  : ''
+const shareText = form ? `${form.title} — ${dateText}\n${pageUrl}` : ''
+---
+
+<Site title={form ? `${s('title')} — ${form.title}` : s('title')} description={form?.intro || undefined} noindex>
+  <section class="rg">
+    <p class="rg-back"><a href={form?.eventSlug ? eventHref(locale, form.eventSlug) : eventsListHref(locale)}><Icon name="chevronLeft" size={20} />{s('back')}</a></p>
+    {
+      unavailable ? (
+        <UnavailableState />
+      ) : !form ? (
+        <div class="rg-card rg-center"><h1>{s('not_found_t')}</h1><p>{s('not_found_p')}</p></div>
+      ) : done ? (
+        <div class="rg-card rg-done" role="status">
+          <span class="rg-done-icon" aria-hidden="true"><Icon name="check" size={24} /></span>
+          <h1>{done.status === 'confirmed' ? s('done_t') : s('wait_t')}</h1>
+          <p>{done.status === 'confirmed' ? s('done_p', { title: form.title }) : s('wait_p', { n: String(done.position) })}</p>
+          <p class="rg-code"><span>{s('code')}</span><strong>{done.code}</strong></p>
+          <p class="rg-note">{s('keep_code')}</p>
+          <div class="rg-actions">
+            <a class="btn btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share')}<Icon name="external" size={16} /></a>
+            {form.eventSlug && <a class="btn btn-secondary" href={eventHref(locale, form.eventSlug)}><Icon name="calendar" size={20} />{s('see_event')}</a>}
+          </div>
+          <p class="rg-note">{s('cancel_p')} <a href={cancelHref(locale, done.cancelToken)}>{s('cancel_link')}</a></p>
+          <p class="rg-note rg-privacy">{s('privacy_kept', { months: '6' })}</p>
+        </div>
+      ) : (
+        <>
+          <header class="rg-head">
+            <p class="rg-kicker">{s('kicker')}</p>
+            <h1>{form.title}</h1>
+            <p class="rg-date"><Icon name="calendar" size={20} />{dateText}</p>
+            {form.intro && <p class="rg-intro">{form.intro}</p>}
+            {open && form.spotsLeft !== null && <p class="rg-spots" data-low={form.spotsLeft <= 5 ? '' : undefined}>{form.spotsLeft > 0 ? s('spots', { n: String(form.spotsLeft) }) : s('spots_full')}</p>}
+          </header>
+          {!open ? (
+            <div class="rg-card rg-center">
+              <h2>{s(`state_${form.state === 'draft' ? 'closed' : form.state}_t`)}</h2>
+              <p>{s(`state_${form.state === 'draft' ? 'closed' : form.state}_p`)}</p>
+            </div>
+          ) : (
+            <form method="post" class="rg-card rg-form" novalidate>
+              {form.audience === 'members' && <p class="rg-members"><Icon name="account" size={20} />{s('members_only')} <a href={`/${locale}/${locale === 'fr' ? 'mon-espace' : 'my-space'}/`}>{s('sign_in')}</a></p>}
+              {error && <p class="field-error rg-error" role="alert"><span aria-hidden="true">⚠</span>{error}</p>}
+              <input type="hidden" name="token" value={token} />
+              <div class="rg-trap" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+              <fieldset class="rg-fields">
+                <legend class="rg-legend">{form.forMinors ? s('guardian_h') : s('you_h')}</legend>
+                <Field id="rg-name" name="name" label={s('f_name')} placeholder={s('ph_name')} autocomplete="name" value={v('name')} required />
+                <Field id="rg-phone" name="phone" type="tel" label={s('f_phone')} placeholder="6 77 12 34 56" autocomplete="tel" hint={phoneHint ?? s('f_phone_help')} error={phoneHint} value={v('phone')} required />
+                {form.askWhatsapp && <Field id="rg-whatsapp" name="whatsapp" type="tel" label={s('f_whatsapp')} placeholder="6 77 12 34 56" hint={s('f_whatsapp_help')} value={v('whatsapp')} />}
+                <Field id="rg-email" name="email" type="email" label={s('f_email')} placeholder={s('ph_email')} autocomplete="email" value={v('email')} />
+                {!form.forMinors && <Field id="rg-party" name="partySize" type="number" label={s('f_party')} placeholder="1" hint={s('f_party_help')} value={v('partySize') || '1'} />}
+              </fieldset>
+              {form.forMinors && (
+                <fieldset class="rg-fields">
+                  <legend class="rg-legend">{s('children_h')}</legend>
+                  <p class="rg-note">{s('children_p')}</p>
+                  {Array.from({ length: SLOTS }, (_, i) => (
+                    <div class="rg-child">
+                      <Field id={`rg-child${i}`} name={`child${i}`} label={s('child_n', { n: String(i + 1) })} placeholder={s('ph_child')} value={v(`child${i}`)} />
+                      <div class="rg-ages" role="radiogroup" aria-label={s('age_of', { n: String(i + 1) })}>
+                        {AGE_BANDS.filter((a) => a !== 'adult').map((a) => (
+                          <Choice kind="radio" id={`rg-age${i}-${a}`} name={`age${i}`} value={a} label={s(`age_${a.replace('-', '_')}`)} checked={(v(`age${i}`) || '6-9') === a} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  <Choice id="rg-guardian" name="guardian" label={s('guardian')} checked={v('guardian') === 'on'} />
+                </fieldset>
+              )}
+              {form.fields.length > 0 && (
+                <fieldset class="rg-fields">
+                  <legend class="rg-legend">{s('more_h')}</legend>
+                  {form.fields.map((f) =>
+                    f.kind === 'yesno' ? (
+                      <Choice id={`rg-${f.id}`} name={f.id} label={f.label} checked={v(f.id) === 'on'} />
+                    ) : f.kind === 'choice' ? (
+                      <div class="field">
+                        <span class="field-label" id={`rg-${f.id}-l`}>{f.label}{f.required && <span aria-hidden="true"> *</span>}</span>
+                        <div class="rg-choices" role="radiogroup" aria-labelledby={`rg-${f.id}-l`}>
+                          {f.options.map((o) => <Choice kind="radio" id={`rg-${f.id}-${o.value}`} name={f.id} value={o.value} label={o.label} checked={v(f.id) === o.value} />)}
+                        </div>
+                      </div>
+                    ) : f.kind === 'multi' ? (
+                      <div class="field">
+                        <span class="field-label" id={`rg-${f.id}-l`}>{f.label}{f.required && <span aria-hidden="true"> *</span>}</span>
+                        <div class="rg-choices">
+                          {f.options.map((o) => <Choice id={`rg-${f.id}-${o.value}`} name={f.id} value={o.value} label={o.label} checked={(values[f.id] as string[] | undefined)?.includes(o.value)} />)}
+                        </div>
+                      </div>
+                    ) : (
+                      <Field id={`rg-${f.id}`} name={f.id} label={f.label} placeholder="" value={v(f.id)} required={f.required} />
+                    ),
+                  )}
+                </fieldset>
+              )}
+              <div class="rg-consent">
+                <Choice id="rg-consent" name="consent" label={s('consent')} checked={v('consent') === 'on'} />
+                <p class="rg-note">{s('consent_p', { months: '6' })} <a href={`/${locale}/${locale === 'fr' ? 'confidentialite' : 'privacy'}/`}>{s('privacy')}</a></p>
+              </div>
+              <Button type="submit" size="lg">{form.spotsLeft === 0 ? s('submit_wait') : s('submit')}<Icon name="arrowRight" /></Button>
+            </form>
+          )}
+        </>
+      )
+    }
+  </section>
+</Site>
+
+<style>
+  .rg {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 40rem);
+    margin-inline: auto;
+    padding-block: 2rem 4rem;
+  }
+  .rg-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.75rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+  }
+  .rg-head {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .rg-kicker {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .rg h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  .rg-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .rg-intro {
+    max-width: 62ch;
+    color: var(--ink-muted);
+  }
+  .rg-spots {
+    justify-self: start;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: var(--primary-soft);
+    font-weight: 600;
+  }
+  .rg-spots[data-low] {
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+  .rg-card {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .rg-center {
+    justify-items: center;
+    text-align: center;
+  }
+  .rg-fields {
+    display: grid;
+    gap: 1rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+  .rg-legend {
+    margin-block-end: 0.25rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .rg-trap {
+    position: absolute;
+    inset-inline-start: -9999px;
+  }
+  .rg-note {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+  .rg-members {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background: var(--info-soft);
+    color: var(--info);
+  }
+  .rg-child {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .rg-ages,
+  .rg-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+  .rg-consent {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .rg-done {
+    justify-items: center;
+    text-align: center;
+  }
+  .rg-done-icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--success-soft);
+    color: var(--success);
+  }
+  .rg-code {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--primary-soft);
+  }
+  .rg-code strong {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    letter-spacing: 0.15em;
+  }
+  .rg-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+</style>

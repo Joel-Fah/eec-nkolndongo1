@@ -33,8 +33,8 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 <aside class="site-cta" aria-labelledby="site-cta-title">
   <div class="site-cta-card">
     <div class="grid gap-2">
-      <h2 id="site-cta-title" class="text-3xl">{t('footer.invite_title')}</h2>
-      <p class="max-w-[48ch] text-ink-muted">{t('footer.invite_text')}</p>
+      <h2 id="site-cta-title" class="text-3xl" data-slot="home.invite_title">{t('footer.invite_title')}</h2>
+      <p class="max-w-[48ch] text-ink-muted" data-slot="home.invite_text">{t('footer.invite_text')}</p>
     </div>
     <div class="flex flex-wrap gap-3">
       <Button href={href(locale, pathOf('trouver'))} size="lg"><Icon name="location" />{t('footer.invite_find')}</Button>
@@ -54,7 +54,7 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
         {
           socials.map(([icon, name, key]) => (
             <li>
-              <a class="footer-social" data-setting-link={`parish.${key}`} title={`${name} · ${t('footer.social_pending')}`} aria-label={`${name} · ${t('footer.social_pending')}`} data-label-ready={name} rel="noopener" target="_blank">
+              <a class="footer-social" data-setting-link={`parish.${key}`} data-tip={`${name} · ${t('footer.social_pending')}`} data-tip-above aria-label={`${name} · ${t('footer.social_pending')}`} data-label-ready={name} rel="noopener" target="_blank">
                 <Icon name={icon} />
               </a>
             </li>
@@ -69,7 +69,7 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
           <ul class="grid gap-1" role="list">
             {tab.children.map((child) => (
               <li>
-                <a class="footer-link" href={href(locale, `${tab.slug[locale]}/${child.slug[locale]}`)}>
+                <a class="footer-link" href={href(locale, `${tab.slug[locale]}/${child.slug[locale]}`)} data-season-link={child.id === 'moissons' ? 'moissons' : undefined}>
                   {t(labelKey(child.id))}
                 </a>
               </li>
@@ -81,6 +81,8 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
   </div>
 
   <div class="footer-meta">
+    <p class="text-sm text-ink-muted" data-offline-badge hidden role="status">{t('pwa.from_cache')}</p>
+    <p class="text-sm text-ink-muted"><button type="button" class="footer-link text-sm" data-install hidden>{t('pwa.install')}</button><span data-install-ios hidden>{t('pwa.install_ios')}</span></p>
     <p class="text-sm text-ink-muted">{t('footer.rights')} · <a class="footer-link text-sm" href="https://storyset.com" rel="noopener" target="_blank">{t('footer.credits')}</a> · <a class="footer-link text-sm" href={href(locale, pathOf('credits'))}>{t('footer.photo_credits')}</a></p>
     <ul class="flex flex-wrap items-center gap-x-4" role="list">
       {legal.map((l) => <li><a class="footer-link text-sm" href={href(locale, l.path)}>{t(labelKey(l.id))}</a></li>)}
@@ -100,9 +102,17 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 </div>
 
 <script>
+  import { applyHomeSlots } from '../lib/home-slots-client'
   import { applyPublicSettings } from '../lib/settings-client'
+  import { applySeasonLinks } from '../lib/season-client'
+  import { initPwa } from '../scripts/pwa'
+  initPwa()
   applyPublicSettings()
+  applySeasonLinks()
+  document.addEventListener('astro:page-load', applySeasonLinks)
+  applyHomeSlots()
   document.addEventListener('astro:page-load', applyPublicSettings)
+  document.addEventListener('astro:page-load', applyHomeSlots)
 
   // The playground loads (and starts) only when the footer is about to be seen.
   let stop: (() => void) | undefined

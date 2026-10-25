@@ -82,3 +82,11 @@ workspace package `@eec/module-<id>`. The reference implementation is `modules/s
 - Don't import another module's internals (only `@eec/module-<id>`), or anything from `apps/*`.
 - Don't add a top-level nav tab (max 5 — see `docs/product/navigation.md`).
 - Don't commit generated files (merged messages, illustrations, fonts).
+
+## Lessons from Phase 04
+- **Cross-module data** is read by table name with raw SQL (the boundaries test forbids importing another module's internals); say so in the module README.
+- **Group scope:** a module with `scopedByGroup` must pass `modules/scope.test.ts` (a grant for group A never opens group B or the parish). Use `requirePermissionAnywhere` then `mayOn(c, perm, groupId)` once the resource's group is known.
+- **A new permission** is only written into system roles when a role is first created: after adding one, tell Joël to grant it in Rôles on each environment (and add it to `systemRoles` for new environments).
+- **Admin strings:** the admin loads only the `admin.*` messages plus the module's own `i18n/*.json`; a key under `member.*` or `site.*` is missing there. After editing any message file run `pnpm --filter @eec/i18n build` (and restart `pnpm dev`).
+- **Anything private** (member data, photos, notifications) is `private, no-store`, in the service worker's private list, and audited without values. A new kind of personal data needs a decision record and a `data-protection.md` entry before code.
+- **Run the `owasp-security` skill** on every new route, upload or data field.

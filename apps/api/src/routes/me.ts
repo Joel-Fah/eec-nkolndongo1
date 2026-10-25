@@ -38,7 +38,17 @@ async function currentSessionId(c: Context<AppEnv>) {
 }
 
 export const meRoutes = new Hono<AppEnv>()
+  // Is the visitor a signed-in, active member (staff and super admin count)? Nothing else is said: for pages that are for members.
+  .get('/membership', async (c) => {
+    const actor = await c.var.deps.actor()
+    c.header('cache-control', 'private, no-store')
+    c.header('vary', 'Cookie')
+    return c.json({ member: actor?.principal.status === 'active' })
+  })
   .get('/', async (c) => {
+    // Who is signed in must never come from a cache: a browser or proxy keeping this would show someone as signed in after they left.
+    c.header('cache-control', 'private, no-store')
+    c.header('vary', 'Cookie')
     const actor = await c.var.deps.actor()
     if (!actor) return fail(c, 401, 'unauthenticated')
     const db = await c.var.deps.db()
@@ -255,6 +265,15 @@ export const meRoutes = new Hono<AppEnv>()
         theme: profiles.theme,
         status: profiles.status,
         deletionRequestedAt: profiles.deletionRequestedAt,
+        // The optional details (decision 0047): the right of access covers them too; the picture is not included, it is yours already.
+        birthDate: profiles.birthDate,
+        gender: profiles.gender,
+        neighbourhood: profiles.neighbourhood,
+        city: profiles.city,
+        maritalStatus: profiles.maritalStatus,
+        profession: profiles.profession,
+        photoAsAvatar: profiles.photoAsAvatar,
+        hasPhoto: sql<boolean>`${profiles.photoKey} is not null`,
       })
       .from(profiles)
       .where(eq(profiles.userId, actor.userId))

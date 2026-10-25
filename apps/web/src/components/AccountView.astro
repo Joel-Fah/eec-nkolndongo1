@@ -13,6 +13,7 @@ import google from '@eec/ui/brand/google-g.svg?raw'
 import { localeOf, useT } from '../lib/i18n'
 import { href, pages } from '../lib/nav'
 import { peoplePhotos, photoSrc } from '../lib/placeholders'
+import ProfileSection from './ProfileSection.astro'
 import '../styles/patterns.css'
 
 const locale = localeOf(Astro.currentLocale)
@@ -147,6 +148,7 @@ const tiles = [
         <p class="text-ink-muted">{t('member.welcome')}</p>
       </div>
     </div>
+    <ProfileSection />
     <ul class="acct-tiles" role="list">
       {
         tiles.map(([icon, key]) => (
@@ -161,7 +163,7 @@ const tiles = [
     </ul>
     <div class="acct-panels">
       <details class="acct-panel" data-panel="profile">
-        <summary>{t('member.panel_profile')}</summary>
+        <summary><span>{t('member.panel_profile')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <form data-form="profile" class="acct-fields" novalidate>
           <Field id="pf-first" name="firstName" label={t('member.first_name')} placeholder={t('common.ph.first_name')} autocomplete="given-name" />
           <Field id="pf-last" name="lastName" label={t('member.last_name')} placeholder={t('common.ph.last_name')} autocomplete="family-name" />
@@ -171,7 +173,7 @@ const tiles = [
         </form>
       </details>
       <details class="acct-panel" data-panel="data">
-        <summary>{t('member.panel_data')}</summary>
+        <summary><span>{t('member.panel_data')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <div class="acct-fields">
           <p class="text-sm text-ink-muted" data-privacy-line></p>
           <div class="acct-notice" data-policy-change hidden role="status">
@@ -198,7 +200,7 @@ const tiles = [
         </div>
       </details>
       <details class="acct-panel" data-panel="devices">
-        <summary>{t('member.panel_devices')}</summary>
+        <summary><span>{t('member.panel_devices')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <div class="acct-fields">
           <ul class="grid gap-2 text-sm" data-devices role="list"></ul>
           <Button variant="secondary" data-signout-others>{t('member.devices_others')}</Button>
@@ -253,6 +255,8 @@ const tiles = [
 </section>
 
 <script>
+  import { forgetBadge, initAccountBadge } from '../scripts/account-badge'
+  import { initProfile } from '../scripts/profile'
   const found = document.querySelector<HTMLElement>('[data-account]')
   if (found) {
     const root: HTMLElement = found
@@ -288,6 +292,10 @@ const tiles = [
         if (initials) initials.textContent = name.slice(0, 1).toUpperCase()
         show('in')
         loadPanels(me.json.user)
+        if (!root.dataset.profileReady) {
+          root.dataset.profileReady = '1'
+          initProfile(root, me.json.user)
+        }
       } else show('out')
     }
     const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement | null
@@ -453,7 +461,11 @@ const tiles = [
         const v = (n: string) => input(signup, n)?.value.trim() ?? ''
         const result = await call('/members/signup', { firstName: v('firstName'), lastName: v('lastName'), email: v('email'), password: input(signup, 'password')?.value ?? '', phone: v('phone') || undefined, acceptPrivacy: true, acceptNews: !!input(signup, 'acceptNews')?.checked })
         submit?.removeAttribute('aria-busy')
-        if (result.ok) return refresh()
+        if (result.ok) {
+        forgetBadge()
+        void initAccountBadge()
+        return refresh()
+      }
         // Errors about the password or the address send the visitor back to the right step.
         if (result.code.startsWith('password')) goto(1)
         else if (result.code === 'email_taken') goto(0)
@@ -551,8 +563,9 @@ const tiles = [
       const screen = root.querySelector<HTMLElement>('[data-leaving]')
       if (screen) screen.hidden = false
       await Promise.all([call('/auth/sign-out', {}), new Promise((r) => setTimeout(r, 1600))])
-      show('out')
-      if (screen) screen.hidden = true
+      // The header was drawn for a signed-in person: forget it and start the page over, signed out.
+      forgetBadge()
+      location.reload()
     })
     refresh()
   }
@@ -890,11 +903,28 @@ const tiles = [
     background: var(--surface-2);
   }
   .acct-panel > summary {
-    min-height: 2.75rem;
+    min-height: 3rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     font-weight: 600;
     cursor: pointer;
+    list-style: none;
+    border-radius: var(--radius-md);
+  }
+  .acct-panel > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A closed panel must look openable: a chevron that turns, and a hover tint. */
+  .acct-panel > summary .eec-chevron {
+    color: var(--ink-muted);
+  }
+  .acct-panel > summary:hover {
+    color: var(--primary);
+  }
+  .acct-panel[open] > summary .eec-chevron {
+    transform: rotate(180deg);
   }
   .acct-panel[open] > summary {
     margin-block-end: 0.5rem;

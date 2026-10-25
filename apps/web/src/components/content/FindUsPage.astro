@@ -10,7 +10,9 @@ import Site from '../../layouts/Site.astro'
 import { publicJson } from '../../lib/content-api'
 import { localeOf, useT } from '../../lib/i18n'
 import { href, labelKey, pages } from '../../lib/nav'
+import { breadcrumbs, church } from '../../lib/seo'
 import type { StoryData } from '../../lib/story-routes'
+import JsonLd from '../JsonLd.astro'
 import PageView from '../PageView.astro'
 import PageHero from '../page/PageHero.astro'
 import ContactForm from './ContactForm.astro'
@@ -26,6 +28,13 @@ const [settings, story] = await Promise.all([
 const p = settings.state === 'ok' ? (settings.data.parish ?? {}) : {}
 const directions = story.state === 'ok' ? story.data.slots.trouver?.directions?.text : ''
 const landmarks = story.state === 'ok' ? story.data.slots.trouver?.landmarks?.text : ''
+const ld = [
+  church(Astro.site ?? Astro.url, t('site.name'), p),
+  breadcrumbs(Astro.site ?? Astro.url, [
+    { name: t('nav.home'), path: `/${locale}/` },
+    { name: t(labelKey('trouver')), path: Astro.url.pathname },
+  ]),
+]
 const lat = p.mapLat && p.mapLng ? Number(p.mapLat) : null
 const lng = p.mapLat && p.mapLng ? Number(p.mapLng) : null
 const hasPoint = lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng)
@@ -67,6 +76,7 @@ Astro.response.headers.set(
 ---
 
 <Site title={t(labelKey('trouver'))} description={t('pages.trouver.lead')}>
+  <JsonLd slot="head" data={ld} />
   <PageHero id="trouver" />
   <section class="fu">
     <div class="fu-left">

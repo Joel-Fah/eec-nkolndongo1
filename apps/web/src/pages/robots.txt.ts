@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro'
 export const GET: APIRoute = ({ site }) => {
   const open = import.meta.env.PUBLIC_SITE_INDEXABLE === '1'
   const body = open
-    ? `User-agent: *\nAllow: /\nDisallow: /_brand\n\nSitemap: ${new URL('sitemap-index.xml', site)}\n`
+    ? `User-agent: *\nAllow: /\nDisallow: /_brand\n\nSitemap: ${new URL('sitemap.xml', site)}\n`
     : 'User-agent: *\nDisallow: /\n'
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } })
 }

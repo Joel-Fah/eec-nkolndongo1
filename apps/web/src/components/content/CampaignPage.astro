@@ -1,0 +1,792 @@
+---
+/**
+ * « Fête des Moissons » (decisions 0041, 0042): a members' experience, in season only. Under the hero (unchanged), one calm story:
+ * what we gather together (the basket fills, the amount counts up: the only place where progress is shown), what each group brings
+ * (small baskets, never compared), the week ahead (a ribbon of events), giving simply, and a closing invitation. A visitor who is not
+ * signed in sees a warm teaser with NO amount; out of season the page says « see you next year ». Private, no-store, noindex: the
+ * offline copy never keeps it. Motion is gentle and optional (scripts/harvest.ts; static when motion is reduced).
+ * `?simule=YYYY-MM-DD` replays a season, on localhost only.
+ */
+import Button from '@eec/ui/astro/Button.astro'
+import Icon from '@eec/ui/astro/Icon.astro'
+import Illustration from '@eec/ui/astro/Illustration.astro'
+import Site from '../../layouts/Site.astro'
+import { type EventOcc, isMember, publicJson } from '../../lib/content-api'
+import { eventHref } from '../../lib/events-routes'
+import { localeOf, useT } from '../../lib/i18n'
+import { href, labelKey, pages } from '../../lib/nav'
+import PageHero from '../page/PageHero.astro'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`campaigns.site.${key}` as 'campaigns.site.kicker', vars)
+const simulated =
+  ['localhost', '127.0.0.1'].includes(Astro.url.hostname) &&
+  /^\d{4}-\d{2}-\d{2}$/.test(Astro.url.searchParams.get('simule') ?? '')
+    ? (Astro.url.searchParams.get('simule') as string)
+    : ''
+Astro.response.headers.set('cache-control', 'private, no-store')
+Astro.response.headers.set('vary', 'Cookie')
+Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+
+type Camp = {
+  slug: string
+  title: string
+  description: string
+  startsOn: string
+  endsOn: string
+  phase: 'before' | 'during' | 'after'
+  inSeason: boolean
+  daysLeft: number
+  daysUntil: number
+  goal: number
+  raised: number
+  percent: number
+  groups: { name: string; goal: number; raised: number }[]
+}
+const member = await isMember(Astro)
+const accountHref = href(locale, pages.find((p) => p.id === 'account')?.path[locale] ?? '')
+const giveHref = href(locale, pages.find((p) => p.id === 'give')?.path[locale] ?? '')
+
+// A visitor only ever gets the teaser (no amount is requested); a member gets the full data.
+const res = member
+  ? await publicJson<{ campaign: Camp | null }>(
+      Astro,
+      `/api/campaigns/public/current?locale=${locale}${simulated ? `&asOf=${simulated}` : ''}`,
+    )
+  : await publicJson<{ campaign: Partial<Camp> | null }>(
+      Astro,
+      `/api/campaigns/public/teaser?locale=${locale}`,
+    )
+const unavailable = res.state === 'unavailable'
+const c = res.state === 'ok' ? res.data.campaign : null
+const inSeason = !!c && c.inSeason === true
+const mode: 'full' | 'teaser' | 'later' = !c || !inSeason ? 'later' : member ? 'full' : 'teaser'
+const full = mode === 'full' ? (c as Camp) : null
+
+const events = full
+  ? await publicJson<{ items: EventOcc[] }>(
+      Astro,
+      `/api/events/public?locale=${locale}&from=${full.startsOn}&to=${full.endsOn}`,
+    )
+  : null
+const program = (events?.state === 'ok' ? events.data.items : [])
+  .filter((o) => !o.cancelled)
+  .slice(0, 12)
+const settings = full
+  ? await publicJson<{ giving?: Record<string, string> }>(Astro, '/api/settings/public')
+  : null
+const g = settings?.state === 'ok' ? (settings.data.giving ?? {}) : {}
+const methods = [
+  { id: 'momo', label: t('settings.site.momo' as 'settings.site.copy'), number: g.momoNumber },
+  { id: 'om', label: t('settings.site.om' as 'settings.site.copy'), number: g.omNumber },
+].filter((m) => m.number)
+
+const nf = new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-GB')
+const money = (n: number) => `${nf.format(n)} FCFA`
+const dateText = (d: string, o: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat(locale, { ...o, timeZone: 'UTC' }).format(new Date(`${d}T12:00:00Z`))
+const range = c
+  ? `${dateText(c.startsOn as string, { day: 'numeric', month: 'long' })} → ${dateText(c.endsOn as string, { day: 'numeric', month: 'long', year: 'numeric' })}`
+  : ''
+const fill = full ? Math.min(full.percent, 100) : 0
+// The fruit in the basket: one more every fifth of the goal, never more than five.
+const fruit = Math.min(Math.floor(fill / 20) + (fill > 0 ? 1 : 0), 5)
+const shareUrl = full ? new URL(Astro.url.pathname, Astro.site ?? Astro.url).href : ''
+const wa = full ? `https://wa.me/?text=${encodeURIComponent(`${full.title}\n${shareUrl}`)}` : ''
+---
+
+<Site title={t(labelKey('moissons'))} description={t('pages.moissons.lead')} noindex letterhead={false}>
+  <PageHero id="moissons" />
+  {
+    unavailable ? (
+      <UnavailableState />
+    ) : mode === 'later' ? (
+      <section class="hv hv-later" data-harvest>
+        <Illustration name="gardening" class="hv-art" />
+        <h2>{s('later_t')}</h2>
+        <p class="hv-lead">{s('later_p')}</p>
+        {member && c && (c as Camp).raised > 0 && <p class="hv-thanks">{s('later_thanks', { a: money((c as Camp).raised) })}</p>}
+      </section>
+    ) : mode === 'teaser' ? (
+      <section class="hv hv-teaser" data-harvest>
+        <div class="hv-dots" aria-hidden="true"></div>
+        <div class="hv-teaser-in">
+          <Illustration name="gardening" class="hv-art" />
+          <p class="hv-kicker">{s('kicker')}</p>
+          <h2>{s('teaser_t')}</h2>
+          <p class="hv-dates">{range}</p>
+          <p class="hv-lead">{s('teaser_p')}</p>
+          <p class="hv-actions">
+            <Button href={accountHref} size="lg"><Icon name="account" size={20} />{s('signin')}</Button>
+            <Button href={accountHref} variant="secondary" size="lg">{s('join')}<Icon name="external" size={20} /></Button>
+          </p>
+          <p class="hv-note">{s('teaser_note')}</p>
+        </div>
+      </section>
+    ) : full && (
+      <div class="hv" data-harvest data-locale={locale}>
+        <div class="hv-dots" aria-hidden="true"></div>
+        {simulated && <p class="hv-sim" role="note">{s('simulated', { d: simulated })}</p>}
+
+        <section class="hv-sec hv-gather" aria-labelledby="hv-g" data-reveal>
+          <div class="hv-gather-text">
+            <p class="hv-kicker">{s('kicker')}</p>
+            <h2 id="hv-g">{s('gather_t')}</h2>
+            <p class="hv-lead">{full.phase === 'before' ? s('before_p', { n: String(full.daysUntil) }) : full.phase === 'after' ? s('after_p') : full.description || s('gather_p')}</p>
+            <p class="hv-amount" data-count={full.raised} data-fmt="money">{money(full.raised)}</p>
+            <p class="hv-sub">{s('of_goal', { b: money(full.goal) })}</p>
+            {full.percent >= 100 ? <p class="hv-thanks">{s('goal_passed')}</p> : <p class="hv-warm">{s('warm', { p: String(full.percent) })}</p>}
+            {full.phase === 'during' && <p class="hv-days">{full.daysLeft === 1 ? s('last_day') : s('days_left', { n: String(full.daysLeft) })}</p>}
+          </div>
+          <figure class="hv-basket" style={`--f:${fill / 100}`}>
+            <svg viewBox="0 0 320 320" role="img" aria-label={s('basket', { p: String(full.percent) })} focusable="false">
+              <defs>
+                <clipPath id="hv-in"><path d="M52 140h216l-24 146a16 16 0 0 1-16 14H92a16 16 0 0 1-16-14z" /></clipPath>
+              </defs>
+              <g class="hv-leaves" aria-hidden="true">
+                <path d="M30 70c14-22 38-26 44-20-6 16-26 28-44 20z" />
+                <path d="M270 40c-12-20-34-22-40-16 6 14 24 24 40 16z" />
+                <path d="M286 120c-10-14-26-14-30-8 6 10 18 16 30 8z" />
+              </g>
+              <path class="hv-handle" d="M72 142C72 40 248 40 248 142" fill="none" />
+              <g clip-path="url(#hv-in)">
+                <rect class="hv-back" x="40" y="120" width="240" height="190" />
+                <rect class="hv-level" x="40" y="120" width="240" height="190" />
+                <path class="hv-weave" d="M40 172h240M40 210h240M40 248h240M96 140v170M148 140v170M200 140v170M252 140v170" fill="none" />
+              </g>
+              <g class="hv-fruit" aria-hidden="true">
+                {Array.from({ length: fruit }, (_, i) => (
+                  <circle class="hv-f" style={`--k:${i};`} cx={[104, 160, 214, 132, 190][i]} cy={[132, 118, 134, 104, 100][i]} r={[22, 25, 21, 19, 20][i]} data-tone={i % 3} />
+                ))}
+              </g>
+              <path class="hv-rim" d="M44 140h232" fill="none" />
+            </svg>
+            <figcaption class="hv-cap">{s('basket', { p: String(full.percent) })}</figcaption>
+          </figure>
+        </section>
+
+        {full.groups.length > 0 && (
+          <section class="hv-sec hv-together" aria-labelledby="hv-t" data-reveal>
+            <h2 id="hv-t">{s('groups_h')}</h2>
+            <p class="hv-lead">{s('groups_p')}</p>
+            <ul class="hv-field">
+              {full.groups.map((x, i) => {
+                const f = x.goal > 0 ? Math.min(x.raised / x.goal, 1) : 0
+                return (
+                  <li style={`--i:${i};--f:${f}`}>
+                    <button type="button" class="hv-mini" aria-label={`${x.name}: ${money(x.raised)}`}>
+                      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <clipPath id={`m${i}`}><path d="M14 40h72l-8 46a6 6 0 0 1-6 5H28a6 6 0 0 1-6-5z" /></clipPath>
+                        <path class="hv-m-handle" d="M24 42C24 8 76 8 76 42" fill="none" />
+                        <g clip-path={`url(#m${i})`}>
+                          <rect class="hv-m-back" x="10" y="36" width="80" height="60" />
+                          <rect class="hv-m-level" x="10" y="36" width="80" height="60" />
+                        </g>
+                        <path class="hv-m-rim" d="M14 40h72" fill="none" />
+                      </svg>
+                      <span class="hv-m-name">{x.name}</span>
+                      <span class="hv-m-says">{money(x.raised)}<small>{s('of_target', { b: money(x.goal) })}</small></span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        )}
+
+        <section class="hv-sec hv-week" aria-labelledby="hv-w" data-reveal>
+          <h2 id="hv-w">{s('week_h')}</h2>
+          {program.length === 0 ? <p class="hv-lead">{s('week_none')}</p> : (
+            <ul class="hv-ribbon">
+              {program.map((o, i) => (
+                <li style={`--i:${i}`}>
+                  <a href={eventHref(locale, o.slug)}>
+                    <span class="hv-when">{dateText(o.date, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                    <strong>{o.title}</strong>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section class="hv-sec hv-give" aria-labelledby="hv-gv" data-reveal>
+          <div class="hv-give-card">
+            <h2 id="hv-gv">{s('give_t')}</h2>
+            <p>{s('give_p')}</p>
+            {methods.length > 0 && <ul class="hv-methods">{methods.map((m) => <li><strong>{m.label}</strong> {m.number}</li>)}</ul>}
+            <Button href={giveHref} variant="secondary"><Icon name="gift" size={20} />{s('how_go')}</Button>
+          </div>
+        </section>
+
+        <section class="hv-sec hv-close" aria-labelledby="hv-c" data-reveal>
+          {full.percent >= 100 && <span class="hv-cheer" aria-hidden="true">{Array.from({ length: 12 }, (_, k) => <i style={`--k:${k}`} data-shape={['star', 'dot', 'bar', 'ring'][k % 4]} />)}</span>}
+          <h2 id="hv-c">{s('close_t')}</h2>
+          <p class="hv-lead">{s('close_p')}</p>
+          <div class="hv-stack" role="img" aria-label={`${full.title}: ${money(full.raised)} — ${s('percent', { p: String(full.percent) })}`}>
+            <span class="hv-sheet hv-sheet-a" aria-hidden="true"></span>
+            <span class="hv-sheet hv-sheet-b" aria-hidden="true"></span>
+            <span class="hv-sheet hv-sheet-c" aria-hidden="true"></span>
+            <div class="hv-sheet hv-sheet-front" aria-hidden="true">
+              <span class="hv-s-kicker">{s('card_parish')}</span>
+              <strong class="hv-s-title">{full.title}</strong>
+              <span class="hv-s-amount">{money(full.raised)}</span>
+              <span class="hv-s-track"><span style={`width:${fill}%`}></span></span>
+              <span class="hv-s-pct">{s('percent', { p: String(full.percent) })}</span>
+            </div>
+          </div>
+          <Button href={wa} variant="secondary" target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} />{s('share')}<Icon name="external" size={16} /></Button>
+        </section>
+      </div>
+    )
+  }
+</Site>
+
+<script>
+  import { initHarvest } from '../../scripts/harvest'
+  initHarvest()
+  document.addEventListener('astro:page-load', initHarvest)
+</script>
+
+<style>
+  /* One calm surface under the hero: warm paper tinted with the harvest gold, a soft field of dots, sections that settle in. */
+  .hv {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    gap: clamp(3rem, 8vw, 6rem);
+    padding-block: clamp(2.5rem, 6vw, 5rem);
+    padding-inline: max(1rem, calc((100% - 64rem) / 2));
+    /* Starts and ends on the page colour, so it blends into the sections before and after. */
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in oklab, var(--gold) 11%, var(--bg)) 40%, color-mix(in oklab, var(--gold) 9%, var(--bg)) 65%, var(--bg) 100%);
+  }
+  .hv-dots {
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    background-image: radial-gradient(circle, color-mix(in oklab, var(--gold) 60%, var(--ink)) 0.1rem, transparent 0.14rem);
+    background-size: 1.9rem 1.9rem;
+    opacity: 0.22;
+    transform: rotate(-9deg);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 30% 25%, #000, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 60% at 30% 25%, #000, transparent 75%);
+    pointer-events: none;
+    animation: hv-drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes hv-drift {
+    to {
+      transform: rotate(-9deg) translate3d(-1.5%, 2%, 0);
+    }
+  }
+  .hv-sec {
+    display: grid;
+    gap: 1rem;
+  }
+  .hv h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .hv-kicker {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .hv-lead {
+    max-width: 56ch;
+    font-size: var(--text-lg);
+    color: var(--ink-muted);
+  }
+  .hv-sim {
+    justify-self: start;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--info-soft);
+    color: var(--info);
+    font-weight: 600;
+  }
+  /* Sections settle in as they come into view (only when the script has started; without it everything is simply there). */
+  .hv[data-js] [data-reveal] {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition:
+      opacity 0.9s var(--ease-out, ease),
+      transform 0.9s var(--ease-out, ease);
+  }
+  .hv[data-js] [data-reveal][data-in] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 1 — what we gather together */
+  .hv-gather {
+    align-items: center;
+  }
+  @media (min-width: 48rem) {
+    .hv-gather {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+  .hv-gather-text {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .hv-amount {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .hv-sub {
+    color: var(--ink-muted);
+  }
+  .hv-warm,
+  .hv-thanks {
+    font-weight: 600;
+  }
+  .hv-days {
+    justify-self: start;
+    padding: 0.125rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--gold) 28%, var(--bg));
+    font-weight: 700;
+  }
+  .hv-basket {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: center;
+  }
+  .hv-basket svg {
+    width: min(100%, 24rem);
+    height: auto;
+    overflow: visible;
+  }
+  .hv-handle,
+  .hv-rim {
+    stroke: var(--clay, var(--ink-muted));
+    stroke-width: 11;
+    stroke-linecap: round;
+  }
+  .hv-back {
+    fill: var(--surface-2);
+  }
+  .hv-level {
+    fill: var(--gold);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: scaleY(var(--f));
+  }
+  .hv[data-js] .hv-level {
+    transform: scaleY(0);
+    transition: transform 2.2s var(--ease-out, ease) 0.3s;
+  }
+  .hv[data-js] [data-in] .hv-level {
+    transform: scaleY(var(--f));
+  }
+  .hv-weave {
+    stroke: color-mix(in oklab, var(--clay, var(--ink)) 65%, transparent);
+    stroke-width: 6;
+  }
+  .hv-leaves path {
+    fill: color-mix(in oklab, var(--primary) 70%, var(--bg));
+    opacity: 0.8;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: hv-sway 7s ease-in-out infinite alternate;
+  }
+  .hv-leaves path:nth-child(2) {
+    animation-delay: -2s;
+  }
+  .hv-leaves path:nth-child(3) {
+    animation-delay: -4s;
+  }
+  @keyframes hv-sway {
+    to {
+      transform: rotate(6deg) translateY(-3px);
+    }
+  }
+  /* The fruit land one after another once the basket is in view. */
+  .hv-f {
+    fill: var(--clay, var(--season));
+    stroke: var(--surface);
+    stroke-width: 3;
+  }
+  .hv-f[data-tone='1'] {
+    fill: var(--primary);
+  }
+  .hv-f[data-tone='2'] {
+    fill: var(--gold);
+  }
+  .hv[data-js] .hv-f {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  .hv[data-js] [data-in] .hv-f {
+    animation: hv-land 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    animation-delay: calc(1.2s + var(--k) * 0.35s);
+  }
+  @keyframes hv-land {
+    from {
+      opacity: 0;
+      transform: translateY(-60px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .hv-cap {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  /* 2 — everyone brings something: small baskets drifting at their own pace, never put side by side as a score */
+  .hv-field {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 1.5rem;
+    justify-content: center;
+    padding-block: 1rem;
+  }
+  .hv-field li {
+    margin-block-start: calc((var(--i) % 3) * 1.25rem);
+    animation: hv-float 6s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -1.3s);
+  }
+  @keyframes hv-float {
+    to {
+      transform: translateY(-0.5rem);
+    }
+  }
+  .hv-mini {
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    width: 9.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    cursor: default;
+    transition:
+      transform var(--duration-ui, 0.28s) var(--ease-out, ease),
+      background var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hv-mini:hover,
+  .hv-mini:focus-visible {
+    transform: translateY(-4px) scale(1.05);
+    background: color-mix(in oklab, var(--gold) 14%, transparent);
+  }
+  .hv-mini svg {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+  .hv-m-handle,
+  .hv-m-rim {
+    stroke: var(--clay, var(--ink-muted));
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .hv-m-back {
+    fill: var(--surface-2);
+  }
+  .hv-m-level {
+    fill: var(--gold);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transform: scaleY(var(--f));
+  }
+  .hv[data-js] .hv-m-level {
+    transform: scaleY(0);
+    transition: transform 1.8s var(--ease-out, ease) calc(0.3s + var(--i) * 0.15s);
+  }
+  .hv[data-js] [data-in] .hv-m-level {
+    transform: scaleY(var(--f));
+  }
+  .hv-m-name {
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+  /* Each group's own amount and its own target, always visible (no hover needed); no order, no ranking. */
+  .hv-m-says {
+    display: grid;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .hv-m-says small {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+
+  /* 3 — the week ahead: a ribbon of cards */
+  .hv-ribbon {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(78%, 15rem);
+    gap: 0.875rem;
+    padding: 0.75rem 0.25rem 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  @media (max-width: 47.99rem) {
+    /* On a phone the ribbon runs from one screen edge to the other, then scrolls under the edges. */
+    .hv-ribbon {
+      margin-inline: -1rem;
+      padding-inline: 1rem;
+      scroll-padding-inline: 1rem;
+      grid-auto-columns: min(72%, 15rem);
+    }
+  }
+  .hv-ribbon li {
+    scroll-snap-align: start;
+    transform: rotate(calc((var(--i) % 3 - 1) * 1.2deg));
+  }
+  .hv-ribbon a {
+    display: grid;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 1rem 1.125rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform var(--duration-ui, 0.28s) var(--ease-out, ease),
+      box-shadow var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hv-ribbon a:hover,
+  .hv-ribbon a:focus-visible {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: var(--elevation-2);
+  }
+  .hv-when {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: capitalize;
+    color: var(--primary);
+  }
+  .hv-ribbon strong {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 500;
+  }
+
+  /* 4 — giving, simply */
+  .hv-give-card {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    max-width: 40rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .hv-methods {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  /* 5 — closing */
+  .hv-close {
+    position: relative;
+    justify-items: center;
+    text-align: center;
+  }
+  /* The thanks card: a few sheets dropped on one another, each tilted its own way, tinted from the theme (no frame, no top rule). */
+  .hv-stack {
+    position: relative;
+    display: grid;
+    width: min(84%, 24rem);
+    margin-block: 1.5rem 1rem;
+    aspect-ratio: 4 / 3;
+  }
+  .hv-sheet {
+    grid-area: 1 / 1;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elevation-2);
+    transition: transform var(--duration-ui, 0.28s) var(--ease-out, ease);
+  }
+  .hv-sheet-a {
+    background: color-mix(in oklab, var(--gold) 38%, var(--surface));
+    transform: rotate(-9deg) translate(-4%, 3%);
+  }
+  .hv-sheet-b {
+    background: color-mix(in oklab, var(--primary) 22%, var(--surface));
+    transform: rotate(6deg) translate(5%, 1%);
+  }
+  .hv-sheet-c {
+    background: color-mix(in oklab, var(--clay, var(--season)) 26%, var(--surface));
+    transform: rotate(-3deg) translate(-1%, -3%);
+  }
+  .hv-sheet-front {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    transform: rotate(1.5deg);
+    text-align: start;
+  }
+  .hv-stack:hover .hv-sheet-a {
+    transform: rotate(-12deg) translate(-8%, 4%);
+  }
+  .hv-stack:hover .hv-sheet-b {
+    transform: rotate(9deg) translate(9%, 1%);
+  }
+  .hv-stack:hover .hv-sheet-c {
+    transform: rotate(-5deg) translate(-3%, -5%);
+  }
+  .hv-s-kicker {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .hv-s-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.15;
+  }
+  .hv-s-amount {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--primary);
+  }
+  .hv-s-track {
+    display: block;
+    width: 100%;
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .hv-s-track > span {
+    display: block;
+    height: 100%;
+    background: var(--gold);
+  }
+  .hv-s-pct {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hv-sheet {
+      transition: none;
+    }
+  }
+  .hv-cheer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hv-cheer i {
+    --a: calc(var(--k) * 30deg);
+    position: absolute;
+    inset-block-start: calc(50% + 48% * sin(var(--a)));
+    inset-inline-start: calc(50% + 48% * cos(var(--a)));
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--gold);
+    animation: hv-twinkle 3.2s ease-in-out infinite;
+    animation-delay: calc(var(--k) * -0.27s);
+  }
+  .hv-cheer i[data-shape='dot'] {
+    border-radius: 50%;
+    background: var(--primary);
+  }
+  .hv-cheer i[data-shape='bar'] {
+    width: 0.375rem;
+    height: 1.25rem;
+    background: var(--clay, var(--season));
+  }
+  .hv-cheer i[data-shape='ring'] {
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: inset 0 0 0 0.2rem var(--gold);
+  }
+  @keyframes hv-twinkle {
+    50% {
+      opacity: 0.25;
+      scale: 0.7;
+    }
+  }
+
+  /* the teaser and the « see you next year » state */
+  .hv-teaser,
+  .hv-later {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    padding: clamp(3rem, 8vw, 6rem) 1rem;
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in oklab, var(--gold) 11%, var(--bg)) 50%, var(--bg) 100%);
+  }
+  .hv-teaser-in {
+    display: grid;
+    justify-items: center;
+    gap: 0.875rem;
+    max-width: 40rem;
+  }
+  .hv-teaser :global(.hv-art),
+  .hv-later :global(.hv-art) {
+    width: min(70%, 15rem);
+    height: auto;
+  }
+  .hv-dates {
+    font-weight: 700;
+  }
+  .hv-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .hv-note {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hv-dots,
+    .hv-leaves path,
+    .hv-field li,
+    .hv-cheer i {
+      animation: none;
+    }
+    .hv[data-js] [data-reveal],
+    .hv[data-js] .hv-level,
+    .hv[data-js] .hv-m-level,
+    .hv[data-js] .hv-f {
+      opacity: 1;
+      transform: none;
+      transition: none;
+      animation: none;
+    }
+    .hv[data-js] .hv-level,
+    .hv[data-js] .hv-m-level {
+      transform: scaleY(var(--f));
+    }
+  }
+</style>

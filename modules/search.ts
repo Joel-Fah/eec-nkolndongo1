@@ -9,11 +9,12 @@ import type { Db } from '@eec/db'
 import { eventsItems } from '@eec/module-events/schema'
 import { guides } from '@eec/module-guides/schema'
 import { newsPosts } from '@eec/module-news/schema'
+import { sermons } from '@eec/module-sermons/schema'
 import { sql } from 'drizzle-orm'
 
 export type Locale = 'fr' | 'en'
 export type SearchHit = {
-  type: 'news' | 'events' | 'guides' | 'departments'
+  type: 'news' | 'events' | 'guides' | 'departments' | 'sermons'
   key: string
   title: string
   snippet: string
@@ -84,6 +85,15 @@ function sources(locale: Locale) {
       title: t('title_fr', 'title_en'),
       excerpt: sql`null::text`,
       body: body('description_fr', 'description_en', 'title_en'),
+    },
+    {
+      type: 'sermons',
+      from: sql`${sermons}`,
+      where: sql`state = 'published' and (publish_at is null or publish_at <= now()) and (unpublish_at is null or unpublish_at > now())`,
+      key: sql`slug`,
+      title: t('title_fr', 'title_en'),
+      excerpt: t('summary_fr', 'summary_en'),
+      body: body('body_fr', 'body_en', 'title_en'),
     },
     {
       type: 'guides',

@@ -12,7 +12,14 @@ export function initContactForm() {
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]')
   if (!form || form.dataset.ready) return
   form.dataset.ready = '1'
-  const openedAt = Date.now()
+  // The server signs the moment the form is shown; it is sent back with the message (minimum fill time).
+  const token: Promise<string> = fetch('/api/contact/token', {
+    credentials: 'omit',
+    cache: 'no-store',
+  })
+    .then((r) => r.json() as Promise<{ token: string }>)
+    .then((j) => j.token)
+    .catch(() => '')
   const L = JSON.parse(form.dataset.i18n ?? '{}') as Strings
   const status = form.querySelector<HTMLElement>('[data-status]')
   const done = document.querySelector<HTMLElement>('[data-contact-done]')
@@ -141,7 +148,7 @@ export function initContactForm() {
           message: val('message'),
           consent: true,
           website: val('website'),
-          openedAt,
+          token: await token,
         }),
       })
       if (res.ok) {

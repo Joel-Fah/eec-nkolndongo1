@@ -5,7 +5,7 @@
 # only ever sees the dev values in .env.local.
 #     bash scripts/ops/prod-shell.sh
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 [ -f .env.production.local ] || { echo "Missing .env.production.local"; exit 1; }
 rc="$(mktemp)"
 cat > "$rc" <<'RC'

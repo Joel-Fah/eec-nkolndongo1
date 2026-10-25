@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@eec/i18n": "workspace:*",
+    "@eec/ui": "workspace:*",
     "@tanstack/react-query": "5.104.4",
     "react": "catalog:"
   },

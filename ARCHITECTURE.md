@@ -1,7 +1,7 @@
 # Architecture
 
-Status: **foundations built (Phase 01)**: monorepo, brand, tokens, primitives, public shell and admin shell.
-Database, auth, API modules and content are Phase 02+. Rationale for each choice lives in `docs/decisions/`.
+Status: **Phase 04 built on dev** (see `STATUS.md`): platform core, parish life modules, go-live kit, sermons, meditations, bulletin,
+registrations, campaigns, Sunday reports, notifications, PWA. Rationale for each choice lives in `docs/decisions/`.
 
 ## 1. Goals that shape the architecture
 
@@ -53,7 +53,8 @@ modules/
   registry.ts     The single list of modules (data only)
   api.ts, admin.ts  Their API routers and admin pages (server / browser sides of the registry)
   <module>/       One folder per feature (see §4) — settings, media, members, news, events, schedule, liturgy,
-                  departments, guides, story, contact, legal (search and the admin « À faire » roll-up live with the API)
+                  departments, guides, story, contact, legal, sermons, meditations, bulletin, registrations, campaigns,
+                  sundays, cli (search and the admin « À faire » / notifications roll-ups live with the API)
 scripts/          One-off tooling (pexels curation, seeding, image optimisation)
 docs/             All documentation
 .claude/skills/   Project skills for Claude
@@ -133,7 +134,8 @@ modules/events/                 workspace package @eec/module-events
 - No third-party requests on page load (fonts, icons, images all first-party).
 - `Save-Data` / `prefers-reduced-data` → no autoplay, lower image tier, motion reduced.
 - Maps, video, audio load on explicit tap.
-- PWA (phase 2): installable, offline read of recent news/agenda/bulletin.
+- PWA (decision 0037): a hand-written service worker (`apps/web/src/sw/sw.js`, built by `pages/sw.js.ts`, stamped per build), per-locale manifest, FR/EN offline pages.
+  Public pages only (max 40 saved); never admin, API, auth, Mon espace, previews, registration, search or anything `private` / `no-store`.
 
 ## 9. Environments
 
@@ -165,3 +167,19 @@ voice and tone, logo, colour, type, shape, motion, icons, illustration, every co
   `routes/todo.ts` (admin « À faire ») and `policy.ts` (the privacy-policy version in force, decision 0033).
 - Decisions: 0027 (rendering), 0028 (rich text), 0029 (events), 0030 (search), 0031 (people and consent), 0032 (Bible
   translations), 0033 (legal versions). Content truth: `pnpm content:pending`. Manual end-to-end run: `pnpm e2e`.
+
+## Phase 04 additions
+- **Modules:** `sermons` (links only, 0034), `meditations` (CSV import, passages as references), `bulletin` (assembled from the site's own data),
+  `registrations` (waitlist, check-in, retention, 0035), `campaigns` (Moissons: validated totals only, 0041), `sundays` (Sunday reports:
+  aggregates only, special days, proposed figures validated by the secretariat or treasurer, 0043 / 0044 / 0045).
+- **Cross-module data is read by table name with raw SQL, never by importing another module** (`modules/boundaries.test.ts`): `sundays` feeds
+  `campaign_progress`; `apps/api/src/routes/todo.ts` and `notifications.ts` are roll-ups across modules.
+- **Notifications** (0044 / 0046): table `notifications` + `notification_mutes`; reminders are worked out when the list is read (no scheduler),
+  one row per person and thing (kind + params, never text), grouped by week, with a deep link; resolved by themselves; four kinds a person can mute.
+  The admin bell is `apps/admin/src/components/Notifications.tsx`; pure rules in `apps/api/src/routes/reminders.ts`.
+- **Member-only pages:** `/api/me/membership`; the Moissons page is `private, no-store`, `noindex`, in the service worker's private list (0042).
+- **Pickers:** `DatePicker` / `TimePicker` in `packages/ui/react/pickers.tsx` (admin, wrapped as `DateField` / `TimeField` in `@eec/admin-kit`)
+  and `packages/ui/src/pickers.ts` (public, native popover). No date library.
+- **Share cards, JSON-LD, sitemap:** `scripts/og-generate.ts`, `scripts/jsonld-check.ts`, on-demand `/sitemap.xml`; the launch kit is `docs/ops/launch.md`.
+- **Checks you can run:** `pnpm check` (lint, typecheck, tests incl. route-table, scope matrix, boundaries), `pnpm e2e` (local stack only).
+- Decisions 0034–0047 are listed in `docs/decisions/README.md`.

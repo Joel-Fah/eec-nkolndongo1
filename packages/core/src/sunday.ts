@@ -69,3 +69,15 @@ export function suggestSundayName(date: string): { fr: string; en: string; seaso
       return { fr: 'Dimanche du temps ordinaire', en: 'Sunday in Ordinary Time', season }
   }
 }
+
+/** Is it Sunday where the parish is (Douala by default)? */
+export const isSundayIn = (now: Date, tz = PARISH_TZ) => dow(localDate(now, tz)) === 0
+
+/**
+ * Should the site open on « Ce dimanche » for this visit? Only on a Sunday, and only the first time that day on this device
+ * (`seen` is the day stored by the previous redirect), so nobody is ever held on that page. Returns the day to remember.
+ */
+export function openOnSunday(now: Date, seen: string | undefined, tz = PARISH_TZ) {
+  const today = localDate(now, tz)
+  return { open: isSundayIn(now, tz) && seen !== today, today }
+}

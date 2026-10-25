@@ -197,5 +197,9 @@
   "period_range": "Pick dates",
   "from": "From",
   "until_date": "To",
-  "untitled_full": "Untitled event"
+  "untitled_full": "Untitled event",
+  "side_slug_help": "Created automatically from the title, always unique; it no longer changes once the event is published.",
+  "registrations": "Registrations",
+  "side_registrations": "This event takes registrations",
+  "side_registrations_help": "Only events that take registrations can have a registration form. Once ticked and saved, the “Registrations” button appears at the top."
 }

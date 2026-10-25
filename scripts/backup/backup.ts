@@ -69,6 +69,14 @@ try {
     const put = await aws.fetch(`${base}/${name}`, { method: 'PUT', body: encrypted })
     if (!put.ok) throw new Error(`upload failed: ${put.status}`)
     console.log(`backup uploaded: ${bucket}/${name} (${(encrypted.length / 1024).toFixed(0)} KB)`)
+    // Tell the app (Admin → Santé reads « last backup age »). Never fails the backup: the table may not exist yet.
+    await c
+      .query(
+        `insert into system_marks (key, at, note) values ('backup', now(), $1)
+         on conflict (key) do update set at = now(), note = excluded.note`,
+        [`${bucket}/${name}`],
+      )
+      .catch(() => {})
     // Keep the newest KEEP backups.
     const list = await (await aws.fetch(`${base}?list-type=2&prefix=db/`)).text()
     const names = [...list.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => m[1] as string).sort()

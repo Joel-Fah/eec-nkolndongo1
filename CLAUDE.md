@@ -35,7 +35,7 @@ super admin and (for now) the only developer. Read this file, then `STATUS.md`, 
 
 Astro (public) · Vite + React + TanStack (admin) · Hono on Cloudflare Workers (API) · Neon Postgres +
 self-hosted Better Auth (0018) · Drizzle · S3-compatible bucket: Neon Object Storage now, R2 later (0020) · YouTube (video) ·
-Google Drive (archive only) · outbox now, Brevo later (0019) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + Erode (0023).
+Google Drive (archive only) · outbox now, Brevo later (0019) · hand-written PWA service worker (0037) · in-app notifications (0044) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + Erode (0023).
 pnpm workspaces + Turborepo.
 
 ## How to work
@@ -43,7 +43,7 @@ pnpm workspaces + Turborepo.
 - New feature → use the `new-module` skill. Features live in `modules/<name>/`, never scattered.
 - UI work → `design-system` skill. Animation → `gsap-motion`. Illustrations → `svg-illustration`.
   Emails → `email-templates`. Copy → `i18n-content`. Stock photos → `pexels-curation`.
-  Before a release → `release-checklist`.
+  Before a release → `release-checklist`. New route, upload, personal data or third-party call → `owasp-security`.
 - Icons: Hugeicons **stroke-rounded only** (`@hugeicons/core-free-icons`). No other icon set.
 - **Document as you build:** every new component, pattern, animation, transition or token is documented
   in the living guide (`apps/web` → `/fr/_brand`, `/en/_brand`) in the same change. No entry = not done.
@@ -52,12 +52,24 @@ pnpm workspaces + Turborepo.
 - Prefer editing existing docs over creating new ones. All documentation lives in `docs/`, except the
   root files (README, CLAUDE, ARCHITECTURE, STATUS).
 
-## Commands (once scaffolded)
+## Commands
 
 ```bash
 pnpm install
-pnpm dev            # all apps
-pnpm dev --filter web|admin|api
-pnpm lint && pnpm typecheck && pnpm test
-pnpm db:generate && pnpm db:migrate
+pnpm dev            # gateway :8080 + site + admin (pnpm dev:stop frees the ports; if the site fails to start in 30 s, stop and retry)
+pnpm check          # lint + typecheck + tests for everything (use --concurrency=2)
+pnpm e2e            # manual end-to-end checks against the LOCAL stack only
+pnpm db:generate && pnpm db:migrate     # migrations: additive, own commit, dev branch only unless Joël says so
+pnpm db:seed        # roles, settings (production: only on Joël's go)
+pnpm bible:seed · pnpm content:pending · pnpm build:site
+pnpm --filter @eec/i18n build           # after editing any messages/*.json (compiles the messages; a missing key crashes the screen)
+pnpm --filter @eec/scripts og:generate | brand:icons | jsonld:check | social:kit
 ```
+
+## Rules learned the hard way
+
+- Anything private (Mon espace, photos, notifications, member-only pages) is `private, no-store`, `noindex`, and in the service worker's private list.
+- Figures that wait for validation (0045) count nowhere; a person cannot validate their own entry.
+- Modules never import each other: cross-module data is read by table name; `modules/scope.test.ts` and the route-table test must stay green.
+- System-role grants are only written when a role is created: after adding a permission, grant it in Rôles on each environment (tell Joël).
+- Production is Joël's: no deploy, migration, seed, secret, role grant or merge to `main` without his explicit OK. Never set `SITE_INDEXABLE=1`.

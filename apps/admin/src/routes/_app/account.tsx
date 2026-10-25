@@ -1,11 +1,13 @@
 import { ApiError, api, useLocale, useMe } from '@eec/admin-kit'
 import type { Locale, MessageKey } from '@eec/i18n'
+import { avatarSvg } from '@eec/ui/avatar-art'
 import { Badge, Button, SelectField, TextField } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { type FormEvent, useEffect, useState } from 'react'
 import { deviceName, fmt, notify, PageHeader } from '../../components/kit'
 import { PasswordField } from '../../components/PasswordField'
+import { ProfilePanel, useMyProfile } from '../../components/ProfilePanel'
 import { type ThemeChoice, useTheme } from '../../lib/theme'
 
 export const Route = createFileRoute('/_app/account')({ component: Account })
@@ -51,64 +53,103 @@ function Account() {
     />
   )
 
+  const mine = useMyProfile().data
+  const signIn = mine?.signIn ?? []
+
   return (
-    <div className="grid max-w-4xl gap-8">
+    <div className="grid gap-8">
       <PageHeader title={t('admin.account.title')} lead={t('admin.account.lead')} />
-      <form className="admin-panel" onSubmit={submit}>
-        <h2 className="text-xl">{t('admin.account.profile')}</h2>
-        <p className="text-sm text-ink-muted">{me?.user.email}</p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {field('firstName', 'admin.users.first_name', 'common.ph.first_name')}
-          {field('lastName', 'admin.users.last_name', 'common.ph.last_name')}
-          {field('name', 'admin.users.display_name', 'common.ph.name')}
-          {field('phone', 'admin.users.phone', 'common.ph.phone')}
-        </div>
-        <div>
-          <Button type="submit" loading={save.isPending}>
-            {t('admin.common.save')}
-          </Button>
-        </div>
-      </form>
+      <div className="acct-grid">
+        <div className="acct-col">
+          <form className="admin-panel" onSubmit={submit}>
+            <h2 className="text-xl">{t('admin.account.profile')}</h2>
+            <div className="acct-form-grid">
+              {field('firstName', 'admin.users.first_name', 'common.ph.first_name')}
+              {field('lastName', 'admin.users.last_name', 'common.ph.last_name')}
+              {field('name', 'admin.users.display_name', 'common.ph.name')}
+              {field('phone', 'admin.users.phone', 'common.ph.phone')}
+            </div>
+            <div>
+              <Button type="submit" loading={save.isPending}>
+                {t('admin.common.save')}
+              </Button>
+            </div>
+          </form>
 
-      <section className="admin-panel">
-        <h2 className="text-xl">{t('admin.account.prefs')}</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField
-            label={t('admin.users.language')}
-            value={locale}
-            onValueChange={(v) => {
-              if (!v) return
-              setLocale(v as Locale)
-              save.mutate({ locale: v })
-            }}
-            options={[
-              { value: 'fr', label: 'Français' },
-              { value: 'en', label: 'English' },
-            ]}
-          />
-          <SelectField
-            label={t('admin.account.theme')}
-            value={theme.choice}
-            onValueChange={(v) => {
-              if (!v) return
-              theme.set(v as ThemeChoice)
-              save.mutate({ theme: v })
-            }}
-            options={(['system', 'light', 'dark'] as const).map((c) => ({
-              value: c,
-              label: t(`admin.account.themes.${c}`),
-            }))}
-          />
+          <ProfilePanel />
+          <Password hasPassword={signIn.length === 0 || signIn.includes('email')} />
         </div>
-      </section>
 
-      <Password />
-      <Sessions />
+        <aside className="acct-col acct-aside" aria-label={t('admin.account.title')}>
+          <div className="acct-id">
+            <span className="acct-id-photo" aria-hidden="true">
+              {mine?.photo.asAvatar && mine.photo.url ? (
+                <img src={mine.photo.url} alt="" referrerPolicy="no-referrer" />
+              ) : (
+                <span
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
+                  dangerouslySetInnerHTML={{ __html: avatarSvg(mine?.seed ?? 0) }}
+                />
+              )}
+            </span>
+            <div className="grid gap-1">
+              <p className="font-display text-2xl">{me?.user.name}</p>
+              <p className="text-ink-muted">{me?.user.email}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {signIn.map((x) => (
+                <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                  {t(`admin.account.sign_${x}` as MessageKey)}
+                </Badge>
+              ))}
+              {(me?.roles ?? []).slice(0, 3).map((r) => (
+                <Badge key={`${r.role}${r.groupId ?? ''}`} tone="gold">
+                  {r.role}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <section className="admin-panel">
+            <h2 className="text-xl">{t('admin.account.prefs')}</h2>
+            <div className="grid gap-4">
+              <SelectField
+                label={t('admin.users.language')}
+                value={locale}
+                onValueChange={(v) => {
+                  if (!v) return
+                  setLocale(v as Locale)
+                  save.mutate({ locale: v })
+                }}
+                options={[
+                  { value: 'fr', label: 'Français' },
+                  { value: 'en', label: 'English' },
+                ]}
+              />
+              <SelectField
+                label={t('admin.account.theme')}
+                value={theme.choice}
+                onValueChange={(v) => {
+                  if (!v) return
+                  theme.set(v as ThemeChoice)
+                  save.mutate({ theme: v })
+                }}
+                options={(['system', 'light', 'dark'] as const).map((c) => ({
+                  value: c,
+                  label: t(`admin.account.themes.${c}`),
+                }))}
+              />
+            </div>
+          </section>
+
+          <Sessions />
+        </aside>
+      </div>
     </div>
   )
 }
 
-function Password() {
+function Password({ hasPassword }: { hasPassword: boolean }) {
   const { t } = useLocale()
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
@@ -137,10 +178,17 @@ function Password() {
     e.preventDefault()
     change.mutate()
   }
+  if (!hasPassword)
+    return (
+      <section className="admin-panel">
+        <h2 className="text-xl">{t('admin.account.password')}</h2>
+        <p className="text-ink-muted">{t('admin.account.google_only')}</p>
+      </section>
+    )
   return (
     <form className="admin-panel" onSubmit={submit}>
       <h2 className="text-xl">{t('admin.account.password')}</h2>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="acct-form-grid">
         <PasswordField
           label={t('admin.account.current')}
           placeholder={t('admin.account.current_ph')}
@@ -152,13 +200,13 @@ function Password() {
         <PasswordField
           label={t('admin.account.new')}
           placeholder={t('common.ph.new_password')}
-          hint={t('auth.password.hint')}
           autoComplete="new-password"
           required
           value={next}
           onChange={(e: { target: { value: string } }) => setNext(e.target.value)}
         />
       </div>
+      <p className="text-sm text-ink-muted">{t('auth.password.hint')}</p>
       <div>
         <Button type="submit" loading={change.isPending}>
           {t('admin.account.change')}

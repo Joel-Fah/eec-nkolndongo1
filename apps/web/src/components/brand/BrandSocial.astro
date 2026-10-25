@@ -1,0 +1,109 @@
+---
+import Icon from '@eec/ui/astro/Icon.astro'
+import { useT } from '../../lib/i18n'
+import { AVATAR_VARIANTS, AVATARS, BANNERS } from '../../lib/social-kit'
+import Section from './Section.astro'
+
+const t = useT(Astro.currentLocale)
+const base = '/brand/social'
+---
+
+<Section id="social" title={t('brand.social.title')} lead={t('brand.social.lead')}>
+  <div class="grid gap-3">
+    <h3 class="text-2xl">{t('brand.social.banners')}</h3>
+    <p class="max-w-[72ch] text-ink-muted">{t('brand.social.banners_p')}</p>
+  </div>
+  <div class="grid gap-10">
+    {
+      BANNERS.map((b) => (
+        <figure class="grid gap-3" id={`social-${b.id}`}>
+          <div class="soc-frame" style={`aspect-ratio:${b.width}/${b.height}`}>
+            <img src={`${base}/${b.file}`} width={b.width} height={b.height} alt={`${b.platform} — ${t('brand.social.banner_alt')}`} loading="lazy" decoding="async" />
+          </div>
+          <figcaption class="flex flex-wrap items-center justify-between gap-3">
+            <span class="grid gap-1">
+              <strong class="text-lg">{b.platform} · {b.width} × {b.height} px</strong>
+              <span class="max-w-[64ch] text-sm text-ink-muted">{t(`brand.social.note_${b.note}`)}</span>
+            </span>
+            <a class="btn btn-secondary" href={`${base}/${b.file}`} download>
+              <Icon name="download" size={20} />
+              {t('brand.social.download')} (PNG)
+            </a>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+
+  <div class="grid gap-3">
+    <h3 class="text-2xl">{t('brand.social.avatars')}</h3>
+    <p class="max-w-[72ch] text-ink-muted">{t('brand.social.avatars_p')}</p>
+  </div>
+  <div class="soc-avatars">
+    {
+      AVATARS.map((a) => (
+        <div class="soc-avatar-card">
+          <div class="soc-avatar-row">
+            {AVATAR_VARIANTS.map((v) => (
+              <img class="soc-square" src={`${base}/${a.file}-${v}.png`} width={96} height={96} alt={`${a.platform} — ${t(`brand.social.variant_${v}`)}`} loading="lazy" decoding="async" />
+            ))}
+          </div>
+          <strong>{a.platform}</strong>
+          <span class="text-sm text-ink-muted">{a.size} × {a.size} px</span>
+          <span class="flex flex-wrap gap-2">
+            {AVATAR_VARIANTS.map((v) => (
+              <a class="btn btn-ghost btn-sm" href={`${base}/${a.file}-${v}.png`} download>
+                <Icon name="download" size={16} />
+                {t(`brand.social.variant_${v}`)}
+              </a>
+            ))}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="grid gap-2 rounded-xl bg-gold-soft p-6">
+    <h3 class="text-xl">{t('brand.social.rules_title')}</h3>
+    <ul class="grid list-disc gap-2 ps-5">
+      {(['r1', 'r2', 'r3', 'r4'] as const).map((k) => <li>{t(`brand.social.${k}`)}</li>)}
+    </ul>
+  </div>
+</Section>
+
+<style>
+  .soc-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--elevation-1);
+    background: var(--surface-2);
+  }
+  .soc-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .soc-avatars {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+  .soc-avatar-card {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .soc-avatar-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .soc-square {
+    border-radius: 0;
+    box-shadow: var(--elevation-1);
+  }
+</style>

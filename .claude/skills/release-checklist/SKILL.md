@@ -19,7 +19,7 @@ Run locally / manually (CI stays frugal — `docs/ops/ci-cd.md`).
 - [ ] Reduced motion pass; contrast in both themes
 
 ## i18n & themes
-- [ ] No missing keys (`pnpm i18n:check`); FR typography correct
+- [ ] No missing keys (`pnpm check` (it compiles the messages; a missing key fails the typecheck)); FR typography correct
 - [ ] Language switcher keeps the equivalent page
 - [ ] Light and dark reviewed on every changed page
 
@@ -32,6 +32,7 @@ Run locally / manually (CI stays frugal — `docs/ops/ci-cd.md`).
 - [ ] Every new API route has Zod validation + `requirePermission`
 - [ ] Secrets only in Cloudflare/GitHub secrets; `git grep` for keys is clean
 - [ ] Dependencies audited (`pnpm audit`)
+- [ ] Run the `owasp-security` skill on everything that changed (routes, uploads, personal data, third-party calls)
 
 ## Wrap-up
 - [ ] DB migration applied to Neon main (backup branch created first)

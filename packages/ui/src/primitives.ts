@@ -11,7 +11,7 @@ const q = <T extends Element = HTMLElement>(root: ParentNode, sel: string) =>
   root.querySelector<T>(sel)
 
 /** Position a [popover] under (or over) its trigger, kept inside the viewport. */
-function placePopover(pop: HTMLElement, trigger: HTMLElement) {
+export function placePopover(pop: HTMLElement, trigger: HTMLElement) {
   const t = trigger.getBoundingClientRect()
   const margin = 8
   const align = pop.dataset.align ?? 'start'

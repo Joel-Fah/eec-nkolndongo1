@@ -36,7 +36,7 @@ export const legalModule = defineModule({
         group: 'settings',
         label: { fr: 'Documents légaux', en: 'Legal documents' },
         path: '/m/legal',
-        icon: 'shield',
+        icon: 'audit',
         order: 30,
         permission: 'legal:read',
       },

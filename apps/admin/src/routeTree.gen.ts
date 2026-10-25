@@ -15,11 +15,15 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAuditRouteImport } from './routes/_app/audit'
 import { Route as AppGroupsRouteImport } from './routes/_app/groups'
+import { Route as AppHealthRouteImport } from './routes/_app/health'
 import { Route as AppOutboxRouteImport } from './routes/_app/outbox'
 import { Route as AppRolesRouteImport } from './routes/_app/roles'
 import { Route as AppUiRouteImport } from './routes/_app/ui'
+import { Route as AppValidateRouteImport } from './routes/_app/validate'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ResetTokenRouteImport } from './routes/reset.$token'
+import { Route as AppHelpIndexRouteImport } from './routes/_app/help.index'
+import { Route as AppHelpSlugRouteImport } from './routes/_app/help.$slug'
 import { Route as AppMModuleRouteImport } from './routes/_app/m.$module'
 import { Route as AppUsersIndexRouteImport } from './routes/_app/users.index'
 import { Route as AppUsersIdRouteImport } from './routes/_app/users.$id'
@@ -53,6 +57,11 @@ const AppGroupsRoute = AppGroupsRouteImport.update({
   path: '/groups',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHealthRoute = AppHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppOutboxRoute = AppOutboxRouteImport.update({
   id: '/outbox',
   path: '/outbox',
@@ -68,6 +77,11 @@ const AppUiRoute = AppUiRouteImport.update({
   path: '/ui',
   getParentRoute: () => AppRoute,
 } as any)
+const AppValidateRoute = AppValidateRouteImport.update({
+  id: '/validate',
+  path: '/validate',
+  getParentRoute: () => AppRoute,
+} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
@@ -77,6 +91,16 @@ const ResetTokenRoute = ResetTokenRouteImport.update({
   id: '/reset/$token',
   path: '/reset/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppHelpIndexRoute = AppHelpIndexRouteImport.update({
+  id: '/help/',
+  path: '/help/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHelpSlugRoute = AppHelpSlugRouteImport.update({
+  id: '/help/$slug',
+  path: '/help/$slug',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppMModuleRoute = AppMModuleRouteImport.update({
   id: '/m/$module',
@@ -100,13 +124,17 @@ export interface FileRoutesByFullPath {
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
+  '/health': typeof AppHealthRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
+  '/validate': typeof AppValidateRoute
   '/invite/$token': typeof InviteTokenRoute
   '/reset/$token': typeof ResetTokenRoute
+  '/help/$slug': typeof AppHelpSlugRoute
   '/m/$module': typeof AppMModuleRoute
   '/users/$id': typeof AppUsersIdRoute
+  '/help/': typeof AppHelpIndexRoute
   '/users/': typeof AppUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -114,14 +142,18 @@ export interface FileRoutesByTo {
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
+  '/health': typeof AppHealthRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
+  '/validate': typeof AppValidateRoute
   '/invite/$token': typeof InviteTokenRoute
   '/reset/$token': typeof ResetTokenRoute
   '/': typeof AppIndexRoute
+  '/help/$slug': typeof AppHelpSlugRoute
   '/m/$module': typeof AppMModuleRoute
   '/users/$id': typeof AppUsersIdRoute
+  '/help': typeof AppHelpIndexRoute
   '/users': typeof AppUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -131,14 +163,18 @@ export interface FileRoutesById {
   '/_app/account': typeof AppAccountRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/groups': typeof AppGroupsRoute
+  '/_app/health': typeof AppHealthRoute
   '/_app/outbox': typeof AppOutboxRoute
   '/_app/roles': typeof AppRolesRoute
   '/_app/ui': typeof AppUiRoute
+  '/_app/validate': typeof AppValidateRoute
   '/invite/$token': typeof InviteTokenRoute
   '/reset/$token': typeof ResetTokenRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/help/$slug': typeof AppHelpSlugRoute
   '/_app/m/$module': typeof AppMModuleRoute
   '/_app/users/$id': typeof AppUsersIdRoute
+  '/_app/help/': typeof AppHelpIndexRoute
   '/_app/users/': typeof AppUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -149,13 +185,17 @@ export interface FileRouteTypes {
     | '/account'
     | '/audit'
     | '/groups'
+    | '/health'
     | '/outbox'
     | '/roles'
     | '/ui'
+    | '/validate'
     | '/invite/$token'
     | '/reset/$token'
+    | '/help/$slug'
     | '/m/$module'
     | '/users/$id'
+    | '/help/'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,14 +203,18 @@ export interface FileRouteTypes {
     | '/account'
     | '/audit'
     | '/groups'
+    | '/health'
     | '/outbox'
     | '/roles'
     | '/ui'
+    | '/validate'
     | '/invite/$token'
     | '/reset/$token'
     | '/'
+    | '/help/$slug'
     | '/m/$module'
     | '/users/$id'
+    | '/help'
     | '/users'
   id:
     | '__root__'
@@ -179,14 +223,18 @@ export interface FileRouteTypes {
     | '/_app/account'
     | '/_app/audit'
     | '/_app/groups'
+    | '/_app/health'
     | '/_app/outbox'
     | '/_app/roles'
     | '/_app/ui'
+    | '/_app/validate'
     | '/invite/$token'
     | '/reset/$token'
     | '/_app/'
+    | '/_app/help/$slug'
     | '/_app/m/$module'
     | '/_app/users/$id'
+    | '/_app/help/'
     | '/_app/users/'
   fileRoutesById: FileRoutesById
 }
@@ -241,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGroupsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/health': {
+      id: '/_app/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof AppHealthRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/outbox': {
       id: '/_app/outbox'
       path: '/outbox'
@@ -262,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/validate': {
+      id: '/_app/validate'
+      path: '/validate'
+      fullPath: '/validate'
+      preLoaderRoute: typeof AppValidateRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
@@ -275,6 +337,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset/$token'
       preLoaderRoute: typeof ResetTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/help/': {
+      id: '/_app/help/'
+      path: '/help'
+      fullPath: '/help/'
+      preLoaderRoute: typeof AppHelpIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/help/$slug': {
+      id: '/_app/help/$slug'
+      path: '/help/$slug'
+      fullPath: '/help/$slug'
+      preLoaderRoute: typeof AppHelpSlugRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/m/$module': {
       id: '/_app/m/$module'
@@ -304,12 +380,16 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppAuditRoute: typeof AppAuditRoute
   AppGroupsRoute: typeof AppGroupsRoute
+  AppHealthRoute: typeof AppHealthRoute
   AppOutboxRoute: typeof AppOutboxRoute
   AppRolesRoute: typeof AppRolesRoute
   AppUiRoute: typeof AppUiRoute
+  AppValidateRoute: typeof AppValidateRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppHelpSlugRoute: typeof AppHelpSlugRoute
   AppMModuleRoute: typeof AppMModuleRoute
   AppUsersIdRoute: typeof AppUsersIdRoute
+  AppHelpIndexRoute: typeof AppHelpIndexRoute
   AppUsersIndexRoute: typeof AppUsersIndexRoute
 }
 
@@ -317,12 +397,16 @@ const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppAuditRoute: AppAuditRoute,
   AppGroupsRoute: AppGroupsRoute,
+  AppHealthRoute: AppHealthRoute,
   AppOutboxRoute: AppOutboxRoute,
   AppRolesRoute: AppRolesRoute,
   AppUiRoute: AppUiRoute,
+  AppValidateRoute: AppValidateRoute,
   AppIndexRoute: AppIndexRoute,
+  AppHelpSlugRoute: AppHelpSlugRoute,
   AppMModuleRoute: AppMModuleRoute,
   AppUsersIdRoute: AppUsersIdRoute,
+  AppHelpIndexRoute: AppHelpIndexRoute,
   AppUsersIndexRoute: AppUsersIndexRoute,
 }
 

@@ -1,4 +1,6 @@
 {
   "_": "Production-only settings added to the built Worker config by scripts/assemble-site.ts (never used in dev). The Hyperdrive id is not a secret; the connection string behind it lives only in Cloudflare.",
-  "hyperdriveId": "fbb960ccb27f471a859a2b6026e64eaf"
+  "hyperdriveId": "fbb960ccb27f471a859a2b6026e64eaf",
+  "analyticsDataset": "analytics_events",
+  "accountId": "ce99236d128159a2f3d834b620a47f5a"
 }

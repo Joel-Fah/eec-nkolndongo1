@@ -3,10 +3,13 @@ import { Card } from '@eec/ui/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Headcount } from '../../components/Headcount'
 import { Icon } from '../../components/Icon'
+import { LastSunday } from '../../components/LastSunday'
 import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
+import { SundayYear } from '../../components/SundayYear'
 import { TodoPanel } from '../../components/TodoPanel'
 import { TrendsSection } from '../../components/Trends'
+import { VisitsSection } from '../../components/Visits'
 import { WelcomeBanner } from '../../components/WelcomeBanner'
 import { labelOf, navFor } from '../../lib/nav'
 
@@ -23,6 +26,8 @@ function Dashboard() {
       <QuickActions />
       <TodoPanel />
       <Headcount />
+      <LastSunday />
+      <SundayYear />
       <RecentActivity />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {groups.map((g) => (
@@ -42,6 +47,7 @@ function Dashboard() {
         ))}
       </div>
       <TrendsSection />
+      <VisitsSection />
     </div>
   )
 }

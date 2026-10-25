@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { zonedToUtc } from './recurrence.ts'
-import { comingSunday, suggestSundayName, sundaysFrom } from './sunday.ts'
+import { comingSunday, isSundayIn, openOnSunday, suggestSundayName, sundaysFrom } from './sunday.ts'
 
 const at = (y: number, m: number, d: number, h: number) =>
   zonedToUtc(y, m, d, h, 0, 'Africa/Douala')
@@ -29,5 +29,22 @@ describe('suggestSundayName', () => {
     expect(suggestSundayName('2027-04-04').fr).toBe('2e dimanche de Pâques')
     expect(suggestSundayName('2027-05-16').fr).toBe('Dimanche de la Pentecôte')
     expect(suggestSundayName('2026-10-25').fr).toBe('Dimanche du temps ordinaire')
+  })
+})
+
+describe('opening on Sunday', () => {
+  // 2026-10-25 is a Sunday; Douala is UTC+1.
+  const sunMorning = new Date('2026-10-25T07:00:00Z')
+  const sunLate = new Date('2026-10-25T23:30:00Z') // already Monday in Douala
+  const sat = new Date('2026-10-24T12:00:00Z')
+  it('opens on Sunday, once per day on a device', () => {
+    expect(openOnSunday(sunMorning, undefined)).toEqual({ open: true, today: '2026-10-25' })
+    expect(openOnSunday(sunMorning, '2026-10-25').open).toBe(false)
+    expect(openOnSunday(sunMorning, '2026-10-18').open).toBe(true)
+  })
+  it('follows the parish clock, not the visitor’s', () => {
+    expect(isSundayIn(sunLate)).toBe(false)
+    expect(isSundayIn(sat)).toBe(false)
+    expect(openOnSunday(sat, undefined).open).toBe(false)
   })
 })

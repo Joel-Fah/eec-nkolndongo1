@@ -1,16 +1,33 @@
 ---
+import Icon from '@eec/ui/astro/Icon.astro'
 import { localeOf, useT } from '../../lib/i18n'
 
 const t = useT(localeOf(Astro.currentLocale))
 ---
 
-<p class="fallback-note" role="note">{t('news.site.fallback_note')}</p>
+<p class="fallback-note" role="note">
+  <span class="fallback-ico" aria-hidden="true"><Icon name="translation" size={20} /></span>
+  <span>{t('news.site.fallback_note')}</span>
+</p>
 
 <style>
   .fallback-note {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     background: var(--gold-soft, var(--surface-2));
     font-size: var(--text-sm);
+  }
+  .fallback-ico {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--gold) 28%, transparent);
+    color: var(--gold-ink, var(--ink));
   }
 </style>

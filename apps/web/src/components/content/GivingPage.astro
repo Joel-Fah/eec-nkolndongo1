@@ -19,13 +19,22 @@ import PageHero from '../page/PageHero.astro'
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
 const s = (key: string) => t(`settings.site.${key}` as 'settings.site.copy')
-const [settings, story] = await Promise.all([
+const [settings, story, camp] = await Promise.all([
   publicJson<{ giving?: Record<string, string>; season?: Record<string, string> }>(
     Astro,
     '/api/settings/public',
   ),
   publicJson<StoryData>(Astro, `/api/story/public?locale=${locale}`),
+  publicJson<{ campaign: { title: string; inSeason: boolean; phase: string } | null }>(
+    Astro,
+    `/api/campaigns/public/current?locale=${locale}`,
+  ),
 ])
+const campaign =
+  camp.state === 'ok' && camp.data.campaign?.phase === 'during' && camp.data.campaign.inSeason
+    ? camp.data.campaign
+    : null
+const moissonsPath = href(locale, pages.find((p) => p.id === 'moissons')?.path[locale] ?? '')
 const g = settings.state === 'ok' ? (settings.data.giving ?? {}) : {}
 const season = settings.state === 'ok' ? (settings.data.season ?? {}) : {}
 const usage = story.state === 'ok' ? story.data.slots.give?.usage : undefined
@@ -63,6 +72,13 @@ Astro.response.headers.set(
   {
     ready ? (
       <div class="gv">
+        {campaign && (
+          <a class="gv-camp" href={moissonsPath}>
+            <span class="gv-camp-k">{t('campaigns.site.give_block_k' as 'campaigns.site.kicker')}</span>
+            <strong>{campaign.title}</strong>
+            <span>{t('campaigns.site.give_block_go' as 'campaigns.site.kicker')}</span>
+          </a>
+        )}
         <section class="gv-thanks">
           <div>
             <p class="gv-kicker">{s('thanks_k')}</p>
@@ -238,6 +254,21 @@ Astro.response.headers.set(
     align-self: end;
     margin-block-end: -4.5rem;
     translate: 0 14%;
+  }
+  .gv-camp {
+    display: grid;
+    gap: 0.125rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-xl);
+    background: var(--gold-soft, var(--primary-soft));
+    color: inherit;
+    text-decoration: none;
+  }
+  .gv-camp-k {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .gv-moissons {
     display: flex;

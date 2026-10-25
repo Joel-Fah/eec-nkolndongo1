@@ -19,6 +19,7 @@
     "db:seed": "pnpm --filter @eec/modules db:seed",
     "e2e": "pnpm --filter @eec/scripts e2e",
     "content:pending": "pnpm --filter @eec/scripts content:pending",
+    "bible:seed": "pnpm --filter @eec/modules bible:seed",
     "content:seed-dev": "pnpm --filter @eec/modules content:seed-dev",
     "admin:bootstrap": "pnpm --filter @eec/auth admin:bootstrap",
     "fonts:fetch": "pnpm --filter @eec/scripts fonts:fetch",

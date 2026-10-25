@@ -127,7 +127,7 @@ export function TodoPanel() {
         text: 'dash.todo_missing_en_news',
         n: d.missingEn?.news ?? 0,
         module: 'news',
-        icon: 'newspaper',
+        icon: 'translation',
         level: 'info',
       },
       {
@@ -135,7 +135,7 @@ export function TodoPanel() {
         text: 'dash.todo_missing_en_events',
         n: d.missingEn?.events ?? 0,
         module: 'events',
-        icon: 'calendar',
+        icon: 'translation',
         level: 'info',
       },
       {
@@ -143,7 +143,7 @@ export function TodoPanel() {
         text: 'dash.todo_missing_en_guides',
         n: d.missingEn?.guides ?? 0,
         module: 'guides',
-        icon: 'checklist',
+        icon: 'translation',
         level: 'info',
       },
     ] as Item[]

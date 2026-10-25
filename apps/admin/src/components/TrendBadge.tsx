@@ -7,7 +7,16 @@ import { Icon } from './Icon'
  * « ▲ +12 % vs last month »: green for more, red for fewer, grey when nothing changed. The direction is also
  * written out for screen readers (colour and arrow are never the only signal).
  */
-export function TrendBadge({ current, previous }: { current: number; previous: number }) {
+export function TrendBadge({
+  current,
+  previous,
+  label,
+}: {
+  current: number
+  previous: number
+  /** What it is compared with, when it is not « last month ». */
+  label?: string
+}) {
   const { t } = useLocale()
   const { direction, percent, diff } = change(current, previous)
   const sign = direction === 'up' ? '+' : direction === 'down' ? '−' : ''
@@ -29,7 +38,7 @@ export function TrendBadge({ current, previous }: { current: number; previous: n
       <span className="sr-only">
         {word} {percent === null ? Math.abs(diff) : `${percent} %`}
       </span>
-      <span className="trend-period">{t('dash.vs_last_month')}</span>
+      <span className="trend-period">{label ?? t('dash.vs_last_month')}</span>
     </span>
   )
 }

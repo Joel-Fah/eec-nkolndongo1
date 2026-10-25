@@ -23,7 +23,7 @@ no admin action required. Gives a reason to "rediscover" the site through the ye
 | **Année liturgique** | A circular dial of the year | Drag/rotate; each season shows colour + meaning |
 | **Agenda** | Calendar + list, filter by department | Add to calendar, share |
 | **Actualités** | Editorial magazine layout | Share to WhatsApp, read time |
-| **Prédications** (P2) | Listening room — mini player persists across pages | Filter by series/speaker/book |
+| **Prédications** | Listening room: cards with a drawn banner or photo, a YouTube facade and links to listen (no hosted audio, decision 0034) | Filter by series, preacher (consented), book, year |
 | **Donner** | Gratitude-first; how gifts are used | Copy MoMo/OM number, (P3) pay in-page |
 | **Fête des Moissons** (P2) | Harvest basket fills toward the goal | Share, give |
 | **Nous trouver** | Illustrated map of the hill | Tap to load the real map; directions |
@@ -33,3 +33,12 @@ no admin action required. Gives a reason to "rediscover" the site through the ye
 ## Shared micro-interactions
 Page transitions (View Transitions, page-turn feel) · logo loader · hand-drawn underline on key words ·
 magnetic primary buttons (desktop) · cursor-aware glow on cards (desktop) · gentle toasts.
+
+## Phase 04 pages (signatures)
+- **Fête des Moissons** (members, in season): one calm story: the basket fills, groups as small baskets, the week's events as a ribbon, giving simply, a closing stack of tilted sheets. Visitors see a teaser with no amount; out of season, « à l'an prochain ».
+- **Prédications**: the listening room (filters without reloads), the sermon page with a click-to-load YouTube facade.
+- **Méditations et bulletin**: the meditation of the day with its week strip, the bulletin reading page with A4 / A5 print layouts.
+- **Inscriptions**: forms per event, waitlist, cancellation by signed link; works without JavaScript.
+- **Mon espace**: hello, a profile completion card (consent, optional details, private photo), panels (profile, data and choices, devices), and the « Carte de Sainte-Cène — bientôt » tile. Panels show a turning chevron.
+- **Hors ligne**: plain text listing the pages saved on this device.
+- **Brand guide** (`/_brand`, staff only): now with a social media kit and the credits as an end-of-film roll.

@@ -25,7 +25,7 @@ link. From then on, merges to `main` deploy through the `deploy` workflow.
    `ADMIN_PATH`), applies migrations to the production Neon branch, then `wrangler deploy`.
 2. **Migrations are additive by default.** A destructive one (drop, rename, type change) needs a decision record and
    Joël's explicit OK before merging.
-3. Preview without deploying: Actions → `preview` → Run workflow (uploads a version, gives a preview URL).
+3. Preview: Actions → `preview` → Run workflow. It deploys the branch to a **separate** Worker (`eec-nkolndongo1-preview`, see « Safe preview »), never touching production's data.
 4. Launch = set the repository variable `SITE_INDEXABLE=1` and redeploy. Until then every page, file and header says
    « noindex », robots.txt disallows everything, and a ribbon says the site is not indexed yet.
 
@@ -49,6 +49,14 @@ migrations are not rolled back by this: write a new forward migration.
   `clean:test-data` and the spike refuse anything but `dev`. CI deploys without the prompt (it is the intended path).
 - Check before acting: `echo $NEON_BRANCH` (dev / production).
 
+## Safe preview (separate Worker, dev data)
+A version of the production Worker would reuse production's secrets and database, so previews run on their own Worker,
+`eec-nkolndongo1-preview` (built with `PREVIEW_WORKER=1`: no Hyperdrive, no cron, always noindex). One-time setup, once the
+Worker exists (first run of the `preview` workflow creates it): set its secrets **from your dev values** (`.env.local`), never
+production's: `wrangler secret put <NAME> --name eec-nkolndongo1-preview` for `AUTH_SECRET` (a new value), `DATABASE_URL_UNPOOLED`
+(the dev Neon branch), the `AWS_*`/`MEDIA_BUCKET` keys (the dev bucket). Then the preview URL is
+`https://eec-nkolndongo1-preview.<your subdomain>.workers.dev`. Check with the admin « Système » screen that the database name is dev.
+
 ## Media second copy (R2)
 `pnpm media:sync` copies the media files to a Cloudflare R2 bucket (only new ones, never deletes). The weekly `backup`
 workflow runs it once these GitHub secrets exist: `MEDIA_COPY_ENDPOINT` (`https://<account id>.r2.cloudflarestorage.com`),
@@ -69,6 +77,41 @@ send the list to the content partner.
 A Cloudflare Cron Trigger (03:17 UTC) runs `apps/api/src/retention.ts`: expired sessions and links, outbox > 90 days,
 audit > 24 months, accounts whose deletion was requested > 30 days ago. Each run writes a row in `retention_runs`.
 By hand: `pnpm --filter @eec/api retention`.
+
+## Santé, visit counts, validation (Phase 04a)
+- **Admin → Santé** (`core:system-health`): the daily cron also records a health row (database answer time, bucket reachable,
+  last backup age, outbox backlog, database size, files size; orange from 70 % of a free limit). « Vérifier maintenant » runs it
+  on demand. The backup workflow writes the « last backup » mark (`system_marks`); until its first run after this version
+  the backup shows orange « aucune sauvegarde enregistrée ». Neon egress and Workers requests/day cannot be read by the
+  Worker: read them in the Neon console and the Cloudflare dashboard (monthly).
+- **Visit counts** (decision 0038): Analytics Engine was enabled by Joël (2026-10-22), `deploy.json` names the dataset `analytics_events` and the account. **Still to do by Joël: set the Worker secret `CF_ANALYTICS_TOKEN`** (step 5). The dataset appears in the dashboard only after the first deploy writes data. Original steps, for the record:
+  1. Dashboard → **Workers & Pages → Analytics Engine** (in the left menu, under « Workers & Pages » or « Storage & databases »):
+     enable it if it asks, and **note the plan it shows** (Free is expected: 100 000 points a day). If it asks for a card or an
+     upgrade, **stop and tell me**: we leave it dormant.
+  2. Pick a dataset name, for example `eec_visits` (it is created by the first write; nothing to create by hand).
+  3. Dashboard → right column of any page (or the URL `dash.cloudflare.com/<id>`): copy the **Account ID** (a 32-character id; not a
+     secret).
+  4. Put both in `apps/web/deploy.json` (`"analyticsDataset": "eec_visits"`, `"accountId": "<id>"`) and merge (I can do this).
+  5. My Profile → **API Tokens → Create token → Custom token**: permission **Account · Account Analytics · Read**, scoped to this
+     account only. Copy it once and set it: `pnpm --filter @eec/web exec wrangler secret put CF_ANALYTICS_TOKEN --config
+     dist/server/wrangler.json` (or in the Worker's *Settings → Variables and Secrets* as a secret).
+  6. After the next deploy, open the admin home: the « Visites » section fills in from the next day. Without step 1 do **not** set
+     the dataset: a binding to a service the account has not enabled fails the deploy.
+- **Validator role**: after a deploy that adds permissions, run `pnpm db:seed` in `prod-shell.sh` (idempotent: new permissions
+  and the « Validateur de contenu » role), then grant the role on **Rôles / Utilisateurs** with Joël. The role sees **À valider**.
+- **Share cards** (`apps/web/public/og/*.jpg`): redrawn by `node scripts/og-generate.ts` (needs Chrome and playwright-core) when
+  the parish name or tagline changes; commit the result.
+- **Structured data check**: `node scripts/jsonld-check.ts <base url>`, then Google's Rich Results Test (see `launch.md`).
+
+## Phase 04 go-live checklist (Joël, in this order)
+1. Neon backup branch, then migrations **0024–0034** (all additive) on production, then `pnpm db:seed` and `pnpm bible:seed`.
+2. Role grants in Rôles (system roles only get grants when first created): treasurer = campaigns read + progress, sundays read + offerings;
+   secretariat = campaigns read + edit + validate, sundays read + attendance + close + export, registrations; **Editor = sundays read + propose** (0045).
+3. A new privacy-policy version and its notice (0033), because the purposes grew: profile details and photo (0047), Sunday figures stay aggregates.
+4. Private profile photos live in the media bucket under `private/avatar/…` (never a public media key). The second copy (`media:sync`) and the backups
+   must treat that prefix as **private data**: keep the destination private and encrypted like the database backups.
+5. `CF_ANALYTICS_TOKEN` if visit counts are wanted; never set `SITE_INDEXABLE=1` without reading `docs/ops/launch.md`.
+6. Real-phone passes: install and offline, LCP, TalkBack, keyboard, the pickers and the member card on a phone.
 
 ## Monitoring and limits to watch (Free plans)
 Workers: 100 000 requests/day, 10 ms CPU per request. Neon: storage and the 5 GB/month egress shared with the media

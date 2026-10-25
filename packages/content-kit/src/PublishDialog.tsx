@@ -3,7 +3,7 @@
  * before it lets go (title, text, dates that do not make sense).
  */
 import { Dialog } from '@base-ui/react/dialog'
-import { useLocale } from '@eec/admin-kit'
+import { DateTimeField, useLocale } from '@eec/admin-kit'
 import { Button } from '@eec/ui/react'
 import { useState } from 'react'
 
@@ -81,26 +81,18 @@ export function PublishDialog({
               </label>
             </fieldset>
             {mode === 'later' && (
-              <label className="grid gap-1">
-                <span className="field-label">{t('content.publish.from')}</span>
-                <input
-                  className="input"
-                  type="datetime-local"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                />
-              </label>
-            )}
-            <label className="grid gap-1">
-              <span className="field-label">{t('content.publish.until')}</span>
-              <input
-                className="input"
-                type="datetime-local"
-                value={until}
-                onChange={(e) => setUntil(e.target.value)}
+              <DateTimeField
+                label={t('content.publish.from')}
+                value={from}
+                onChange={(v: string) => setFrom(v)}
               />
-              <span className="field-hint">{t('content.publish.until_help')}</span>
-            </label>
+            )}
+            <DateTimeField
+              label={t('content.publish.until')}
+              value={until}
+              onChange={(v: string) => setUntil(v)}
+              hint={t('content.publish.until_help')}
+            />
             <div className="dialog-actions">
               <Button variant="secondary" onClick={onClose}>
                 {t('content.picker.cancel')}

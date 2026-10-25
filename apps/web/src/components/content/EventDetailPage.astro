@@ -8,6 +8,9 @@ import Site from '../../layouts/Site.astro'
 import { type EventDetail, publicJson } from '../../lib/content-api'
 import { dayText, eventHref, eventsListHref, fmt, TZ, timeText } from '../../lib/events-routes'
 import { localeOf, useT } from '../../lib/i18n'
+import { registrationHref } from '../../lib/registrations-routes'
+import { breadcrumbs, event as eventLd, organization } from '../../lib/seo'
+import JsonLd from '../JsonLd.astro'
 import Picture from '../Picture.astro'
 import GeneratedBanner from './GeneratedBanner.astro'
 import GoogleCalendarIcon from './GoogleCalendarIcon.astro'
@@ -41,6 +44,15 @@ if (result.state === 'ok') {
   else ev = d
 }
 const unavailable = result.state === 'unavailable'
+// An in-site registration form for this event, if there is one (the external address in the event still works).
+const regForm =
+  ev && !preview
+    ? await publicJson<{ form: { slug: string; state: string } | null }>(
+        Astro,
+        `/api/registrations/public/by-event/${encodeURIComponent(ev.slug)}?locale=${locale}`,
+      )
+    : null
+const registration = regForm?.state === 'ok' ? regForm.data.form : null
 if (!ev && !unavailable) Astro.response.status = 404
 Astro.response.headers.set(
   'cache-control',
@@ -48,7 +60,37 @@ Astro.response.headers.set(
 )
 if (preview) Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
 
-const url = ev ? new URL(eventHref(locale, ev.slug), Astro.url).href : ''
+const url = ev ? new URL(eventHref(locale, ev.slug), Astro.site ?? Astro.url).href : ''
+const coverVariants = ev?.cover ? [...ev.cover.variants].sort((a, b) => a.width - b.width) : []
+const cover = coverVariants.find((v) => v.width >= 1200) ?? coverVariants.at(-1)
+const shareImage = cover ? new URL(`/media/${cover.key}`, Astro.site ?? Astro.url).href : undefined
+const ld = ev
+  ? [
+      organization(Astro.site ?? Astro.url, t('site.name')),
+      // Google requires a location for an Event: without one we publish no Event markup (the page itself is unaffected).
+      ...(ev.location
+        ? [
+            eventLd(Astro.site ?? Astro.url, {
+              url,
+              name: ev.title,
+              description: ev.description,
+              startsAt: ev.startsAt,
+              endsAt: ev.endsAt,
+              cancelled: ev.cancelled,
+              locale,
+              location: ev.location,
+              image: shareImage,
+              organizer: t('site.name'),
+            }),
+          ]
+        : []),
+      breadcrumbs(Astro.site ?? Astro.url, [
+        { name: t('nav.home'), path: `/${locale}/` },
+        { name: label('back'), path: eventsListHref(locale) },
+        { name: ev.title, path: eventHref(locale, ev.slug) },
+      ]),
+    ]
+  : []
 const wa = ev ? `https://wa.me/?text=${encodeURIComponent(`${ev.title}\n${url}`)}` : ''
 const icsHref = ev ? `/api/events/public/item/${ev.slug}/event.ics?locale=${locale}` : ''
 // Google Calendar template link (opens their site only when clicked; nothing is loaded from them).
@@ -63,7 +105,8 @@ const kind = EVENT_KIND_STYLE[kindKey]
 const d = ev ? new Date(ev.startsAt) : new Date()
 ---
 
-<Site title={ev?.title ?? label('not_found_t')} description={ev?.description} noindex={preview || !ev}>
+<Site title={ev?.title ?? label('not_found_t')} description={ev?.description} noindex={preview || !ev} image={shareImage}>
+  {ev && !preview && <JsonLd slot="head" data={ld} />}
   <article class="ed">
     <p class="ed-back"><a href={eventsListHref(locale)}><Icon name="chevronLeft" size={20} />{label('back')}</a></p>
     {preview && <p class="ed-preview" role="note">{label('preview_banner')}</p>}
@@ -123,6 +166,7 @@ const d = ev ? new Date(ev.startsAt) : new Date()
                   <h3 class="ed-card-sub">{label('add_to_calendar')}</h3>
                   <a class="ed-action" href={google} target="_blank" rel="noopener noreferrer"><GoogleCalendarIcon /><span>{label('add_google')}</span><Icon name="external" size={16} /></a>
                   <a class="ed-action" href={icsHref} download><Icon name="calendar" size={20} /><span>{label('add_ics')}</span></a>
+                  {registration && registration.state === 'open' && <a class="ed-action ed-action-primary" href={registrationHref(locale, registration.slug)}><Icon name="check" size={20} /><span>{label('register')}</span></a>}
                   {ev.registrationUrl && <a class="ed-action ed-action-primary" href={ev.registrationUrl} target="_blank" rel="noopener noreferrer"><Icon name="check" size={20} /><span>{label('register')}</span><Icon name="external" size={16} /></a>}
                   <a class="ed-action" href={wa} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" size={20} /><span>{label('share_whatsapp')}</span><Icon name="external" size={16} /></a>
                 </div>

@@ -9,6 +9,7 @@ import Icon from '@eec/ui/astro/Icon.astro'
 import Mark from '@eec/ui/astro/Mark.astro'
 import BrandColour from '../../components/brand/BrandColour.astro'
 import BrandComponents from '../../components/brand/BrandComponents.astro'
+import BrandCredits from '../../components/brand/BrandCredits.astro'
 import BrandIcons from '../../components/brand/BrandIcons.astro'
 import BrandIdentity from '../../components/brand/BrandIdentity.astro'
 import BrandLogo from '../../components/brand/BrandLogo.astro'
@@ -16,6 +17,7 @@ import BrandMotion from '../../components/brand/BrandMotion.astro'
 import BrandPatterns from '../../components/brand/BrandPatterns.astro'
 import BrandRules from '../../components/brand/BrandRules.astro'
 import BrandShape from '../../components/brand/BrandShape.astro'
+import BrandSocial from '../../components/brand/BrandSocial.astro'
 import BrandType from '../../components/brand/BrandType.astro'
 import BrandVoice from '../../components/brand/BrandVoice.astro'
 import ThemeToggle from '../../components/ThemeToggle.astro'
@@ -41,7 +43,9 @@ const toc = [
   ['icons', 'brand.nav.icons'],
   ['components', 'brand.nav.components'],
   ['patterns', 'brand.nav.patterns'],
+  ['social', 'brand.nav.social'],
   ['rules', 'brand.nav.rules'],
+  ['credits', 'brand.nav.credits'],
 ] as const
 ---
 
@@ -119,7 +123,9 @@ const toc = [
       <BrandIcons />
       <BrandComponents />
       <BrandPatterns />
+      <BrandSocial />
       <BrandRules />
+      <BrandCredits />
     </main>
   </div>
   <dialog class="dialog brand-search" data-brand-search aria-label={t('brand.search.open')}>

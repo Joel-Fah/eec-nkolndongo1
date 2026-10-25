@@ -3,7 +3,7 @@
  * and reply with a WhatsApp, e-mail or phone link (we send no e-mail). Prayer requests appear only to people allowed to
  * read them (contact:read-sensitive); they are never exported.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { ConfirmDialog } from '@eec/content-kit'
 import type { MessageKey } from '@eec/i18n'
 import {
@@ -163,23 +163,15 @@ export default function ContactInbox() {
           />
           {range === 'custom' && (
             <>
-              <TextField
+              <DateField
                 label={t(k('range_from'))}
-                placeholder=""
-                type="date"
                 value={custom.from}
-                onChange={(e: { target: { value: string } }) =>
-                  setCustom({ ...custom, from: e.target.value })
-                }
+                onChange={(v: string) => setCustom({ ...custom, from: v })}
               />
-              <TextField
+              <DateField
                 label={t(k('range_to'))}
-                placeholder=""
-                type="date"
                 value={custom.to}
-                onChange={(e: { target: { value: string } }) =>
-                  setCustom({ ...custom, to: e.target.value })
-                }
+                onChange={(v: string) => setCustom({ ...custom, to: v })}
               />
             </>
           )}
