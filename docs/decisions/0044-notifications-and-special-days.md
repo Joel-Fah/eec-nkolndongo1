@@ -21,3 +21,5 @@ per-person mute, reminders for validators (campaign entries waiting) and for ser
 reminder. Each is additive: a new `kind` and, for push or email, a new decision.
 **Consequences:** table `notifications`; API `/api/notifications` (list, read, dismiss); rules tested in `reminders.test.ts`; e2e checks;
 brand entry; help guide updated.
+
+**Amended by 0045:** reminders for validators (proposed Sunday figures, Moissons entries) and a weekly summary were added; in-app only.

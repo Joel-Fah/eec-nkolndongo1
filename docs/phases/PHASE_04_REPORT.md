@@ -164,3 +164,8 @@ trends); « Dimanche dernier » card on the main dashboard; group names travel w
 (suggestions: Nouvel An, Vendredi saint, Ascension, Noël). The top bar has a bell: reminders for the last four Sundays still missing attendance or
 offerings (worked out when the list is read, resolved by themselves, grouped by week, deep link to the sheet), read / hide / mark all read.
 Tests: `reminders.test.ts`, `rules.test.ts`, e2e (3 new checks). Migration 0031 applied on dev only. Options not built: push, email digest, mute.
+
+**Proposed figures (decision 0045, migration 0032).** Editor-entered Sunday figures are pending until validated by the secretariat (attendance) or the
+treasurer (offerings); pending figures count nowhere (totals, trends, dashboard, export, Moissons link) and block closing the Sunday. Validators get
+in-app notifications (a Sunday to validate, Moissons entries to validate, a weekly summary); the badge shows up to 99+. **Production:** grant
+`sundays:read` and `sundays:propose` to the Editor role in Rôles (system grants are only written at role creation).

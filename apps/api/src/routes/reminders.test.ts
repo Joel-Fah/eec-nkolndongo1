@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueSundays, pastSundays, weekOf } from './reminders.ts'
+import { dueSundays, grew, pastSundays, weekOf } from './reminders.ts'
 
 describe('reminders', () => {
   it('groups by the Monday of the week', () => {
@@ -25,5 +25,11 @@ describe('reminders', () => {
       { date: '2026-10-25', what: 'attendance' },
     ])
     expect(dueSundays(days, done, { attendance: false, offerings: false })).toEqual([])
+  })
+  it('tells again only when a number went up or what is missing changed', () => {
+    expect(grew({ count: 2 }, { count: 3 })).toBe(true)
+    expect(grew({ count: 3 }, { count: 2 })).toBe(false)
+    expect(grew({ what: 'attendance' }, { what: 'both' })).toBe(true)
+    expect(grew({ what: 'both' }, { what: 'both' })).toBe(false)
   })
 })

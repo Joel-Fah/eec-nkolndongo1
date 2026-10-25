@@ -22,6 +22,13 @@ export const sundaysModule = defineModule({
     },
     { action: 'offerings', label: { fr: 'Saisir les offrandes', en: 'Enter offerings' } },
     {
+      action: 'propose',
+      label: {
+        fr: 'Proposer les chiffres du dimanche (à valider par le secrétariat ou la trésorerie)',
+        en: 'Propose the Sunday figures (to be validated by the secretariat or the treasurer)',
+      },
+    },
+    {
       action: 'close',
       label: { fr: 'Clôturer ou rouvrir un dimanche', en: 'Close or reopen a Sunday' },
     },

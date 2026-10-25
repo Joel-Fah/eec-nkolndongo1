@@ -32,3 +32,10 @@ export function dueSundays(
   }
   return out
 }
+
+export type Rec = Record<string, unknown>
+/** A change worth being told again: a number went up, or what is missing changed. */
+export const grew = (before: Rec, after: Rec) =>
+  Object.entries(after).some(([key, v]) =>
+    typeof v === 'number' ? v > Number(before[key] ?? 0) : before[key] !== v,
+  )

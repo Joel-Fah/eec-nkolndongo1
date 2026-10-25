@@ -23,3 +23,4 @@ The **Sunday report** keeps, for each Sunday, the **number of people** (men, wom
 - Rights are given in **Roles** (secretariat: read, attendance, close, export; treasurer: read, offerings).
 - A day that is not a Sunday (Christmas, Good Friday…) is entered like a Sunday: pick its date in “Another day”, then **name it** before entering anything.
 - The **bell** at the top reminds you of the last four weeks' Sundays still missing attendance or offerings; a click opens the right Sunday, and the reminder ticks itself once it is entered.
+- An **editor** can enter the figures right after the service: they are **proposals** (“To validate”). The secretariat validates attendance, the treasurer the offerings; until then nothing counts in the totals, and the Sunday cannot be closed.

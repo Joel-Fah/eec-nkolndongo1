@@ -115,8 +115,14 @@ const dto = (r: Report, lines: Offering[], canAttendance: boolean) => ({
   note: canAttendance ? r.note : '',
   closed: r.closed,
   closedAt: r.closedAt,
-  offerings: offeringsTotal(lines),
+  // What was entered by a proposer waits for its validator and is counted nowhere until then (decision 0045).
+  entered: !!r.attendanceAt,
+  attendancePending: r.attendancePending,
+  pending: r.attendancePending || lines.some((l) => l.pending),
+  offerings: offeringsTotal(lines.filter((l) => !l.pending)),
+  offeringsPending: offeringsTotal(lines.filter((l) => l.pending)),
   lines: lines.map((l) => ({
+    pending: l.pending,
     id: l.id,
     purpose: l.purpose,
     amountXaf: l.amountXaf,
@@ -215,8 +221,9 @@ export const sundaysApi = new Hono<AppEnv>()
       byDate.set(r.sundayDate, [...(byDate.get(r.sundayDate) ?? []), dto(r, mine, canAttendance)])
     }
     const items = [...byDate.entries()].map(([date, svc]) => {
+      const counted = svc.filter((x) => !x.attendancePending)
       const sum = (k: 'men' | 'women' | 'children') =>
-        svc.every((x) => x[k] === null) ? null : svc.reduce((n, x) => n + (x[k] ?? 0), 0)
+        counted.every((x) => x[k] === null) ? null : counted.reduce((n, x) => n + (x[k] ?? 0), 0)
       const men = sum('men')
       const women = sum('women')
       const children = sum('children')
@@ -227,10 +234,18 @@ export const sundaysApi = new Hono<AppEnv>()
         men,
         women,
         children,
-        attendance: canAttendance ? (men ?? 0) + (women ?? 0) + (children ?? 0) : null,
+        attendance: !canAttendance
+          ? null
+          : men === null &&
+              women === null &&
+              children === null &&
+              svc.some((x) => x.attendancePending)
+            ? null
+            : (men ?? 0) + (women ?? 0) + (children ?? 0),
         serviceKind: svc.some((x) => x.serviceKind === 'special') ? 'special' : 'ordinary',
         serviceLabel: svc.find((x) => x.serviceLabel)?.serviceLabel ?? '',
         closed: svc.every((x) => x.closed),
+        pending: svc.some((x) => x.pending),
         offerings: svc.reduce((n, x) => n + x.offerings, 0),
       }
     })
@@ -302,12 +317,15 @@ export const sundaysApi = new Hono<AppEnv>()
       })),
     })
   })
-  .put('/reports/:date/attendance', requirePermission('sundays:attendance'), async (c) => {
+  .put('/reports/:date/attendance', requirePermissionAnywhere('sundays:read'), async (c) => {
     const date = c.req.param('date')
     const p = attendanceBody.safeParse(await c.req.json().catch(() => null))
     if (!isReportDate(date) || date > todayLocal() || !p.success) return fail(c, 400, 'invalid')
     for (const k of ['men', 'women', 'children'] as const)
       if (p.data[k] != null && !countOk(p.data[k])) return fail(c, 400, 'invalid')
+    // The secretariat enters attendance for good; a proposer (the editor) only proposes it (decision 0045).
+    const validator = await mayOn(c, 'sundays:attendance', null)
+    if (!validator && !(await mayOn(c, 'sundays:propose', null))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
     // A day that is not a Sunday is always a special day, and it must be named (nothing is created before it is).
     if (!(await namedOrSunday(db, date, serviceOf(c.req.query('n')), p.data.serviceLabel)))
@@ -315,12 +333,15 @@ export const sundaysApi = new Hono<AppEnv>()
     const special = isSundayDate(date) ? {} : { serviceKind: 'special' as const }
     const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     if (r.closed) return fail(c, 409, 'closed')
+    // A proposer cannot overwrite figures the secretariat has already validated.
+    if (!validator && r.attendanceAt && !r.attendancePending) return fail(c, 409, 'validated')
     const actor = await c.var.deps.actor()
     await db
       .update(sundayReports)
       .set({
         ...p.data,
         ...special,
+        attendancePending: !validator,
         attendanceBy: actor?.userId,
         attendanceAt: new Date(),
         updatedAt: new Date(),
@@ -331,8 +352,8 @@ export const sundaysApi = new Hono<AppEnv>()
       action: 'update',
       entityType: 'sunday_report',
       entityId: r.id,
-      summaryFr: 'Présences saisies',
-      summaryEn: 'Attendance entered',
+      summaryFr: validator ? 'Présences saisies' : 'Présences proposées',
+      summaryEn: validator ? 'Attendance entered' : 'Attendance proposed',
     })
     return c.json({ ok: true })
   })
@@ -347,7 +368,8 @@ export const sundaysApi = new Hono<AppEnv>()
       return fail(c, 400, 'invalid')
     if (
       !(await mayOn(c, 'sundays:attendance', null)) &&
-      !(await mayOn(c, 'sundays:offerings', null))
+      !(await mayOn(c, 'sundays:offerings', null)) &&
+      !(await mayOn(c, 'sundays:propose', null))
     )
       return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
@@ -366,7 +388,7 @@ export const sundaysApi = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
-  .post('/reports/:date/offerings', requirePermissionAnywhere('sundays:offerings'), async (c) => {
+  .post('/reports/:date/offerings', requirePermissionAnywhere('sundays:read'), async (c) => {
     const date = c.req.param('date')
     const p = offeringBody.safeParse(await c.req.json().catch(() => null))
     if (
@@ -378,7 +400,9 @@ export const sundaysApi = new Hono<AppEnv>()
     )
       return fail(c, 400, 'invalid')
     const groupId = p.data.groupId ?? null
-    if (!(await mayOn(c, 'sundays:offerings', groupId))) return fail(c, 403, 'forbidden')
+    // The treasurer (or a group leader, for their group) enters offerings for good; a proposer only proposes them.
+    const direct = await mayOn(c, 'sundays:offerings', groupId)
+    if (!direct && !(await mayOn(c, 'sundays:propose', null))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
     if (!(await namedOrSunday(db, date, serviceOf(c.req.query('n')))))
       return fail(c, 400, 'label_required')
@@ -394,23 +418,25 @@ export const sundaysApi = new Hono<AppEnv>()
         amountXaf: p.data.amountXaf,
         groupId,
         campaignId: purpose === 'moissons' ? (p.data.campaignId ?? null) : null,
+        pending: !direct,
         createdBy: actor?.userId,
       })
       .returning()
     if (!row) throw new Error('insert failed')
-    const progressId = await syncCampaign(db, row, date, actor?.userId)
+    // Nothing reaches a campaign before it is validated.
+    const progressId = direct ? await syncCampaign(db, row, date, actor?.userId) : null
     if (progressId !== row.progressId)
       await db.update(sundayOfferings).set({ progressId }).where(eq(sundayOfferings.id, row.id))
     await audit(c, {
       action: 'create',
       entityType: 'sunday_offering',
       entityId: row.id,
-      summaryFr: 'Offrande saisie',
-      summaryEn: 'Offering entered',
+      summaryFr: direct ? 'Offrande saisie' : 'Offrande proposée',
+      summaryEn: direct ? 'Offering entered' : 'Offering proposed',
     })
     return c.json({ id: row.id }, 201)
   })
-  .patch('/offerings/:id', requirePermissionAnywhere('sundays:offerings'), async (c) => {
+  .patch('/offerings/:id', requirePermissionAnywhere('sundays:read'), async (c) => {
     const id = c.req.param('id')
     const p = offeringBody.safeParse(await c.req.json().catch(() => null))
     if (!uuidRe.test(id) || !p.success) return fail(c, 400, 'invalid')
@@ -421,9 +447,17 @@ export const sundaysApi = new Hono<AppEnv>()
     const [rep] = cur
       ? await db.select().from(sundayReports).where(eq(sundayReports.id, cur.reportId))
       : []
-    if (!cur || !rep || !(await mayOn(c, 'sundays:offerings', cur.groupId)))
+    if (!cur || !rep) return fail(c, 404, 'not_found')
+    // A validator edits any line they may; a proposer only the lines still waiting for validation.
+    const direct = await mayOn(c, 'sundays:offerings', cur.groupId)
+    if (!direct && !(cur.pending && (await mayOn(c, 'sundays:propose', null))))
       return fail(c, 404, 'not_found')
-    if (p.data.groupId !== undefined && !(await mayOn(c, 'sundays:offerings', p.data.groupId)))
+    if (
+      p.data.groupId !== undefined &&
+      !(direct
+        ? await mayOn(c, 'sundays:offerings', p.data.groupId)
+        : await mayOn(c, 'sundays:propose', null))
+    )
       return fail(c, 403, 'forbidden')
     if (rep.closed) return fail(c, 409, 'closed')
     const purpose = p.data.purpose ?? cur.purpose
@@ -439,10 +473,15 @@ export const sundaysApi = new Hono<AppEnv>()
           : null,
     } as Offering
     const actor = await c.var.deps.actor()
-    const progressId = await syncCampaign(db, next, rep.sundayDate, actor?.userId)
+    // Editing as a validator is taking responsibility for the line: it is validated.
+    const stillPending = !direct
+    const progressId = stillPending
+      ? null
+      : await syncCampaign(db, next, rep.sundayDate, actor?.userId)
     await db
       .update(sundayOfferings)
       .set({
+        pending: stillPending,
         purpose,
         amountXaf: next.amountXaf,
         groupId: next.groupId,
@@ -460,7 +499,7 @@ export const sundaysApi = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
-  .delete('/offerings/:id', requirePermissionAnywhere('sundays:offerings'), async (c) => {
+  .delete('/offerings/:id', requirePermissionAnywhere('sundays:read'), async (c) => {
     const id = c.req.param('id')
     if (!uuidRe.test(id)) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
@@ -468,7 +507,11 @@ export const sundaysApi = new Hono<AppEnv>()
     const [rep] = cur
       ? await db.select().from(sundayReports).where(eq(sundayReports.id, cur.reportId))
       : []
-    if (!cur || !rep || !(await mayOn(c, 'sundays:offerings', cur.groupId)))
+    if (!cur || !rep) return fail(c, 404, 'not_found')
+    if (
+      !(await mayOn(c, 'sundays:offerings', cur.groupId)) &&
+      !(cur.pending && (await mayOn(c, 'sundays:propose', null)))
+    )
       return fail(c, 404, 'not_found')
     if (rep.closed) return fail(c, 409, 'closed')
     await syncCampaign(db, { ...cur, campaignId: null }, rep.sundayDate, undefined)
@@ -482,6 +525,52 @@ export const sundaysApi = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
+  // Validates what a proposer entered: attendance by the secretariat, offering lines by the treasurer (or the group's leader).
+  .post('/reports/:date/validate', requirePermissionAnywhere('sundays:read'), async (c) => {
+    const date = c.req.param('date')
+    if (!isReportDate(date)) return fail(c, 400, 'invalid')
+    const db = await c.var.deps.db()
+    const [r] = await db
+      .select()
+      .from(sundayReports)
+      .where(here(date, serviceOf(c.req.query('n'))))
+    if (!r) return fail(c, 404, 'not_found')
+    if (r.closed) return fail(c, 409, 'closed')
+    const actor = await c.var.deps.actor()
+    let done = 0
+    if (r.attendancePending && (await mayOn(c, 'sundays:attendance', null))) {
+      await db
+        .update(sundayReports)
+        .set({ attendancePending: false, attendanceBy: actor?.userId, updatedAt: new Date() })
+        .where(eq(sundayReports.id, r.id))
+      done++
+    }
+    const lines = await db
+      .select()
+      .from(sundayOfferings)
+      .where(and(eq(sundayOfferings.reportId, r.id), eq(sundayOfferings.pending, true)))
+    for (const l of lines) {
+      if (!(await mayOn(c, 'sundays:offerings', l.groupId))) continue
+      const progressId = await syncCampaign(db, { ...l, pending: false }, date, actor?.userId)
+      await db
+        .update(sundayOfferings)
+        .set({ pending: false, progressId, updatedAt: new Date() })
+        .where(eq(sundayOfferings.id, l.id))
+      done++
+    }
+    // Something was waiting but this person may validate none of it.
+    if (done === 0 && (r.attendancePending || lines.length > 0)) return fail(c, 403, 'forbidden')
+    if (done === 0) return c.json({ ok: true, validated: 0 })
+    // The audit line carries no figure.
+    await audit(c, {
+      action: 'update',
+      entityType: 'sunday_report',
+      entityId: r.id,
+      summaryFr: 'Bilan validé',
+      summaryEn: 'Report validated',
+    })
+    return c.json({ ok: true, validated: done })
+  })
   .post('/reports/:date/close', requirePermission('sundays:close'), async (c) => {
     const date = c.req.param('date')
     const p = z
@@ -491,6 +580,14 @@ export const sundaysApi = new Hono<AppEnv>()
     if (!isReportDate(date) || !p.success) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
     const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
+    if (p.data.closed) {
+      const waiting = await db
+        .select({ id: sundayOfferings.id })
+        .from(sundayOfferings)
+        .where(and(eq(sundayOfferings.reportId, r.id), eq(sundayOfferings.pending, true)))
+        .limit(1)
+      if (r.attendancePending || waiting.length) return fail(c, 409, 'pending')
+    }
     const actor = await c.var.deps.actor()
     await db
       .update(sundayReports)
@@ -547,15 +644,19 @@ export const sundaysApi = new Hono<AppEnv>()
     const rows = []
     const flat = []
     for (const r of reports) {
-      const lines = await visibleLines(
-        c,
-        all.filter((l) => l.reportId === r.id),
-      )
+      // What still waits for its validator is not in any statistic.
+      const lines = (
+        await visibleLines(
+          c,
+          all.filter((l) => l.reportId === r.id),
+        )
+      ).filter((l) => !l.pending)
+      const counted = canAttendance && !r.attendancePending
       rows.push({
         date: r.sundayDate,
-        men: canAttendance ? r.men : null,
-        women: canAttendance ? r.women : null,
-        children: canAttendance ? r.children : null,
+        men: counted ? r.men : null,
+        women: counted ? r.women : null,
+        children: counted ? r.children : null,
         lines,
       })
       flat.push(...lines)
@@ -582,8 +683,12 @@ export const sundaysApi = new Hono<AppEnv>()
   // CSV: dangerous (`export`), audited by row count only.
   .get('/export.csv', requirePermission('sundays:export'), async (c) => {
     const db = await c.var.deps.db()
-    const reports = await db.select().from(sundayReports).orderBy(asc(sundayReports.sundayDate))
-    const lines = reports.length ? await db.select().from(sundayOfferings) : []
+    const reports = (
+      await db.select().from(sundayReports).orderBy(asc(sundayReports.sundayDate))
+    ).filter((r) => !r.attendancePending)
+    const lines = reports.length
+      ? await db.select().from(sundayOfferings).where(eq(sundayOfferings.pending, false))
+      : []
     const names = new Map(
       (await db.select({ id: groups.id, fr: groups.nameFr }).from(groups)).map((g) => [g.id, g.fr]),
     )

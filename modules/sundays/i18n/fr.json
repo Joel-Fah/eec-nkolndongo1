@@ -80,5 +80,13 @@
   "feast_christmas": "Noël",
   "feast_goodfriday": "Vendredi saint",
   "feast_ascension": "Ascension",
-  "day_name": "Nom du jour"
+  "day_name": "Nom du jour",
+  "to_validate": "À valider",
+  "proposer_note": "Ce que vous saisissez est une proposition : le secrétariat (présences) ou la trésorerie (offrandes) la valide avant qu’elle compte.",
+  "propose": "Proposer",
+  "validate_attendance": "Valider les présences",
+  "validate_offerings": "Valider les offrandes",
+  "validated": "Validé.",
+  "pending_total": "+ {amount} en attente de validation (pas encore comptés)",
+  "close_blocked": "Validez d’abord ce qui est en attente."
 }

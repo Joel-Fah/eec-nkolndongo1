@@ -1614,7 +1614,18 @@
       "what_offerings": "Offerings are missing.",
       "what_both": "Attendance and offerings are missing.",
       "open_item": "Open",
-      "loading": "Loading…"
+      "loading": "Loading…",
+      "review_t": "Report of {date} to validate",
+      "review_done_t": "Report of {date} validated",
+      "review_attendance": "Proposed attendance is waiting for your validation.",
+      "review_offerings": "Proposed offerings are waiting for your validation.",
+      "review_both": "Proposed attendance and offerings are waiting for your validation.",
+      "campaign_t": "Harvest festival: {n} entr(y/ies) to validate",
+      "campaign_done_t": "Harvest festival: all validated",
+      "campaign_p": "They count in the public total only once validated.",
+      "nudge_t": "This week, {n} thing(s) are waiting for you",
+      "nudge_done_t": "This week, everything is up to date",
+      "nudge_p": "{reports} report(s) to fill in · {reviews} to validate · {entries} harvest entr(y/ies)"
     }
   },
   "login": {

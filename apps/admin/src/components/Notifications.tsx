@@ -9,7 +9,14 @@ import { Icon } from './Icon'
 type Item = {
   id: string
   kind: string
-  params: { date?: string; what?: 'attendance' | 'offerings' | 'both' }
+  params: {
+    date?: string
+    what?: 'attendance' | 'offerings' | 'both'
+    count?: number
+    reports?: number
+    reviews?: number
+    entries?: number
+  }
   href: string
   weekOf: string
   read: boolean
@@ -18,6 +25,11 @@ type Item = {
 type Feed = { items: Item[]; unread: number }
 const k = (key: string) => `admin.notifications.${key}` as MessageKey
 
+/** The summary of the week first, then what to validate, then what to fill in. */
+const RANK = (kind: string) =>
+  ['week_nudge', 'sunday_review', 'campaign_review'].indexOf(kind) >= 0
+    ? ['week_nudge', 'sunday_review', 'campaign_review'].indexOf(kind)
+    : 3
 const DAY = 86_400_000
 const monday = (d: Date) => new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * DAY)
 const iso = (d: Date) => d.toISOString().slice(0, 10)
@@ -81,8 +93,42 @@ export function NotificationsBell() {
       window.dispatchEvent(new HashChangeEvent('hashchange')),
     )
   }
-  const title = (n: Item) =>
-    t(k(n.resolved ? 'sunday_done_t' : 'sunday_due_t'), { date: day(n.params.date ?? n.weekOf) })
+  // Each kind writes its own words; nothing but the kind and its numbers is stored.
+  const title = (n: Item) => {
+    const date = day(n.params.date ?? n.weekOf)
+    if (n.kind === 'sunday_review') return t(k(n.resolved ? 'review_done_t' : 'review_t'), { date })
+    if (n.kind === 'campaign_review')
+      return t(k(n.resolved ? 'campaign_done_t' : 'campaign_t'), {
+        n: String(n.params.count ?? 0),
+      })
+    if (n.kind === 'week_nudge')
+      return t(k(n.resolved ? 'nudge_done_t' : 'nudge_t'), {
+        n: String((n.params.reports ?? 0) + (n.params.reviews ?? 0) + (n.params.entries ?? 0)),
+      })
+    return t(k(n.resolved ? 'sunday_done_t' : 'sunday_due_t'), { date })
+  }
+  const detail = (n: Item) => {
+    if (n.resolved) return t(k('done'))
+    if (n.kind === 'sunday_review') return t(k(`review_${n.params.what ?? 'both'}`))
+    if (n.kind === 'campaign_review') return t(k('campaign_p'))
+    if (n.kind === 'week_nudge')
+      return t(k('nudge_p'), {
+        reports: String(n.params.reports ?? 0),
+        reviews: String(n.params.reviews ?? 0),
+        entries: String(n.params.entries ?? 0),
+      })
+    return t(k(`what_${n.params.what ?? 'both'}`))
+  }
+  const icon = (n: Item) =>
+    n.resolved
+      ? 'check'
+      : n.kind === 'week_nudge'
+        ? 'clock'
+        : n.kind === 'campaign_review'
+          ? 'gift'
+          : n.kind === 'sunday_review'
+            ? 'shield'
+            : 'notebook'
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger
@@ -93,7 +139,7 @@ export function NotificationsBell() {
         <Icon name="bell" size={20} />
         {unread > 0 && (
           <span className="notif-count" aria-hidden="true">
-            {unread > 9 ? '9+' : unread}
+            {unread > 99 ? '99+' : unread}
           </span>
         )}
       </Popover.Trigger>
@@ -140,30 +186,30 @@ export function NotificationsBell() {
                 <section key={w} aria-label={weekTitle(w)}>
                   <h3 className="notif-week">{weekTitle(w)}</h3>
                   <ul className="notif-list">
-                    {list.map((n) => (
-                      <li key={n.id} data-unread={!n.read && !n.resolved} data-done={n.resolved}>
-                        <button type="button" className="notif-item" onClick={() => go(n)}>
-                          <span className="notif-ico" aria-hidden="true">
-                            <Icon name={n.resolved ? 'check' : 'notebook'} size={20} />
-                          </span>
-                          <span className="grid gap-0.5 text-start">
-                            <strong>{title(n)}</strong>
-                            <span className="text-sm text-ink-muted">
-                              {n.resolved ? t(k('done')) : t(k(`what_${n.params.what ?? 'both'}`))}
+                    {[...list]
+                      .sort((a, b) => RANK(a.kind) - RANK(b.kind))
+                      .map((n) => (
+                        <li key={n.id} data-unread={!n.read && !n.resolved} data-done={n.resolved}>
+                          <button type="button" className="notif-item" onClick={() => go(n)}>
+                            <span className="notif-ico" aria-hidden="true">
+                              <Icon name={icon(n)} size={20} />
                             </span>
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          className="notif-x"
-                          aria-label={t(k('dismiss'))}
-                          data-tip={t(k('dismiss'))}
-                          onClick={() => dismiss.mutate(n.id)}
-                        >
-                          <Icon name="close" size={16} />
-                        </button>
-                      </li>
-                    ))}
+                            <span className="grid gap-0.5 text-start">
+                              <strong>{title(n)}</strong>
+                              <span className="text-sm text-ink-muted">{detail(n)}</span>
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            className="notif-x"
+                            aria-label={t(k('dismiss'))}
+                            data-tip={t(k('dismiss'))}
+                            onClick={() => dismiss.mutate(n.id)}
+                          >
+                            <Icon name="close" size={16} />
+                          </button>
+                        </li>
+                      ))}
                   </ul>
                 </section>
               ))

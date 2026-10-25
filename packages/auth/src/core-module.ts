@@ -103,7 +103,14 @@ export const systemRoles = [
     en: 'Editor',
     descFr: 'Écrit et publie les contenus.',
     descEn: 'Writes and publishes content.',
-    grants: ['core:groups-read', 'news:read', 'news:edit', 'news:publish'],
+    grants: [
+      'core:groups-read',
+      'news:read',
+      'news:edit',
+      'news:publish',
+      'sundays:read',
+      'sundays:propose',
+    ],
   },
   {
     key: 'validateur',

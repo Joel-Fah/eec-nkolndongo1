@@ -1614,7 +1614,18 @@
       "what_offerings": "Les offrandes manquent.",
       "what_both": "Présences et offrandes manquent.",
       "open_item": "Ouvrir",
-      "loading": "Chargement…"
+      "loading": "Chargement…",
+      "review_t": "Bilan du {date} à valider",
+      "review_done_t": "Bilan du {date} validé",
+      "review_attendance": "Des présences proposées attendent votre validation.",
+      "review_offerings": "Des offrandes proposées attendent votre validation.",
+      "review_both": "Présences et offrandes proposées attendent votre validation.",
+      "campaign_t": "Fête des Moissons : {n} entrée(s) à valider",
+      "campaign_done_t": "Fête des Moissons : tout est validé",
+      "campaign_p": "Elles ne comptent dans le total public qu’une fois validées.",
+      "nudge_t": "Cette semaine, {n} chose(s) vous attendent",
+      "nudge_done_t": "Cette semaine, tout est à jour",
+      "nudge_p": "{reports} bilan(s) à saisir · {reviews} à valider · {entries} entrée(s) Moissons"
     }
   },
   "login": {

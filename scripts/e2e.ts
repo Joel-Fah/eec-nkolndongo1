@@ -334,6 +334,8 @@ const stamp = Date.now().toString(36)
     'sundays: a Moissons line creates one unvalidated campaign entry',
     line.status === 201 && entries.length === 1 && entries[0]?.validated === false,
   )
+  const noop = await api(`/sundays/reports/${day}/validate`, { method: 'POST' })
+  ok('sundays: validating with nothing waiting changes nothing', noop.status === 200)
   await api(`/sundays/reports/${day}/close`, {
     method: 'POST',
     body: JSON.stringify({ closed: true }),

@@ -37,6 +37,7 @@ type Line = {
   groupId: string | null
   campaignId: string | null
   linked: boolean
+  pending?: boolean
 }
 type Report = {
   id: string
@@ -52,7 +53,11 @@ type Report = {
   serviceLabel: string
   note: string
   closed: boolean
+  entered?: boolean
+  attendancePending?: boolean
+  pending?: boolean
   offerings: number
+  offeringsPending?: number
   lines: Line[]
 }
 type Hints = {
@@ -210,6 +215,7 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                               >
                                 <span className="flex flex-wrap items-center gap-2">
                                   {r.closed && <Badge tone="success">{t(k('closed'))}</Badge>}
+                                  {r.pending && <Badge tone="warning">{t(k('to_validate'))}</Badge>}
                                   {r.serviceKind === 'special' && (
                                     <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
                                   )}
@@ -522,7 +528,10 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
     (_, i) => data.services.find((x) => x.n === i + 1) ?? blankService(date, i + 1),
   )
   const several = services.length > 1
-  const canAdd = hasPermission(me, 'sundays:attendance') || hasPermission(me, 'sundays:offerings')
+  const canAdd =
+    hasPermission(me, 'sundays:attendance') ||
+    hasPermission(me, 'sundays:offerings') ||
+    hasPermission(me, 'sundays:propose')
   return (
     <div className="grid gap-6">
       <div>
@@ -559,11 +568,14 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
                   {r.serviceKind === 'special' && (
                     <Badge tone="gold">{r.serviceLabel || t(k('special'))}</Badge>
                   )}
+                  {r.pending && <Badge tone="warning">{t(k('to_validate'))}</Badge>}
                 </span>
                 {r.id && hasPermission(me, 'sundays:close') && (
                   <Button
                     variant={r.closed ? 'secondary' : 'primary'}
                     loading={close.isPending}
+                    disabled={!r.closed && !!r.pending}
+                    data-tip={!r.closed && r.pending ? t(k('close_blocked')) : undefined}
                     onClick={() => close.mutate({ n: r.n, closed: !r.closed })}
                   >
                     {t(k(r.closed ? 'reopen' : 'close'))}
@@ -647,7 +659,12 @@ function Attendance({
 }) {
   const { t } = useLocale()
   const me = useMe().data
-  const can = hasPermission(me, 'sundays:attendance') && !report.closed
+  const validator = hasPermission(me, 'sundays:attendance')
+  // A proposer can enter or correct figures until the secretariat has validated them.
+  const can =
+    !report.closed &&
+    (validator ||
+      (hasPermission(me, 'sundays:propose') && !(report.entered && !report.attendancePending)))
   const [v, setV] = useState({
     men: report.men === null ? '' : String(report.men),
     women: report.women === null ? '' : String(report.women),
@@ -677,6 +694,16 @@ function Attendance({
     },
     onError: () => say(t(k('error')), 'danger'),
   })
+  const qc = useQueryClient()
+  const check = useMutation({
+    mutationFn: () => api(`/sundays/reports/${date}/validate?n=${report.n}`, { method: 'POST' }),
+    onSuccess: () => {
+      say(t(k('validated')))
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      onChange()
+    },
+    onError: () => say(t(k('error')), 'danger'),
+  })
   const total = attendanceTotal({ men: num(v.men), women: num(v.women), children: num(v.children) })
   const field = (key: 'men' | 'women' | 'children') => (
     <TextField
@@ -692,7 +719,11 @@ function Attendance({
   )
   return (
     <section className="admin-panel grid gap-3" aria-label={t(k('attendance'))}>
-      <h2 className="text-xl">{t(k('attendance'))}</h2>
+      <h2 className="flex flex-wrap items-center gap-2 text-xl">
+        {t(k('attendance'))}
+        {report.attendancePending && <Badge tone="warning">{t(k('to_validate'))}</Badge>}
+      </h2>
+      {!validator && can && <p className="text-sm text-ink-muted">{t(k('proposer_note'))}</p>}
       <div className="reg-grid reg-grid-3">
         {field('men')}
         {field('women')}
@@ -747,9 +778,17 @@ function Attendance({
         }
       />
       {can && (
-        <div>
+        <div className="flex flex-wrap gap-2">
           <Button loading={save.isPending} onClick={() => save.mutate()}>
-            {t(k('save'))}
+            {t(validator ? k('save') : k('propose'))}
+          </Button>
+        </div>
+      )}
+      {validator && report.attendancePending && !report.closed && (
+        <div>
+          <Button variant="secondary" loading={check.isPending} onClick={() => check.mutate()}>
+            <Icon name="check" size={20} />
+            {t(k('validate_attendance'))}
           </Button>
         </div>
       )}
@@ -769,7 +808,18 @@ function Offerings({
   const { t, locale } = useLocale()
   const lang = locale === 'en' ? 'en' : 'fr'
   const me = useMe().data
-  const can = hasPermission(me, 'sundays:offerings') && !report.closed
+  const validator = hasPermission(me, 'sundays:offerings')
+  const can = (validator || hasPermission(me, 'sundays:propose')) && !report.closed
+  const qc = useQueryClient()
+  const check = useMutation({
+    mutationFn: () => api(`/sundays/reports/${date}/validate?n=${report.n}`, { method: 'POST' }),
+    onSuccess: () => {
+      say(t(k('validated')))
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      onChange()
+    },
+    onError: () => say(t(k('error')), 'danger'),
+  })
   const groups = useGroups()
   const hints = useQuery({ queryKey: ['sun-hints'], queryFn: () => api<Hints>('/sundays/hints') })
   const [v, setV] = useState({
@@ -819,6 +869,12 @@ function Offerings({
     <section className="admin-panel grid gap-3" aria-label={t(k('offerings'))}>
       <h2 className="text-xl">{t(k('offerings'))}</h2>
       <p className="font-display text-3xl">{xaf(report.offerings)}</p>
+      {!!report.offeringsPending && (
+        <p className="text-sm text-ink-muted">
+          {t(k('pending_total'), { amount: xaf(report.offeringsPending) })}
+        </p>
+      )}
+      {!validator && can && <p className="text-sm text-ink-muted">{t(k('proposer_note'))}</p>}
       {report.lines.length === 0 ? (
         <p className="text-sm text-ink-muted">{t(k('no_lines'))}</p>
       ) : (
@@ -826,7 +882,10 @@ function Offerings({
           {report.lines.map((l) => (
             <li key={l.id} className="sun-line">
               <span className="grid">
-                <strong>{purposeLabel(l.purpose, lang)}</strong>
+                <strong className="flex flex-wrap items-center gap-2">
+                  {purposeLabel(l.purpose, lang)}
+                  {l.pending && <Badge tone="warning">{t(k('to_validate'))}</Badge>}
+                </strong>
                 <span className="text-sm text-ink-muted">
                   {groupName(l)}
                   {l.linked ? ` · ${t(k('linked'))}` : ''}
@@ -834,7 +893,7 @@ function Offerings({
               </span>
               <span className="flex items-center gap-2">
                 <strong>{xaf(l.amountXaf)}</strong>
-                {can && (
+                {can && (validator || l.pending) && (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -848,6 +907,14 @@ function Offerings({
             </li>
           ))}
         </ul>
+      )}
+      {validator && report.lines.some((l) => l.pending) && !report.closed && (
+        <div>
+          <Button variant="secondary" loading={check.isPending} onClick={() => check.mutate()}>
+            <Icon name="check" size={20} />
+            {t(k('validate_offerings'))}
+          </Button>
+        </div>
       )}
       {can && (
         <div className="grid gap-3 sun-add">

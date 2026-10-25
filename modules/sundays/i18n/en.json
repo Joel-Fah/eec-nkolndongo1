@@ -80,5 +80,13 @@
   "feast_christmas": "Christmas",
   "feast_goodfriday": "Good Friday",
   "feast_ascension": "Ascension",
-  "day_name": "Name of the day"
+  "day_name": "Name of the day",
+  "to_validate": "To validate",
+  "proposer_note": "What you enter is a proposal: the secretariat (attendance) or the treasurer (offerings) validates it before it counts.",
+  "propose": "Propose",
+  "validate_attendance": "Validate attendance",
+  "validate_offerings": "Validate offerings",
+  "validated": "Validated.",
+  "pending_total": "+ {amount} waiting for validation (not counted yet)",
+  "close_blocked": "Validate what is waiting first."
 }
