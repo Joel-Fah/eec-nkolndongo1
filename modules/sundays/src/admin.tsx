@@ -7,6 +7,7 @@ import {
   api,
   ChartCard,
   hasPermission,
+  monthName,
   type Series,
   useLocale,
   useMe,
@@ -300,22 +301,6 @@ function Meter({
   )
 }
 
-/** Every month between the first and the last that has data (a month with nothing is zero, not missing). */
-const monthsBetween = (first: string, last: string) => {
-  const out: string[] = []
-  let [y, m] = first.split('-').map(Number) as [number, number]
-  const [ly, lm] = last.split('-').map(Number) as [number, number]
-  while (y < ly || (y === ly && m <= lm)) {
-    out.push(`${y}-${String(m).padStart(2, '0')}`)
-    m++
-    if (m > 12) {
-      m = 1
-      y++
-    }
-  }
-  return out
-}
-
 function Trends() {
   const { t, locale } = useLocale()
   const q = useQuery({
@@ -333,19 +318,34 @@ function Trends() {
   // The three attendance bars share one scale, so they can be compared; the offerings have their own.
   const maxA = Math.max(1, ...periods.flatMap((p) => [p.men, p.women, p.children]))
   const maxO = Math.max(1, ...periods.map((p) => p.offerings))
-  const months = periods.length
-    ? monthsBetween(periods[0]?.period as string, periods.at(-1)?.period as string)
-    : []
-  const at = (key: 'men' | 'women' | 'children' | 'offerings') =>
-    months.map((m) => periods.find((p) => p.period === m)?.[key] ?? 0)
+  // The chart is the weeks of the current month (its Sundays, oldest first); every month is on the dashboard.
+  const today = new Date().toISOString().slice(0, 10)
+  const first = `${today.slice(0, 7)}-01`
+  const wk = useQuery({
+    queryKey: ['sun-month', first],
+    queryFn: () =>
+      api<{
+        items: {
+          date: string
+          men: number | null
+          women: number | null
+          children: number | null
+          offerings: number
+        }[]
+      }>(`/sundays/reports?from=${first}&to=${today}`),
+  })
+  const sundays = [...(wk.data?.items ?? [])].sort((x, y) => x.date.localeCompare(y.date))
+  const days = sundays.map((s) => s.date)
+  const per = (key: 'men' | 'women' | 'children' | 'offerings') => sundays.map((s) => s[key] ?? 0)
   const people: Series[] = [
-    { key: 'men', label: t(k('men')), values: at('men'), tone: 'primary' },
-    { key: 'women', label: t(k('women')), values: at('women'), tone: 'gold' },
-    { key: 'children', label: t(k('children')), values: at('children'), tone: 'clay' },
+    { key: 'men', label: t(k('men')), values: per('men'), tone: 'primary' },
+    { key: 'women', label: t(k('women')), values: per('women'), tone: 'gold' },
+    { key: 'children', label: t(k('children')), values: per('children'), tone: 'clay' },
   ]
   const money: Series[] = [
-    { key: 'money', label: t(k('offerings')), values: at('offerings'), tone: 'gold' },
+    { key: 'money', label: t(k('offerings')), values: per('offerings'), tone: 'gold' },
   ]
+  const monthLabel = monthName(first.slice(0, 7), locale)
   // The cards, a year at a time (newest year first, months in order inside it); the change is against the month before.
   const years = [...new Set(periods.map((p) => p.period.slice(0, 4)))].sort().reverse()
   return (
@@ -354,25 +354,18 @@ function Trends() {
         <EmptyState title={t(k('trends_empty_t'))} text={t(k('trends_empty_p'))} />
       ) : (
         <>
-          <div className="reg-grid reg-grid-2">
-            {d?.attendance && (
-              <ChartCard
-                title={t(k('attendance'))}
-                legend={people}
-                table={{ months, series: people, monthHeader: t(k('month_h')) }}
-                summary={t(k('view_numbers'))}
-              >
-                <AreaChart months={months} series={people} label={t(k('attendance'))} />
+          {days.length > 0 && (
+            <div className="grid gap-6">
+              {d?.attendance && (
+                <ChartCard title={`${t(k('attendance'))} · ${monthLabel}`} legend={people}>
+                  <AreaChart months={days} series={people} label={t(k('attendance'))} />
+                </ChartCard>
+              )}
+              <ChartCard title={`${t(k('offerings'))} · ${monthLabel}`}>
+                <AreaChart months={days} series={money} label={t(k('offerings'))} />
               </ChartCard>
-            )}
-            <ChartCard
-              title={t(k('offerings'))}
-              table={{ months, series: money, monthHeader: t(k('month_h')) }}
-              summary={t(k('view_numbers'))}
-            >
-              <AreaChart months={months} series={money} label={t(k('offerings'))} />
-            </ChartCard>
-          </div>
+            </div>
+          )}
           {years.map((y) => (
             <section key={y} className="grid gap-3" aria-label={y}>
               <h2 className="sermon-month">
