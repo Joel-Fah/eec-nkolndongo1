@@ -41,9 +41,12 @@ export const profiles = pgTable('profiles', {
   profession: text('profession'),
   /** A private object (never a public media key); who may see it is `photoLevel`. */
   photoKey: text('photo_key'),
+  /** Deprecated (decision 0047, amended): the team always sees an uploaded photo; kept so nothing is dropped. Use `photoAsAvatar`. */
   photoLevel: text('photo_level', { enum: ['private', 'staff'] })
     .notNull()
     .default('private'),
+  /** The member's choice: their photo as the avatar in the navbar (true), or a generated avatar (false, the default). */
+  photoAsAvatar: boolean('photo_as_avatar').notNull().default(false),
   photoUpdatedAt: tz('photo_updated_at'),
   lastSeenAt: tz('last_seen_at'),
   /** Set when the person asked to delete their account (30-day grace, then purged). */
