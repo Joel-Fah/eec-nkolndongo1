@@ -13,6 +13,7 @@ import { healthRoutes } from './routes/health.ts'
 import { invitationRoutes } from './routes/invitations.ts'
 import { meRoutes } from './routes/me.ts'
 import { memberRoutes } from './routes/members.ts'
+import { notificationRoutes } from './routes/notifications.ts'
 import { outboxRoutes } from './routes/outbox.ts'
 import { roleRoutes } from './routes/roles.ts'
 import { searchRoutes } from './routes/search.ts'
@@ -40,6 +41,7 @@ export function createApp() {
   app.route('/flags', flagRoutes)
   app.route('/search', searchRoutes)
   app.route('/todo', todoRoutes)
+  app.route('/notifications', notificationRoutes)
   app.route('/trends', trendsRoutes)
   app.route('/system-health', healthRoutes)
   app.route('/visits', visitsRoutes)
