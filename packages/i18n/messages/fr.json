@@ -332,7 +332,9 @@
       "illustration": "Illustration",
       "components": "Composants",
       "rules": "Règles et entretien",
-      "patterns": "Motifs de page"
+      "patterns": "Motifs de page",
+      "social": "Réseaux sociaux",
+      "credits": "Crédits"
     },
     "identity": {
       "title": "Notre identité",
@@ -1129,6 +1131,38 @@
       "placeholder": "Un composant, une couleur, une règle…",
       "empty": "Rien ne correspond à cette recherche.",
       "hint": "↑ ↓ pour choisir · Entrée pour y aller · Échap pour fermer"
+    },
+    "social": {
+      "title": "Kit des réseaux sociaux",
+      "lead": "Des bannières et des photos de profil prêtes à poser sur nos pages, à la taille de chaque plateforme. Elles ne portent que le logo et le nom de la paroisse.",
+      "banners": "Bannières de couverture",
+      "banners_p": "Dessinées à partir de nos bannières abstraites. Le cadre pointillé montre la zone sûre : rien d’important ne doit en sortir, car les téléphones recadrent les côtés et la photo de profil recouvre un coin.",
+      "banner_alt": "Bannière de couverture, logo et nom de la paroisse",
+      "download": "Télécharger",
+      "note_fb": "Facebook rogne les côtés sur téléphone et la photo de profil recouvre le coin en bas à gauche : tout est au centre.",
+      "note_x": "X recadre le haut et le bas selon l’écran et la photo de profil recouvre le coin en bas à gauche : tout est au centre.",
+      "note_yt": "YouTube affiche toute l’image sur télévision mais seulement la bande centrale sur téléphone : le logo et le nom sont dans cette bande.",
+      "avatars": "Photos de profil",
+      "avatars_p": "Le logo est centré et occupe les deux tiers du carré, pour qu’un recadrage en cercle ne le touche jamais. Deux fonds : crème, et vert de la paroisse (avec le halo crème autour du logo).",
+      "variant_light": "Fond crème",
+      "variant_green": "Fond vert",
+      "rules_title": "À respecter",
+      "r1": "Ne jamais déformer, recolorier ni redessiner le logo : on le place, c’est tout (zone de dégagement de 28 % de sa hauteur).",
+      "r2": "Pas de slogan, de date ni de promesse sur les bannières : seulement les noms qui figurent déjà partout.",
+      "r3": "Vérifier la page d’aide de la plateforme avant une grande campagne : les tailles changent de temps en temps. Le script `pnpm --filter @eec/scripts social:kit` redessine tout.",
+      "r4": "Une bannière de fête ou de saison peut être ajoutée plus tard, avec la même méthode, après validation de Joël."
+    },
+    "credits": {
+      "title": "Crédits",
+      "lead": "Qui a conçu et construit ce site, et ce sur quoi il s’appuie.",
+      "photo_alt": "Portrait de Joël Fah",
+      "role": "Développeur, administrateur et propriétaire du produit",
+      "thanks": "Ce site a été pensé, dessiné et construit par Joël Fah pour la paroisse de Nkolndongo 1.",
+      "also": "Et aussi",
+      "also_fonts": "Polices : Switzer et Erode (Fontshare, licence libre d’usage).",
+      "also_illos": "Illustrations : Storyset « Cuate », recolorées dans notre palette.",
+      "also_icons": "Icônes : Hugeicons, trait arrondi.",
+      "also_photos": "Photos provisoires (Pexels) et leurs auteurs"
     }
   },
   "home": {

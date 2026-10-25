@@ -1,0 +1,92 @@
+---
+import Icon from '@eec/ui/astro/Icon.astro'
+import { localeOf, useT } from '../../lib/i18n'
+import Section from './Section.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const links = [
+  { icon: 'github', label: 'GitHub', handle: 'Joel-Fah', href: 'https://github.com/Joel-Fah' },
+  { icon: 'xTwitter', label: 'X', handle: '@FahDejon', href: 'https://x.com/FahDejon' },
+  {
+    icon: 'instagram',
+    label: 'Instagram',
+    handle: '@fahjoel',
+    href: 'https://www.instagram.com/fahjoel',
+  },
+  {
+    icon: 'linkedin',
+    label: 'LinkedIn',
+    handle: 'in/joelfah',
+    href: 'https://www.linkedin.com/in/joelfah',
+  },
+] as const
+const photo = `/${locale === 'fr' ? 'credits-photos' : 'photo-credits'}/`
+---
+
+<Section id="credits" title={t('brand.credits.title')} lead={t('brand.credits.lead')}>
+  <div class="cr-card">
+    <img class="cr-photo" src="/brand/credits/joel.webp" width="120" height="120" alt={t('brand.credits.photo_alt')} loading="lazy" decoding="async" />
+    <div class="grid gap-3">
+      <div class="grid gap-1">
+        <h3 class="text-2xl">Joël Fah</h3>
+        <p class="text-ink-muted">{t('brand.credits.role')}</p>
+      </div>
+      <p class="max-w-[60ch]">{t('brand.credits.thanks')}</p>
+      <ul class="cr-links">
+        {
+          links.map((l) => (
+            <li>
+              <a class="btn btn-secondary" href={l.href} target="_blank" rel="noopener noreferrer">
+                <Icon name={l.icon} size={20} />
+                <span>{l.label}</span>
+                <span class="text-ink-muted">{l.handle}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+  <div class="grid gap-2">
+    <h3 class="text-xl">{t('brand.credits.also')}</h3>
+    <ul class="grid list-disc gap-2 ps-5 text-ink-muted">
+      <li>{t('brand.credits.also_fonts')}</li>
+      <li>{t('brand.credits.also_illos')}</li>
+      <li>{t('brand.credits.also_icons')}</li>
+      <li><a class="underline" href={photo}>{t('brand.credits.also_photos')}</a></li>
+    </ul>
+  </div>
+</Section>
+
+<style>
+  .cr-card {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  @media (min-width: 40rem) {
+    .cr-card {
+      grid-template-columns: auto 1fr;
+    }
+  }
+  .cr-photo {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--gold);
+  }
+  .cr-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

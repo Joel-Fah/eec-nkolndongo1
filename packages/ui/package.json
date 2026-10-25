@@ -17,7 +17,8 @@
     "./motion": "./src/motion.ts",
     "./primitives": "./src/primitives.ts",
     "./react": "./react/index.tsx",
-    "./pickers": "./src/pickers.ts"
+    "./pickers": "./src/pickers.ts",
+    "./abstract-art": "./src/abstract-art.ts"
   },
   "scripts": {
     "build": "node ../../scripts/fonts-fetch.ts && node ../../scripts/illos-fetch.ts",

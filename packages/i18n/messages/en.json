@@ -332,7 +332,9 @@
       "illustration": "Illustration",
       "components": "Components",
       "rules": "Rules and upkeep",
-      "patterns": "Page patterns"
+      "patterns": "Page patterns",
+      "social": "Social media",
+      "credits": "Credits"
     },
     "identity": {
       "title": "Our identity",
@@ -1129,6 +1131,38 @@
       "placeholder": "A component, a colour, a rule…",
       "empty": "Nothing matches this search.",
       "hint": "↑ ↓ to choose · Enter to go · Esc to close"
+    },
+    "social": {
+      "title": "Social media kit",
+      "lead": "Banners and profile pictures ready to put on our pages, at each platform's size. They carry only the logo and the parish name.",
+      "banners": "Cover banners",
+      "banners_p": "Drawn from our abstract banners. The dashed frame is the safe area: nothing important may leave it, because phones crop the sides and the profile picture covers a corner.",
+      "banner_alt": "Cover banner, logo and parish name",
+      "download": "Download",
+      "note_fb": "Facebook crops the sides on phones and the profile picture covers the bottom-left corner: everything sits in the centre.",
+      "note_x": "X crops the top and bottom depending on the screen and the profile picture covers the bottom-left corner: everything sits in the centre.",
+      "note_yt": "YouTube shows the whole image on TV but only the central strip on phones: the logo and name are inside that strip.",
+      "avatars": "Profile pictures",
+      "avatars_p": "The logo is centred and takes two thirds of the square, so a circular crop never touches it. Two backgrounds: cream, and the parish green (with the cream halo around the logo).",
+      "variant_light": "Cream background",
+      "variant_green": "Green background",
+      "rules_title": "Keep in mind",
+      "r1": "Never stretch, recolour or redraw the logo: place it, nothing more (clear space of 28 % of its height).",
+      "r2": "No slogan, date or promise on the banners: only the names that already appear everywhere.",
+      "r3": "Check the platform's help page before a big campaign: sizes change now and then. The script `pnpm --filter @eec/scripts social:kit` redraws everything.",
+      "r4": "A feast or season banner can be added later with the same method, after Joël's approval."
+    },
+    "credits": {
+      "title": "Credits",
+      "lead": "Who designed and built this site, and what it stands on.",
+      "photo_alt": "Portrait of Joël Fah",
+      "role": "Developer, administrator and product owner",
+      "thanks": "This site was thought through, designed and built by Joël Fah for the Nkolndongo 1 parish.",
+      "also": "Also",
+      "also_fonts": "Fonts: Switzer and Erode (Fontshare, free-to-use licence).",
+      "also_illos": "Illustrations: Storyset “Cuate”, recoloured into our palette.",
+      "also_icons": "Icons: Hugeicons, stroke-rounded.",
+      "also_photos": "Placeholder photos (Pexels) and their authors"
     }
   },
   "home": {
