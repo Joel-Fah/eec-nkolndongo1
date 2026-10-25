@@ -1,4 +1,4 @@
-# Phase 04 — Go-live & Grow: report (in progress)
+# Phase 04 — Go-live & Grow: report
 
 _Updated 2026-10-22, at Checkpoint A (04a)._
 
@@ -201,3 +201,17 @@ The admin shows the sign-in method (Google / e-mail) in the member list, record 
 entry is gone) and « Mon compte » was redone: two columns using the whole width, an identity card, the password section aligned (and not offered to Google-only
 accounts), the eye button without a hover background, a help guide « Mon compte ». **Sign-out bug:** the server did sign out; the public header kept its
 « signed in » avatar for up to five minutes in the tab (and `/api/me` had no `no-store`): now cleared on sign-out and sign-in, kept for 1 minute, and `/api/me` is `private, no-store`.
+
+
+## Wrap-up (2026-10-25)
+**Built (on dev):** launch kit (slots, validation, help, health, share cards, JSON-LD, sitemap), sermons (links only), meditations and bulletin, registrations,
+campaigns (Moissons), the members' Moissons page, PWA, Sunday reports (special days, proposed figures, trends), in-app notifications with mutes, member profile
+(consent, details, private photo, generated avatar), custom date and time pickers, brand social kit and credits, `owasp-security` skill, docs.
+**Decisions:** 0034–0047 (0036 audio encoding was never needed: decision 0034 removed audio hosting).
+**Migrations:** 0024–0035, all additive.
+**Deviations:** sermons are links, no audio, no podcast (0034); the PWA worker is hand-written (no library); the member card was removed for now (communion card, next phase).
+**Known issues:** « Mes inscriptions » in Mon espace; per-event `.ics` on the confirmation page; the Hébreux 8, 19 typo in the parish's 2026 calendar; the e2e is slow on the
+remote dev database and needs a retry now and then (a refused upload used to break the next request: fixed).
+**Device-pass record:** none yet. Real-phone checks (install and offline on Android, LCP/CLS, TalkBack, keyboard, tap-to-dial, `.ics` on Google Calendar and iOS, the pickers) are Joël's.
+**Suggestions for Phase 05:** the communion card together with a properly planned « Mon espace » (groups, my registrations, card), newsletter once a domain exists,
+pawaPay payments, push notifications (a decision first), `pg_trgm` search, department spaces, an audio host if podcasts are wanted, a self-service data request log.

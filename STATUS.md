@@ -1,6 +1,6 @@
 # STATUS
 
-## Current phase: 04a — Go-live · Checkpoint A (launch kit) ready for review
+## Current phase: 04 — Go-live & Grow · built on dev, wrapped up; waiting for the production deploy
 _Last updated: 2026-10-23._ Branch `feat/phase-04a-go-live` (from `main`, which already carries Phase 03: both PRs were merged and
 the `deploy` workflow shipped them, migrations 0006–0018 included, on 2026-10-22). **Dev only for everything new**; nothing of
 04a is deployed. Report in progress: `docs/phases/PHASE_04_REPORT.md`.

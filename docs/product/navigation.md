@@ -10,7 +10,7 @@ Max **5 top-level tabs**. Everything else nests in dropdowns. The logo links hom
 | **Actualités** / News | Nouvelles · Prédications · Méditations & bulletin |
 | **Donner** / Give | (direct page) |
 
-Right side utilities: Search · FR/EN · Theme · **Mon espace** (member login).
+Right side utilities: Search · FR/EN · Theme · **Mon espace** (member login; once signed in the button shows the person's avatar, with a warning mark while their profile is incomplete, decision 0047). « Fête des Moissons » is a members' page, shown only in season (0042).
 Footer: Contact, hours, address, socials (WhatsApp, Facebook, YouTube), legal links.
 
 ## Behaviour

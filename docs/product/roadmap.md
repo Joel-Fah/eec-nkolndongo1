@@ -26,15 +26,18 @@ Each item becomes a module (`modules/<id>`). Phases are indicative; order inside
 
 ## Phase 2 — Grow
 - `sermons` ✅ (links only, decision 0034): series, preacher with consent, passages, YouTube facade, any https links; podcast RSS parked until a host with direct file URLs exists
-- `bulletin`: weekly bulletin & meditation programme (web + PDF)
-- `registrations`: forms for events (retreats, concerts, catechism)
+- `bulletin` ✅ and `meditations` ✅: weekly bulletin (assembled from the site's own data, print layouts) and the meditation programme (CSV import)
+- `registrations` ✅: forms for events, waitlist, check-in, retention
 - `newsletter`: Brevo lists, email templates (needs domain)
-- `campaigns`: Fête des Moissons page with goal tracker (harvest basket)
-- PWA: installable, offline reading
+- `campaigns` ✅: Fête des Moissons (members' page in season, validated totals only)
+- `sundays` ✅ (added): Sunday and special-day reports, proposed figures validated by the secretariat and the treasurer, trends
+- In-app notifications ✅ (added): reminders, validators' queue, weekly summary, per-person mutes
+- PWA ✅: installable, offline reading of saved public pages
+- Member profile ✅ (added): optional details behind a consent, private photo, generated avatar, completion warnings
 
 ## Phase 3 — Deepen
 - `payments`: pawaPay (MTN MoMo + Orange Money), receipts, treasurer reconciliation
-- Member services: carte de Sainte-Cène (it is the member card already shown in Mon espace, decision 0047: one card, the communion function is added to it), attendance, group memberships
+- Member services: **carte de Sainte-Cène** (the member card was removed from Mon espace for now, decision 0047: one card, planned properly here together with the rest of « Mon espace »), attendance, group memberships
 - Department spaces (leaders' tools)
 - `requests`: sacrament requests (only after a data-protection decision record)
 - Privacy-friendly analytics dashboard
