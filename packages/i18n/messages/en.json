@@ -2158,8 +2158,6 @@
     "insight_ok_do": "See the dashboard",
     "quick": "Quick actions",
     "qa_upload": "Add a photo",
-    "qa_invite": "Invite someone",
-    "qa_members": "View members",
     "qa_settings": "Settings",
     "qa_outbox": "Outbox",
     "qa_activity": "Recent activity",
@@ -2201,7 +2199,9 @@
     "visits_mobile": "Phone",
     "visits_desktop": "Computer",
     "visits_top": "Most read pages",
-    "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not."
+    "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not.",
+    "qa_news": "Write a news post",
+    "qa_sunday": "Sunday report"
   },
   "content": {
     "status": {

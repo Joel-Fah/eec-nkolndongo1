@@ -2158,8 +2158,6 @@
     "insight_ok_do": "Voir le tableau de bord",
     "quick": "Actions rapides",
     "qa_upload": "Ajouter une photo",
-    "qa_invite": "Inviter quelqu’un",
-    "qa_members": "Voir les membres",
     "qa_settings": "Paramètres",
     "qa_outbox": "Boîte d’envoi",
     "qa_activity": "Activité récente",
@@ -2201,7 +2199,9 @@
     "visits_mobile": "Téléphone",
     "visits_desktop": "Ordinateur",
     "visits_top": "Pages les plus lues",
-    "visits_gap": "Seules les pages servies à la demande sont comptées : la page d’accueil et les pages fixes ne le sont pas."
+    "visits_gap": "Seules les pages servies à la demande sont comptées : la page d’accueil et les pages fixes ne le sont pas.",
+    "qa_news": "Écrire une actualité",
+    "qa_sunday": "Bilan du dimanche"
   },
   "content": {
     "status": {
