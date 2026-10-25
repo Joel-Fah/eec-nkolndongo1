@@ -50,13 +50,9 @@
   "delete_line": "Delete",
   "delete_line_t": "Delete this offering?",
   "delete_line_p": "It will no longer count. If it is linked to an unvalidated campaign amount, that one is removed too.",
-  "grain": "Group by",
-  "by_month": "By month",
-  "by_week": "By week",
   "export": "Export (CSV)",
   "trends_empty_t": "No trend yet",
   "trends_empty_p": "They appear as soon as Sundays are entered.",
-  "period": "Period",
   "sundays_n": "{n} Sunday(s)",
   "by_purpose": "By purpose",
   "by_group": "By group",
@@ -66,5 +62,10 @@
   "services_n": "{n} services",
   "service_name": "Name of this service (optional)",
   "service_name_ph": "English service",
-  "dash_t": "Last Sunday"
+  "dash_t": "Last Sunday",
+  "year_t": "The year’s Sundays",
+  "year_pick": "Choose the year",
+  "month_h": "Month",
+  "view_numbers": "View the chart’s numbers",
+  "vs_previous": "vs previous Sunday"
 }

@@ -462,14 +462,20 @@ export const sundaysApi = new Hono<AppEnv>()
 
   // Trends: by week or month, attendance and offerings by purpose, and by group over the range. Each person sees what they may.
   .get('/analytics', requirePermissionAnywhere('sundays:read'), async (c) => {
-    const grain = c.req.query('grain') === 'week' ? 'week' : 'month'
+    // Monthly only: a Sunday is one a week, so a weekly view would just repeat the Sundays.
+    const grain = 'month' as const
+    const year = /^\d{4}$/.test(c.req.query('year') ?? '') ? (c.req.query('year') as string) : null
     const today = todayLocal()
-    const from = /^\d{4}-\d{2}-\d{2}$/.test(c.req.query('from') ?? '')
-      ? (c.req.query('from') as string)
-      : new Date(Date.now() - 400 * 86_400_000).toISOString().slice(0, 10)
-    const to = /^\d{4}-\d{2}-\d{2}$/.test(c.req.query('to') ?? '')
-      ? (c.req.query('to') as string)
-      : today
+    const from = year
+      ? `${year}-01-01`
+      : /^\d{4}-\d{2}-\d{2}$/.test(c.req.query('from') ?? '')
+        ? (c.req.query('from') as string)
+        : new Date(Date.now() - 400 * 86_400_000).toISOString().slice(0, 10)
+    const to = year
+      ? `${year}-12-31`
+      : /^\d{4}-\d{2}-\d{2}$/.test(c.req.query('to') ?? '')
+        ? (c.req.query('to') as string)
+        : today
     const db = await c.var.deps.db()
     const reports = await db
       .select()
@@ -507,7 +513,12 @@ export const sundaysApi = new Hono<AppEnv>()
     const names = new Map(
       (await db.select({ id: groups.id, fr: groups.nameFr }).from(groups)).map((g) => [g.id, g.fr]),
     )
+    // The years that have any report (for the year toggle): only years with data are offered.
+    const yrs = await db
+      .selectDistinct({ y: sql<string>`left(${sundayReports.sundayDate}, 4)` })
+      .from(sundayReports)
     return c.json({
+      years: yrs.map((r) => r.y).sort(),
       grain,
       attendance: canAttendance,
       periods: rollup(rows, grain),

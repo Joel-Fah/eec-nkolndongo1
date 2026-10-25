@@ -50,13 +50,9 @@
   "delete_line": "Supprimer",
   "delete_line_t": "Supprimer cette offrande ?",
   "delete_line_p": "Elle ne comptera plus. Si elle est liée à une somme non validée d’une campagne, celle-ci est retirée aussi.",
-  "grain": "Regrouper",
-  "by_month": "Par mois",
-  "by_week": "Par semaine",
   "export": "Exporter (CSV)",
   "trends_empty_t": "Pas encore de tendance",
   "trends_empty_p": "Elles apparaissent dès que des dimanches sont saisis.",
-  "period": "Période",
   "sundays_n": "{n} dimanche(s)",
   "by_purpose": "Par objet",
   "by_group": "Par groupe",
@@ -66,5 +62,10 @@
   "services_n": "{n} cultes",
   "service_name": "Nom de ce culte (facultatif)",
   "service_name_ph": "Culte en anglais",
-  "dash_t": "Dimanche dernier"
+  "dash_t": "Dimanche dernier",
+  "year_t": "Les dimanches de l’année",
+  "year_pick": "Choisir l’année",
+  "month_h": "Mois",
+  "view_numbers": "Voir les chiffres du graphique",
+  "vs_previous": "vs dimanche précédent"
 }

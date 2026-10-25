@@ -2,6 +2,7 @@ import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { Icon } from './Icon'
 import { TrendBadge } from './TrendBadge'
 
 type Item = {
@@ -68,19 +69,26 @@ export function LastSunday() {
       <div className="grid gap-4 sm:grid-cols-3">
         {cards.map((c) => (
           <div key={c.key} className="stat-card">
-            <p className="stat-number">{c.text}</p>
+            <p className={`stat-number${c.key === 'offerings' ? ' sun-money' : ''}`}>{c.text}</p>
             <p className="text-sm text-ink-muted">{t(k(c.key))}</p>
-            {before && <TrendBadge current={c.n} previous={c.prev} />}
+            {before && <TrendBadge current={c.n} previous={c.prev} label={t(k('vs_previous'))} />}
           </div>
         ))}
         {now.attendance !== null && (
-          <div className="stat-card">
-            <p className="text-sm text-ink-muted">
-              {t(k('men'))} · {t(k('women'))} · {t(k('children'))}
-            </p>
-            <p className="stat-number">
-              {now.men ?? 0} · {now.women ?? 0} · {now.children ?? 0}
-            </p>
+          <div className="stat-card sun-split">
+            {(
+              [
+                ['male', 'men', now.men],
+                ['female', 'women', now.women],
+                ['baby', 'children', now.children],
+              ] as const
+            ).map(([icon, key, n]) => (
+              <div key={key} className="sun-split-item">
+                <Icon name={icon} size={20} />
+                <p className="stat-number">{n ?? 0}</p>
+                <p className="text-sm text-ink-muted">{t(k(key))}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>

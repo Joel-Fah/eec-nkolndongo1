@@ -2949,3 +2949,101 @@ html[data-nav-open] {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
+
+/* Sunday trends: each month is a card; every measure has its own bar with its label right under it. */
+.sun-months {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+}
+.sun-month {
+  display: grid;
+  gap: 0.875rem;
+  align-content: start;
+}
+.sun-month-h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  text-transform: capitalize;
+}
+.sun-month-h small {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ink-muted);
+}
+.sun-month-grid {
+  display: grid;
+  gap: 0.75rem 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.sun-month-grid > .sun-meter[data-k="money"] {
+  grid-column: 1 / -1;
+}
+.sun-meter {
+  display: grid;
+  gap: 0.375rem;
+}
+.sun-meter .sun-bar {
+  margin: 0;
+}
+.sun-meter-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.375rem;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.sun-meter-label strong {
+  margin-inline-start: auto;
+  color: var(--ink);
+}
+.sun-meter-label em,
+.sun-total em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--danger);
+}
+.sun-meter-label em[data-up],
+.sun-total em[data-up] {
+  color: var(--success);
+}
+.sun-total {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+@media (max-width: 29.99rem) {
+  .sun-month-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* « Dimanche dernier »: men, women and children, each with its icon and its label under its number. */
+.sun-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
+.sun-split-item {
+  display: grid;
+  justify-items: start;
+  gap: 0.125rem;
+  color: var(--primary);
+}
+.sun-split-item .stat-number {
+  color: var(--ink);
+}
+
+.stat-number.sun-money {
+  font-size: var(--text-3xl);
+}

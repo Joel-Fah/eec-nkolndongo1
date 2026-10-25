@@ -6,6 +6,7 @@ import { Icon } from '../../components/Icon'
 import { LastSunday } from '../../components/LastSunday'
 import { QuickActions } from '../../components/QuickActions'
 import { RecentActivity } from '../../components/RecentActivity'
+import { SundayYear } from '../../components/SundayYear'
 import { TodoPanel } from '../../components/TodoPanel'
 import { TrendsSection } from '../../components/Trends'
 import { VisitsSection } from '../../components/Visits'
@@ -26,6 +27,7 @@ function Dashboard() {
       <TodoPanel />
       <Headcount />
       <LastSunday />
+      <SundayYear />
       <RecentActivity />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {groups.map((g) => (

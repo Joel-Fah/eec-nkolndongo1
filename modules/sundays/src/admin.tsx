@@ -202,22 +202,58 @@ type Period = {
   offerings: number
   byPurpose: Record<string, number>
 }
+/** One measure: its bar, and right under it what it is and how much (the label always sits under its own progress). */
+function Meter({
+  tone,
+  icon,
+  label,
+  value,
+  ratio,
+  change,
+}: {
+  tone: 'men' | 'women' | 'children' | 'money'
+  icon?: 'male' | 'female' | 'baby' | 'gift'
+  label: string
+  value: string
+  ratio: number
+  change?: number | null
+}) {
+  return (
+    <div className="sun-meter" data-k={tone}>
+      <span className="sun-bar" role="img" aria-label={`${label}: ${value}`}>
+        <span data-k={tone} style={{ width: `${Math.max(Math.min(ratio, 1), 0) * 100}%` }} />
+      </span>
+      <span className="sun-meter-label">
+        {icon && <Icon name={icon} size={16} />}
+        <span>{label}</span>
+        <strong>{value}</strong>
+        {change != null && change !== undefined && (
+          <em data-up={change >= 0 ? '' : undefined}>
+            {change > 0 ? '+' : ''}
+            {change} %
+          </em>
+        )}
+      </span>
+    </div>
+  )
+}
+
 function Trends() {
   const { t, locale } = useLocale()
   const me = useMe().data
-  const [grain, setGrain] = useState<'week' | 'month'>('month')
   const q = useQuery({
-    queryKey: ['sun-analytics', grain],
+    queryKey: ['sun-analytics', 'month'],
     queryFn: () =>
       api<{
         attendance: boolean
         periods: Period[]
         purposes: { purpose: string; amount: number }[]
         groups: { groupId: string | null; amount: number; name: string | null }[]
-      }>(`/sundays/analytics?grain=${grain}`),
+      }>('/sundays/analytics?grain=month'),
   })
   const d = q.data
-  const maxA = Math.max(1, ...(d?.periods ?? []).map((p) => p.attendance))
+  // The three attendance bars share one scale, so they can be compared; the offerings have their own.
+  const maxA = Math.max(1, ...(d?.periods ?? []).flatMap((p) => [p.men, p.women, p.children]))
   const maxO = Math.max(1, ...(d?.periods ?? []).map((p) => p.offerings))
   const exportCsv = async () => {
     const res = await fetch('/api/sundays/export.csv', { credentials: 'include' })
@@ -231,91 +267,78 @@ function Trends() {
   }
   return (
     <div className="grid gap-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="media-select">
-          <SelectField
-            label={t(k('grain'))}
-            value={grain}
-            onValueChange={(v) => v && setGrain(v as 'week' | 'month')}
-            options={[
-              { value: 'month', label: t(k('by_month')) },
-              { value: 'week', label: t(k('by_week')) },
-            ]}
-          />
-        </div>
-        {hasPermission(me, 'sundays:export') && (
+      {hasPermission(me, 'sundays:export') && (
+        <div className="flex justify-end">
           <Button variant="secondary" onClick={exportCsv}>
             <Icon name="download" size={20} />
             {t(k('export'))}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       {d && d.periods.length === 0 ? (
         <EmptyState title={t(k('trends_empty_t'))} text={t(k('trends_empty_p'))} />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="chart-table sun-table">
-            <thead>
-              <tr>
-                <th scope="col">{t(k('period'))}</th>
-                {d?.attendance && <th scope="col">{t(k('attendance'))}</th>}
-                <th scope="col">{t(k('offerings'))}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(d?.periods ?? []).map((p, i, all) => {
-                const prev = all[i - 1]
-                const ta = prev ? trend(p.attendance, prev.attendance) : null
-                const to = prev ? trend(p.offerings, prev.offerings) : null
-                return (
-                  <tr key={p.period}>
-                    <th scope="row">
-                      {periodText(p.period, grain, locale)}
-                      <small>{t(k('sundays_n'), { n: String(p.sundays) })}</small>
-                    </th>
-                    {d?.attendance && (
-                      <td>
-                        <span className="sun-bar" role="img" aria-label={`${p.attendance}`}>
-                          <span data-k="men" style={{ width: `${(p.men / maxA) * 100}%` }} />
-                          <span data-k="women" style={{ width: `${(p.women / maxA) * 100}%` }} />
-                          <span
-                            data-k="children"
-                            style={{ width: `${(p.children / maxA) * 100}%` }}
-                          />
-                        </span>
-                        <span className="sun-num">
-                          <strong>{p.attendance}</strong> · {t(k('men_n'), { n: String(p.men) })} ·{' '}
-                          {t(k('women_n'), { n: String(p.women) })} ·{' '}
-                          {t(k('children_n'), { n: String(p.children) })}
-                          {ta !== null && (
-                            <em data-up={ta >= 0 ? '' : undefined}>
-                              {ta > 0 ? '+' : ''}
-                              {ta} %
-                            </em>
-                          )}
-                        </span>
-                      </td>
+        <ul className="sun-months">
+          {(d?.periods ?? []).map((p, i, all) => {
+            const prev = all[i - 1]
+            return (
+              <li key={p.period} className="sun-month admin-panel">
+                <h3 className="sun-month-h">
+                  {periodText(p.period, 'month', locale)}
+                  <small>{t(k('sundays_n'), { n: String(p.sundays) })}</small>
+                </h3>
+                <div className="sun-month-grid">
+                  {d?.attendance && (
+                    <>
+                      <Meter
+                        tone="men"
+                        icon="male"
+                        label={t(k('men'))}
+                        value={String(p.men)}
+                        ratio={p.men / maxA}
+                      />
+                      <Meter
+                        tone="women"
+                        icon="female"
+                        label={t(k('women'))}
+                        value={String(p.women)}
+                        ratio={p.women / maxA}
+                      />
+                      <Meter
+                        tone="children"
+                        icon="baby"
+                        label={t(k('children'))}
+                        value={String(p.children)}
+                        ratio={p.children / maxA}
+                      />
+                    </>
+                  )}
+                  <Meter
+                    tone="money"
+                    icon="gift"
+                    label={t(k('offerings'))}
+                    value={xaf(p.offerings)}
+                    ratio={p.offerings / maxO}
+                    change={prev ? trend(p.offerings, prev.offerings) : null}
+                  />
+                </div>
+                {d?.attendance && (
+                  <p className="sun-total">
+                    {t(k('present_n'), { n: String(p.attendance) })}
+                    {prev && trend(p.attendance, prev.attendance) !== null && (
+                      <em
+                        data-up={(trend(p.attendance, prev.attendance) ?? 0) >= 0 ? '' : undefined}
+                      >
+                        {(trend(p.attendance, prev.attendance) ?? 0) > 0 ? '+' : ''}
+                        {trend(p.attendance, prev.attendance)} %
+                      </em>
                     )}
-                    <td>
-                      <span className="sun-bar" role="img" aria-label={xaf(p.offerings)}>
-                        <span data-k="money" style={{ width: `${(p.offerings / maxO) * 100}%` }} />
-                      </span>
-                      <span className="sun-num">
-                        <strong>{xaf(p.offerings)}</strong>
-                        {to !== null && (
-                          <em data-up={to >= 0 ? '' : undefined}>
-                            {to > 0 ? '+' : ''}
-                            {to} %
-                          </em>
-                        )}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                  </p>
+                )}
+              </li>
+            )
+          })}
+        </ul>
       )}
       {d && d.purposes.length > 0 && (
         <div className="reg-grid reg-grid-2">
