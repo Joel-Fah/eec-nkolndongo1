@@ -18,6 +18,22 @@ import UnavailableState from './UnavailableState.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
+const pickerLabels = (placeholder: string) =>
+  JSON.stringify({
+    open: t('picker.open'),
+    prev: t('picker.prev'),
+    next: t('picker.next'),
+    today: t('picker.today'),
+    clear: t('picker.clear'),
+    chooseMonth: t('picker.choose_month'),
+    chooseYear: t('picker.choose_year'),
+    prevYears: t('picker.prev_years'),
+    nextYears: t('picker.next_years'),
+    hour: t('picker.hour'),
+    minute: t('picker.minute'),
+    done: t('picker.done'),
+    placeholder,
+  })
 const s = (key: string, vars?: Record<string, string>) =>
   t(`meditations.site.${key}` as 'meditations.site.psalm', vars)
 const TZ = 'Africa/Douala'
@@ -191,7 +207,7 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
             <h2 id="md-cal-h" class="md-h">{s('calendar_h')}</h2>
             <p>{s('calendar_p')}</p>
             <div class="md-cal-row">
-              <label>{s('calendar_time')}<input class="input" type="time" value="06:00" /></label>
+              <label>{s('calendar_time')}<input class="input" type="time" value="06:00" data-picker={pickerLabels(t('picker.time_ph'))} /></label>
               <label class="check-row" for="md-from-today"><input id="md-from-today" type="checkbox" class="checkbox" data-from-today checked /><span>{s('calendar_from')}</span></label>
               <button type="button" class="btn btn-primary" data-go>{s('calendar_go')}</button>
             </div>
@@ -204,7 +220,9 @@ const labelText = (l: string) => (l ? s(`label_${l}`) : '')
 </Site>
 
 <script>
+  import { initPickers } from '@eec/ui/pickers'
   import { initLiveNav } from '../../scripts/live-nav'
+  initPickers()
   import { initMeditationCalendar } from '../../scripts/meditation-calendar'
   const bind = () => {
     initLiveNav()

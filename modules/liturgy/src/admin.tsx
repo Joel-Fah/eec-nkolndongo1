@@ -2,7 +2,7 @@
  * Liturgie (admin, /m/liturgy): the Sundays (next 8, the 4 before), the liturgical year's texts (approved before
  * they show) and the verses. People's names on a Sunday are public only when the consent box is ticked.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { GuardedDialog, RefEditor, ViewToggle } from '@eec/content-kit'
 import {
   type BibleRef,
@@ -386,16 +386,12 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
             }}
           >
             <h2 className="dialog-title">{t(k('add_sunday'))}</h2>
-            <label className="grid gap-1">
-              <span className="field-label">{t(k('pick_date'))}</span>
-              <input
-                className="input"
-                type="date"
-                required
-                value={pick}
-                onChange={(e) => setPick(e.target.value)}
-              />
-            </label>
+            <DateField
+              label={t(k('pick_date'))}
+              required
+              value={pick}
+              onChange={(v: string) => setPick(v)}
+            />
             <div className="dialog-actions">
               <Button type="button" variant="secondary" onClick={requestClose}>
                 {t(k('cancel'))}
@@ -839,15 +835,11 @@ function Verses() {
                   setForm({ ...form, textEn: e.target.value })
                 }
               />
-              <label className="grid gap-1">
-                <span className="field-label">{t(k('on_date'))}</span>
-                <input
-                  className="input"
-                  type="date"
-                  value={form.onDate ?? ''}
-                  onChange={(e) => setForm({ ...form, onDate: e.target.value || null })}
-                />
-              </label>
+              <DateField
+                label={t(k('on_date'))}
+                value={form.onDate ?? ''}
+                onChange={(v: string) => setForm({ ...form, onDate: v || null })}
+              />
               <SelectField
                 label={t(k('for_season'))}
                 value={form.season ?? 'none'}

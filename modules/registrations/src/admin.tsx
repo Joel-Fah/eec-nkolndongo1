@@ -2,7 +2,7 @@
  * Registrations (admin, /m/registrations): the forms, who signed up (with how long their data is kept, counted down in colour),
  * adding someone by hand, a one-handed check-in view that shows names only, and the CSV export for those who may.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, DateTimeField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { ConfirmDialog, TagInput, ViewToggle } from '@eec/content-kit'
 import { AGE_BANDS, type AgeBand, daysLeft, normalizePhone, type RetentionLevel } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
@@ -1133,13 +1133,11 @@ function FormEditor({
               })),
             ]}
           />
-          <TextField
+          <DateField
             label={t(k('f_event_date'))}
-            type="date"
-            placeholder=""
             value={v.eventDate}
             disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('eventDate', e.target.value)}
+            onChange={(v: string) => set('eventDate', v)}
           />
         </div>
         <p className="text-sm text-ink-muted">
@@ -1150,21 +1148,17 @@ function FormEditor({
       <section className="grid gap-2">
         <h3 className="text-lg">{t(k('f_when'))}</h3>
         <div className="reg-grid reg-grid-3">
-          <TextField
+          <DateTimeField
             label={t(k('f_opens'))}
-            type="datetime-local"
-            placeholder=""
             value={toLocalInput(v.opensAt)}
             disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('opensAt', toIso(e.target.value))}
+            onChange={(v: string) => set('opensAt', toIso(v))}
           />
-          <TextField
+          <DateTimeField
             label={t(k('f_closes'))}
-            type="datetime-local"
-            placeholder=""
             value={toLocalInput(v.closesAt)}
             disabled={!canEdit}
-            onChange={(e: { target: { value: string } }) => set('closesAt', toIso(e.target.value))}
+            onChange={(v: string) => set('closesAt', toIso(v))}
           />
           <TextField
             label={t(k('f_capacity'))}

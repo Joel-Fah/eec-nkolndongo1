@@ -6,6 +6,7 @@ import {
   AreaChart,
   api,
   ChartCard,
+  DateField,
   hasPermission,
   monthName,
   type Series,
@@ -170,10 +171,8 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
             content: (
               <div className="grid gap-4">
                 <div className="flex flex-wrap items-end gap-3">
-                  <TextField
+                  <DateField
                     label={t(k('other_sunday'))}
-                    type="date"
-                    placeholder=""
                     max={hints.data?.today}
                     value={pick}
                     hint={
@@ -181,7 +180,7 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                         ? t(k('not_sunday'))
                         : undefined
                     }
-                    onChange={(e: { target: { value: string } }) => setPick(e.target.value)}
+                    onChange={(v: string) => setPick(v)}
                   />
                   <Button
                     variant="secondary"

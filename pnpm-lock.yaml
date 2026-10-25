@@ -1754,6 +1754,9 @@ importers:
       '@eec/i18n':
         specifier: workspace:*
         version: link:../i18n
+      '@eec/ui':
+        specifier: workspace:*
+        version: link:../ui
       '@tanstack/react-query':
         specifier: 5.104.4
         version: 5.104.4(@types/react@19.3.0)(react@19.3.1)

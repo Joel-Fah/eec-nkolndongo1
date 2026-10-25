@@ -437,7 +437,7 @@
       "a11y": "Accessibilité",
       "demo": "Démonstration",
       "upcoming_title": "À documenter au fil de la construction",
-      "upcoming": "Sélecteur de date · Tableau de données · Zone de téléversement · Lecteur audio · Bandeau de saison · Cartes d’actualités et d’événements · Pagination",
+      "upcoming": "Tableau de données · Zone de téléversement · Lecteur audio · Bandeau de saison · Cartes d’actualités et d’événements · Pagination",
       "icon": {
         "name": "Icône",
         "desc": "Hugeicons à trait arrondi, rendues au moment de la construction : aucun JavaScript.",
@@ -1039,6 +1039,20 @@
         "desc": "Dans la barre du haut, une cloche (bell-ring) avec le nombre de non lues. Elle ouvre une fenêtre : Non lues / Toutes, rappels regroupés par semaine (Cette semaine, La semaine dernière, Semaine du … au …), chacun avec un lien direct vers l’écran concerné, une pastille rouge s’il n’est pas lu, une coche quand c’est fait, et une croix pour le masquer.",
         "use": "<NotificationsBell> dans la barre du haut ; chaque notification a un type (kind) et des paramètres, le texte est écrit par l’écran, jamais stocké.",
         "a11y": "Le bouton annonce le nombre de non lues ; la fenêtre est un dialogue avec titre ; chaque notification et sa croix sont des boutons de 44 px ; fermer avec Échap."
+      },
+      "datepicker": {
+        "name": "Sélecteur de date",
+        "label": "Date de l’événement",
+        "desc": "Un champ qui ouvre un calendrier de la maison au lieu de celui du navigateur : mois en toutes lettres, semaine commençant le lundi, aujourd’hui cerclé d’or, jour choisi en vert. Le titre mène aux mois puis aux années. Icône calendar-minus. Même rendu dans l’administration (React) et sur le site (popover natif, chargé seulement sur les pages qui en ont).",
+        "use": "Admin : <DateField label value onChange min max />. Site : <input type=\"date\" data-picker=\"…\"> ; l’input natif reste dans la page (formulaire sans JavaScript). Valeur = AAAA-MM-JJ.",
+        "a11y": "Chaque jour est un bouton nommé en toutes lettres ; flèches (jour, semaine), Début/Fin (semaine), Page précédente/suivante (mois, avec Maj : année), Échap ferme et rend le focus ; cibles de 40 à 44 px."
+      },
+      "timepicker": {
+        "name": "Sélecteur d’heure",
+        "label": "Heure de début",
+        "desc": "Même famille : deux colonnes, les heures et les minutes (de 5 en 5), la valeur choisie en vert. Icône time-02.",
+        "use": "Admin : <TimeField label value onChange step />. Site : <input type=\"time\" data-picker=\"…\">. Valeur = HH:mm. <DateTimeField /> assemble les deux (AAAA-MM-JJTHH:mm).",
+        "a11y": "Colonnes nommées (Heures, Minutes), boutons de 44 px, flèches haut/bas, Échap ferme."
       }
     },
     "rules": {
@@ -1638,6 +1652,23 @@
       "kind_sunday_review_p": "Des chiffres proposés qui attendent votre validation.",
       "kind_campaign_review": "Moissons à valider",
       "kind_campaign_review_p": "Des entrées de la Fête des Moissons à valider."
+    },
+    "picker": {
+      "open": "Choisir",
+      "prev": "Mois précédent",
+      "next": "Mois suivant",
+      "today": "Aujourd’hui",
+      "clear": "Effacer",
+      "choose_month": "Choisir le mois",
+      "choose_year": "Choisir l’année",
+      "prev_years": "Années précédentes",
+      "next_years": "Années suivantes",
+      "hour": "Heures",
+      "minute": "Minutes",
+      "done": "Terminé",
+      "date_ph": "25 octobre 2026",
+      "time_ph": "09:30",
+      "time": "Heure"
     }
   },
   "login": {
@@ -2411,5 +2442,21 @@
     "install": "Installer l’application",
     "install_ios": "Sur iPhone : touchez « Partager », puis « Sur l’écran d’accueil ».",
     "install_done": "Application installée"
+  },
+  "picker": {
+    "open": "Choisir",
+    "prev": "Mois précédent",
+    "next": "Mois suivant",
+    "today": "Aujourd’hui",
+    "clear": "Effacer",
+    "choose_month": "Choisir le mois",
+    "choose_year": "Choisir l’année",
+    "prev_years": "Années précédentes",
+    "next_years": "Années suivantes",
+    "hour": "Heures",
+    "minute": "Minutes",
+    "done": "Terminé",
+    "date_ph": "Choisir une date",
+    "time_ph": "Choisir une heure"
   }
 }

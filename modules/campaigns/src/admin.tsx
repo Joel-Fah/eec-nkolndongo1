@@ -2,7 +2,7 @@
  * Fête des Moissons (admin, /m/campaigns): the campaigns, the amounts received (entered by the treasurer, validated by someone
  * else: only validated totals reach the public page), and an optional goal per group, shown as encouragement.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { ConfirmDialog, CoverField } from '@eec/content-kit'
 import type { MessageKey } from '@eec/i18n'
 import {
@@ -337,15 +337,11 @@ function Amounts({ campaign, onChange }: { campaign: Campaign; onChange: () => v
                 setV((x) => ({ ...x, amount: e.target.value }))
               }
             />
-            <TextField
+            <DateField
               label={t(k('f_date'))}
-              type="date"
-              placeholder=""
               max={today()}
               value={v.date}
-              onChange={(e: { target: { value: string } }) =>
-                setV((x) => ({ ...x, date: e.target.value }))
-              }
+              onChange={(v: string) => setV((x) => ({ ...x, date: v }))}
             />
             <SelectField
               label={t(k('f_group'))}
@@ -607,21 +603,17 @@ function Form({
         {field('descriptionEn', t(k('f_desc_en')), true)}
       </div>
       <div className="reg-grid reg-grid-3">
-        <TextField
+        <DateField
           label={t(k('f_starts'))}
-          type="date"
-          placeholder=""
           value={v.startsOn}
           disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('startsOn', e.target.value)}
+          onChange={(v: string) => set('startsOn', v)}
         />
-        <TextField
+        <DateField
           label={t(k('f_ends'))}
-          type="date"
-          placeholder=""
           value={v.endsOn}
           disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) => set('endsOn', e.target.value)}
+          onChange={(v: string) => set('endsOn', v)}
         />
         <TextField
           label={t(k('f_goal'))}

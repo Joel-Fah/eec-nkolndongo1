@@ -437,7 +437,7 @@
       "a11y": "Accessibility",
       "demo": "Demo",
       "upcoming_title": "To document as we build",
-      "upcoming": "Date picker · Data table · File upload · Audio player · Season banner · News and event cards · Pagination",
+      "upcoming": "Data table · File upload · Audio player · Season banner · News and event cards · Pagination",
       "icon": {
         "name": "Icon",
         "desc": "Stroke-rounded Hugeicons, rendered at build time: no JavaScript.",
@@ -1039,6 +1039,20 @@
         "desc": "In the top bar, a bell (bell-ring) with the unread count. It opens a panel: Unread / All, reminders grouped by week (This week, Last week, Week of … to …), each with a deep link to the screen concerned, a red dot while unread, a tick once done, and a cross to hide it.",
         "use": "<NotificationsBell> in the top bar; each notification has a kind and parameters, the text is written by the screen, never stored.",
         "a11y": "The button announces the unread count; the panel is a titled dialog; every notification and its cross are 44 px buttons; Esc closes it."
+      },
+      "datepicker": {
+        "name": "Date picker",
+        "label": "Event date",
+        "desc": "A field that opens the house's own calendar instead of the browser's: month names in full, week starting on Monday, today ringed in gold, the chosen day in green. The title leads to months, then years. Calendar-minus icon. Same look in the admin (React) and on the site (native popover, loaded only on pages that have one).",
+        "use": "Admin: <DateField label value onChange min max />. Site: <input type=\"date\" data-picker=\"…\">; the native input stays in the page (the form works without JavaScript). Value = YYYY-MM-DD.",
+        "a11y": "Every day is a button named in full; arrows (day, week), Home/End (week), Page up/down (month, with Shift: year), Esc closes and returns focus; 40 to 44 px targets."
+      },
+      "timepicker": {
+        "name": "Time picker",
+        "label": "Start time",
+        "desc": "Same family: two columns, hours and minutes (every 5), the chosen value in green. Time-02 icon.",
+        "use": "Admin: <TimeField label value onChange step />. Site: <input type=\"time\" data-picker=\"…\">. Value = HH:mm. <DateTimeField /> pairs the two (YYYY-MM-DDTHH:mm).",
+        "a11y": "Named columns (Hours, Minutes), 44 px buttons, up/down arrows, Esc closes."
       }
     },
     "rules": {
@@ -1638,6 +1652,23 @@
       "kind_sunday_review_p": "Proposed figures waiting for your validation.",
       "kind_campaign_review": "Harvest entries to validate",
       "kind_campaign_review_p": "Harvest festival entries waiting for validation."
+    },
+    "picker": {
+      "open": "Choose",
+      "prev": "Previous month",
+      "next": "Next month",
+      "today": "Today",
+      "clear": "Clear",
+      "choose_month": "Choose the month",
+      "choose_year": "Choose the year",
+      "prev_years": "Earlier years",
+      "next_years": "Later years",
+      "hour": "Hours",
+      "minute": "Minutes",
+      "done": "Done",
+      "date_ph": "25 October 2026",
+      "time_ph": "09:30",
+      "time": "Time"
     }
   },
   "login": {
@@ -2411,5 +2442,21 @@
     "install": "Install the app",
     "install_ios": "On iPhone: tap “Share”, then “Add to Home Screen”.",
     "install_done": "App installed"
+  },
+  "picker": {
+    "open": "Choose",
+    "prev": "Previous month",
+    "next": "Next month",
+    "today": "Today",
+    "clear": "Clear",
+    "choose_month": "Choose the month",
+    "choose_year": "Choose the year",
+    "prev_years": "Earlier years",
+    "next_years": "Later years",
+    "hour": "Hours",
+    "minute": "Minutes",
+    "done": "Done",
+    "date_ph": "Choose a date",
+    "time_ph": "Choose a time"
   }
 }

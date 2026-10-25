@@ -3,7 +3,7 @@
  * preacher (with the consent box), series, passages, a YouTube video and links (any https address). Nothing is uploaded:
  * the site hosts no audio (decision 0034). Autosave, a plain « Publier » dialog, earlier versions and preview links.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import {
   ConfirmDialog,
   CoverField,
@@ -245,20 +245,8 @@ function List({ onOpen }: { onOpen: (id: string) => void }) {
               ]}
             />
           </div>
-          <TextField
-            label={t(k('date_from'))}
-            type="date"
-            placeholder=""
-            value={from}
-            onChange={(e: { target: { value: string } }) => setFrom(e.target.value)}
-          />
-          <TextField
-            label={t(k('date_to'))}
-            type="date"
-            placeholder=""
-            value={to}
-            onChange={(e: { target: { value: string } }) => setTo(e.target.value)}
-          />
+          <DateField label={t(k('date_from'))} value={from} onChange={(v: string) => setFrom(v)} />
+          <DateField label={t(k('date_to'))} value={to} onChange={(v: string) => setTo(v)} />
         </div>
         <div className="flex items-end gap-3">
           <ViewToggle
@@ -720,15 +708,11 @@ function Editor({ id, onBack }: { id: string; onBack: () => void }) {
 
           <div className="admin-panel grid gap-4">
             <h2 className="text-lg">{t(k('when'))}</h2>
-            <TextField
+            <DateField
               label={t(k('preached_on'))}
-              type="date"
-              placeholder=""
               value={draft.preachedOn ?? ''}
               disabled={!canEdit}
-              onChange={(e: { target: { value: string } }) =>
-                set('preachedOn', e.target.value || null)
-              }
+              onChange={(v: string) => set('preachedOn', v || null)}
             />
             <SelectField
               label={t(k('preacher'))}

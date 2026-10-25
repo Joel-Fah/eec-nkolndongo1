@@ -3,7 +3,7 @@
  * repeat), place, group, cover — with autosave, the shared publish dialog, versions, preview, duplicate, and a
  * « coming dates » panel to cancel or move one date of a repeating event.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import {
   ConfirmDialog,
   CoverField,
@@ -322,25 +322,17 @@ function List({
         </div>
         {period === 'range' && (
           <>
-            <label className="grid gap-1">
-              <span className="field-label">{t(k('from'))}</span>
-              <input
-                className="input"
-                type="date"
-                value={rangeFrom}
-                onChange={(e) => setRangeFrom(e.target.value)}
-              />
-            </label>
-            <label className="grid gap-1">
-              <span className="field-label">{t(k('until_date'))}</span>
-              <input
-                className="input"
-                type="date"
-                value={rangeTo}
-                min={rangeFrom || undefined}
-                onChange={(e) => setRangeTo(e.target.value)}
-              />
-            </label>
+            <DateField
+              label={t(k('from'))}
+              value={rangeFrom}
+              onChange={(v: string) => setRangeFrom(v)}
+            />
+            <DateField
+              label={t(k('until_date'))}
+              value={rangeTo}
+              min={rangeFrom || undefined}
+              onChange={(v: string) => setRangeTo(v)}
+            />
           </>
         )}
         <div className="media-select">
@@ -993,13 +985,13 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                   ]}
                 />
                 {endKind === 'until' && (
-                  <input
-                    className="input max-w-56"
-                    type="date"
-                    aria-label={t(k('end_until'))}
-                    value={r.until ?? ''}
-                    onChange={(e) => e.target.value && patchRec({ until: e.target.value })}
-                  />
+                  <div className="max-w-64">
+                    <DateField
+                      label={t(k('end_until'))}
+                      value={r.until ?? ''}
+                      onChange={(v: string) => v && patchRec({ until: v })}
+                    />
+                  </div>
                 )}
                 {endKind === 'count' && (
                   <label className="grid max-w-40 gap-1">

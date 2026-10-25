@@ -2,7 +2,7 @@
  * Meditations (admin, /m/meditations): the programmes, the days of a programme (a month at a time, a row each, opened in
  * place to edit), and the import of the parish's yearly calendar from a CSV, checked line by line before anything is saved.
  */
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { ConfirmDialog, RefEditor } from '@eec/content-kit'
 import {
   type BibleRef,
@@ -145,23 +145,15 @@ function Plans({ onOpen }: { onOpen: (id: string) => void }) {
             }
           />
           <div className="grid gap-3 sm:grid-cols-2">
-            <TextField
+            <DateField
               label={t(k('starts_on'))}
-              type="date"
-              placeholder=""
               value={v.startsOn}
-              onChange={(e: { target: { value: string } }) =>
-                setV((x) => ({ ...x, startsOn: e.target.value }))
-              }
+              onChange={(v: string) => setV((x) => ({ ...x, startsOn: v }))}
             />
-            <TextField
+            <DateField
               label={t(k('ends_on'))}
-              type="date"
-              placeholder=""
               value={v.endsOn}
-              onChange={(e: { target: { value: string } }) =>
-                setV((x) => ({ ...x, endsOn: e.target.value }))
-              }
+              onChange={(v: string) => setV((x) => ({ ...x, endsOn: v }))}
             />
           </div>
           <div className="flex gap-2">
@@ -369,16 +361,14 @@ function Days({ plan, canEdit }: { plan: Plan; canEdit: boolean }) {
           </div>
         )}
         {canEdit && (
-          <TextField
+          <DateField
             label={t(k('add_day'))}
-            type="date"
-            placeholder=""
             min={plan.startsOn}
             max={plan.endsOn}
             value={adding}
-            onChange={(e: { target: { value: string } }) => {
-              setAdding(e.target.value)
-              toggle(e.target.value || null)
+            onChange={(v: string) => {
+              setAdding(v)
+              toggle(v || null)
             }}
           />
         )}

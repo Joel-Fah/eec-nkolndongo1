@@ -34,6 +34,22 @@ import Section from './Section.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
+const pickerLabels = (placeholder: string) =>
+  JSON.stringify({
+    open: t('picker.open'),
+    prev: t('picker.prev'),
+    next: t('picker.next'),
+    today: t('picker.today'),
+    clear: t('picker.clear'),
+    chooseMonth: t('picker.choose_month'),
+    chooseYear: t('picker.choose_year'),
+    prevYears: t('picker.prev_years'),
+    nextYears: t('picker.next_years'),
+    hour: t('picker.hour'),
+    minute: t('picker.minute'),
+    done: t('picker.done'),
+    placeholder,
+  })
 type Id =
   | 'icon'
   | 'mark'
@@ -61,6 +77,8 @@ type Id =
   | 'marquee'
   | 'pagination'
   | 'insetfields'
+  | 'datepicker'
+  | 'timepicker'
   | 'search'
   | 'imagery'
   | 'tables'
@@ -440,6 +458,24 @@ const doc = (id: Id) => ({
       </div>
     </DocBlock>
 
+    <DocBlock {...doc('datepicker')}>
+      <div class="max-w-72">
+        <label class="field">
+          <span class="field-label">{t('brand.components.datepicker.label')}</span>
+          <input class="input" type="date" data-picker={pickerLabels(t('picker.date_ph'))} />
+        </label>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('timepicker')}>
+      <div class="max-w-72">
+        <label class="field">
+          <span class="field-label">{t('brand.components.timepicker.label')}</span>
+          <input class="input" type="time" value="09:30" data-picker={pickerLabels(t('picker.time_ph'))} />
+        </label>
+      </div>
+    </DocBlock>
+
     <DocBlock {...doc('search')}>
       <form class="grid gap-3 md:grid-cols-[1fr_auto] md:items-end" role="search" onsubmit="return false">
         <Field id="d-search" type="search" icon="search" label={t('ui.search_label')} placeholder={t('ui.search_placeholder')} />
@@ -506,6 +542,8 @@ const doc = (id: Id) => ({
 </Section>
 
 <script>
+  import { initPickers } from '@eec/ui/pickers'
+  initPickers()
   // Charts (Chart.js, loaded only when the guide's charts come into view). Colours come from the design tokens and
   // follow light/dark; animation is off with reduced motion. The same numbers are in the table below them.
   const host = document.querySelector<HTMLElement>('[data-charts]')

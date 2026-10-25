@@ -1727,3 +1727,167 @@
   opacity: 0.5;
   font-weight: 700;
 }
+
+/* ── Date and time pickers (admin): the field, the calendar, the hour and minute columns ───── */
+@layer components {
+  .picker-trigger {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 2.75rem;
+    text-align: start;
+    cursor: pointer;
+  }
+  .picker-trigger[data-empty] {
+    color: var(--ink-muted);
+  }
+  .picker-trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .picker-pop {
+    width: min(92vw, 19rem);
+    padding: 0.75rem;
+  }
+  .picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .picker-nav {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    color: var(--ink-muted);
+  }
+  .picker-nav:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+  .picker-title {
+    flex: 1;
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-size: var(--text-lg, 1.125rem);
+    text-transform: capitalize;
+  }
+  .picker-title:hover {
+    background: var(--surface-2);
+  }
+  .picker-week,
+  .picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .picker-week span {
+    display: grid;
+    place-items: center;
+    height: 2rem;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .picker-day {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    min-height: 2.5rem;
+    border-radius: var(--radius-md);
+    font-variant-numeric: tabular-nums;
+  }
+  .picker-day:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .picker-day[data-out-month] {
+    color: var(--ink-muted);
+    opacity: 0.55;
+  }
+  .picker-day[data-today] {
+    box-shadow: inset 0 0 0 1.5px var(--gold);
+  }
+  .picker-day[aria-selected="true"] {
+    background: var(--primary);
+    color: var(--bg);
+    opacity: 1;
+  }
+  .picker-day:disabled,
+  .picker-cell:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+  }
+  .picker-cells {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+  .picker-cell {
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    font-variant-numeric: tabular-nums;
+    text-transform: capitalize;
+  }
+  .picker-cell:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .picker-cell[aria-pressed="true"],
+  .picker-cell[aria-selected="true"] {
+    background: var(--primary);
+    color: var(--bg);
+  }
+  .picker-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .picker-link {
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-md);
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .picker-link:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .picker-link:disabled {
+    opacity: 0.4;
+  }
+  .picker-time {
+    width: min(92vw, 15rem);
+  }
+  .picker-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .picker-col {
+    display: grid;
+    align-content: start;
+    gap: 0.125rem;
+    max-height: 14rem;
+    overflow-y: auto;
+  }
+  .picker-col legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .picker-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+}

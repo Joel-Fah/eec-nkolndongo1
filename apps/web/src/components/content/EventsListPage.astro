@@ -79,6 +79,23 @@ const groups = [
 ]
 
 const label = (key: string) => t(`events.site.${key}` as 'events.site.today')
+const pickerLabels = (placeholder: string) =>
+  JSON.stringify({
+    open: t('picker.open'),
+    prev: t('picker.prev'),
+    next: t('picker.next'),
+    today: t('picker.today'),
+    clear: t('picker.clear'),
+    chooseMonth: t('picker.choose_month'),
+    chooseYear: t('picker.choose_year'),
+    prevYears: t('picker.prev_years'),
+    nextYears: t('picker.next_years'),
+    hour: t('picker.hour'),
+    minute: t('picker.minute'),
+    done: t('picker.done'),
+    placeholder,
+  })
+
 const link = (extra: Record<string, string | null>) => {
   const p = new URLSearchParams()
   const merged: Record<string, string | null> = {
@@ -186,8 +203,8 @@ Astro.response.headers.set(
       <form class="ev-range" data-live-form method="get" action={eventsListHref(locale)}>
         <input type="hidden" name="periode" value="dates" />
         {group && <input type="hidden" name="groupe" value={group} />}
-        <label><span>{label('range_from')}</span><input type="date" name="du" value={rangeFrom} /></label>
-        <label><span>{label('range_to')}</span><input type="date" name="au" value={rangeTo} min={rangeFrom || undefined} /></label>
+        <label><span>{label('range_from')}</span><input type="date" name="du" value={rangeFrom} data-picker={pickerLabels(t('picker.date_ph'))} /></label>
+        <label><span>{label('range_to')}</span><input type="date" name="au" value={rangeTo} min={rangeFrom || undefined} data-picker={pickerLabels(t('picker.date_ph'))} /></label>
         <Button type="submit" variant="secondary">{label('range_apply')}</Button>
       </form>
     )}
@@ -300,7 +317,9 @@ Astro.response.headers.set(
 </Site>
 
 <script>
+  import { initPickers } from '@eec/ui/pickers'
   import { initLiveNav } from '../../scripts/live-nav'
+  initPickers()
   initLiveNav()
   document.addEventListener('astro:page-load', initLiveNav)
 </script>
@@ -364,12 +383,7 @@ Astro.response.headers.set(
     font-size: var(--text-sm);
     font-weight: 600;
   }
-  .ev-range input[type='date'] {
-    min-height: 2.75rem;
-    padding-inline: 0.75rem;
-    border-radius: var(--radius-md);
-    background: var(--surface);
-    box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  .ev-range :global(.picker-trigger) {
     font-weight: 400;
   }
   .ev-layout {

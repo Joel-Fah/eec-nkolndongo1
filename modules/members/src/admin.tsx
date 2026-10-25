@@ -3,7 +3,7 @@
  * Names and contacts are personal data: this screen needs `members:read`, the export `members:export`.
  */
 import { Dialog } from '@base-ui/react/dialog'
-import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
+import { api, DateField, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import { shortDate } from '@eec/core'
 import type { MessageKey } from '@eec/i18n'
 import { Avatar, Badge, Button, SelectField, TextField, toastManager } from '@eec/ui/react'
@@ -132,13 +132,7 @@ export default function MembersPage() {
             { value: 'deactivated', label: t(k('status_deactivated')) },
           ]}
         />
-        <TextField
-          label={t(k('since'))}
-          placeholder="2026-01-01"
-          type="date"
-          value={since}
-          onChange={(e: { target: { value: string } }) => setSince(e.target.value)}
-        />
+        <DateField label={t(k('since'))} value={since} onChange={(v: string) => setSince(v)} />
       </div>
 
       {list.isPending ? (
