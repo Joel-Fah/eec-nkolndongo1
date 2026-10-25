@@ -110,8 +110,8 @@ export const consents = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    /** privacy (required to hold an account) | news (optional, parish news later) */
-    kind: text('kind', { enum: ['privacy', 'news'] }).notNull(),
+    /** privacy (required to hold an account) | news (optional, parish news later) | profile (optional details and photo, 0047) */
+    kind: text('kind', { enum: ['privacy', 'news', 'profile'] }).notNull(),
     policyVersion: text('policy_version').notNull(),
     grantedAt: tz('granted_at').notNull().defaultNow(),
     withdrawnAt: tz('withdrawn_at'),

@@ -1,6 +1,15 @@
 /** Roles, permissions, groups and who has what (decision 0005; Phase 02 §5.1). */
 import { sql } from 'drizzle-orm'
-import { boolean, index, pgTable, primaryKey, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  date,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { createdAt, id, timestamps, tz } from '../columns.ts'
 import { user } from './auth.ts'
 
@@ -20,6 +29,22 @@ export const profiles = pgTable('profiles', {
   status: text('status', { enum: ['active', 'invited', 'deactivated'] })
     .notNull()
     .default('active'),
+  /**
+   * Optional details a member chose to add (decision 0047). Only ever filled while the `profile` consent is active; withdrawing
+   * the consent clears them all. Staff see an age band, never `birthDate`.
+   */
+  birthDate: date('birth_date', { mode: 'string' }),
+  gender: text('gender', { enum: ['woman', 'man'] }),
+  neighbourhood: text('neighbourhood'),
+  city: text('city'),
+  maritalStatus: text('marital_status', { enum: ['single', 'married', 'widowed', 'divorced'] }),
+  profession: text('profession'),
+  /** A private object (never a public media key); who may see it is `photoLevel`. */
+  photoKey: text('photo_key'),
+  photoLevel: text('photo_level', { enum: ['private', 'staff'] })
+    .notNull()
+    .default('private'),
+  photoUpdatedAt: tz('photo_updated_at'),
   lastSeenAt: tz('last_seen_at'),
   /** Set when the person asked to delete their account (30-day grace, then purged). */
   deletionRequestedAt: tz('deletion_requested_at'),
