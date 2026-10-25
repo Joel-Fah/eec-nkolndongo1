@@ -280,7 +280,7 @@ function Meter({
   change,
 }: {
   tone: 'men' | 'women' | 'children' | 'money'
-  icon?: 'male' | 'female' | 'baby' | 'gift'
+  icon?: 'male' | 'female' | 'baby' | 'money'
   label: string
   value: string
   ratio: number
