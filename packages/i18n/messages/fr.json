@@ -662,8 +662,8 @@
       },
       "langfallback": {
         "name": "Note de langue",
-        "desc": "Quand un texte n’existe pas encore en anglais, la version française s’affiche, avec cette note au-dessus du titre.",
-        "use": "<LangFallbackNote /> quand l’API renvoie fallback = true.",
+        "desc": "Quand un texte n’existe pas encore en anglais, la version française s’affiche, avec cette note au-dessus du titre. Elle commence par l’icône de traduction (translation) dans une pastille dorée ; la même icône marque les cartes « à traduire » de l’écran À faire.",
+        "use": "<LangFallbackNote /> quand l’API renvoie fallback = true ; icône `translation`.",
         "a11y": "role=note, contraste vérifié dans les deux thèmes."
       },
       "editor": {

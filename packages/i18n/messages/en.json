@@ -662,8 +662,8 @@
       },
       "langfallback": {
         "name": "Language note",
-        "desc": "When a text does not exist in English yet, the French version is shown with this note above the title.",
-        "use": "<LangFallbackNote /> when the API returns fallback = true.",
+        "desc": "When a text does not exist in English yet, the French version shows with this note above the title. It starts with the translation icon in a gold chip; the same icon marks the “to translate” cards of the To do screen.",
+        "use": "<LangFallbackNote /> when the API returns fallback = true; `translation` icon.",
         "a11y": "role=note, contrast checked in both themes."
       },
       "editor": {

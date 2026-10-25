@@ -99,7 +99,14 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
             <h1 class="bl-title">{b.title || s('title')}</h1>
             <p class="bl-week">{fmt(b.weekOf)}</p>
           </header>
-          {anyFallback && <p class="bl-note bl-noprint">{s('fallback')}</p>}
+          {anyFallback && (
+            <p class="bl-note bl-noprint">
+              <span class="bl-note-ico" aria-hidden="true">
+                <Icon name="translation" size={20} />
+              </span>
+              <span>{s('fallback')}</span>
+            </p>
+          )}
           <div class="bl-blocks">
             {
               b.blocks.map((blk) => (
@@ -196,10 +203,23 @@ const anyFallback = !!b?.blocks.some((x) => x.items.some((i) => i.fallback))
     text-transform: capitalize;
   }
   .bl-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
     padding: 0.625rem 0.875rem;
     border-radius: var(--radius-md);
     background: var(--surface-2);
     font-size: var(--text-sm);
+  }
+  .bl-note-ico {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--gold) 28%, transparent);
+    color: var(--gold-ink, var(--ink));
   }
   .bl-blocks {
     display: grid;
