@@ -1,6 +1,16 @@
 /** Platform tables: audit log, invitations/reset links, mail outbox, rate limits, feature flags. */
 import { sql } from 'drizzle-orm'
-import { bigint, boolean, index, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { createdAt, id, tz, updatedAt } from '../columns.ts'
 import { user } from './auth.ts'
 
@@ -165,3 +175,31 @@ export const systemMarks = pgTable('system_marks', {
   at: tz('at').notNull().defaultNow(),
   note: text('note').notNull().default(''),
 })
+
+/**
+ * In-app notifications (decision 0044): one row per person and per thing to do. `kind` + `params` are labelled on screen
+ * (never stored as text), `href` is the deep link, `weekOf` (the Monday) groups them. `ref` makes a notification unique per
+ * person so it is never created twice; `resolvedAt` is set when the thing is done, `dismissedAt` when the person hides it.
+ */
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    ref: text('ref').notNull(),
+    params: jsonb('params').notNull().default({}),
+    href: text('href').notNull(),
+    weekOf: text('week_of').notNull(),
+    readAt: tz('read_at'),
+    resolvedAt: tz('resolved_at'),
+    dismissedAt: tz('dismissed_at'),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('notifications_ref_idx').on(t.userId, t.kind, t.ref),
+    index('notifications_user_idx').on(t.userId, t.createdAt),
+  ],
+)

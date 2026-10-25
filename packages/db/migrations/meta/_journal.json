@@ -218,6 +218,13 @@
       "when": 1792897912376,
       "tag": "0030_confused_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792911161774,
+      "tag": "0031_real_firebrand",
+      "breakpoints": true
     }
   ]
 }
