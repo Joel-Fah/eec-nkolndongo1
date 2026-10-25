@@ -89,6 +89,8 @@ async function load(db: Db, userId: string) {
       photoLevel: profiles.photoLevel,
       photoUpdatedAt: profiles.photoUpdatedAt,
       createdAt: user.createdAt,
+      // The picture Google gave at sign-in, if any: it counts as the person's photo until they choose another (decision 0047).
+      image: user.image,
     })
     .from(profiles)
     .innerJoin(user, eq(user.id, profiles.userId))
@@ -104,7 +106,7 @@ async function load(db: Db, userId: string) {
         profession: row.profession,
       }
     : emptyDetails()
-  const hasPhoto = !!row?.photoKey
+  const hasPhoto = !!row?.photoKey || !!row?.image
   const completeness: Completeness = profileCompleteness(details, consent, hasPhoto)
   return { row, consent, details, hasPhoto, completeness }
 }
@@ -123,8 +125,12 @@ export const profileRoutes = new Hono<AppEnv>()
       seed: avatarSeed(actor.userId),
       incomplete: !completeness.complete,
       // The photo shows in the navbar only if its owner shared it; otherwise the generated avatar does.
-      photo: !!row?.photoKey && row.photoLevel === 'staff',
-      photoV: row?.photoUpdatedAt?.getTime() ?? 0,
+      photo:
+        row?.photoLevel === 'staff'
+          ? row.photoKey
+            ? `/api/me/photo?v=${row.photoUpdatedAt?.getTime() ?? 0}`
+            : (row.image ?? null)
+          : null,
     })
   })
   .get('/profile', requireSelf(), async (c) => {
@@ -138,8 +144,13 @@ export const profileRoutes = new Hono<AppEnv>()
       details,
       photo: {
         has: hasPhoto,
+        // Where it comes from: a picture the person uploaded, or the one Google gave (kept until they choose another).
+        source: row?.photoKey ? 'upload' : row?.image ? 'google' : null,
+        googleAvailable: !!row?.image,
+        url: row?.photoKey
+          ? `/api/me/photo?v=${row.photoUpdatedAt?.getTime() ?? 0}`
+          : (row?.image ?? null),
         level: row?.photoLevel ?? 'private',
-        v: row?.photoUpdatedAt?.getTime() ?? 0,
       },
       completeness,
       memberCode: memberCode(actor.userId),
@@ -253,6 +264,7 @@ export const profileRoutes = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
+  // Deletes the uploaded picture (the Google one, if there is one, shows again); with no upload, it removes the Google one from the account.
   .delete('/photo', requireSelf(), async (c) => {
     const actor = await c.var.deps.actor()
     if (!actor) return fail(c, 401, 'unauthenticated')
@@ -261,14 +273,21 @@ export const profileRoutes = new Hono<AppEnv>()
       .select({ key: profiles.photoKey })
       .from(profiles)
       .where(eq(profiles.userId, actor.userId))
-    await db
-      .update(profiles)
-      .set({ photoKey: null, photoLevel: 'private', photoUpdatedAt: null })
-      .where(eq(profiles.userId, actor.userId))
-    if (cur?.key)
+    if (cur?.key) {
+      await db
+        .update(profiles)
+        .set({ photoKey: null, photoUpdatedAt: null })
+        .where(eq(profiles.userId, actor.userId))
       await createPrivateStore(c.env)
         .delete(cur.key)
         .catch(() => {})
+    } else {
+      await db.update(user).set({ image: null }).where(eq(user.id, actor.userId))
+      await db
+        .update(profiles)
+        .set({ photoLevel: 'private' })
+        .where(eq(profiles.userId, actor.userId))
+    }
     await audit(c, {
       action: 'delete',
       entityType: 'account',

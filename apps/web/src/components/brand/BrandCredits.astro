@@ -1,10 +1,16 @@
 ---
+/**
+ * The credits, as the end of a film: the dark screen, a narrator's few lines, the lead role, the cast list in two columns, the usual
+ * little joke, then « to be continued ». Warm and a little rueful, the site's own voice. Everything is plain text, readable at once; a
+ * small script only lets the lines arrive one after another when the visitor has not asked for less motion.
+ */
 import Icon from '@eec/ui/astro/Icon.astro'
 import { localeOf, useT } from '../../lib/i18n'
 import Section from './Section.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
+const c = (key: string) => t(`brand.credits.${key}` as 'brand.credits.title')
 const links = [
   { icon: 'github', label: 'GitHub', handle: 'Joel-Fah', href: 'https://github.com/Joel-Fah' },
   { icon: 'xTwitter', label: 'X', handle: '@FahDejon', href: 'https://x.com/FahDejon' },
@@ -21,72 +27,240 @@ const links = [
     href: 'https://www.linkedin.com/in/joelfah',
   },
 ] as const
+const cast = [
+  ['role_all', 'who_all'],
+  ['role_fonts', 'who_fonts'],
+  ['role_illos', 'who_illos'],
+  ['role_icons', 'who_icons'],
+  ['role_photos', 'who_photos'],
+  ['role_bugs', 'who_bugs'],
+  ['role_parish', 'who_parish'],
+] as const
 const photo = `/${locale === 'fr' ? 'credits-photos' : 'photo-credits'}/`
 ---
 
-<Section id="credits" title={t('brand.credits.title')} lead={t('brand.credits.lead')}>
-  <div class="cr-card">
-    <img class="cr-photo" src="/brand/credits/joel.webp" width="120" height="120" alt={t('brand.credits.photo_alt')} loading="lazy" decoding="async" />
-    <div class="grid gap-3">
-      <div class="grid gap-1">
-        <h3 class="text-2xl">Joël Fah</h3>
-        <p class="text-ink-muted">{t('brand.credits.role')}</p>
-      </div>
-      <p class="max-w-[60ch]">{t('brand.credits.thanks')}</p>
+<Section id="credits" title={c('title')} lead={c('lead')}>
+  <div class="cr-stage" data-credits>
+    <p class="cr-kicker cr-line">{c('kicker')}</p>
+
+    <div class="cr-voice cr-line">
+      <p>{c('voice_1')}</p>
+      <p>{c('voice_2')}</p>
+      <p class="cr-voice-last">{c('voice_3')}</p>
+    </div>
+
+    <div class="cr-lead cr-line">
+      <p class="cr-role">{c('lead_role')}</p>
+      <img class="cr-photo" src="/brand/credits/joel.webp" width="120" height="120" alt={c('photo_alt')} loading="lazy" decoding="async" />
+      <p class="cr-name">Joël Fah</p>
+      <p class="cr-sub">{c('lead_sub')}</p>
       <ul class="cr-links">
         {
           links.map((l) => (
             <li>
-              <a class="btn btn-secondary" href={l.href} target="_blank" rel="noopener noreferrer">
+              <a href={l.href} target="_blank" rel="noopener noreferrer">
                 <Icon name={l.icon} size={20} />
                 <span>{l.label}</span>
-                <span class="text-ink-muted">{l.handle}</span>
+                <span class="cr-handle">{l.handle}</span>
               </a>
             </li>
           ))
         }
       </ul>
     </div>
-  </div>
-  <div class="grid gap-2">
-    <h3 class="text-xl">{t('brand.credits.also')}</h3>
-    <ul class="grid list-disc gap-2 ps-5 text-ink-muted">
-      <li>{t('brand.credits.also_fonts')}</li>
-      <li>{t('brand.credits.also_illos')}</li>
-      <li>{t('brand.credits.also_icons')}</li>
-      <li><a class="underline" href={photo}>{t('brand.credits.also_photos')}</a></li>
-    </ul>
+
+    <dl class="cr-cast">
+      {
+        cast.map(([role, who]) => (
+          <div class="cr-line">
+            <dt>{c(role)}</dt>
+            <dd>{who === 'who_photos' ? <a href={photo}>{c(who)}</a> : c(who)}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="cr-fine cr-line">{c('fine')}</p>
+
+    <div class="cr-end cr-line">
+      <p class="cr-end-t">{c('end_t')}</p>
+      <p class="cr-end-p">{c('end_p')}</p>
+    </div>
   </div>
 </Section>
 
-<style>
-  .cr-card {
+<style is:global>
+  .cr-stage {
     display: grid;
-    gap: 1.5rem;
-    align-items: start;
-    padding: 1.5rem;
+    gap: 3.5rem;
+    justify-items: center;
+    padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem);
     border-radius: var(--radius-xl);
-    background: var(--surface);
-    box-shadow: var(--elevation-1);
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, color-mix(in oklab, var(--gold) 16%, transparent), transparent),
+      var(--ink);
+    color: var(--bg);
+    text-align: center;
   }
-  @media (min-width: 40rem) {
-    .cr-card {
-      grid-template-columns: auto 1fr;
-    }
+  .cr-kicker {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .cr-voice {
+    display: grid;
+    gap: 1rem;
+    max-width: 38rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.5;
+    font-style: italic;
+    opacity: 0.92;
+  }
+  .cr-voice-last {
+    color: var(--gold);
+  }
+  .cr-lead {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+  }
+  .cr-role {
+    font-size: var(--text-sm);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.7;
   }
   .cr-photo {
     width: 7.5rem;
     height: 7.5rem;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--gold);
+    box-shadow: 0 0 0 3px var(--ink), 0 0 0 5px var(--gold);
+  }
+  .cr-name {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 6vw, 3.5rem);
+    line-height: 1;
+  }
+  .cr-sub {
+    max-width: 30rem;
+    opacity: 0.8;
   }
   .cr-links {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
-    list-style: none;
-    margin: 0;
+    margin: 0.5rem 0 0;
     padding: 0;
+    list-style: none;
+  }
+  .cr-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--bg) 10%, transparent);
+    color: var(--bg);
+    text-decoration: none;
+    transition: background var(--duration-ui) var(--ease-out);
+  }
+  .cr-links a:hover {
+    background: color-mix(in oklab, var(--bg) 20%, transparent);
+  }
+  .cr-handle {
+    opacity: 0.7;
+  }
+  .cr-cast {
+    display: grid;
+    gap: 1.25rem;
+    width: min(100%, 40rem);
+    margin: 0;
+  }
+  .cr-cast > div {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .cr-cast dt {
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .cr-cast dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+  }
+  .cr-cast a {
+    color: var(--bg);
+    text-underline-offset: 0.25em;
+  }
+  @media (min-width: 40rem) {
+    .cr-cast > div {
+      grid-template-columns: 1fr 1fr;
+      align-items: baseline;
+      gap: 1.5rem;
+    }
+    .cr-cast dt {
+      text-align: end;
+    }
+    .cr-cast dd {
+      text-align: start;
+    }
+  }
+  .cr-fine {
+    max-width: 32rem;
+    font-size: var(--text-sm);
+    font-style: italic;
+    opacity: 0.65;
+  }
+  .cr-end {
+    display: grid;
+    gap: 0.5rem;
+    padding-block-start: 1rem;
+  }
+  .cr-end-t {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--gold);
+  }
+  .cr-end-p {
+    opacity: 0.8;
+  }
+  /* The lines arrive one after another, only for someone who has not asked for less motion. */
+  .cr-stage[data-reveal] .cr-line {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.8s var(--ease-out),
+      transform 0.8s var(--ease-out);
+  }
+  .cr-stage[data-reveal] .cr-line[data-in] {
+    opacity: 1;
+    transform: none;
   }
 </style>
+
+<script>
+  const stage = document.querySelector<HTMLElement>('[data-credits]')
+  if (stage && !matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    stage.setAttribute('data-reveal', '')
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting) {
+            e.target.setAttribute('data-in', '')
+            io.unobserve(e.target)
+          }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    )
+    for (const el of stage.querySelectorAll('.cr-line')) io.observe(el)
+  }
+</script>

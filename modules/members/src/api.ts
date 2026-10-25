@@ -57,18 +57,27 @@ const detailCols = {
   profession: profiles.profession,
   photoKey: profiles.photoKey,
   photoLevel: profiles.photoLevel,
+  image: user.image,
 }
 const todayLocal = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 /** Strip the raw birth date and the photo key; say only whether staff may open the picture. */
-function safe<T extends { birthDate: string | null; photoKey: string | null; photoLevel: string }>(
-  r: T,
-) {
-  const { birthDate, photoKey, photoLevel, ...rest } = r
+function safe<
+  T extends {
+    id: string
+    birthDate: string | null
+    photoKey: string | null
+    photoLevel: string
+    image: string | null
+  },
+>(r: T) {
+  const { birthDate, photoKey, photoLevel, image, ...rest } = r
   return {
     ...rest,
     ageBand: ageBand(birthDate, todayLocal()),
-    photo: !!photoKey && photoLevel === 'staff',
+    // A picture is shown to staff only when its owner chose the staff level: the uploaded one through our private route, the Google one by its address.
+    photoUrl:
+      photoLevel === 'staff' ? (photoKey ? `/api/members/${r.id}/photo` : (image ?? null)) : null,
   }
 }
 

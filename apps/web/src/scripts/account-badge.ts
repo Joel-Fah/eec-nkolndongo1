@@ -4,7 +4,7 @@
  * cached public HTML and knows nothing about the visitor, so this asks `/api/me/badge` (private, never cached) and keeps the answer
  * for five minutes in this tab. Signed out: nothing changes. Mon espace clears the saved answer when the profile changes.
  */
-import { identiconSvg } from '@eec/ui/identicon'
+import { avatarSvg } from '@eec/ui/avatar-art'
 
 type Badge = {
   signedIn: boolean
@@ -50,13 +50,17 @@ export async function initAccountBadge() {
     if (link.dataset.badged) continue
     link.dataset.badged = '1'
     const icon = link.querySelector<HTMLElement>('[data-account-icon]')
+    const identiconFallback = avatarSvg(b.seed ?? 0)
     if (icon) {
       const wrap = document.createElement('span')
       wrap.className = 'nav-avatar'
       wrap.setAttribute('aria-hidden', 'true')
       wrap.innerHTML = b.photo
-        ? `<img src="/api/me/photo?v=${b.photoV ?? 0}" alt="" width="28" height="28" decoding="async">`
-        : identiconSvg(b.seed ?? 0)
+        ? `<img src="${b.photo}" alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer">`
+        : avatarSvg(b.seed ?? 0)
+      wrap.querySelector('img')?.addEventListener('error', () => {
+        wrap.innerHTML = identiconFallback
+      })
       icon.replaceWith(wrap)
     }
     if (b.incomplete) {

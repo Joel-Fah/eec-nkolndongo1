@@ -19,7 +19,7 @@
     "./react": "./react/index.tsx",
     "./pickers": "./src/pickers.ts",
     "./abstract-art": "./src/abstract-art.ts",
-    "./identicon": "./src/identicon.ts"
+    "./avatar-art": "./src/avatar-art.ts"
   },
   "scripts": {
     "build": "node ../../scripts/fonts-fetch.ts && node ../../scripts/illos-fetch.ts",

@@ -13,3 +13,9 @@
 9. **Retention:** with the account; included in « my data » (JSON copy) and removed with the account after the 30-day grace period.
 **Consequences:** migration 0034 (additive: columns on `profiles`, consent kind `profile`); API on `/api/me`; `modules/members` shows age band and place to staff with `members:read`, the photo only at the *staff* level; `docs/legal/data-protection.md` and `modules/members/README.md` updated; decision 0031's pattern (who decides what leaves, audited) applies. **Production:** migration 0034 and the policy-version notice are Joël's steps.
 **Not now:** a downloadable or shareable card, a public member directory, any use of the details for decisions about a person.
+
+**Amended 2026-10-25 (Joël's review):**
+- **A Google photo counts.** People who sign in with Google already have the picture Google gave; it is their photo until they choose another (the completeness card no longer asks for one). They can keep it, upload a different one, or remove it, and the visibility level (only me / staff who manage members) applies to either. The Google picture is not copied into our storage; a picture that cannot load gives way to the generated avatar.
+- **The generated avatar is our own drawing**, not a GitHub-style grid: a soft tint of one of our tones, translucent circles, a ring, a dotted arc and a low wave. It is square and fills its frame (rounded square in the public header, circle in the admin bar), never a circle inside a circle.
+- **The warning mark** uses the warning background, not red.
+- **The member card is the communion card.** The « Carte de Sainte-Cène » that was announced and this member card are one object: the card built here will carry the communion function when that phase comes. The separate « soon » tile is removed.

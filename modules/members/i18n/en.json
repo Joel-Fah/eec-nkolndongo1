@@ -43,7 +43,15 @@
     "place": "Neighbourhood, city",
     "marital": "Marital status",
     "profession": "Profession",
-    "kind_profile": "Full profile"
+    "kind_profile": "Full profile",
+    "contact": "Contact",
+    "language": "Language",
+    "profile": "Profile",
+    "profile_empty": "This person has not completed their profile yet.",
+    "journey": "Journey",
+    "deleting": "Deletion requested",
+    "state_on": "Active",
+    "state_off": "Withdrawn"
   },
   "err": {
     "generic": "Something went wrong.",

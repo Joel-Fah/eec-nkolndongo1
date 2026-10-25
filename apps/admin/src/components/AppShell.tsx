@@ -1,6 +1,6 @@
 import { Menu } from '@base-ui/react/menu'
 import { api, useLocale, useMe, useSessionActions } from '@eec/admin-kit'
-import { identiconSvg } from '@eec/ui/identicon'
+import { avatarSvg } from '@eec/ui/avatar-art'
 import { useQuery } from '@tanstack/react-query'
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
@@ -37,8 +37,7 @@ export function AppShell() {
         signedIn: boolean
         seed?: number
         incomplete?: boolean
-        photo?: boolean
-        photoV?: number
+        photo?: string | null
       }>('/me/badge'),
     staleTime: 5 * 60_000,
     enabled: !!me,
@@ -158,17 +157,13 @@ export function AppShell() {
               >
                 {b?.signedIn ? (
                   b.photo ? (
-                    <img
-                      className="admin-avatar-img"
-                      src={`/api/me/photo?v=${b.photoV ?? 0}`}
-                      alt=""
-                    />
+                    <img className="admin-avatar-img" src={b.photo} alt="" />
                   ) : (
                     <span
                       className="admin-avatar-img"
                       aria-hidden="true"
                       // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
-                      dangerouslySetInnerHTML={{ __html: identiconSvg(b.seed ?? 0) }}
+                      dangerouslySetInnerHTML={{ __html: avatarSvg(b.seed ?? 0) }}
                     />
                   )
                 ) : (

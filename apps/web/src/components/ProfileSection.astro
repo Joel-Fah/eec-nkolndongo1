@@ -41,6 +41,9 @@ const messages = {
   photoSaved: p('photo_saved'),
   photoErr: p('photo_err'),
   levelSaved: p('level_saved'),
+  srcGoogle: p('photo_google'),
+  srcUpload: p('photo_upload'),
+  srcNone: p('photo_generated'),
   consentNeed: p('consent_need'),
 }
 const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
@@ -74,7 +77,7 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
   </section>
 
   <details class="acct-panel" data-panel="fullprofile">
-    <summary>{p('panel')}</summary>
+    <summary><span>{p('panel')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
     <div class="acct-fields">
       <!-- Without consent: what and why, then one unticked box -->
       <form data-pf-consent hidden class="acct-fields" novalidate>
@@ -107,7 +110,8 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
           <div><Button type="submit" variant="secondary">{p('btn_save')}</Button></div>
         </form>
 
-        <div class="pf-photo">
+      </div>
+        <div class="pf-photo" data-pf-photo hidden>
           <p class="font-semibold">{p('photo_t')}</p>
           <p class="text-sm text-ink-muted">{p('photo_p')}</p>
           <div class="pf-photo-row">
@@ -116,9 +120,9 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
               <input type="file" accept="image/*" hidden data-pf-file />
               <div class="acct-row">
                 <Button variant="secondary" data-pf-choose><Icon name="imageUp" size={20} />{p('photo_choose')}</Button>
-                <Button variant="ghost" data-pf-remove hidden>{p('photo_remove')}</Button>
+                <Button variant="ghost" data-pf-remove hidden data-label-delete={p('photo_remove')} data-label-back={p('photo_back_google')}>{p('photo_remove')}</Button>
               </div>
-              <p class="text-sm text-ink-muted" data-pf-generated>{p('photo_generated')}</p>
+              <p class="text-sm text-ink-muted" data-pf-source></p>
             </div>
           </div>
           <fieldset class="pf-level" data-pf-level hidden>
@@ -128,11 +132,10 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
           </fieldset>
         </div>
 
-        <div class="pf-withdraw">
+        <div class="pf-withdraw" data-pf-withdraw-zone hidden>
           <Button variant="ghost" data-pf-withdraw>{p('withdraw')}</Button>
           <p class="text-sm text-ink-muted">{p('withdraw_help')}</p>
         </div>
-      </div>
     </div>
   </details>
 </div>
@@ -236,7 +239,7 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
     width: 5rem;
     height: 5rem;
     overflow: hidden;
-    border-radius: 50%;
+    border-radius: var(--radius-lg);
     box-shadow: 0 0 0 1.5px var(--line-strong);
   }
   .pf-photo-preview > svg,

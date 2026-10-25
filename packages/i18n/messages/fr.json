@@ -1059,8 +1059,8 @@
       },
       "identicon": {
         "name": "Avatar généré",
-        "desc": "Pour quelqu’un sans photo (ou dont la photo est privée) : une grille symétrique de 5 × 5 cases arrondies dans l’une de nos couleurs, sur un fond teinté. Toujours la même pour la même personne ; la couleur suit le thème.",
-        "use": "identiconSvg(graine) dans @eec/ui/identicon ; la graine vient de avatarSeed(idCompte) dans @eec/core. Arrondi par CSS (border-radius: 50 %).",
+        "desc": "Pour quelqu’un sans photo (ou dont la photo est privée) : une petite composition à notre manière — un fond teinté, de grands cercles translucides, un anneau, un arc pointillé et une vague basse, dans nos couleurs. Toujours la même pour la même personne ; la couleur suit le thème. Le dessin est carré et remplit son cadre : c’est le cadre (carré arrondi dans l’en-tête, cercle dans l’administration) qui donne la forme.",
+        "use": "avatarSvg(graine) dans @eec/ui/avatar-art ; la graine vient de avatarSeed(idCompte) dans @eec/core.",
         "a11y": "Décoratif (aria-hidden) : le nom de la personne est toujours à côté."
       },
       "membercard": {
@@ -1071,7 +1071,7 @@
       },
       "profilebadge": {
         "name": "Avatar du compte et marque d’alerte",
-        "desc": "Dans la barre du haut, le bouton du compte montre l’avatar de la personne ; tant que son profil est incomplet, une pastille rouge à point d’exclamation s’y ajoute (aussi dans l’administration, car l’équipe fait aussi partie de la communauté). On avertit, on ne bloque jamais.",
+        "desc": "Dans la barre du haut, le bouton du compte montre l’avatar de la personne ; tant que son profil est incomplet, une pastille d’alerte (fond d’avertissement, point d’exclamation) s’y ajoute (aussi dans l’administration, car l’équipe fait aussi partie de la communauté). On avertit, on ne bloque jamais.",
         "use": "Site : scripts/account-badge.ts (demande /api/me/badge, gardé 5 minutes). Admin : AppShell. Classes .nav-avatar et .acct-badge.",
         "a11y": "Le libellé du bouton dit que le profil est à compléter ; la pastille est décorative (aria-hidden)."
       }
@@ -1153,35 +1153,51 @@
     },
     "social": {
       "title": "Kit des réseaux sociaux",
-      "lead": "Des bannières et des photos de profil prêtes à poser sur nos pages, à la taille de chaque plateforme. Elles ne portent que le logo et le nom de la paroisse.",
+      "lead": "Des bannières et des photos de profil pour nos pages, à la taille de chaque plateforme. Ici, c’est l’art qui parle : des rubans de lumière, loin des cercles du reste du site. Le logo se contente d’un coin.",
       "banners": "Bannières de couverture",
-      "banners_p": "Dessinées à partir de nos bannières abstraites. Le cadre pointillé montre la zone sûre : rien d’important ne doit en sortir, car les téléphones recadrent les côtés et la photo de profil recouvre un coin.",
-      "banner_alt": "Bannière de couverture, logo et nom de la paroisse",
+      "banners_p": "Des rubans d’or, d’argile et de crème qui glissent sur le vert profond de la paroisse. Le logo et le nom restent dans un coin, à l’intérieur de la bande que tous les téléphones affichent.",
+      "banner_alt": "Bannière de couverture : rubans de lumière, logo et nom de la paroisse",
       "download": "Télécharger",
-      "note_fb": "Facebook rogne les côtés sur téléphone et la photo de profil recouvre le coin en bas à gauche : tout est au centre.",
-      "note_x": "X recadre le haut et le bas selon l’écran et la photo de profil recouvre le coin en bas à gauche : tout est au centre.",
-      "note_yt": "YouTube affiche toute l’image sur télévision mais seulement la bande centrale sur téléphone : le logo et le nom sont dans cette bande.",
+      "note_fb": "Facebook rogne les côtés sur téléphone : le logo reste à droite, à l’abri du recadrage et loin de la photo de profil.",
+      "note_x": "X recadre le haut et le bas selon l’écran : le logo reste à droite, loin de la photo de profil.",
+      "note_yt": "YouTube montre toute l’image sur télévision mais surtout la bande centrale sur téléphone : le logo est dans cette bande.",
       "avatars": "Photos de profil",
-      "avatars_p": "Le logo est centré et occupe les deux tiers du carré, pour qu’un recadrage en cercle ne le touche jamais. Deux fonds : crème, et vert de la paroisse (avec le halo crème autour du logo).",
+      "avatars_p": "Carrées, sans arrondi : chaque plateforme les recadre à sa façon (cercle, carré arrondi). Le logo est au centre, assez petit pour ne jamais être coupé. Deux versions : les rubans, ou le logo seul sur crème.",
+      "variant_art": "Rubans",
       "variant_light": "Fond crème",
-      "variant_green": "Fond vert",
       "rules_title": "À respecter",
-      "r1": "Ne jamais déformer, recolorier ni redessiner le logo : on le place, c’est tout (zone de dégagement de 28 % de sa hauteur).",
-      "r2": "Pas de slogan, de date ni de promesse sur les bannières : seulement les noms qui figurent déjà partout.",
+      "r1": "Ne jamais déformer, recolorier ni redessiner le logo : on le place, c’est tout.",
+      "r2": "Pas de slogan, de date ni de promesse sur les bannières : seulement le logo et le nom de la paroisse.",
       "r3": "Vérifier la page d’aide de la plateforme avant une grande campagne : les tailles changent de temps en temps. Le script `pnpm --filter @eec/scripts social:kit` redessine tout.",
-      "r4": "Une bannière de fête ou de saison peut être ajoutée plus tard, avec la même méthode, après validation de Joël."
+      "r4": "Une bannière de fête ou de saison peut venir plus tard, avec la même méthode, après validation de Joël."
     },
     "credits": {
       "title": "Crédits",
-      "lead": "Qui a conçu et construit ce site, et ce sur quoi il s’appuie.",
+      "lead": "Comme à la fin d’un film : on reste assis jusqu’au bout, parce que c’est là que sont les noms.",
       "photo_alt": "Portrait de Joël Fah",
-      "role": "Développeur, administrateur et propriétaire du produit",
-      "thanks": "Ce site a été pensé, dessiné et construit par Joël Fah pour la paroisse de Nkolndongo 1.",
-      "also": "Et aussi",
-      "also_fonts": "Polices : Switzer et Erode (Fontshare, licence libre d’usage).",
-      "also_illos": "Illustrations : Storyset « Cuate », recolorées dans notre palette.",
-      "also_icons": "Icônes : Hugeicons, trait arrondi.",
-      "also_photos": "Photos provisoires (Pexels) et leurs auteurs"
+      "kicker": "Générique de fin",
+      "voice_1": "Tout n’a pas tourné comme prévu.",
+      "voice_2": "Il y a eu des versions jetées, des « et si on recommençait ? », des soirs où le code ne voulait rien savoir. Les gens autour l’applaudissaient quand même, un peu désolés pour lui.",
+      "voice_3": "Lui s’est relevé, a recommencé, et a regardé un cran plus haut.",
+      "lead_role": "Dans le rôle principal",
+      "lead_sub": "Développeur, administrateur, product owner et, au besoin, service d’assistance du dimanche.",
+      "role_all": "Scénario, direction artistique, code et recodage",
+      "who_all": "Joël Fah",
+      "role_fonts": "Polices",
+      "who_fonts": "Switzer et Erode, par Fontshare",
+      "role_illos": "Illustrations",
+      "who_illos": "Storyset, collection « Cuate », recolorée à nos couleurs",
+      "role_icons": "Icônes",
+      "who_icons": "Hugeicons, trait arrondi",
+      "role_photos": "Photos provisoires",
+      "who_photos": "Pexels, et leurs auteurs",
+      "role_bugs": "Bugs",
+      "who_bugs": "Tous retrouvés, certains plusieurs fois",
+      "role_parish": "Avec la patience de",
+      "who_parish": "La paroisse de Nkolndongo 1",
+      "fine": "Aucun bug n’a été blessé pendant le tournage. Plusieurs ont été retrouvés.",
+      "end_t": "À suivre…",
+      "end_p": "La saison 1 s’arrête ici. La suite arrive, et elle vise toujours un peu plus haut."
     }
   },
   "home": {
@@ -2228,7 +2244,7 @@
       "withdraw_help": "Efface vos détails et votre photo.",
       "withdrawn": "Votre accord est retiré ; vos détails et votre photo sont effacés.",
       "photo_t": "Ma photo",
-      "photo_p": "Elle est privée : vous seul(e) la voyez, sauf si vous choisissez de la partager avec l’équipe paroissiale qui gère les membres. Elle n’est jamais publique.",
+      "photo_p": "Elle reste privée : vous seul(e) la voyez, sauf si vous choisissez de la partager avec l’équipe paroissiale qui gère les membres. Elle n’est jamais publique.",
       "photo_generated": "Sans photo, un avatar abstrait vous représente.",
       "photo_choose": "Choisir une photo",
       "photo_remove": "Supprimer ma photo",
@@ -2242,9 +2258,12 @@
       "card_label": "Carte de membre",
       "card_since": "Membre depuis {year}",
       "card_code": "N° {code}",
-      "card_note": "Pour l’instant, la carte se voit ici : elle ne se télécharge pas encore.",
+      "card_note": "Bientôt, cette carte sera aussi votre carte de Sainte-Cène. Pour l’instant elle se voit ici, sans téléchargement.",
       "btn_save": "Enregistrer mon profil",
-      "msg_saved": "Profil enregistré."
+      "msg_saved": "Profil enregistré.",
+      "photo_google": "C’est la photo de votre compte Google. Gardez-la, ou choisissez-en une autre.",
+      "photo_upload": "C’est la photo que vous avez choisie.",
+      "photo_back_google": "Revenir à ma photo Google"
     }
   },
   "hero": {

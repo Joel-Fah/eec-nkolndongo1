@@ -21,7 +21,7 @@ import Skeleton from '@eec/ui/astro/Skeleton.astro'
 import Tabs from '@eec/ui/astro/Tabs.astro'
 import Tooltip from '@eec/ui/astro/Tooltip.astro'
 import Verse from '@eec/ui/astro/Verse.astro'
-import { identiconSvg } from '@eec/ui/identicon'
+import { avatarSvg } from '@eec/ui/avatar-art'
 import { localeOf, useT } from '../../lib/i18n'
 import { peoplePhotos, photoSrc } from '../../lib/placeholders'
 import { type ShapeId, shapes } from '../../lib/shapes'
@@ -465,18 +465,18 @@ const doc = (id: Id) => ({
 
     <DocBlock {...doc('identicon')}>
       <div class="flex flex-wrap gap-4">
-        {[3208079932, 17, 4242, 987654321, 2026].map((seed) => <span class="brand-identicon" set:html={identiconSvg(seed)} />)}
+        {[3208079932, 17, 4242, 987654321, 2026].map((seed) => <span class="brand-identicon" set:html={avatarSvg(seed)} />)}
       </div>
     </DocBlock>
 
     <DocBlock {...doc('membercard')}>
-      <MemberCard label={t('member.profile.card_label')} parish={t('site.parish')} name="Marie Ngono" since={t('member.profile.card_since', { year: '2026' })} code={t('member.profile.card_code', { code: 'EEC-7K2M-4Q9X' })} avatar={identiconSvg(2026)} />
+      <MemberCard label={t('member.profile.card_label')} parish={t('site.parish')} name="Marie Ngono" since={t('member.profile.card_since', { year: '2026' })} code={t('member.profile.card_code', { code: 'EEC-7K2M-4Q9X' })} avatar={avatarSvg(2026)} />
     </DocBlock>
 
     <DocBlock {...doc('profilebadge')}>
       <div class="flex flex-wrap items-center gap-6">
-        <span class="acct-link btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={identiconSvg(2026)} /><span class="acct-badge">!</span></span>
-        <span class="acct-link btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={identiconSvg(7)} /></span>
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge">!</span></span>
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(7)} /></span>
       </div>
     </DocBlock>
 
@@ -569,7 +569,7 @@ const doc = (id: Id) => ({
     width: 4.5rem;
     height: 4.5rem;
     overflow: hidden;
-    border-radius: 50%;
+    border-radius: var(--radius-lg);
     box-shadow: 0 0 0 1.5px var(--line-strong);
   }
 </style>

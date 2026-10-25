@@ -187,3 +187,10 @@ all 31 native inputs of the admin replaced; a native-popover version for the two
 `pnpm --filter @eec/scripts social:kit` from the shared `abstractArt`), credits, entries for the pickers, avatar, card and warning mark.
 **Skills and docs:** `owasp-security` skill; ARCHITECTURE (Phase 04 additions) and CLAUDE (commands, rules) brought up to date.
 **Production (Joël):** migration 0034, a new privacy-policy version and notice (0033), the object-store credentials already used by media.
+
+**Review round on Checkpoint F (2026-10-25).** Generated avatar redrawn in our own language and made to fill its frame; Google photo counts as the member's photo
+(keep, replace or remove, with the same visibility levels); warning mark on the warning background; the member card and the communion card are one (the
+« bientôt » tile is gone); date picker icon `calendar-minus-02`; translation icon centred with its text; Mon espace panels show a turning chevron and a hover;
+the admin member record is a hero (photo, name, status, age band, city) plus Contact / Profil / Parcours / Groupes / Consentements cards; **social kit redone**
+(ribbons of light in the parish's greens, gold and clay; mark in one corner; square profile pictures that each platform crops) and **credits rewritten** as
+an end-of-film roll in the site's voice.

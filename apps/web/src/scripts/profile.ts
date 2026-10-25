@@ -3,7 +3,7 @@
  * details, and the private photo (resized in the browser, so only a small WebP leaves the phone). Everything is the signed-in
  * person's own; the server decides what is stored. Texts come from the page (data-msgs).
  */
-import { identiconSvg } from '@eec/ui/identicon'
+import { avatarSvg } from '@eec/ui/avatar-art'
 import { initPickers } from '@eec/ui/pickers'
 import { forgetBadge } from './account-badge'
 import { initMemberCards } from './member-card'
@@ -19,7 +19,13 @@ type Details = {
 type Profile = {
   consent: boolean
   details: Details
-  photo: { has: boolean; level: 'private' | 'staff'; v: number }
+  photo: {
+    has: boolean
+    source: 'upload' | 'google' | null
+    googleAvailable: boolean
+    url: string | null
+    level: 'private' | 'staff'
+  }
   completeness: {
     steps: { key: string; done: boolean; optional: boolean }[]
     filled: number
@@ -90,9 +96,13 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
   }
   const avatar = (into: HTMLElement | null, p: Profile, size: number) => {
     if (!into) return
-    into.innerHTML = p.photo.has
-      ? `<img src="/api/me/photo?v=${p.photo.v}" alt="" width="${size}" height="${size}" decoding="async">`
-      : identiconSvg(p.seed)
+    into.innerHTML = p.photo.url
+      ? `<img src="${p.photo.url}" alt="" width="${size}" height="${size}" decoding="async" referrerpolicy="no-referrer">`
+      : avatarSvg(p.seed)
+    // A picture that cannot load (a stale Google address, say) gives way to the generated avatar.
+    into.querySelector('img')?.addEventListener('error', () => {
+      into.innerHTML = avatarSvg(p.seed)
+    })
   }
   const setSelect = (name: string, value: string | null) => {
     const native = form?.elements.namedItem(name) as HTMLSelectElement | null
@@ -142,9 +152,12 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
     const code = q('[data-mcard-code]')
     if (code) code.textContent = fill(msgs.code ?? '', { code: p.memberCode })
     avatar(q('[data-mcard-photo]'), p, 72)
-    // Panel: consent or details
+    // Panel: consent or details; the photo is shown whenever there is one (Google's counts) or the consent allows adding one.
     if (consentForm) consentForm.hidden = p.consent
     if (body) body.hidden = !p.consent
+    q<HTMLElement>('[data-pf-withdraw-zone]')?.toggleAttribute('hidden', !p.consent)
+    q<HTMLElement>('[data-pf-photo]')?.toggleAttribute('hidden', !(p.consent || p.photo.has))
+    q<HTMLElement>('[data-pf-choose]')?.toggleAttribute('hidden', !p.consent)
     if (p.consent && form) {
       const set = (n: string, v: string | null) => {
         const el = form.elements.namedItem(n) as HTMLInputElement | null
@@ -159,15 +172,29 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
       set('profession', p.details.profession)
       setSelect('gender', p.details.gender)
       setSelect('maritalStatus', p.details.maritalStatus)
-      avatar(q('[data-pf-preview]'), p, 80)
-      q<HTMLElement>('[data-pf-remove]')?.toggleAttribute('hidden', !p.photo.has)
-      q<HTMLElement>('[data-pf-generated]')?.toggleAttribute('hidden', p.photo.has)
-      q<HTMLElement>('[data-pf-level]')?.toggleAttribute('hidden', !p.photo.has)
-      const radio = host.querySelector<HTMLInputElement>(
-        `input[name="photoLevel"][value="${p.photo.level}"]`,
-      )
-      if (radio) radio.checked = true
     }
+    avatar(q('[data-pf-preview]'), p, 80)
+    const remove = q<HTMLElement>('[data-pf-remove]')
+    if (remove) {
+      remove.toggleAttribute('hidden', !p.photo.has)
+      remove.textContent =
+        (p.photo.source === 'upload' && p.photo.googleAvailable
+          ? remove.dataset.labelBack
+          : remove.dataset.labelDelete) ?? ''
+    }
+    const src = q('[data-pf-source]')
+    if (src)
+      src.textContent =
+        (p.photo.source === 'google'
+          ? msgs.srcGoogle
+          : p.photo.source === 'upload'
+            ? msgs.srcUpload
+            : msgs.srcNone) ?? ''
+    q<HTMLElement>('[data-pf-level]')?.toggleAttribute('hidden', !p.photo.has)
+    const radio = host.querySelector<HTMLInputElement>(
+      `input[name="photoLevel"][value="${p.photo.level}"]`,
+    )
+    if (radio) radio.checked = true
   }
 
   async function load() {

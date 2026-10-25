@@ -124,7 +124,7 @@ const { label, parish, name = '', since = '', code = '', avatar = '' } = Astro.p
     width: 4.5rem;
     height: 4.5rem;
     overflow: hidden;
-    border-radius: 50%;
+    border-radius: var(--radius-lg);
     box-shadow: 0 0 0 3px color-mix(in oklab, var(--bg) 85%, transparent);
   }
   .mcard-photo > svg,

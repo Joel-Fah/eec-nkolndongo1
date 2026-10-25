@@ -1894,14 +1894,14 @@
 
 /* ── Generated avatar, the profile warning mark and the member card (decision 0047) ───────── */
 @layer components {
+  /* The avatar fills the button's own rounded shape: no second circle inside it. */
   .nav-avatar {
-    display: inline-grid;
-    place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
+    display: block;
+    flex: none;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1.5px var(--line-strong);
+    border-radius: inherit;
   }
   .nav-avatar > svg,
   .nav-avatar > img {
@@ -1910,7 +1910,24 @@
     height: 100%;
     object-fit: cover;
   }
-  .acct-link {
+  .btn-icon.nav-account:has(.nav-avatar) {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    overflow: visible;
+  }
+  .btn-icon.nav-account .nav-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-md);
+  }
+  .btn:not(.btn-icon).nav-account .nav-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--radius-sm);
+  }
+  .nav-account {
     position: relative;
   }
   .acct-badge {
@@ -1922,14 +1939,16 @@
     width: 1.125rem;
     height: 1.125rem;
     border-radius: 50%;
-    background: var(--danger);
-    color: var(--bg);
+    background: var(--warning-soft);
+    color: var(--warning);
     font-size: 0.6875rem;
     font-weight: 700;
     line-height: 1;
-    box-shadow: 0 0 0 2px var(--bg);
+    box-shadow:
+      0 0 0 1.5px var(--warning),
+      0 0 0 3.5px var(--bg);
   }
-  .identicon {
+  .avatar-art {
     display: block;
     width: 100%;
     height: 100%;

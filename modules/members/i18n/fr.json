@@ -43,7 +43,15 @@
     "place": "Quartier, ville",
     "marital": "Situation matrimoniale",
     "profession": "Profession",
-    "kind_profile": "Profil complet"
+    "kind_profile": "Profil complet",
+    "contact": "Contact",
+    "language": "Langue",
+    "profile": "Profil",
+    "profile_empty": "Cette personne n’a pas encore complété son profil.",
+    "journey": "Parcours",
+    "deleting": "Suppression demandée",
+    "state_on": "Actif",
+    "state_off": "Retiré"
   },
   "err": {
     "generic": "Une erreur est survenue.",

@@ -42,10 +42,7 @@ const benefits = [
   ['check', 'pages.account.l2'],
   ['calendar', 'pages.account.l3'],
 ] as const
-const tiles = [
-  ['users', 'groups'],
-  ['bible', 'card'],
-] as const
+const tiles = [['users', 'groups']] as const
 ---
 
 <section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), wait: t('member.google_wait'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale} data-me-msgs={JSON.stringify({ privacy: t('member.privacy_line', { date: '{date}', v: '{v}' }), newsSince: t('member.news_since', { date: '{date}' }), newsOff: t('member.news_off'), pending: t('member.delete_pending', { date: '{date}' }), staff: t('member.delete_staff'), current: t('member.devices_current'), device: t('member.devices_unknown') })}>
@@ -163,7 +160,7 @@ const tiles = [
     </ul>
     <div class="acct-panels">
       <details class="acct-panel" data-panel="profile">
-        <summary>{t('member.panel_profile')}</summary>
+        <summary><span>{t('member.panel_profile')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <form data-form="profile" class="acct-fields" novalidate>
           <Field id="pf-first" name="firstName" label={t('member.first_name')} placeholder={t('common.ph.first_name')} autocomplete="given-name" />
           <Field id="pf-last" name="lastName" label={t('member.last_name')} placeholder={t('common.ph.last_name')} autocomplete="family-name" />
@@ -173,7 +170,7 @@ const tiles = [
         </form>
       </details>
       <details class="acct-panel" data-panel="data">
-        <summary>{t('member.panel_data')}</summary>
+        <summary><span>{t('member.panel_data')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <div class="acct-fields">
           <p class="text-sm text-ink-muted" data-privacy-line></p>
           <div class="acct-notice" data-policy-change hidden role="status">
@@ -200,7 +197,7 @@ const tiles = [
         </div>
       </details>
       <details class="acct-panel" data-panel="devices">
-        <summary>{t('member.panel_devices')}</summary>
+        <summary><span>{t('member.panel_devices')}</span><span class="eec-chevron" aria-hidden="true"></span></summary>
         <div class="acct-fields">
           <ul class="grid gap-2 text-sm" data-devices role="list"></ul>
           <Button variant="secondary" data-signout-others>{t('member.devices_others')}</Button>
@@ -897,11 +894,28 @@ const tiles = [
     background: var(--surface-2);
   }
   .acct-panel > summary {
-    min-height: 2.75rem;
+    min-height: 3rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     font-weight: 600;
     cursor: pointer;
+    list-style: none;
+    border-radius: var(--radius-md);
+  }
+  .acct-panel > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A closed panel must look openable: a chevron that turns, and a hover tint. */
+  .acct-panel > summary .eec-chevron {
+    color: var(--ink-muted);
+  }
+  .acct-panel > summary:hover {
+    color: var(--primary);
+  }
+  .acct-panel[open] > summary .eec-chevron {
+    transform: rotate(180deg);
   }
   .acct-panel[open] > summary {
     margin-block-end: 0.5rem;

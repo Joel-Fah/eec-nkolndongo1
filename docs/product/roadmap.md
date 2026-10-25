@@ -34,7 +34,7 @@ Each item becomes a module (`modules/<id>`). Phases are indicative; order inside
 
 ## Phase 3 — Deepen
 - `payments`: pawaPay (MTN MoMo + Orange Money), receipts, treasurer reconciliation
-- Member services: carte de Sainte-Cène, attendance, group memberships
+- Member services: carte de Sainte-Cène (it is the member card already shown in Mon espace, decision 0047: one card, the communion function is added to it), attendance, group memberships
 - Department spaces (leaders' tools)
 - `requests`: sacrament requests (only after a data-protection decision record)
 - Privacy-friendly analytics dashboard

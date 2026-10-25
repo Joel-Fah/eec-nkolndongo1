@@ -19,10 +19,6 @@ const base = '/brand/social'
         <figure class="grid gap-3" id={`social-${b.id}`}>
           <div class="soc-frame" style={`aspect-ratio:${b.width}/${b.height}`}>
             <img src={`${base}/${b.file}`} width={b.width} height={b.height} alt={`${b.platform} — ${t('brand.social.banner_alt')}`} loading="lazy" decoding="async" />
-            <span class="soc-safe" style={`width:${(b.safe.width / b.width) * 100}%;height:${(b.safe.height / b.height) * 100}%`} aria-hidden="true" />
-            {b.avatar && (
-              <span class="soc-avatar" style={`left:${b.avatar.x * 100}%;top:${b.avatar.y * 100}%;width:${b.avatar.size * 100 * (b.height / b.width)}%;aspect-ratio:1`} aria-hidden="true" />
-            )}
           </div>
           <figcaption class="flex flex-wrap items-center justify-between gap-3">
             <span class="grid gap-1">
@@ -49,7 +45,7 @@ const base = '/brand/social'
         <div class="soc-avatar-card">
           <div class="soc-avatar-row">
             {AVATAR_VARIANTS.map((v) => (
-              <img class="soc-round" src={`${base}/${a.file}-${v}.png`} width={96} height={96} alt={`${a.platform} — ${t(`brand.social.variant_${v}`)}`} loading="lazy" decoding="async" />
+              <img class="soc-square" src={`${base}/${a.file}-${v}.png`} width={96} height={96} alt={`${a.platform} — ${t(`brand.social.variant_${v}`)}`} loading="lazy" decoding="async" />
             ))}
           </div>
           <strong>{a.platform}</strong>
@@ -88,22 +84,6 @@ const base = '/brand/social'
     width: 100%;
     height: 100%;
   }
-  .soc-safe {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
-    border: 2px dashed color-mix(in oklab, var(--clay) 80%, transparent);
-    border-radius: var(--radius-md);
-    pointer-events: none;
-  }
-  .soc-avatar {
-    position: absolute;
-    border-radius: 50%;
-    background: color-mix(in oklab, var(--ink) 18%, transparent);
-    box-shadow: inset 0 0 0 3px var(--bg);
-    pointer-events: none;
-  }
   .soc-avatars {
     display: grid;
     gap: 1rem;
@@ -122,8 +102,8 @@ const base = '/brand/social'
     display: flex;
     gap: 0.75rem;
   }
-  .soc-round {
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px var(--line);
+  .soc-square {
+    border-radius: 0;
+    box-shadow: var(--elevation-1);
   }
 </style>

@@ -1059,8 +1059,8 @@
       },
       "identicon": {
         "name": "Generated avatar",
-        "desc": "For someone with no photo (or whose photo is private): a symmetric 5 × 5 grid of rounded cells in one of our colours on a tinted background. Always the same for the same person; the colour follows the theme.",
-        "use": "identiconSvg(seed) from @eec/ui/identicon; the seed comes from avatarSeed(accountId) in @eec/core. Rounded with CSS (border-radius: 50%).",
+        "desc": "For someone with no photo (or whose photo is private): a small composition in our own manner — a tinted background, big translucent circles, a ring, a dotted arc and a low wave, in our colours. Always the same for the same person; the colour follows the theme. The drawing is square and fills its frame: the frame (rounded square in the header, circle in the admin) gives the shape.",
+        "use": "avatarSvg(seed) from @eec/ui/avatar-art; the seed comes from avatarSeed(accountId) in @eec/core.",
         "a11y": "Decorative (aria-hidden): the person's name is always next to it."
       },
       "membercard": {
@@ -1071,7 +1071,7 @@
       },
       "profilebadge": {
         "name": "Account avatar and warning mark",
-        "desc": "In the top bar the account button shows the person's avatar; while their profile is incomplete a red dot with an exclamation mark is added (also in the admin, since the team belongs to the congregation too). We warn, we never block.",
+        "desc": "In the top bar the account button shows the person's avatar; while their profile is incomplete a warning dot (warning background, exclamation mark) is added (also in the admin, since the team belongs to the congregation too). We warn, we never block.",
         "use": "Site: scripts/account-badge.ts (asks /api/me/badge, kept 5 minutes). Admin: AppShell. Classes .nav-avatar and .acct-badge.",
         "a11y": "The button's label says the profile needs completing; the dot is decorative (aria-hidden)."
       }
@@ -1153,35 +1153,51 @@
     },
     "social": {
       "title": "Social media kit",
-      "lead": "Banners and profile pictures ready to put on our pages, at each platform's size. They carry only the logo and the parish name.",
+      "lead": "Banners and profile pictures for our pages, at each platform's size. Here the art does the talking: ribbons of light, far from the circles used across the rest of the site. The logo makes do with a corner.",
       "banners": "Cover banners",
-      "banners_p": "Drawn from our abstract banners. The dashed frame is the safe area: nothing important may leave it, because phones crop the sides and the profile picture covers a corner.",
-      "banner_alt": "Cover banner, logo and parish name",
+      "banners_p": "Ribbons of gold, clay and cream gliding over the parish's deep green. The logo and name stay in one corner, inside the strip every phone shows.",
+      "banner_alt": "Cover banner: ribbons of light, logo and parish name",
       "download": "Download",
-      "note_fb": "Facebook crops the sides on phones and the profile picture covers the bottom-left corner: everything sits in the centre.",
-      "note_x": "X crops the top and bottom depending on the screen and the profile picture covers the bottom-left corner: everything sits in the centre.",
-      "note_yt": "YouTube shows the whole image on TV but only the central strip on phones: the logo and name are inside that strip.",
+      "note_fb": "Facebook crops the sides on phones: the logo stays on the right, safe from the crop and away from the profile picture.",
+      "note_x": "X crops the top and bottom depending on the screen: the logo stays on the right, away from the profile picture.",
+      "note_yt": "YouTube shows the whole image on TV but mostly the central strip on phones: the logo is inside that strip.",
       "avatars": "Profile pictures",
-      "avatars_p": "The logo is centred and takes two thirds of the square, so a circular crop never touches it. Two backgrounds: cream, and the parish green (with the cream halo around the logo).",
+      "avatars_p": "Square, no rounding: each platform crops them its own way (circle, rounded square). The logo is in the middle, small enough never to be cut. Two versions: the ribbons, or the logo alone on cream.",
+      "variant_art": "Ribbons",
       "variant_light": "Cream background",
-      "variant_green": "Green background",
       "rules_title": "Keep in mind",
-      "r1": "Never stretch, recolour or redraw the logo: place it, nothing more (clear space of 28 % of its height).",
-      "r2": "No slogan, date or promise on the banners: only the names that already appear everywhere.",
+      "r1": "Never stretch, recolour or redraw the logo: place it, nothing more.",
+      "r2": "No slogan, date or promise on the banners: only the logo and the parish name.",
       "r3": "Check the platform's help page before a big campaign: sizes change now and then. The script `pnpm --filter @eec/scripts social:kit` redraws everything.",
-      "r4": "A feast or season banner can be added later with the same method, after Joël's approval."
+      "r4": "A feast or season banner can come later with the same method, after Joël's approval."
     },
     "credits": {
       "title": "Credits",
-      "lead": "Who designed and built this site, and what it stands on.",
+      "lead": "Like the end of a film: you stay in your seat to the very end, because that is where the names are.",
       "photo_alt": "Portrait of Joël Fah",
-      "role": "Developer, administrator and product owner",
-      "thanks": "This site was thought through, designed and built by Joël Fah for the Nkolndongo 1 parish.",
-      "also": "Also",
-      "also_fonts": "Fonts: Switzer and Erode (Fontshare, free-to-use licence).",
-      "also_illos": "Illustrations: Storyset “Cuate”, recoloured into our palette.",
-      "also_icons": "Icons: Hugeicons, stroke-rounded.",
-      "also_photos": "Placeholder photos (Pexels) and their authors"
+      "kicker": "End credits",
+      "voice_1": "Not everything turned out as planned.",
+      "voice_2": "There were discarded versions, “what if we started over?”, evenings when the code would hear nothing of it. Everyone around still applauded, a little sorry for him.",
+      "voice_3": "He got up, started again, and looked one notch higher.",
+      "lead_role": "In the leading role",
+      "lead_sub": "Developer, administrator, product owner and, when needed, the Sunday help desk.",
+      "role_all": "Story, art direction, code and recoding",
+      "who_all": "Joël Fah",
+      "role_fonts": "Fonts",
+      "who_fonts": "Switzer and Erode, by Fontshare",
+      "role_illos": "Illustrations",
+      "who_illos": "Storyset, “Cuate” collection, recoloured to our palette",
+      "role_icons": "Icons",
+      "who_icons": "Hugeicons, stroke-rounded",
+      "role_photos": "Placeholder photos",
+      "who_photos": "Pexels, and their authors",
+      "role_bugs": "Bugs",
+      "who_bugs": "All found again, some more than once",
+      "role_parish": "With the patience of",
+      "who_parish": "The Nkolndongo 1 parish",
+      "fine": "No bugs were harmed during filming. Several were found again.",
+      "end_t": "To be continued…",
+      "end_p": "Season 1 stops here. The next one is coming, and it still aims a little higher."
     }
   },
   "home": {
@@ -2228,7 +2244,7 @@
       "withdraw_help": "Erases your details and your photo.",
       "withdrawn": "Your agreement is withdrawn; your details and photo are erased.",
       "photo_t": "My photo",
-      "photo_p": "It is private: only you see it, unless you choose to share it with the parish team who manage members. It is never public.",
+      "photo_p": "It stays private: only you see it, unless you choose to share it with the parish team who manage members. It is never public.",
       "photo_generated": "Without a photo, an abstract avatar represents you.",
       "photo_choose": "Choose a photo",
       "photo_remove": "Delete my photo",
@@ -2242,9 +2258,12 @@
       "card_label": "Member card",
       "card_since": "Member since {year}",
       "card_code": "No. {code}",
-      "card_note": "For now the card is shown here: it cannot be downloaded yet.",
+      "card_note": "Soon this card will also be your communion card. For now it is shown here, with no download.",
       "btn_save": "Save my profile",
-      "msg_saved": "Profile saved."
+      "msg_saved": "Profile saved.",
+      "photo_google": "This is the photo from your Google account. Keep it, or choose another.",
+      "photo_upload": "This is the photo you chose.",
+      "photo_back_google": "Go back to my Google photo"
     }
   },
   "hero": {
