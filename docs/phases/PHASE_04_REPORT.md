@@ -169,3 +169,5 @@ Tests: `reminders.test.ts`, `rules.test.ts`, e2e (3 new checks). Migration 0031 
 treasurer (offerings); pending figures count nowhere (totals, trends, dashboard, export, Moissons link) and block closing the Sunday. Validators get
 in-app notifications (a Sunday to validate, Moissons entries to validate, a weekly summary); the badge shows up to 99+. **Production:** grant
 `sundays:read` and `sundays:propose` to the Editor role in Rôles (system grants are only written at role creation).
+
+**Notification mutes (decision 0046, migration 0033).** A gear in the bell's panel switches each of the four kinds on or off, per person; a silenced kind is not raised, shown or counted (badge and weekly summary). e2e: 3 new notification checks.

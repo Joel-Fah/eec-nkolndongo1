@@ -1625,7 +1625,19 @@
       "campaign_p": "They count in the public total only once validated.",
       "nudge_t": "This week, {n} thing(s) are waiting for you",
       "nudge_done_t": "This week, everything is up to date",
-      "nudge_p": "{reports} report(s) to fill in · {reviews} to validate · {entries} harvest entr(y/ies)"
+      "nudge_p": "{reports} report(s) to fill in · {reviews} to validate · {entries} harvest entr(y/ies)",
+      "settings": "Settings",
+      "settings_back": "Back to notifications",
+      "settings_t": "Settings",
+      "settings_p": "Choose what you are told about. This only affects you.",
+      "kind_week_nudge": "The week's summary",
+      "kind_week_nudge_p": "One line that gathers what is waiting for you.",
+      "kind_sunday_report_due": "Reports to fill in",
+      "kind_sunday_report_due_p": "A recent Sunday whose attendance or offerings are missing.",
+      "kind_sunday_review": "Reports to validate",
+      "kind_sunday_review_p": "Proposed figures waiting for your validation.",
+      "kind_campaign_review": "Harvest entries to validate",
+      "kind_campaign_review_p": "Harvest festival entries waiting for validation."
     }
   },
   "login": {

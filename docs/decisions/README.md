@@ -47,3 +47,6 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0041 | Campaigns (Moissons): validated totals only, entered and validated by two people | Accepted |
 | 0042 | The Moissons page: members only, in season, one immersive story | Accepted |
 | 0043 | Sunday reports: attendance and offerings as aggregates, two roles | Accepted |
+| 0044 | In-app notifications, and reports on days that are not Sundays | Accepted |
+| 0045 | Proposed Sunday figures: the editor proposes, the secretariat and the treasurer validate | Accepted |
+| 0046 | A person can silence a kind of notification | Accepted |

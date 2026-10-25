@@ -23,3 +23,4 @@ reminder. Each is additive: a new `kind` and, for push or email, a new decision.
 brand entry; help guide updated.
 
 **Amended by 0045:** reminders for validators (proposed Sunday figures, Moissons entries) and a weekly summary were added; in-app only.
+**Amended by 0046:** a person can silence a kind of notification (see below).

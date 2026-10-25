@@ -361,6 +361,29 @@ const stamp = Date.now().toString(36)
     body: JSON.stringify({ ids: mine ? [mine.id] : ['00000000-0000-4000-8000-000000000000'] }),
   })
   ok('notifications: a notification can be hidden', hide.status === 200)
+  const mute = await api('/notifications/mute', {
+    method: 'PUT',
+    body: JSON.stringify({ kind: 'week_nudge', muted: true }),
+  })
+  const quiet = (await api('/notifications')).json as {
+    items: { kind: string }[]
+    muted: string[]
+  }
+  ok(
+    'notifications: a muted kind is not shown',
+    mute.status === 200 &&
+      quiet.muted.includes('week_nudge') &&
+      !quiet.items.some((n) => n.kind === 'week_nudge'),
+  )
+  await api('/notifications/mute', {
+    method: 'PUT',
+    body: JSON.stringify({ kind: 'week_nudge', muted: false }),
+  })
+  // Leave the Sunday as it was found, so the checks can run again.
+  await api(`/sundays/reports/${day}/close`, {
+    method: 'POST',
+    body: JSON.stringify({ closed: false }),
+  })
   await api(`/sundays/reports/${day}/close`, {
     method: 'POST',
     body: JSON.stringify({ closed: false }),

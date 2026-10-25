@@ -1625,7 +1625,19 @@
       "campaign_p": "Elles ne comptent dans le total public qu’une fois validées.",
       "nudge_t": "Cette semaine, {n} chose(s) vous attendent",
       "nudge_done_t": "Cette semaine, tout est à jour",
-      "nudge_p": "{reports} bilan(s) à saisir · {reviews} à valider · {entries} entrée(s) Moissons"
+      "nudge_p": "{reports} bilan(s) à saisir · {reviews} à valider · {entries} entrée(s) Moissons",
+      "settings": "Réglages",
+      "settings_back": "Retour aux notifications",
+      "settings_t": "Réglages",
+      "settings_p": "Choisissez ce qui vous est signalé. Ce réglage ne concerne que vous.",
+      "kind_week_nudge": "Le résumé de la semaine",
+      "kind_week_nudge_p": "Une ligne qui rassemble ce qui vous attend.",
+      "kind_sunday_report_due": "Bilans à saisir",
+      "kind_sunday_report_due_p": "Un dimanche récent dont les présences ou les offrandes manquent.",
+      "kind_sunday_review": "Bilans à valider",
+      "kind_sunday_review_p": "Des chiffres proposés qui attendent votre validation.",
+      "kind_campaign_review": "Moissons à valider",
+      "kind_campaign_review_p": "Des entrées de la Fête des Moissons à valider."
     }
   },
   "login": {

@@ -24,3 +24,4 @@ Onglet **Tendances** : présences et offrandes par mois ou par semaine, avec la 
 - Un jour qui n’est pas un dimanche (Noël, Vendredi saint…) se saisit comme un dimanche : choisissez sa date dans « Un autre jour », puis **nommez-le** avant de saisir.
 - La **cloche** en haut de l’écran vous rappelle les dimanches des quatre dernières semaines dont les présences ou les offrandes manquent ; un clic ouvre le bon dimanche, et le rappel se coche tout seul quand c’est saisi.
 - Un **éditeur** peut saisir les chiffres tout de suite après le culte : ce sont des **propositions** (« À valider »). Le secrétariat valide les présences, la trésorerie les offrandes ; tant que ce n’est pas fait, rien ne compte dans les totaux, et on ne peut pas clôturer le dimanche.
+- Dans la **cloche**, l’engrenage permet de couper un type de rappel (résumé de la semaine, bilans à saisir, bilans à valider, Moissons à valider). Cela ne vous concerne que vous.

@@ -22,7 +22,8 @@ type Item = {
   read: boolean
   resolved: boolean
 }
-type Feed = { items: Item[]; unread: number }
+type Feed = { items: Item[]; unread: number; muted: string[] }
+const KINDS = ['week_nudge', 'sunday_report_due', 'sunday_review', 'campaign_review'] as const
 const k = (key: string) => `admin.notifications.${key}` as MessageKey
 
 /** The summary of the week first, then what to validate, then what to fill in. */
@@ -41,6 +42,7 @@ export function NotificationsBell() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [onlyUnread, setOnlyUnread] = useState(true)
+  const [settings, setSettings] = useState(false)
   const q = useQuery({
     queryKey: ['notifications'],
     queryFn: () => api<Feed>('/notifications'),
@@ -57,6 +59,21 @@ export function NotificationsBell() {
   const dismiss = useMutation({
     mutationFn: (id: string) =>
       api('/notifications/dismiss', { method: 'POST', body: { ids: [id] } }),
+    onSuccess: refresh,
+  })
+  const mute = useMutation({
+    mutationFn: (x: { kind: string; muted: boolean }) =>
+      api('/notifications/mute', { method: 'PUT', body: x }),
+    // The switch answers at once; the list catches up when the server has recounted.
+    onMutate: (x) =>
+      qc.setQueryData<Feed>(['notifications'], (old) =>
+        old
+          ? {
+              ...old,
+              muted: x.muted ? [...old.muted, x.kind] : old.muted.filter((kind) => kind !== x.kind),
+            }
+          : old,
+      ),
     onSuccess: refresh,
   })
   const unread = q.data?.unread ?? 0
@@ -147,8 +164,20 @@ export function NotificationsBell() {
         <Popover.Positioner sideOffset={8} align="end" className="eec-positioner">
           <Popover.Popup className="eec-popover eec-popup notif-pop">
             <div className="notif-head">
-              <Popover.Title className="text-lg">{t(k('title'))}</Popover.Title>
-              {unread > 0 && (
+              <Popover.Title className="text-lg">
+                {t(k(settings ? 'settings_t' : 'title'))}
+              </Popover.Title>
+              <button
+                type="button"
+                className="notif-x"
+                aria-pressed={settings}
+                aria-label={t(k(settings ? 'settings_back' : 'settings'))}
+                data-tip={t(k(settings ? 'settings_back' : 'settings'))}
+                onClick={() => setSettings(!settings)}
+              >
+                <Icon name={settings ? 'close' : 'settings'} size={20} />
+              </button>
+              {!settings && unread > 0 && (
                 <button
                   type="button"
                   className="notif-link"
@@ -158,61 +187,90 @@ export function NotificationsBell() {
                 </button>
               )}
             </div>
-            <div className="notif-filter">
-              {([true, false] as const).map((only) => (
-                <button
-                  key={String(only)}
-                  type="button"
-                  aria-pressed={onlyUnread === only}
-                  onClick={() => setOnlyUnread(only)}
-                >
-                  {t(k(only ? 'unread' : 'all'))}
-                </button>
-              ))}
-            </div>
-            {q.isPending ? (
-              <div className="notif-empty" aria-busy="true">
-                <span className="text-sm text-ink-muted">{t(k('loading'))}</span>
-              </div>
-            ) : weeks.length === 0 ? (
-              <div className="notif-empty">
-                <strong>{t(k('empty_t'))}</strong>
-                <span className="text-sm text-ink-muted">
-                  {t(k(onlyUnread ? 'empty_unread' : 'empty_p'))}
-                </span>
+            {settings ? (
+              <div className="grid gap-1">
+                <p className="px-1 text-sm text-ink-muted">{t(k('settings_p'))}</p>
+                {KINDS.map((kind) => {
+                  const off = q.data?.muted.includes(kind) ?? false
+                  return (
+                    <label key={kind} className="notif-opt">
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        checked={!off}
+                        onChange={() => mute.mutate({ kind, muted: !off })}
+                      />
+                      <span className="grid gap-0.5">
+                        <strong>{t(k(`kind_${kind}`))}</strong>
+                        <span className="text-sm text-ink-muted">{t(k(`kind_${kind}_p`))}</span>
+                      </span>
+                    </label>
+                  )
+                })}
               </div>
             ) : (
-              weeks.map(([w, list]) => (
-                <section key={w} aria-label={weekTitle(w)}>
-                  <h3 className="notif-week">{weekTitle(w)}</h3>
-                  <ul className="notif-list">
-                    {[...list]
-                      .sort((a, b) => RANK(a.kind) - RANK(b.kind))
-                      .map((n) => (
-                        <li key={n.id} data-unread={!n.read && !n.resolved} data-done={n.resolved}>
-                          <button type="button" className="notif-item" onClick={() => go(n)}>
-                            <span className="notif-ico" aria-hidden="true">
-                              <Icon name={icon(n)} size={20} />
-                            </span>
-                            <span className="grid gap-0.5 text-start">
-                              <strong>{title(n)}</strong>
-                              <span className="text-sm text-ink-muted">{detail(n)}</span>
-                            </span>
-                          </button>
-                          <button
-                            type="button"
-                            className="notif-x"
-                            aria-label={t(k('dismiss'))}
-                            data-tip={t(k('dismiss'))}
-                            onClick={() => dismiss.mutate(n.id)}
-                          >
-                            <Icon name="close" size={16} />
-                          </button>
-                        </li>
-                      ))}
-                  </ul>
-                </section>
-              ))
+              <>
+                <div className="notif-filter">
+                  {([true, false] as const).map((only) => (
+                    <button
+                      key={String(only)}
+                      type="button"
+                      aria-pressed={onlyUnread === only}
+                      onClick={() => setOnlyUnread(only)}
+                    >
+                      {t(k(only ? 'unread' : 'all'))}
+                    </button>
+                  ))}
+                </div>
+                {q.isPending ? (
+                  <div className="notif-empty" aria-busy="true">
+                    <span className="text-sm text-ink-muted">{t(k('loading'))}</span>
+                  </div>
+                ) : weeks.length === 0 ? (
+                  <div className="notif-empty">
+                    <strong>{t(k('empty_t'))}</strong>
+                    <span className="text-sm text-ink-muted">
+                      {t(k(onlyUnread ? 'empty_unread' : 'empty_p'))}
+                    </span>
+                  </div>
+                ) : (
+                  weeks.map(([w, list]) => (
+                    <section key={w} aria-label={weekTitle(w)}>
+                      <h3 className="notif-week">{weekTitle(w)}</h3>
+                      <ul className="notif-list">
+                        {[...list]
+                          .sort((a, b) => RANK(a.kind) - RANK(b.kind))
+                          .map((n) => (
+                            <li
+                              key={n.id}
+                              data-unread={!n.read && !n.resolved}
+                              data-done={n.resolved}
+                            >
+                              <button type="button" className="notif-item" onClick={() => go(n)}>
+                                <span className="notif-ico" aria-hidden="true">
+                                  <Icon name={icon(n)} size={20} />
+                                </span>
+                                <span className="grid gap-0.5 text-start">
+                                  <strong>{title(n)}</strong>
+                                  <span className="text-sm text-ink-muted">{detail(n)}</span>
+                                </span>
+                              </button>
+                              <button
+                                type="button"
+                                className="notif-x"
+                                aria-label={t(k('dismiss'))}
+                                data-tip={t(k('dismiss'))}
+                                onClick={() => dismiss.mutate(n.id)}
+                              >
+                                <Icon name="close" size={16} />
+                              </button>
+                            </li>
+                          ))}
+                      </ul>
+                    </section>
+                  ))
+                )}
+              </>
             )}
           </Popover.Popup>
         </Popover.Positioner>
