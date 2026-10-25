@@ -43,7 +43,6 @@ export function AppShell() {
     enabled: !!me,
   })
   const b = badge.data
-  const space = locale === 'fr' ? '/fr/mon-espace/' : '/en/my-space/'
   const initials = (me?.user.name ?? '??')
     .split(/\s+/)
     .map((w) => w[0] ?? '')
@@ -184,9 +183,9 @@ export function AppShell() {
                     </div>
                     <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
                       {t('admin.items.account')}
-                    </Menu.LinkItem>
-                    <Menu.LinkItem className="menu-item" render={<a href={space} />}>
-                      {b?.incomplete ? t('admin.user.complete_profile') : t('admin.user.my_space')}
+                      {b?.incomplete && (
+                        <span className="menu-flag">{t('admin.user.to_complete')}</span>
+                      )}
                     </Menu.LinkItem>
                     <Menu.Item
                       className="menu-item menu-item-danger"

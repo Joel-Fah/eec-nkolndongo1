@@ -194,3 +194,10 @@ all 31 native inputs of the admin replaced; a native-popover version for the two
 the admin member record is a hero (photo, name, status, age band, city) plus Contact / Profil / Parcours / Groupes / Consentements cards; **social kit redone**
 (ribbons of light in the parish's greens, gold and clay; mark in one corner; square profile pictures that each platform crops) and **credits rewritten** as
 an end-of-film roll in the site's voice.
+
+**Second review round (2026-10-25).** Member card removed (the « Carte de Sainte-Cène — bientôt » tile is back; both come in the next phase, with the rest of
+« Mon espace »). Photo: the management team always sees an uploaded photo; the member chooses between it and a generated avatar for the menu (migration 0035).
+The admin shows the sign-in method (Google / e-mail) in the member list, record and CSV. Admin accounts complete their profile inside « Mon compte » (the extra menu
+entry is gone) and « Mon compte » was redone: two columns using the whole width, an identity card, the password section aligned (and not offered to Google-only
+accounts), the eye button without a hover background, a help guide « Mon compte ». **Sign-out bug:** the server did sign out; the public header kept its
+« signed in » avatar for up to five minutes in the tab (and `/api/me` had no `no-store`): now cleared on sign-out and sign-in, kept for 1 minute, and `/api/me` is `private, no-store`.

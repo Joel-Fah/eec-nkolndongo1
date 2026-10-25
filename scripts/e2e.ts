@@ -427,12 +427,24 @@ const stamp = Date.now().toString(36)
   })
   ok('profile: details are refused without the consent', noConsent.status === 403)
   ok('profile: a photo is refused without the consent', (await photo(webp)) === 403)
-  await api('/me/profile/consent', { method: 'POST', body: JSON.stringify({ granted: true }) })
+  const grant = await api('/me/profile/consent', {
+    method: 'POST',
+    body: JSON.stringify({ granted: true }),
+  })
+  ok(
+    'profile: the consent can be given',
+    grant.status === 200,
+    String(grant.status) + JSON.stringify(grant.json),
+  )
   const future = await api('/me/profile', {
     method: 'PUT',
     body: JSON.stringify({ birthDate: '2999-01-01' }),
   })
-  ok('profile: a birth date in the future is refused', future.status === 400)
+  ok(
+    'profile: a birth date in the future is refused',
+    future.status === 400,
+    String(future.status) + JSON.stringify(future.json),
+  )
   const saved = await api('/me/profile', {
     method: 'PUT',
     body: JSON.stringify({ birthDate: '1990-05-01', city: 'Yaoundé', gender: 'woman' }),
@@ -441,11 +453,10 @@ const stamp = Date.now().toString(36)
   const mine = (await api('/me/profile')).json as {
     details: { city: string | null }
     completeness: { complete: boolean }
-    memberCode: string
   }
   ok(
-    'profile: the details and the member code come back',
-    mine.details.city === 'Yaoundé' && /^EEC-/.test(mine.memberCode) && !mine.completeness.complete,
+    'profile: the details come back, the profile is not complete yet',
+    mine.details.city === 'Yaoundé' && !mine.completeness.complete,
   )
   ok(
     'profile: a file that is not a picture is refused',
@@ -460,15 +471,19 @@ const stamp = Date.now().toString(36)
       /no-store/.test(own.headers.get('cache-control') ?? ''),
   )
   const myId = (await api('/me')).json.user.id as string
-  // Private by default: even staff cannot open it.
-  ok(
-    'profile: staff cannot open a private photo',
-    (await api(`/members/${myId}/photo`)).status === 404,
-  )
-  await api('/me/photo-level', { method: 'PUT', body: JSON.stringify({ level: 'staff' }) })
+  // The team always sees an uploaded photo; the navbar shows it only if the member chose it.
   const shared = await fetch(`${base}/api/members/${myId}/photo`, { headers: { cookie } })
-  ok('profile: staff open it once the member shares it', shared.status === 200)
-  await api('/me/photo-level', { method: 'PUT', body: JSON.stringify({ level: 'private' }) })
+  ok('profile: the team opens the uploaded photo', shared.status === 200)
+  const before = (await (await fetch(`${base}/api/me/badge`, { headers: { cookie } })).json()) as {
+    photo: string | null
+  }
+  ok('profile: the navbar shows a generated avatar by default', before.photo === null)
+  await api('/me/photo-avatar', { method: 'PUT', body: JSON.stringify({ use: true }) })
+  const after = (await (await fetch(`${base}/api/me/badge`, { headers: { cookie } })).json()) as {
+    photo: string | null
+  }
+  ok('profile: the member can choose their photo as their avatar', !!after.photo)
+  await api('/me/photo-avatar', { method: 'PUT', body: JSON.stringify({ use: false }) })
   await api('/me/profile/consent', { method: 'POST', body: JSON.stringify({ granted: false }) })
   const erased = (await api('/me/profile')).json as {
     details: Record<string, string | null>

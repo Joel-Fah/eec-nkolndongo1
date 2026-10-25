@@ -13,7 +13,7 @@ import { and, asc, desc, eq, gte, ilike, inArray, or, type SQL, sql } from 'driz
 import { Hono } from 'hono'
 import { csvCell } from './csv.ts'
 
-const { user, profiles, consents, groupMembers, groups, userRoles, roles } = schema
+const { user, profiles, consents, groupMembers, groups, userRoles, roles, account } = schema
 
 const isMember = sql`exists (
   select 1 from ${userRoles} ur join ${roles} r on r.id = ur.role_id
@@ -56,7 +56,6 @@ const detailCols = {
   maritalStatus: profiles.maritalStatus,
   profession: profiles.profession,
   photoKey: profiles.photoKey,
-  photoLevel: profiles.photoLevel,
   image: user.image,
 }
 const todayLocal = () =>
@@ -67,17 +66,15 @@ function safe<
     id: string
     birthDate: string | null
     photoKey: string | null
-    photoLevel: string
     image: string | null
   },
 >(r: T) {
-  const { birthDate, photoKey, photoLevel, image, ...rest } = r
+  const { birthDate, photoKey, image, ...rest } = r
   return {
     ...rest,
     ageBand: ageBand(birthDate, todayLocal()),
-    // A picture is shown to staff only when its owner chose the staff level: the uploaded one through our private route, the Google one by its address.
-    photoUrl:
-      photoLevel === 'staff' ? (photoKey ? `/api/members/${r.id}/photo` : (image ?? null)) : null,
+    // The team always sees the photo: the uploaded one through our private route, else the one Google gave.
+    photoUrl: photoKey ? `/api/members/${r.id}/photo` : (image ?? null),
   }
 }
 
@@ -114,6 +111,25 @@ async function newsOf(db: Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>
   return new Set(rows.map((r) => r.userId))
 }
 
+/** How each person signs in: with Google, with an e-mail and password, or both (read from the accounts Better Auth keeps). */
+async function methodsOf(
+  db: Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>,
+  ids: string[],
+) {
+  const map = new Map<string, ('google' | 'email')[]>()
+  if (!ids.length) return map
+  const rows = await db
+    .select({ userId: account.userId, provider: account.providerId })
+    .from(account)
+    .where(inArray(account.userId, ids))
+  for (const r of rows) {
+    const m = r.provider === 'google' ? 'google' : r.provider === 'credential' ? 'email' : null
+    if (m && !(map.get(r.userId) ?? []).includes(m))
+      map.set(r.userId, [...(map.get(r.userId) ?? []), m])
+  }
+  return map
+}
+
 export const membersApi = new Hono<AppEnv>()
   .get('/list', requirePermission('members:read'), async (c) => {
     const db = await c.var.deps.db()
@@ -130,9 +146,18 @@ export const membersApi = new Hono<AppEnv>()
       .offset(offset)
     const page = rows.slice(0, limit)
     const ids = page.map((r) => r.id)
-    const [g, news] = await Promise.all([groupsOf(db, ids), newsOf(db, ids)])
+    const [g, news, how] = await Promise.all([
+      groupsOf(db, ids),
+      newsOf(db, ids),
+      methodsOf(db, ids),
+    ])
     return c.json({
-      items: page.map((r) => ({ ...safe(r), groups: g.get(r.id) ?? [], news: news.has(r.id) })),
+      items: page.map((r) => ({
+        ...safe(r),
+        groups: g.get(r.id) ?? [],
+        news: news.has(r.id),
+        signIn: how.get(r.id) ?? [],
+      })),
       more: rows.length > limit,
     })
   })
@@ -247,7 +272,11 @@ export const membersApi = new Hono<AppEnv>()
       .orderBy(asc(user.name))
       .limit(5000)
     const ids = rows.map((r) => r.id)
-    const [g, news] = await Promise.all([groupsOf(db, ids), newsOf(db, ids)])
+    const [g, news, how] = await Promise.all([
+      groupsOf(db, ids),
+      newsOf(db, ids),
+      methodsOf(db, ids),
+    ])
     const head = [
       'name',
       'email',
@@ -256,6 +285,7 @@ export const membersApi = new Hono<AppEnv>()
       'status',
       'groups',
       'news_consent',
+      'sign_in',
       'age_band',
       'gender',
       'neighbourhood',
@@ -272,6 +302,7 @@ export const membersApi = new Hono<AppEnv>()
         r.status,
         (g.get(r.id) ?? []).map((x) => x.nameFr).join(' | '),
         news.has(r.id) ? 'yes' : 'no',
+        (how.get(r.id) ?? []).join(' + '),
         ageBand(r.birthDate, todayLocal()),
         r.gender,
         r.neighbourhood,
@@ -314,8 +345,9 @@ export const membersApi = new Hono<AppEnv>()
       .innerJoin(profiles, eq(profiles.userId, user.id))
       .where(and(eq(user.id, id), isMember))
     if (!row) return fail(c, 404, 'not_found')
-    const [g, cons] = await Promise.all([
+    const [g, how, cons] = await Promise.all([
       groupsOf(db, [id]),
+      methodsOf(db, [id]),
       db
         .select({
           kind: consents.kind,
@@ -327,5 +359,10 @@ export const membersApi = new Hono<AppEnv>()
         .where(eq(consents.userId, id))
         .orderBy(desc(consents.grantedAt)),
     ])
-    return c.json({ ...safe(row), groups: g.get(id) ?? [], consents: cons })
+    return c.json({
+      ...safe(row),
+      groups: g.get(id) ?? [],
+      signIn: how.get(id) ?? [],
+      consents: cons,
+    })
   })

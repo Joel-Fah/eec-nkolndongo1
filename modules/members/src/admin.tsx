@@ -23,6 +23,7 @@ type Row = {
   deletionRequestedAt: string | null
   groups: Group[]
   news: boolean
+  signIn?: ('google' | 'email')[]
   ageBand?: string | null
   gender?: string | null
   neighbourhood?: string | null
@@ -159,6 +160,7 @@ export default function MembersPage() {
                   <th scope="col">{t(k('col.name'))}</th>
                   <th scope="col">{t(k('col.email'))}</th>
                   <th scope="col">{t(k('col.phone'))}</th>
+                  <th scope="col">{t(k('col.sign_in'))}</th>
                   <th scope="col">{t(k('col.joined'))}</th>
                   <th scope="col">{t(k('col.groups'))}</th>
                   <th scope="col">{t(k('col.news'))}</th>
@@ -189,6 +191,15 @@ export default function MembersPage() {
                     </td>
                     <td>{m.email}</td>
                     <td>{m.phone ?? '—'}</td>
+                    <td>
+                      <span className="flex flex-wrap gap-1">
+                        {(m.signIn ?? []).map((x) => (
+                          <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                            {t(k(`sign_${x}`))}
+                          </Badge>
+                        ))}
+                      </span>
+                    </td>
                     <td>{date(m.joinedAt)}</td>
                     <td>{m.groups.map(gname).join(', ') || '—'}</td>
                     <td>{t(k(m.news ? 'news_yes' : 'news_no'))}</td>
@@ -280,6 +291,17 @@ function DetailSheet({ id, onClose }: { id: string; onClose: () => void }) {
                   <dl className="mem-rows">
                     {row('mail', t(k('col.email')), d.email)}
                     {row('phone', t(k('col.phone')), d.phone ?? '—')}
+                    {row(
+                      'shield',
+                      t(k('col.sign_in')),
+                      <span className="flex flex-wrap gap-1">
+                        {(d.signIn ?? []).map((x) => (
+                          <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                            {t(k(`sign_${x}`))}
+                          </Badge>
+                        ))}
+                      </span>,
+                    )}
                     {row(
                       'language',
                       t(k('detail.language')),

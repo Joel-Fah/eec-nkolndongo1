@@ -3393,3 +3393,172 @@ html[data-nav-open] {
     grid-column: 2;
   }
 }
+
+/* « Mon compte »: profile completion and the two-column layout that uses the whole width. */
+.acct-grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .acct-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  }
+  .acct-aside {
+    position: sticky;
+    inset-block-start: 5rem;
+  }
+}
+.acct-col {
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+}
+.acct-id {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in oklab, var(--gold) 26%, transparent) 0 24%,
+      transparent 25%
+    ),
+    color-mix(in oklab, var(--primary) 9%, var(--surface));
+  box-shadow: var(--elevation-1);
+}
+.acct-id-photo {
+  display: block;
+  width: 5.5rem;
+  height: 5.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.acct-id-photo img,
+.acct-id-photo svg,
+.acct-id-photo > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.acct-form-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+@media (min-width: 40rem) {
+  .acct-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.pp-head {
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+}
+.pp-ico {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--gold) 28%, transparent);
+  color: var(--gold-ink);
+}
+.pp-bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-xs);
+  background: color-mix(in oklab, var(--ink) 10%, transparent);
+}
+.pp-bar > span {
+  display: block;
+  width: var(--pp, 0%);
+  height: 100%;
+  background: var(--primary);
+  transition: width var(--duration-ui) var(--ease-out);
+}
+.pp-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+.pp-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pp-tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+.pp-steps li[data-done="true"] .pp-tick {
+  background: var(--primary);
+  box-shadow: none;
+}
+.pp-steps li[data-done="true"] .pp-tick::after {
+  content: "✓";
+  color: var(--bg);
+  font-size: 0.6875rem;
+  line-height: 1;
+}
+.pp-block {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.pp-why {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+.pp-photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.pp-photo {
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 1.5px var(--line-strong);
+}
+.pp-photo img,
+.pp-photo svg,
+.pp-photo > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.menu-flag {
+  margin-inline-start: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 0.75rem;
+  font-weight: 600;
+}

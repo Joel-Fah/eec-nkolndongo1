@@ -10,8 +10,6 @@ import {
   emptyDetails,
   GENDERS,
   MARITAL,
-  memberCode,
-  PHOTO_LEVELS,
   type ProfileDetails,
   profileCompleteness,
   validBirthDate,
@@ -24,7 +22,7 @@ import { z } from 'zod'
 import { createPrivateStore, PHOTO_MAX_BYTES, sniffPhoto } from '../lib/private-store.ts'
 import { policyVersion } from '../policy.ts'
 
-const { profiles, consents, user } = schema
+const { profiles, consents, user, account } = schema
 const today = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 const text = (n: number) =>
@@ -55,7 +53,7 @@ const CLEARED = {
   maritalStatus: null,
   profession: null,
   photoKey: null,
-  photoLevel: 'private' as const,
+  photoAsAvatar: false,
   photoUpdatedAt: null,
 }
 
@@ -86,7 +84,7 @@ async function load(db: Db, userId: string) {
       maritalStatus: profiles.maritalStatus,
       profession: profiles.profession,
       photoKey: profiles.photoKey,
-      photoLevel: profiles.photoLevel,
+      photoAsAvatar: profiles.photoAsAvatar,
       photoUpdatedAt: profiles.photoUpdatedAt,
       createdAt: user.createdAt,
       // The picture Google gave at sign-in, if any: it counts as the person's photo until they choose another (decision 0047).
@@ -124,9 +122,9 @@ export const profileRoutes = new Hono<AppEnv>()
       signedIn: true,
       seed: avatarSeed(actor.userId),
       incomplete: !completeness.complete,
-      // The photo shows in the navbar only if its owner shared it; otherwise the generated avatar does.
+      // The photo shows in the navbar only if its owner chose it as their avatar; otherwise the generated avatar does (the default).
       photo:
-        row?.photoLevel === 'staff'
+        row?.photoAsAvatar && (row.photoKey || row.image)
           ? row.photoKey
             ? `/api/me/photo?v=${row.photoUpdatedAt?.getTime() ?? 0}`
             : (row.image ?? null)
@@ -138,8 +136,20 @@ export const profileRoutes = new Hono<AppEnv>()
     if (!actor) return fail(c, 401, 'unauthenticated')
     const db = await c.var.deps.db()
     const { row, consent, details, hasPhoto, completeness } = await load(db, actor.userId)
+    const providers = await db
+      .select({ p: account.providerId })
+      .from(account)
+      .where(eq(account.userId, actor.userId))
     c.header('cache-control', 'private, no-store')
     return c.json({
+      // How this account signs in: Google, e-mail and password, or both.
+      signIn: [
+        ...new Set(
+          providers.flatMap((x) =>
+            x.p === 'google' ? ['google'] : x.p === 'credential' ? ['email'] : [],
+          ),
+        ),
+      ],
       consent,
       details,
       photo: {
@@ -150,11 +160,9 @@ export const profileRoutes = new Hono<AppEnv>()
         url: row?.photoKey
           ? `/api/me/photo?v=${row.photoUpdatedAt?.getTime() ?? 0}`
           : (row?.image ?? null),
-        level: row?.photoLevel ?? 'private',
+        asAvatar: !!row?.photoAsAvatar,
       },
       completeness,
-      memberCode: memberCode(actor.userId),
-      memberSince: row?.createdAt ?? null,
       seed: avatarSeed(actor.userId),
     })
   })
@@ -235,8 +243,9 @@ export const profileRoutes = new Hono<AppEnv>()
     const actor = await c.var.deps.actor()
     if (!actor) return fail(c, 401, 'unauthenticated')
     const db = await c.var.deps.db()
-    if (!(await hasConsent(db, actor.userId))) return fail(c, 403, 'consent_required')
+    // The body is read first: answering before reading an upload can break the connection for the next request.
     const form = await c.req.formData().catch(() => null)
+    if (!(await hasConsent(db, actor.userId))) return fail(c, 403, 'consent_required')
     const file = form?.get('file')
     if (!(file instanceof File) || file.size === 0 || file.size > PHOTO_MAX_BYTES)
       return fail(c, 400, 'invalid')
@@ -283,11 +292,11 @@ export const profileRoutes = new Hono<AppEnv>()
         .catch(() => {})
     } else {
       await db.update(user).set({ image: null }).where(eq(user.id, actor.userId))
-      await db
-        .update(profiles)
-        .set({ photoLevel: 'private' })
-        .where(eq(profiles.userId, actor.userId))
     }
+    await db
+      .update(profiles)
+      .set({ photoAsAvatar: false })
+      .where(and(eq(profiles.userId, actor.userId), sql`${profiles.photoKey} is null`))
     await audit(c, {
       action: 'delete',
       entityType: 'account',
@@ -297,25 +306,26 @@ export const profileRoutes = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
+  // The member's choice: their photo as the avatar in the navbar, or the generated one (the default). The team sees an uploaded photo either way.
   .put(
-    '/photo-level',
+    '/photo-avatar',
     requireSelf(),
-    zValidator('json', z.object({ level: z.enum(PHOTO_LEVELS) }).strict()),
+    zValidator('json', z.object({ use: z.boolean() }).strict()),
     async (c) => {
       const actor = await c.var.deps.actor()
       if (!actor) return fail(c, 401, 'unauthenticated')
       const db = await c.var.deps.db()
       await db
         .update(profiles)
-        .set({ photoLevel: c.req.valid('json').level })
+        .set({ photoAsAvatar: c.req.valid('json').use })
         .where(eq(profiles.userId, actor.userId))
       await audit(c, {
         action: 'update',
         entityType: 'account',
         entityId: actor.userId,
-        summaryFr: 'Visibilité de la photo changée',
-        summaryEn: 'Photo visibility changed',
-        diff: { level: c.req.valid('json').level },
+        summaryFr: 'Choix de l’avatar changé',
+        summaryEn: 'Avatar choice changed',
+        diff: { photoAsAvatar: c.req.valid('json').use },
       })
       return c.json({ ok: true })
     },

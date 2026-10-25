@@ -6,7 +6,6 @@
 import { avatarSvg } from '@eec/ui/avatar-art'
 import { initPickers } from '@eec/ui/pickers'
 import { forgetBadge } from './account-badge'
-import { initMemberCards } from './member-card'
 
 type Details = {
   birthDate: string | null
@@ -24,7 +23,7 @@ type Profile = {
     source: 'upload' | 'google' | null
     googleAvailable: boolean
     url: string | null
-    level: 'private' | 'staff'
+    asAvatar: boolean
   }
   completeness: {
     steps: { key: string; done: boolean; optional: boolean }[]
@@ -32,8 +31,6 @@ type Profile = {
     total: number
     complete: boolean
   }
-  memberCode: string
-  memberSince: string | null
   seed: number
 }
 
@@ -142,16 +139,6 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
       q<HTMLElement>('.pf-steps')?.toggleAttribute('hidden', c.complete)
       q<HTMLElement>('[data-pf-lead]')?.toggleAttribute('hidden', c.complete)
     }
-    // Member card
-    const name = [user.firstName, user.name].find(Boolean) ?? ''
-    const nameEl = q('[data-mcard-name]')
-    if (nameEl) nameEl.textContent = user.name || name
-    const since = q('[data-mcard-since]')
-    if (since && p.memberSince)
-      since.textContent = fill(msgs.since ?? '', { year: new Date(p.memberSince).getFullYear() })
-    const code = q('[data-mcard-code]')
-    if (code) code.textContent = fill(msgs.code ?? '', { code: p.memberCode })
-    avatar(q('[data-mcard-photo]'), p, 72)
     // Panel: consent or details; the photo is shown whenever there is one (Google's counts) or the consent allows adding one.
     if (consentForm) consentForm.hidden = p.consent
     if (body) body.hidden = !p.consent
@@ -190,11 +177,9 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
           : p.photo.source === 'upload'
             ? msgs.srcUpload
             : msgs.srcNone) ?? ''
-    q<HTMLElement>('[data-pf-level]')?.toggleAttribute('hidden', !p.photo.has)
-    const radio = host.querySelector<HTMLInputElement>(
-      `input[name="photoLevel"][value="${p.photo.level}"]`,
-    )
-    if (radio) radio.checked = true
+    q<HTMLElement>('[data-pf-avatar-zone]')?.toggleAttribute('hidden', !p.photo.has)
+    const sw = q<HTMLInputElement>('#pf-avatar')
+    if (sw) sw.checked = p.photo.asAvatar
   }
 
   async function load() {
@@ -274,16 +259,14 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
     const r = await api('/me/photo', { method: 'DELETE' })
     if (r.ok) await changed()
   })
-  for (const radio of host.querySelectorAll<HTMLInputElement>('input[name="photoLevel"]'))
-    radio.addEventListener('change', async () => {
-      const r = await put('/me/photo-level', { level: radio.value })
-      if (r.ok) {
-        say(msgs.levelSaved ?? '')
-        forgetBadge()
-      }
-    })
+  q<HTMLInputElement>('#pf-avatar')?.addEventListener('change', async (e) => {
+    const r = await put('/me/photo-avatar', { use: (e.target as HTMLInputElement).checked })
+    if (r.ok) {
+      say(msgs.levelSaved ?? '')
+      await changed()
+    }
+  })
 
-  initMemberCards(host)
   initPickers(host)
   void load()
 }

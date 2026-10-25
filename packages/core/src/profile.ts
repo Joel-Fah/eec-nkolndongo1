@@ -6,8 +6,6 @@ export const GENDERS = ['woman', 'man'] as const
 export type Gender = (typeof GENDERS)[number]
 export const MARITAL = ['single', 'married', 'widowed', 'divorced'] as const
 export type Marital = (typeof MARITAL)[number]
-export const PHOTO_LEVELS = ['private', 'staff'] as const
-export type PhotoLevel = (typeof PHOTO_LEVELS)[number]
 
 export type ProfileDetails = {
   birthDate: string | null

@@ -2,7 +2,7 @@
  * The account button in the header: when the visitor is signed in it shows their avatar (the generated abstract one, or their own
  * picture only if they chose to share it) and a small warning mark while their profile is incomplete (decision 0047). The page itself is
  * cached public HTML and knows nothing about the visitor, so this asks `/api/me/badge` (private, never cached) and keeps the answer
- * for five minutes in this tab. Signed out: nothing changes. Mon espace clears the saved answer when the profile changes.
+ * for a minute in this tab. Signed out: nothing changes. Mon espace clears the saved answer when the profile changes.
  */
 import { avatarSvg } from '@eec/ui/avatar-art'
 
@@ -14,7 +14,7 @@ type Badge = {
   photoV?: number
 }
 const KEY = 'eec-badge'
-const TTL = 5 * 60_000
+const TTL = 60_000
 
 async function read(): Promise<Badge | null> {
   try {

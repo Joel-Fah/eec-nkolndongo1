@@ -230,7 +230,6 @@
     cursor: pointer;
   }
   .input-toggle:hover {
-    background: var(--surface-2);
     color: var(--ink);
   }
 

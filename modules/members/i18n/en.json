@@ -23,7 +23,8 @@
     "phone": "Phone",
     "joined": "Joined",
     "groups": "Groups",
-    "news": "News"
+    "news": "News",
+    "sign_in": "Sign-in"
   },
   "news_yes": "Yes",
   "news_no": "No",
@@ -82,5 +83,7 @@
   "marital_single": "Single",
   "marital_married": "Married",
   "marital_widowed": "Widowed",
-  "marital_divorced": "Divorced"
+  "marital_divorced": "Divorced",
+  "sign_google": "Google",
+  "sign_email": "Email and password"
 }

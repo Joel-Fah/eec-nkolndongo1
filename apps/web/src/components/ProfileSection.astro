@@ -9,7 +9,6 @@ import Field from '@eec/ui/astro/Field.astro'
 import Icon from '@eec/ui/astro/Icon.astro'
 import Mark from '@eec/ui/astro/Mark.astro'
 import { localeOf, useT } from '../lib/i18n'
-import MemberCard from './MemberCard.astro'
 
 const locale = localeOf(Astro.currentLocale)
 const t = useT(locale)
@@ -33,14 +32,12 @@ const picker = (placeholder: string) =>
   })
 const messages = {
   progress: p('progress', { n: '{n}', total: '{total}' }),
-  since: p('card_since', { year: '{year}' }),
-  code: p('card_code', { code: '{code}' }),
   saved: p('msg_saved'),
   error: p('error'),
   withdrawn: p('withdrawn'),
   photoSaved: p('photo_saved'),
   photoErr: p('photo_err'),
-  levelSaved: p('level_saved'),
+  levelSaved: p('avatar_saved'),
   srcGoogle: p('photo_google'),
   srcUpload: p('photo_upload'),
   srcNone: p('photo_generated'),
@@ -67,13 +64,6 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
       <li data-step="photo"><span class="pf-tick" aria-hidden="true"></span>{p('step_photo')}</li>
     </ol>
     <div><Button variant="secondary" data-pf-open>{p('cta')}</Button></div>
-  </section>
-
-  <!-- The member card: on screen only, no download -->
-  <section class="pf-cardwrap" aria-labelledby="pf-card-t">
-    <h3 id="pf-card-t" class="text-xl">{p('card_t')}</h3>
-    <MemberCard label={p('card_label')} parish={t('site.parish')} />
-    <p class="text-sm text-ink-muted">{p('card_note')}</p>
   </section>
 
   <details class="acct-panel" data-panel="fullprofile">
@@ -125,11 +115,10 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
               <p class="text-sm text-ink-muted" data-pf-source></p>
             </div>
           </div>
-          <fieldset class="pf-level" data-pf-level hidden>
-            <legend class="field-label">{p('photo_level')}</legend>
-            <Choice kind="radio" id="pf-level-private" name="photoLevel" value="private" label={p('level_private')} checked />
-            <Choice kind="radio" id="pf-level-staff" name="photoLevel" value="staff" label={p('level_staff')} />
-          </fieldset>
+          <div data-pf-avatar-zone hidden class="grid gap-1">
+            <Choice kind="switch" id="pf-avatar" name="photoAsAvatar" label={p('avatar_use')} />
+            <p class="text-sm text-ink-muted">{p('avatar_help')}</p>
+          </div>
         </div>
 
         <div class="pf-withdraw" data-pf-withdraw-zone hidden>

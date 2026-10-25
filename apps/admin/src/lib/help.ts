@@ -183,6 +183,16 @@ export const GUIDES: Guide[] = [
     screens: ['/m/media'],
   },
   {
+    slug: 'compte',
+    icon: 'account',
+    summary: {
+      fr: 'Mon profil, ma photo, mon mot de passe et mes appareils.',
+      en: 'My profile, my photo, my password and my devices.',
+    },
+    title: { fr: 'Mon compte', en: 'My account' },
+    screens: ['/account'],
+  },
+  {
     slug: 'inviter',
     icon: 'userRoundPlus',
     summary: {

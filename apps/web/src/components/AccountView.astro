@@ -42,7 +42,10 @@ const benefits = [
   ['check', 'pages.account.l2'],
   ['calendar', 'pages.account.l3'],
 ] as const
-const tiles = [['users', 'groups']] as const
+const tiles = [
+  ['users', 'groups'],
+  ['bible', 'card'],
+] as const
 ---
 
 <section class="acct" data-account data-errors={JSON.stringify(messages)} data-hello={t('member.hello', { name: '{name}' })} data-step-label={t('member.step', { n: '{n}', total: '3' })} data-google-msgs={JSON.stringify({ error: t('member.google_err'), consent: t('member.google_err_consent'), staff: t('member.google_err_staff'), unavailable: t('member.google_unavailable'), wait: t('member.google_wait'), fail: t('auth.err.generic'), rate: t('auth.err.rate_limited') })} data-lang={locale} data-me-msgs={JSON.stringify({ privacy: t('member.privacy_line', { date: '{date}', v: '{v}' }), newsSince: t('member.news_since', { date: '{date}' }), newsOff: t('member.news_off'), pending: t('member.delete_pending', { date: '{date}' }), staff: t('member.delete_staff'), current: t('member.devices_current'), device: t('member.devices_unknown') })}>
@@ -252,6 +255,7 @@ const tiles = [['users', 'groups']] as const
 </section>
 
 <script>
+  import { forgetBadge, initAccountBadge } from '../scripts/account-badge'
   import { initProfile } from '../scripts/profile'
   const found = document.querySelector<HTMLElement>('[data-account]')
   if (found) {
@@ -457,7 +461,11 @@ const tiles = [['users', 'groups']] as const
         const v = (n: string) => input(signup, n)?.value.trim() ?? ''
         const result = await call('/members/signup', { firstName: v('firstName'), lastName: v('lastName'), email: v('email'), password: input(signup, 'password')?.value ?? '', phone: v('phone') || undefined, acceptPrivacy: true, acceptNews: !!input(signup, 'acceptNews')?.checked })
         submit?.removeAttribute('aria-busy')
-        if (result.ok) return refresh()
+        if (result.ok) {
+        forgetBadge()
+        void initAccountBadge()
+        return refresh()
+      }
         // Errors about the password or the address send the visitor back to the right step.
         if (result.code.startsWith('password')) goto(1)
         else if (result.code === 'email_taken') goto(0)
@@ -555,8 +563,9 @@ const tiles = [['users', 'groups']] as const
       const screen = root.querySelector<HTMLElement>('[data-leaving]')
       if (screen) screen.hidden = false
       await Promise.all([call('/auth/sign-out', {}), new Promise((r) => setTimeout(r, 1600))])
-      show('out')
-      if (screen) screen.hidden = true
+      // The header was drawn for a signed-in person: forget it and start the page over, signed out.
+      forgetBadge()
+      location.reload()
     })
     refresh()
   }

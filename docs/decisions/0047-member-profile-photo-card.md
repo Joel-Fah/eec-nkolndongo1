@@ -19,3 +19,9 @@
 - **The generated avatar is our own drawing**, not a GitHub-style grid: a soft tint of one of our tones, translucent circles, a ring, a dotted arc and a low wave. It is square and fills its frame (rounded square in the public header, circle in the admin bar), never a circle inside a circle.
 - **The warning mark** uses the warning background, not red.
 - **The member card is the communion card.** The « Carte de Sainte-Cène » that was announced and this member card are one object: the card built here will carry the communion function when that phase comes. The separate « soon » tile is removed.
+
+**Amended again 2026-10-25 (Joël, second review):**
+- **The member card is removed for now.** The « Carte de Sainte-Cène — bientôt » tile is back in « Mon espace »; the card (and what it carries: code, tilt, communion function) is planned properly in the next phase, with the rest of « Mon espace », which still needs work. `memberCode()` stays in `@eec/core` for that phase.
+- **Photo: the team always sees an uploaded photo.** The two visibility levels are replaced by one choice that belongs to the member: **use my photo as my avatar in the menu**, or a **generated avatar (the default)**. The management team who hold `members:read` always see the photo (uploaded, or Google's), because that is what it is for (to recognise people); it is never public. The consent text says so before anything is uploaded. Migration 0035 adds `photo_as_avatar`; `photo_level` is kept, unused.
+- **Staff complete their profile in « Mon compte »** (admin), not in a separate menu entry: the same consent, details, photo and avatar choice, through the same API.
+- The admin shows **how each member signs in** (Google, e-mail and password, or both), read from the accounts Better Auth keeps; it is in the list, the record and the CSV.

@@ -55,6 +55,12 @@ export function useSessionActions() {
     async signOut() {
       await api('/auth/sign-out', { body: {} })
       qc.clear()
+      try {
+        // The public header keeps a short-lived « who is signed in » answer for this tab: forget it.
+        sessionStorage.removeItem('eec-badge')
+      } catch {
+        // storage blocked: nothing to forget
+      }
     },
   }
 }

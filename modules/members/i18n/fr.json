@@ -23,7 +23,8 @@
     "phone": "Téléphone",
     "joined": "Inscrit le",
     "groups": "Groupes",
-    "news": "Nouvelles"
+    "news": "Nouvelles",
+    "sign_in": "Connexion"
   },
   "news_yes": "Oui",
   "news_no": "Non",
@@ -82,5 +83,7 @@
   "marital_single": "Célibataire",
   "marital_married": "Marié(e)",
   "marital_widowed": "Veuf / veuve",
-  "marital_divorced": "Divorcé(e)"
+  "marital_divorced": "Divorcé(e)",
+  "sign_google": "Google",
+  "sign_email": "E-mail et mot de passe"
 }

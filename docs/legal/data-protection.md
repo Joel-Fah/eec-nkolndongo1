@@ -123,12 +123,10 @@
 - **Optional details** a signed-in member may add in « Mon espace »: birth date, gender, neighbourhood and city, marital status, profession.
   Purpose: to know and understand the congregation (age bands, where people live, skills). **No street address, no GPS, nothing sensitive
   beyond that list.** Behind a separate, unticked, withdrawable consent (`profile`) with the policy version; withdrawing erases the details.
-  Staff see an **age band** (never the exact date) and aggregates (groups under 5 people are not shown on their own). The CSV export of these
+  Staff see an **age band** (never the exact date), how the person signs in (Google or e-mail) and aggregates (groups under 5 people are not shown on their own). The CSV export of these
   columns is limited to the export permission and audited by row count.
-- **Profile photo:** private by default (*only me*, or *parish staff who manage members* if the member chooses). Never public. One 512 px WebP,
-  metadata removed in the browser, served only to the owner or, at the staff level, to staff with `members:read` (`private, no-store`). Deleted with
-  the photo, the consent or the account. Without a photo everyone sees a generated abstract avatar.
-- **Member card:** shown on screen only (no download); it holds the name, a short code derived from the account id and the year of sign-up.
+- **Profile photo:** seen by the parish team who manage members (`members:read`), never public; the member decides whether it is also their avatar in the menu (otherwise a generated avatar). One 512 px WebP, metadata removed in the browser, served only by session-checked routes (`private, no-store`). A Google sign-in photo counts as the member's photo until they choose another. Deleted with the photo, the consent or the account.
+- **Member card:** removed for now; it comes back with the communion card in the next phase.
 - Retention: with the account, in « my data » and in the 30-day deletion.
 
 ## Explicitly out of scope until a decision record exists

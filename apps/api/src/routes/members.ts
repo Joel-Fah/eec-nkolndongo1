@@ -40,16 +40,16 @@ const google = z.object({
 })
 
 export const memberRoutes = new Hono<AppEnv>()
-  // A member's picture for the staff who manage members: only when the member chose the *staff* level and their consent still stands.
+  // A member's uploaded picture, for the staff who manage members (the team always sees it; members are told so before they upload).
   .get('/:id/photo', requirePermission('members:read'), async (c) => {
     const id = c.req.param('id')
     if (!/^[0-9a-f-]{36}$/.test(id)) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
     const [row] = await db
-      .select({ key: schema.profiles.photoKey, level: schema.profiles.photoLevel })
+      .select({ key: schema.profiles.photoKey })
       .from(schema.profiles)
       .where(eq(schema.profiles.userId, id))
-    if (!row?.key || row.level !== 'staff') return fail(c, 404, 'not_found')
+    if (!row?.key) return fail(c, 404, 'not_found')
     return photoResponse(c.env, row.key)
   })
   // Starts "Continue with Google". The consent is carried through the redirect by a short-lived cookie and

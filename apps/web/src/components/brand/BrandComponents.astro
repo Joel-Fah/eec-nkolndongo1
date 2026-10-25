@@ -28,7 +28,6 @@ import { type ShapeId, shapes } from '../../lib/shapes'
 import ContentCard from '../content/ContentCard.astro'
 import LangFallbackNote from '../content/LangFallbackNote.astro'
 import UnavailableState from '../content/UnavailableState.astro'
-import MemberCard from '../MemberCard.astro'
 import SiteLockup from '../SiteLockup.astro'
 import ThemeToggle from '../ThemeToggle.astro'
 import DocBlock from './DocBlock.astro'
@@ -81,7 +80,6 @@ type Id =
   | 'insetfields'
   | 'datepicker'
   | 'identicon'
-  | 'membercard'
   | 'profilebadge'
   | 'timepicker'
   | 'search'
@@ -469,10 +467,6 @@ const doc = (id: Id) => ({
       </div>
     </DocBlock>
 
-    <DocBlock {...doc('membercard')}>
-      <MemberCard label={t('member.profile.card_label')} parish={t('site.parish')} name="Marie Ngono" since={t('member.profile.card_since', { year: '2026' })} code={t('member.profile.card_code', { code: 'EEC-7K2M-4Q9X' })} avatar={avatarSvg(2026)} />
-    </DocBlock>
-
     <DocBlock {...doc('profilebadge')}>
       <div class="flex flex-wrap items-center gap-6">
         <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge">!</span></span>
@@ -576,9 +570,7 @@ const doc = (id: Id) => ({
 
 <script>
   import { initPickers } from '@eec/ui/pickers'
-  import { initMemberCards } from '../../scripts/member-card'
   initPickers()
-  initMemberCards()
   // Charts (Chart.js, loaded only when the guide's charts come into view). Colours come from the design tokens and
   // follow light/dark; animation is off with reduced motion. The same numbers are in the table below them.
   const host = document.querySelector<HTMLElement>('[data-charts]')
