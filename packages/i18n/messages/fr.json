@@ -1033,6 +1033,12 @@
         "desc": "Une barre par période, les chiffres écrits à côté (jamais la barre seule), la variation par rapport à la période d’avant. Présences en trois couleurs (hommes, femmes, enfants), offrandes en or.",
         "use": "Trend bars with their numbers",
         "a11y": "One bar per period with the numbers written beside it (never the bar alone) and the change from the period before. Attendance in three colours (men, women, children), offerings in gold."
+      },
+      "notificationbell": {
+        "name": "Cloche de notifications",
+        "desc": "Dans la barre du haut, une cloche (bell-ring) avec le nombre de non lues. Elle ouvre une fenêtre : Non lues / Toutes, rappels regroupés par semaine (Cette semaine, La semaine dernière, Semaine du … au …), chacun avec un lien direct vers l’écran concerné, une pastille rouge s’il n’est pas lu, une coche quand c’est fait, et une croix pour le masquer.",
+        "use": "<NotificationsBell> dans la barre du haut ; chaque notification a un type (kind) et des paramètres, le texte est écrit par l’écran, jamais stocké.",
+        "a11y": "Le bouton annonce le nombre de non lues ; la fenêtre est un dialogue avec titre ; chaque notification et sa croix sont des boutons de 44 px ; fermer avec Échap."
       }
     },
     "rules": {
@@ -1586,6 +1592,29 @@
       "view": "Affichage",
       "view_grid": "Cartes",
       "view_list": "Liste"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "open": "Notifications",
+      "open_n": "Notifications, {n} non lue(s)",
+      "unread": "Non lues",
+      "all": "Toutes",
+      "mark_all": "Tout marquer comme lu",
+      "dismiss": "Masquer",
+      "empty_t": "Rien à signaler",
+      "empty_unread": "Tout est lu. Revenez plus tard.",
+      "empty_p": "Les rappels apparaîtront ici, par semaine.",
+      "this_week": "Cette semaine",
+      "last_week": "La semaine dernière",
+      "week_of": "Semaine du {from} au {to}",
+      "done": "Fait",
+      "sunday_due_t": "Bilan du {date} à saisir",
+      "sunday_done_t": "Bilan du {date} saisi",
+      "what_attendance": "Les présences manquent.",
+      "what_offerings": "Les offrandes manquent.",
+      "what_both": "Présences et offrandes manquent.",
+      "open_item": "Ouvrir",
+      "loading": "Chargement…"
     }
   },
   "login": {

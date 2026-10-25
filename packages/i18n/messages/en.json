@@ -1033,6 +1033,12 @@
         "desc": ".sun-bar, .sun-num (apps/admin).",
         "use": "Chaque barre a un équivalent texte (role=\"img\" + aria-label) et ses chiffres.",
         "a11y": "Each bar has a text equivalent (role=\"img\" + aria-label) and its numbers."
+      },
+      "notificationbell": {
+        "name": "Notification bell",
+        "desc": "In the top bar, a bell (bell-ring) with the unread count. It opens a panel: Unread / All, reminders grouped by week (This week, Last week, Week of … to …), each with a deep link to the screen concerned, a red dot while unread, a tick once done, and a cross to hide it.",
+        "use": "<NotificationsBell> in the top bar; each notification has a kind and parameters, the text is written by the screen, never stored.",
+        "a11y": "The button announces the unread count; the panel is a titled dialog; every notification and its cross are 44 px buttons; Esc closes it."
       }
     },
     "rules": {
@@ -1586,6 +1592,29 @@
       "view": "View",
       "view_grid": "Cards",
       "view_list": "List"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "open": "Notifications",
+      "open_n": "Notifications, {n} unread",
+      "unread": "Unread",
+      "all": "All",
+      "mark_all": "Mark all as read",
+      "dismiss": "Hide",
+      "empty_t": "Nothing to report",
+      "empty_unread": "Everything is read. Come back later.",
+      "empty_p": "Reminders will show up here, by week.",
+      "this_week": "This week",
+      "last_week": "Last week",
+      "week_of": "Week of {from} to {to}",
+      "done": "Done",
+      "sunday_due_t": "Report of {date} to fill in",
+      "sunday_done_t": "Report of {date} filled in",
+      "what_attendance": "Attendance is missing.",
+      "what_offerings": "Offerings are missing.",
+      "what_both": "Attendance and offerings are missing.",
+      "open_item": "Open",
+      "loading": "Loading…"
     }
   },
   "login": {

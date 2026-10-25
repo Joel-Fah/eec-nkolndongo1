@@ -11,6 +11,7 @@ import { HelpSheet } from './HelpSheet'
 import { Icon } from './Icon'
 import { LeavingScreen } from './LeavingScreen'
 import { NavProgress } from './Loading'
+import { NotificationsBell } from './Notifications'
 
 export function AppShell() {
   const { t, locale } = useLocale()
@@ -114,6 +115,7 @@ export function AppShell() {
             <kbd className="admin-kbd">⌘K</kbd>
           </button>
           <div className="admin-topbar-tools">
+            <NotificationsBell />
             {guideForPath(path) && (
               <button
                 type="button"

@@ -4,7 +4,7 @@
   "last_sunday": "Dimanche dernier ({date})",
   "tab_sundays": "Dimanches",
   "tab_trends": "Tendances",
-  "other_sunday": "Un autre dimanche",
+  "other_sunday": "Un autre jour (dimanche ou jour spécial)",
   "not_sunday": "Ce jour n’est pas un dimanche : ce sera un jour spécial, à nommer.",
   "open": "Ouvrir",
   "empty_t": "Aucun bilan",

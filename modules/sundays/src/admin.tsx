@@ -220,9 +220,6 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                                 <strong className="font-display text-2xl">
                                   {dayText(r.date, locale)}
                                 </strong>
-                                {!isSundayDate(r.date) && r.serviceLabel && (
-                                  <span className="text-sm text-ink-muted">{r.serviceLabel}</span>
-                                )}
                                 {r.attendance !== null && (
                                   <span className="text-sm">
                                     {t(k('present_n'), { n: String(r.attendance) })}

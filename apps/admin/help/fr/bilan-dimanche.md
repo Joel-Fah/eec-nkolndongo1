@@ -21,3 +21,5 @@ Onglet **Tendances** : présences et offrandes par mois ou par semaine, avec la 
 - Un responsable de groupe ne voit que les offrandes de **son** groupe, et pas les présences.
 - La note interne ne doit nommer personne.
 - Les droits se donnent dans **Rôles** (secrétariat : lire, présences, clôturer, exporter ; trésorier : lire, offrandes).
+- Un jour qui n’est pas un dimanche (Noël, Vendredi saint…) se saisit comme un dimanche : choisissez sa date dans « Un autre jour », puis **nommez-le** avant de saisir.
+- La **cloche** en haut de l’écran vous rappelle les dimanches des quatre dernières semaines dont les présences ou les offrandes manquent ; un clic ouvre le bon dimanche, et le rappel se coche tout seul quand c’est saisi.

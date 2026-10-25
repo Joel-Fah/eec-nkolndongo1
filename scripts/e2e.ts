@@ -316,7 +316,12 @@ const stamp = Date.now().toString(36)
     method: 'PUT',
     body: JSON.stringify({ men: 1 }),
   })
-  ok('sundays: a date that is not a Sunday is refused', bad.status === 400)
+  ok('sundays: a day that is not a Sunday must be named first', bad.status === 400)
+  const nonsense = await api('/sundays/reports/2026-02-30/attendance', {
+    method: 'PUT',
+    body: JSON.stringify({ men: 1 }),
+  })
+  ok('sundays: an impossible date is refused', nonsense.status === 400)
   const line = await api(`/sundays/reports/${day}/offerings`, {
     method: 'POST',
     body: JSON.stringify({ purpose: 'moissons', amountXaf: 7777, groupId: null, campaignId: cid }),
@@ -338,6 +343,22 @@ const stamp = Date.now().toString(36)
     body: JSON.stringify({ men: 11 }),
   })
   ok('sundays: a closed Sunday refuses changes', locked.status === 409)
+  // The reminder for that Sunday (if the account is old enough to have one) is done once the Sunday is closed.
+  const feed = (await api('/notifications')).json as {
+    items: { id: string; kind: string; params: { date?: string }; resolved: boolean }[]
+    unread: number
+  }
+  ok(
+    'notifications: the list answers',
+    Array.isArray(feed.items) && typeof feed.unread === 'number',
+  )
+  const mine = feed.items.find((n) => n.kind === 'sunday_report_due' && n.params.date === day)
+  ok('notifications: a closed Sunday is not asked for again', !mine || mine.resolved)
+  const hide = await api('/notifications/dismiss', {
+    method: 'POST',
+    body: JSON.stringify({ ids: mine ? [mine.id] : ['00000000-0000-4000-8000-000000000000'] }),
+  })
+  ok('notifications: a notification can be hidden', hide.status === 200)
   await api(`/sundays/reports/${day}/close`, {
     method: 'POST',
     body: JSON.stringify({ closed: false }),

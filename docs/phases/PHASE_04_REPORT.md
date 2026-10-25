@@ -159,3 +159,8 @@ visits open the home; `/fr/` and `/en/` are never redirected (`openOnSunday`, un
 each group shows its own amount and target at all times; the week ribbon runs edge to edge on phones; the page's background starts and ends on
 the page colour so it blends with its neighbours; a Sunday can have several services (migration 0030, tabs per service, a Sunday counts once in
 trends); « Dimanche dernier » card on the main dashboard; group names travel with the offering lines.
+
+**Special days and notifications (decision 0044, migration 0031).** A report can be made for any day: a day that is not a Sunday must be named
+(suggestions: Nouvel An, Vendredi saint, Ascension, Noël). The top bar has a bell: reminders for the last four Sundays still missing attendance or
+offerings (worked out when the list is read, resolved by themselves, grouped by week, deep link to the sheet), read / hide / mark all read.
+Tests: `reminders.test.ts`, `rules.test.ts`, e2e (3 new checks). Migration 0031 applied on dev only. Options not built: push, email digest, mute.

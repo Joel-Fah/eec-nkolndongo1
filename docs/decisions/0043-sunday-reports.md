@@ -22,3 +22,5 @@ Recording them lets the parish see weekly and monthly trends. It is new data, so
    a numbers table under every chart, CSV export.
 **Consequences:** tables `sunday_reports`, `sunday_offerings` (migration 0029); grants for `secretariat`, `tresorier`, `pasteur`
 (read) — to be granted in Rôles on each environment; help guide; `data-protection.md` section.
+
+**Amended by 0044:** a report may be made for any day; a day that is not a Sunday is a special day and must be named.

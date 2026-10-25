@@ -4,7 +4,7 @@
   "last_sunday": "Last Sunday ({date})",
   "tab_sundays": "Sundays",
   "tab_trends": "Trends",
-  "other_sunday": "Another Sunday",
+  "other_sunday": "Another day (a Sunday or a special day)",
   "not_sunday": "This day is not a Sunday: it will be a special day, which needs a name.",
   "open": "Open",
   "empty_t": "No report",
