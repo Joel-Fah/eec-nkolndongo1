@@ -1,4 +1,5 @@
 /** The arithmetic of Sunday reports, pure and tested: Sunday dates, totals, rollups by week or month, XAF text. */
+import { easterSunday } from '@eec/core'
 export const amountOk = (n: unknown): n is number =>
   Number.isInteger(n) && (n as number) >= 1 && (n as number) <= 500_000_000
 export const countOk = (n: unknown): n is number =>
@@ -8,12 +9,28 @@ export const xaf = (n: number) =>
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} FCFA`
 
+/** Any real calendar day: a parish also reports on days that are not Sundays (Christmas, Good Friday…). */
+export const isReportDate = (d: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(d) && new Date(`${d}T12:00:00Z`).toISOString().startsWith(d)
 export const isSundayDate = (d: string) =>
   /^\d{4}-\d{2}-\d{2}$/.test(d) &&
   new Date(`${d}T12:00:00Z`).getUTCDay() === 0 &&
   new Date(`${d}T12:00:00Z`).toISOString().startsWith(d)
 const shift = (d: string, n: number) =>
   new Date(Date.parse(`${d}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
+/** The fixed or movable church days a parish may gather on, besides Sundays: only to suggest a name, never to assume a service. */
+export type Feast = 'newyear' | 'goodfriday' | 'ascension' | 'christmas'
+export function feastOn(date: string): Feast | null {
+  if (!isReportDate(date)) return null
+  if (date.slice(5) === '01-01') return 'newyear'
+  if (date.slice(5) === '12-25') return 'christmas'
+  const e = easterSunday(Number(date.slice(0, 4)))
+  const day = (offset: number) =>
+    new Date(Date.UTC(e.year, e.month - 1, e.day + offset)).toISOString().slice(0, 10)
+  if (date === day(-2)) return 'goodfriday'
+  if (date === day(39)) return 'ascension'
+  return null
+}
 /** The Sunday just before (or on) a day. */
 export const sundayOnOrBefore = (d: string) => shift(d, -new Date(`${d}T12:00:00Z`).getUTCDay())
 /** The last Sunday whose figures are normally told: today's if it is Sunday evening is not assumed, so: strictly before today. */

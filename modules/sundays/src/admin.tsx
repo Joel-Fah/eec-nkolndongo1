@@ -27,7 +27,7 @@ import {
 } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { attendanceTotal, isSundayDate, trend, xaf } from './rules.ts'
+import { attendanceTotal, feastOn, isReportDate, isSundayDate, trend, xaf } from './rules.ts'
 
 type Line = {
   groupName?: { fr: string; en: string } | null
@@ -100,7 +100,7 @@ export default function SundaysPage() {
     history.replaceState(null, '', d ? `#${d}` : location.pathname + location.search)
     setOpenDate(d)
   }
-  return openDate && isSundayDate(openDate) ? (
+  return openDate && isReportDate(openDate) ? (
     <Sheet date={openDate} onBack={() => open(null)} />
   ) : (
     <Home onOpen={open} />
@@ -171,12 +171,16 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                     placeholder=""
                     max={hints.data?.today}
                     value={pick}
-                    hint={pick && !isSundayDate(pick) ? t(k('not_sunday')) : undefined}
+                    hint={
+                      pick && isReportDate(pick) && !isSundayDate(pick)
+                        ? t(k('not_sunday'))
+                        : undefined
+                    }
                     onChange={(e: { target: { value: string } }) => setPick(e.target.value)}
                   />
                   <Button
                     variant="secondary"
-                    disabled={!isSundayDate(pick)}
+                    disabled={!isReportDate(pick)}
                     onClick={() => onOpen(pick)}
                   >
                     {t(k('open'))}
@@ -216,6 +220,9 @@ function Home({ onOpen }: { onOpen: (d: string) => void }) {
                                 <strong className="font-display text-2xl">
                                   {dayText(r.date, locale)}
                                 </strong>
+                                {!isSundayDate(r.date) && r.serviceLabel && (
+                                  <span className="text-sm text-ink-muted">{r.serviceLabel}</span>
+                                )}
                                 {r.attendance !== null && (
                                   <span className="text-sm">
                                     {t(k('present_n'), { n: String(r.attendance) })}
@@ -528,7 +535,10 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
         </Button>
       </div>
       <header className="flex flex-wrap items-start justify-between gap-4">
-        <h1 className="text-4xl">{dayText(date, locale)}</h1>
+        <div className="grid gap-1">
+          {!isSundayDate(date) && <Badge tone="gold">{t(k('special_day'))}</Badge>}
+          <h1 className="text-4xl">{dayText(date, locale)}</h1>
+        </div>
         {canAdd && count < 6 && (
           <Button variant="secondary" onClick={() => setExtra(count + 1)}>
             <Icon name="plus" size={20} />
@@ -564,17 +574,66 @@ function Sheet({ date, onBack }: { date: string; onBack: () => void }) {
                 )}
               </div>
               {r.closed && <p className="text-sm text-ink-muted">{t(k('closed_help'))}</p>}
-              <div className="reg-grid reg-grid-2">
-                {(r.attendance !== null || !r.id) && (
-                  <Attendance report={r} date={date} several={several} onChange={refresh} />
-                )}
-                <Offerings report={r} date={date} onChange={refresh} />
-              </div>
+              {!isSundayDate(date) && !r.serviceLabel ? (
+                <NameDay date={date} n={r.n} onChange={refresh} />
+              ) : (
+                <div className="reg-grid reg-grid-2">
+                  {(r.attendance !== null || !r.id) && (
+                    <Attendance report={r} date={date} several={several} onChange={refresh} />
+                  )}
+                  <Offerings report={r} date={date} onChange={refresh} />
+                </div>
+              )}
             </div>
           ),
         }))}
       />
     </div>
+  )
+}
+
+/** A day that is not a Sunday must be named before anything is entered: « Noël », « Vendredi saint »… */
+function NameDay({ date, n, onChange }: { date: string; n: number; onChange: () => void }) {
+  const { t } = useLocale()
+  const feast = feastOn(date)
+  const [name, setName] = useState('')
+  const save = useMutation({
+    mutationFn: (label: string) =>
+      api(`/sundays/reports/${date}/label?n=${n}`, {
+        method: 'PUT',
+        body: { serviceLabel: label },
+      }),
+    onSuccess: onChange,
+    onError: () => say(t(k('error')), 'danger'),
+  })
+  return (
+    <section className="admin-panel grid gap-3" aria-label={t(k('name_day_t'))}>
+      <h2 className="text-xl">{t(k('name_day_t'))}</h2>
+      <p className="text-ink-muted">{t(k('name_day_p'))}</p>
+      {feast && (
+        <div>
+          <Button variant="secondary" onClick={() => save.mutate(t(k(`feast_${feast}`)))}>
+            {t(k(`feast_${feast}`))}
+          </Button>
+        </div>
+      )}
+      <TextField
+        label={t(k('day_name'))}
+        placeholder={t(k('special_day_ph'))}
+        maxLength={80}
+        value={name}
+        onChange={(e: { target: { value: string } }) => setName(e.target.value)}
+      />
+      <div>
+        <Button
+          loading={save.isPending}
+          disabled={!name.trim()}
+          onClick={() => save.mutate(name.trim())}
+        >
+          {t(k('name_day_save'))}
+        </Button>
+      </div>
+    </section>
   )
 }
 
@@ -596,7 +655,7 @@ function Attendance({
     men: report.men === null ? '' : String(report.men),
     women: report.women === null ? '' : String(report.women),
     children: report.children === null ? '' : String(report.children),
-    special: report.serviceKind === 'special',
+    special: report.serviceKind === 'special' || !isSundayDate(date),
     label: report.serviceLabel,
     note: report.note,
     name: report.serviceName,
@@ -655,16 +714,18 @@ function Attendance({
         />
       )}
       <p className="font-display text-3xl">{t(k('present_n'), { n: String(total) })}</p>
-      <label className="check-row">
-        <input
-          type="checkbox"
-          className="checkbox"
-          checked={v.special}
-          disabled={!can}
-          onChange={(e) => setV((x) => ({ ...x, special: e.target.checked }))}
-        />
-        <span>{t(k('special_sunday'))}</span>
-      </label>
+      {isSundayDate(date) && (
+        <label className="check-row">
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={v.special}
+            disabled={!can}
+            onChange={(e) => setV((x) => ({ ...x, special: e.target.checked }))}
+          />
+          <span>{t(k('special_sunday'))}</span>
+        </label>
+      )}
       {v.special && (
         <TextField
           label={t(k('special_label'))}

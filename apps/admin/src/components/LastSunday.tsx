@@ -30,8 +30,12 @@ export function LastSunday() {
     queryFn: () => api<{ items: Item[] }>('/sundays/reports'),
     enabled: allowed,
   })
-  if (!allowed || !q.data || q.data.items.length === 0) return null
-  const [now, before] = q.data.items as [Item, Item | undefined]
+  // Sundays only: a special day (Christmas…) has no « Sunday before » to compare with.
+  const sundays = (q.data?.items ?? []).filter(
+    (i) => new Date(`${i.date}T12:00:00Z`).getUTCDay() === 0,
+  )
+  if (!allowed || sundays.length === 0) return null
+  const [now, before] = sundays as [Item, Item | undefined]
   const day = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     day: 'numeric',

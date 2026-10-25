@@ -25,6 +25,7 @@ import {
   byPurpose,
   countOk,
   csvCell,
+  isReportDate,
   isSundayDate,
   lastSunday,
   offeringsTotal,
@@ -73,11 +74,23 @@ async function getOrCreate(db: Db, date: string, n = 1): Promise<Report> {
   if (row) return row
   const [made] = await db
     .insert(sundayReports)
-    .values({ sundayDate: date, position: n })
+    .values({
+      sundayDate: date,
+      position: n,
+      ...(isSundayDate(date) ? {} : { serviceKind: 'special' }),
+    })
     .onConflictDoNothing()
     .returning()
   if (made) return made
   return (await db.select().from(sundayReports).where(here(date, n)))[0] as Report
+}
+
+/** A Sunday needs no name; any other day does, either given now or already saved on its report. */
+async function namedOrSunday(db: Db, date: string, n: number, given?: string) {
+  if (isSundayDate(date)) return true
+  if (given?.trim()) return true
+  const [row] = await db.select().from(sundayReports).where(here(date, n))
+  return !!row?.serviceLabel
 }
 
 /** Lines the actor may see: all with a global right, otherwise only those of groups they may read. */
@@ -225,7 +238,7 @@ export const sundaysApi = new Hono<AppEnv>()
   })
   .get('/reports/:date', requirePermissionAnywhere('sundays:read'), async (c) => {
     const date = c.req.param('date')
-    if (!isSundayDate(date)) return fail(c, 400, 'invalid')
+    if (!isReportDate(date)) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
     const rows = await db
       .select()
@@ -292,10 +305,14 @@ export const sundaysApi = new Hono<AppEnv>()
   .put('/reports/:date/attendance', requirePermission('sundays:attendance'), async (c) => {
     const date = c.req.param('date')
     const p = attendanceBody.safeParse(await c.req.json().catch(() => null))
-    if (!isSundayDate(date) || date > todayLocal() || !p.success) return fail(c, 400, 'invalid')
+    if (!isReportDate(date) || date > todayLocal() || !p.success) return fail(c, 400, 'invalid')
     for (const k of ['men', 'women', 'children'] as const)
       if (p.data[k] != null && !countOk(p.data[k])) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
+    // A day that is not a Sunday is always a special day, and it must be named (nothing is created before it is).
+    if (!(await namedOrSunday(db, date, serviceOf(c.req.query('n')), p.data.serviceLabel)))
+      return fail(c, 400, 'label_required')
+    const special = isSundayDate(date) ? {} : { serviceKind: 'special' as const }
     const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     if (r.closed) return fail(c, 409, 'closed')
     const actor = await c.var.deps.actor()
@@ -303,6 +320,7 @@ export const sundaysApi = new Hono<AppEnv>()
       .update(sundayReports)
       .set({
         ...p.data,
+        ...special,
         attendanceBy: actor?.userId,
         attendanceAt: new Date(),
         updatedAt: new Date(),
@@ -318,11 +336,41 @@ export const sundaysApi = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
+  // Names a day that is not a Sunday (« Noël », « Vendredi saint »): whoever may enter attendance or offerings.
+  .put('/reports/:date/label', requirePermissionAnywhere('sundays:read'), async (c) => {
+    const date = c.req.param('date')
+    const p = z
+      .object({ serviceLabel: text(80).min(1) })
+      .strict()
+      .safeParse(await c.req.json().catch(() => null))
+    if (!isReportDate(date) || date > todayLocal() || isSundayDate(date) || !p.success)
+      return fail(c, 400, 'invalid')
+    if (
+      !(await mayOn(c, 'sundays:attendance', null)) &&
+      !(await mayOn(c, 'sundays:offerings', null))
+    )
+      return fail(c, 403, 'forbidden')
+    const db = await c.var.deps.db()
+    const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
+    if (r.closed) return fail(c, 409, 'closed')
+    await db
+      .update(sundayReports)
+      .set({ serviceKind: 'special', serviceLabel: p.data.serviceLabel, updatedAt: new Date() })
+      .where(eq(sundayReports.id, r.id))
+    await audit(c, {
+      action: 'update',
+      entityType: 'sunday_report',
+      entityId: r.id,
+      summaryFr: 'Jour spécial nommé',
+      summaryEn: 'Special day named',
+    })
+    return c.json({ ok: true })
+  })
   .post('/reports/:date/offerings', requirePermissionAnywhere('sundays:offerings'), async (c) => {
     const date = c.req.param('date')
     const p = offeringBody.safeParse(await c.req.json().catch(() => null))
     if (
-      !isSundayDate(date) ||
+      !isReportDate(date) ||
       date > todayLocal() ||
       !p.success ||
       !p.data.purpose ||
@@ -332,6 +380,8 @@ export const sundaysApi = new Hono<AppEnv>()
     const groupId = p.data.groupId ?? null
     if (!(await mayOn(c, 'sundays:offerings', groupId))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
+    if (!(await namedOrSunday(db, date, serviceOf(c.req.query('n')))))
+      return fail(c, 400, 'label_required')
     const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     if (r.closed) return fail(c, 409, 'closed')
     const actor = await c.var.deps.actor()
@@ -438,7 +488,7 @@ export const sundaysApi = new Hono<AppEnv>()
       .object({ closed: z.boolean() })
       .strict()
       .safeParse(await c.req.json().catch(() => null))
-    if (!isSundayDate(date) || !p.success) return fail(c, 400, 'invalid')
+    if (!isReportDate(date) || !p.success) return fail(c, 400, 'invalid')
     const db = await c.var.deps.db()
     const r = await getOrCreate(db, date, serviceOf(c.req.query('n')))
     const actor = await c.var.deps.actor()

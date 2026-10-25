@@ -6,6 +6,8 @@ import {
   byPurpose,
   countOk,
   csvCell,
+  feastOn,
+  isReportDate,
   isSundayDate,
   lastSunday,
   offeringsTotal,
@@ -22,6 +24,15 @@ describe('Sundays', () => {
     expect(isSundayDate('2026-10-24')).toBe(false)
     expect(isSundayDate('2026-02-30')).toBe(false)
     expect(isSundayDate('nope')).toBe(false)
+  })
+  it('accepts any real day, and names the church days that are not Sundays', () => {
+    expect(isReportDate('2026-12-25')).toBe(true)
+    expect(isReportDate('2026-02-30')).toBe(false)
+    expect(feastOn('2026-12-25')).toBe('christmas')
+    expect(feastOn('2026-01-01')).toBe('newyear')
+    expect(feastOn('2026-04-03')).toBe('goodfriday')
+    expect(feastOn('2026-05-14')).toBe('ascension')
+    expect(feastOn('2026-10-24')).toBeNull()
   })
   it('finds the Sunday to report on', () => {
     expect(sundayOnOrBefore('2026-10-27')).toBe('2026-10-25')
