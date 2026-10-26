@@ -1,0 +1,324 @@
+---
+/**
+ * « Mon espace » for a signed-in member (Phase 05, Checkpoint A; plan: docs/product/mon-espace.md): five sections, one at a time, each
+ * reachable by its anchor and loaded on demand (scripts/mon-espace.ts). Everything is private and drawn on the device from /api/me/*; the
+ * profile section is the slot (the existing profile, photo, data and devices panels, reorganised not rewritten).
+ */
+import Icon from '@eec/ui/astro/Icon.astro'
+import { departmentHref, departmentsHref } from '../lib/departments-routes'
+import { eventHref, eventsListHref } from '../lib/events-routes'
+import { localeOf, useT } from '../lib/i18n'
+import { href, pages } from '../lib/nav'
+import { cancelPath } from '../lib/registrations-routes'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const m = (key: string, vars?: Record<string, string>) =>
+  t(`member.me.${key}` as 'member.me.nav_home', vars)
+// Placeholders stay in the text for the scripts to fill ({n}, {total}, {date}, {title}).
+const ph = { n: '{n}', total: '{total}', date: '{date}', title: '{title}' }
+const sections = [
+  ['accueil', 'home', 'nav_home'],
+  ['inscriptions', 'checklist', 'nav_regs'],
+  ['groupes', 'users', 'nav_groups'],
+  ['notifications', 'bell', 'nav_notifs'],
+  ['profil', 'account', 'nav_profile'],
+] as const
+const sundayPath = pages.find((p) => p.id === 'dimanche')?.path[locale] ?? ''
+const accountPath = pages.find((p) => p.id === 'account')?.path[locale] ?? ''
+const messages = Object.fromEntries(
+  [
+    'sunday_k',
+    'sunday_open',
+    'nav_regs',
+    'nav_groups',
+    'next_reg_k',
+    'groups_k',
+    'profile_k',
+    'profile_todo',
+    'profile_go',
+    'soon_k',
+    'soon_t',
+    'no_next',
+    'regs_upcoming',
+    'regs_past',
+    'regs_empty_t',
+    'regs_empty_p',
+    'regs_agenda',
+    'status_confirmed',
+    'status_waitlist',
+    'status_cancelled',
+    'position',
+    'people',
+    'calendar',
+    'cancel',
+    'cancel_ask',
+    'cancel_done',
+    'kept_until',
+    'link_t',
+    'link_p',
+    'link_ph',
+    'link_go',
+    'link_done',
+    'link_bad',
+    'link_taken',
+    'link_rate',
+    'err',
+    'groups_empty_t',
+    'groups_empty_p',
+    'groups_discover',
+    'member_badge',
+    'view_page',
+    'leave',
+    'leave_ask',
+    'leave_done',
+    'next_event',
+    'no_event',
+    'notifs_empty_t',
+    'notifs_empty_p',
+    'this_week',
+    'last_week',
+    'week_of',
+    'mark_all',
+    'dismiss',
+    'settings',
+    'settings_p',
+    'unread',
+    'kind_waitlist_promoted',
+    'kind_policy_change',
+    'kind_group_announcement',
+    'waitlist_promoted_t',
+    'waitlist_promoted_p',
+    'policy_change_t',
+    'policy_change_p',
+    'done',
+    'loading',
+  ].map((k) => [k, m(k, ph)]),
+)
+const links = {
+  agenda: eventsListHref(locale),
+  departments: departmentsHref(locale),
+  sunday: href(locale, sundayPath),
+  account: href(locale, accountPath),
+  cancel: cancelPath(locale),
+  eventBase: eventHref(locale, '__SLUG__'),
+  deptBase: departmentHref(locale, '__KEY__'),
+}
+---
+
+<div class="me" data-me data-lang={locale} data-msgs={JSON.stringify(messages)} data-links={JSON.stringify(links)}>
+  <nav class="me-nav" aria-label={m('nav_label')}>
+    {
+      sections.map(([id, icon, key], i) => (
+        <a class="me-tab" href={`#${id}`} data-me-tab={id} aria-current={i === 0 ? 'page' : undefined}>
+          <Icon name={icon} size={20} />
+          <span>{m(key)}</span>
+          {id === 'notifications' && <span class="me-count" data-me-count hidden></span>}
+        </a>
+      ))
+    }
+  </nav>
+
+  <section class="me-section" data-me-section="accueil" aria-labelledby="me-h-accueil">
+    <h3 class="sr-only" id="me-h-accueil">{m('nav_home')}</h3>
+    <div class="me-cards" data-me-home aria-busy="true"><div class="me-skel"></div><div class="me-skel"></div></div>
+  </section>
+  <section class="me-section" data-me-section="inscriptions" hidden aria-labelledby="me-h-inscriptions">
+    <h3 class="sr-only" id="me-h-inscriptions">{m('nav_regs')}</h3>
+    <div class="me-cards" data-me-regs aria-busy="true"><div class="me-skel"></div></div>
+  </section>
+  <section class="me-section" data-me-section="groupes" hidden aria-labelledby="me-h-groupes">
+    <h3 class="sr-only" id="me-h-groupes">{m('nav_groups')}</h3>
+    <div class="me-cards" data-me-groups aria-busy="true"><div class="me-skel"></div></div>
+  </section>
+  <section class="me-section" data-me-section="notifications" hidden aria-labelledby="me-h-notifications">
+    <h3 class="sr-only" id="me-h-notifications">{m('nav_notifs')}</h3>
+    <div class="me-cards" data-me-notifs aria-busy="true"><div class="me-skel"></div></div>
+  </section>
+  <section class="me-section" data-me-section="profil" hidden aria-labelledby="me-h-profil">
+    <h3 class="sr-only" id="me-h-profil">{m('nav_profile')}</h3>
+    <slot />
+  </section>
+</div>
+
+<style is:global>
+  .me {
+    display: grid;
+    gap: 1rem;
+  }
+  .me-nav {
+    position: sticky;
+    inset-block-start: 4.75rem;
+    z-index: 5;
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.375rem;
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    scrollbar-width: none;
+  }
+  .me-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .me-tab {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-md);
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .me-tab:hover {
+    color: var(--ink);
+  }
+  .me-tab[aria-current='page'] {
+    background: var(--primary);
+    color: var(--bg);
+  }
+  .me-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding-inline: 0.25rem;
+    border-radius: var(--radius-sm);
+    background: var(--warning-soft);
+    color: var(--warning);
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+  .me-section {
+    display: grid;
+    gap: 1rem;
+  }
+  .me-cards {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .me-skel {
+    height: 5rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--ink) 8%, transparent);
+  }
+  .me-card {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem 1.125rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--elevation-1);
+  }
+  .me-card[data-tone='gold'] {
+    background: color-mix(in oklab, var(--gold) 16%, var(--surface));
+  }
+  .me-card[data-tone='green'] {
+    background: color-mix(in oklab, var(--primary) 10%, var(--surface));
+  }
+  .me-card[data-soon] {
+    opacity: 0.75;
+  }
+  .me-k {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .me-t {
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+  .me-m {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  .me-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .me-pill {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .me-pill[data-tone='warn'] {
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+  .me-pill[data-tone='off'] {
+    background: color-mix(in oklab, var(--ink) 10%, transparent);
+    color: var(--ink-muted);
+  }
+  .me-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .me-wk {
+    margin-block-start: 0.5rem;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .me-empty {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: center;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: var(--ink-muted);
+  }
+  .me-empty strong {
+    color: var(--ink);
+  }
+  .me-unread {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-inline-end: 0.5rem;
+    border-radius: 50%;
+    background: var(--danger);
+  }
+  .me-notif {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .me-notif > a {
+    display: grid;
+    gap: 0.25rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .me-link {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .me-link .field {
+    margin: 0;
+  }
+  @media (max-width: 40rem) {
+    .me-nav {
+      inset-block-start: 4rem;
+      margin-inline: -0.5rem;
+    }
+  }
+</style>

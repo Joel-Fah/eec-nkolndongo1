@@ -1953,3 +1953,26 @@
     height: 100%;
   }
 }
+
+@layer components {
+  .nav-bell {
+    position: relative;
+  }
+  .nav-bell-count {
+    position: absolute;
+    inset-block-start: -0.125rem;
+    inset-inline-end: -0.125rem;
+    display: grid;
+    place-items: center;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding-inline: 0.25rem;
+    border-radius: var(--radius-sm);
+    background: var(--warning-soft);
+    color: var(--warning);
+    box-shadow: 0 0 0 1.5px var(--warning);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+}

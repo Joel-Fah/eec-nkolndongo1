@@ -499,5 +499,132 @@ const stamp = Date.now().toString(36)
   )
 }
 
+// 11. Mon espace (Phase 05): my registrations (signed-in link, link by the signed cancel link, cancel), promotion notifies me, my groups, mutes
+{
+  const mk = async (title: string, cap: number) => {
+    const f = await api('/registrations/forms', {
+      method: 'POST',
+      body: JSON.stringify({
+        titleFr: title,
+        eventSlug: `e2e-me-${stamp}-${cap}`,
+        eventDate: '2099-02-01',
+        capacity: cap,
+        waitlist: true,
+      }),
+    })
+    await api(`/registrations/forms/${f.json.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ state: 'published' }),
+    })
+    return {
+      id: f.json.id as string,
+      slug: ((await api(`/registrations/forms/${f.json.id}`)).json.slug as string) ?? '',
+    }
+  }
+  const token = async () =>
+    ((await (await fetch(`${base}/api/registrations/token`)).json()) as { token: string }).token
+  const reg = async (slug: string, n: number, tok: string, signedIn: boolean) => {
+    const res = await fetch(`${base}/api/registrations/submit`, {
+      method: 'POST',
+      headers: signedIn ? { ...H } : { 'content-type': 'application/json', origin: base },
+      body: JSON.stringify({
+        slug,
+        name: `E2E Moi ${n}`,
+        phone: `65500030${n}`,
+        partySize: 1,
+        consent: true,
+        website: '',
+        token: tok,
+        answers: {},
+        children: [],
+        guardian: false,
+      }),
+    })
+    return { status: res.status, json: (await res.json()) as Record<string, any> }
+  }
+  const one = await mk(`E2E — moi ${stamp} (une place)`, 1)
+  const t1 = await token()
+  const t2 = await token()
+  const t3 = await token()
+  await sleep(4400)
+  const anon = await reg(one.slug, 1, t1, false)
+  const mine = await reg(one.slug, 2, t2, true)
+  ok(
+    'mon espace: a place taken, then my signed-in registration goes on the waitlist',
+    anon.json.status === 'confirmed' && mine.json.status === 'waitlist',
+  )
+  const list = (await api('/registrations/mine')).json.items as {
+    id: string
+    status: string
+    position: number | null
+  }[]
+  const waiting = list.find((r) => r.status === 'waitlist')
+  ok(
+    'mon espace: « Mes inscriptions » lists mine with my place on the waitlist',
+    !!waiting && waiting.position === 1,
+  )
+  // Someone else's registration cannot be cancelled through mine; mine can.
+  const other = await api('/registrations/mine/00000000-0000-4000-8000-000000000000/cancel', {
+    method: 'POST',
+    body: '{}',
+  })
+  ok('mon espace: cancelling a registration that is not mine is refused', other.status === 404)
+  // Cancelling the confirmed anonymous registration (its signed link) promotes me, and I am told.
+  await fetch(`${base}/api/registrations/cancel`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: base },
+    body: JSON.stringify({ token: anon.json.cancelToken }),
+  })
+  const feed = (await api('/me/notifications')).json as {
+    items: { kind: string }[]
+    unread: number
+  }
+  ok(
+    'mon espace: the promotion is a notification for me',
+    feed.items.some((n) => n.kind === 'waitlist_promoted') && feed.unread > 0,
+  )
+  const mute = await api('/me/notifications/mute', {
+    method: 'PUT',
+    body: JSON.stringify({ kind: 'waitlist_promoted', muted: true }),
+  })
+  const quiet = (await api('/me/notifications')).json as {
+    items: { kind: string }[]
+    muted: string[]
+  }
+  ok(
+    'mon espace: a muted kind is not shown to me',
+    mute.status === 200 &&
+      !quiet.items.some((n) => n.kind === 'waitlist_promoted') &&
+      quiet.muted.includes('waitlist_promoted'),
+  )
+  await api('/me/notifications/mute', {
+    method: 'PUT',
+    body: JSON.stringify({ kind: 'waitlist_promoted', muted: false }),
+  })
+  // Link a registration made without an account by its signed cancel link.
+  const two = await mk(`E2E — moi ${stamp} (sans compte)`, 5)
+  await sleep(100)
+  const anon2 = await reg(two.slug, 3, t3, false)
+  const claim = await api('/registrations/mine/claim', {
+    method: 'POST',
+    body: JSON.stringify({ token: anon2.json.cancelToken }),
+  })
+  const bad = await api('/registrations/mine/claim', {
+    method: 'POST',
+    body: JSON.stringify({ token: 'not-a-valid-link-at-all' }),
+  })
+  const after = (await api('/registrations/mine')).json.items as { id: string }[]
+  ok(
+    'mon espace: the signed cancel link links a registration to my account, a bad link does not',
+    claim.status === 200 && bad.status === 400 && after.length >= 2,
+  )
+  const groups = await api('/me/groups')
+  ok('mon espace: my groups answer', groups.status === 200 && Array.isArray(groups.json.items))
+  const anonList = await fetch(`${base}/api/registrations/mine`)
+  ok('mon espace: nobody without a session sees registrations', anonList.status === 401)
+  await api(`/registrations/forms/${one.id}`, { method: 'DELETE' })
+  await api(`/registrations/forms/${two.id}`, { method: 'DELETE' })
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

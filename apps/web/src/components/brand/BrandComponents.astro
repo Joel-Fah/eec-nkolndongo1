@@ -28,6 +28,7 @@ import { type ShapeId, shapes } from '../../lib/shapes'
 import ContentCard from '../content/ContentCard.astro'
 import LangFallbackNote from '../content/LangFallbackNote.astro'
 import UnavailableState from '../content/UnavailableState.astro'
+import MeSections from '../MeSections.astro'
 import SiteLockup from '../SiteLockup.astro'
 import ThemeToggle from '../ThemeToggle.astro'
 import DocBlock from './DocBlock.astro'
@@ -79,6 +80,8 @@ type Id =
   | 'pagination'
   | 'insetfields'
   | 'datepicker'
+  | 'mespace'
+  | 'headerbell'
   | 'identicon'
   | 'profilebadge'
   | 'timepicker'
@@ -471,6 +474,27 @@ const doc = (id: Id) => ({
       <div class="flex flex-wrap items-center gap-6">
         <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge">!</span></span>
         <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(7)} /></span>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('mespace')}>
+      <div class="grid max-w-[28rem] gap-3">
+        <MeSections />
+        <div class="me-card" data-tone="gold">
+          <span class="me-k">{t('member.me.next_reg_k')}</span>
+          <span class="me-t">Retraite des femmes</span>
+          <div class="me-row"><span class="me-m">samedi 7 novembre</span><span class="me-pill">{t('member.me.status_confirmed')}</span></div>
+        </div>
+        <div class="me-card">
+          <div class="me-row"><span class="me-t">Concert de Noël</span><span class="me-pill" data-tone="warn">{t('member.me.status_waitlist')}</span></div>
+          <span class="me-m">samedi 19 décembre · n° 1</span>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('headerbell')}>
+      <div class="flex items-center gap-4">
+        <span class="btn btn-ghost btn-icon nav-bell" aria-hidden="true"><Icon name="bell" /><span class="nav-bell-count">3</span></span>
       </div>
     </DocBlock>
 

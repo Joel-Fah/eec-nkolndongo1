@@ -5,6 +5,7 @@ _Last updated: 2026-10-26. History lives in the phase reports (`docs/phases/PHAS
 ## Current phase: 05 — Release, then Mon espace & group life
 Branch `feat/phase-05a-member-home` (from `main`). Brief: `docs/phases/PHASE_05_INSTRUCTIONS.md`. **Working on:** Checkpoint 0 (what Claude can do), then Checkpoint L
 (legal footing), then the Mon espace plan (IA + sketch) — each stops for Joël's approval.
+**Checkpoint A built on dev (2026-10-26):** Mon espace in five sections (Accueil, Inscriptions, Groupes, Notifications, Profil), my registrations with link-by-cancel-link, my groups (list, leave), member notifications and a header bell; migration 0037 (index). Plan: `docs/product/mon-espace.md`. **Checkpoint L (legal) is deferred at Joël's request:** the safer reading applies meanwhile.
 Done on this branch so far: decision **0048** (system-role grants offered once through a ledger, migration 0036, dev only), the generated grants list
 (`docs/ops/release-phase-04.md`), the privacy-policy draft v2 (`docs/legal/privacy-policy-draft-v2.md`), the device-pass sheet (`docs/ops/device-pass.md`),
 the backup error message, the service-worker cache keep-list (+ test), the decisions index in order.

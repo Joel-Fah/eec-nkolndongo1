@@ -10,8 +10,9 @@ type Badge = {
   signedIn: boolean
   seed?: number
   incomplete?: boolean
-  photo?: boolean
-  photoV?: number
+  /** The address of the photo, only when its owner chose it as their avatar. */
+  photo?: string | null
+  unread?: number
 }
 const KEY = 'eec-badge'
 const TTL = 60_000
@@ -46,6 +47,15 @@ export async function initAccountBadge() {
   if (!links.length) return
   const b = await read()
   if (!b?.signedIn) return
+  // The bell: shown once signed in, with the number of unread notifications.
+  for (const bell of document.querySelectorAll<HTMLElement>('[data-bell]')) {
+    bell.hidden = false
+    const n = bell.querySelector<HTMLElement>('[data-bell-count]')
+    if (n && (b.unread ?? 0) > 0) {
+      n.hidden = false
+      n.textContent = (b.unread ?? 0) > 99 ? '99+' : String(b.unread)
+    }
+  }
   for (const link of links) {
     if (link.dataset.badged) continue
     link.dataset.badged = '1'

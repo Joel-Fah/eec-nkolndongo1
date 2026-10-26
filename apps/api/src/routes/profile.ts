@@ -16,13 +16,13 @@ import {
 } from '@eec/core'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { createPrivateStore, PHOTO_MAX_BYTES, sniffPhoto } from '../lib/private-store.ts'
 import { policyVersion } from '../policy.ts'
 
-const { profiles, consents, user, account } = schema
+const { profiles, consents, user, account, notifications } = schema
 const today = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 const text = (n: number) =>
@@ -118,8 +118,22 @@ export const profileRoutes = new Hono<AppEnv>()
     if (actor?.principal.status !== 'active') return c.json({ signedIn: false })
     const db = await c.var.deps.db()
     const { row, completeness } = await load(db, actor.userId)
+    // Unread member notifications, for the bell in the header (a plain count: nothing is computed here).
+    const [unread] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.userId, actor.userId),
+          inArray(notifications.kind, ['waitlist_promoted', 'policy_change', 'group_announcement']),
+          isNull(notifications.readAt),
+          isNull(notifications.resolvedAt),
+          isNull(notifications.dismissedAt),
+        ),
+      )
     return c.json({
       signedIn: true,
+      unread: unread?.n ?? 0,
       seed: avatarSeed(actor.userId),
       incomplete: !completeness.complete,
       // The photo shows in the navbar only if its owner chose it as their avatar; otherwise the generated avatar does (the default).
