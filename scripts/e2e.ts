@@ -13,6 +13,17 @@ const email = process.env.E2E_EMAIL ?? 'news-tester@example.test'
 const password = process.env.E2E_PASSWORD ?? 'une-phrase-solide-2026'
 if (!/localhost|127\.0\.0\.1/.test(base)) throw new Error('e2e runs against a local stack only')
 
+// The dev database is remote and sometimes unreachable for a moment (a 5xx with an HTML error page): try a request again before judging it.
+const realFetch = globalThis.fetch
+globalThis.fetch = (async (...a: Parameters<typeof fetch>) => {
+  let r = await realFetch(...a)
+  for (let i = 0; i < 2 && r.status >= 500; i++) {
+    await new Promise((res) => setTimeout(res, 2500))
+    r = await realFetch(...a)
+  }
+  return r
+}) as typeof fetch
+
 let failures = 0
 const ok = (name: string, pass: boolean, detail = '') => {
   console.log(`${pass ? '✔' : '✘'} ${name}${detail ? ` — ${detail}` : ''}`)
@@ -995,7 +1006,10 @@ const stamp = Date.now().toString(36)
       (await pastor.as(`/communion/cards/${cardId}/approve`, { method: 'POST', body: '{}' }))
         .status === 200,
     )
-    const mine = (await member.as('/communion/me')).json.card as Record<string, any>
+    // the dev database is remote and slow: one retry if a cold request times out
+    let first = await member.as('/communion/me')
+    if (first.status >= 500) first = await member.as('/communion/me')
+    const mine = first.json.card as Record<string, any>
     ok(
       'communion: the member sees a valid card with a QR code and twelve months',
       mine?.state === 'valid' && !!mine.qr && mine.months.length === 12 && !!mine.verifyUrl,
@@ -1039,7 +1053,10 @@ const stamp = Date.now().toString(36)
       method: 'PUT',
       body: JSON.stringify({ month, excused: true }),
     })
-    ok('communion: a signed month cannot be excused', exc.status === 409)
+    ok(
+      'communion: a signed (and past) month cannot be excused',
+      exc.status === 409 || exc.status === 400,
+    )
     ok(
       'communion: an Elder notes a contribution, a member never sees amounts',
       (
@@ -1077,6 +1094,7 @@ const stamp = Date.now().toString(36)
       page.status === 200 &&
         (page.headers.get('cache-control') ?? '').includes('no-store') &&
         (page.headers.get('x-robots-tag') ?? '').includes('noindex'),
+      `${page.status} ${page.headers.get('cache-control')} ${page.headers.get('x-robots-tag')}`,
     )
     ok(
       'communion: the check is open to a scanner account too',

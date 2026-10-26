@@ -17,7 +17,14 @@ const t = useT(locale)
 const m = (key: string, vars?: Record<string, string>) =>
   t(`member.me.${key}` as 'member.me.nav_home', vars)
 // Placeholders stay in the text for the scripts to fill ({n}, {total}, {date}, {title}).
-const ph = { n: '{n}', total: '{total}', date: '{date}', title: '{title}' }
+const ph = {
+  n: '{n}',
+  total: '{total}',
+  date: '{date}',
+  title: '{title}',
+  from: '{from}',
+  to: '{to}',
+}
 const sections = [
   ['accueil', 'home', 'nav_home'],
   ['inscriptions', 'checklist', 'nav_regs'],
@@ -169,6 +176,7 @@ const iconNames = [
   'heart',
   'lock',
   'arrowRight',
+  'megaphone',
 ] as const
 const icons = Object.fromEntries(iconNames.map((n) => [n, iconSvg(n, { size: 20 })]))
 const intros: Record<string, string> = {

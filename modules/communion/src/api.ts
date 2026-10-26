@@ -466,15 +466,24 @@ export const communionApi = new Hono<AppEnv>()
     const actor = await c.var.deps.actor()
     if (!actor) return fail(c, 401, 'unauthenticated')
     const db = await c.var.deps.db()
-    const [card] = await db.select().from(cards).where(eq(cards.userId, actor.userId))
+    // Two rounds to the database, not five: the card, the person, the fee schedule and my groups first; then the card's visas and excuses.
+    const [[card], [who], feeRows, mine] = await Promise.all([
+      db.select().from(cards).where(eq(cards.userId, actor.userId)),
+      db
+        .select({ name: user.name, first: profiles.firstName, birth: profiles.birthDate })
+        .from(user)
+        .innerJoin(profiles, eq(profiles.userId, user.id))
+        .where(eq(user.id, actor.userId)),
+      db.select().from(fees),
+      db
+        .select({ id: groupMembers.groupId, nameFr: groups.nameFr, nameEn: groups.nameEn })
+        .from(groupMembers)
+        .innerJoin(groups, eq(groups.id, groupMembers.groupId))
+        .where(eq(groupMembers.userId, actor.userId)),
+    ])
     // Someone who is not a communicant simply has no card: nothing is said about why.
     if (!card || card.status === 'withdrawn' || card.status === 'proposed')
       return c.json({ card: null })
-    const [who] = await db
-      .select({ name: user.name, first: profiles.firstName, birth: profiles.birthDate })
-      .from(user)
-      .innerJoin(profiles, eq(profiles.userId, user.id))
-      .where(eq(user.id, actor.userId))
     const [vs, es] = await Promise.all([
       db.select({ m: visas.month }).from(visas).where(eq(visas.cardId, card.id)),
       db.select({ m: excuses.month }).from(excuses).where(eq(excuses.cardId, card.id)),
@@ -491,14 +500,6 @@ export const communionApi = new Hono<AppEnv>()
     const upcoming =
       prepMonth ?? (day <= communionSunday(nowMonth) ? nowMonth : nextMonth(nowMonth))
     // What is expected, never what is owed: the age band's amount plus the groups' amounts.
-    const [feeRows, mine] = await Promise.all([
-      db.select().from(fees),
-      db
-        .select({ id: groupMembers.groupId, nameFr: groups.nameFr, nameEn: groups.nameEn })
-        .from(groupMembers)
-        .innerJoin(groups, eq(groups.id, groupMembers.groupId))
-        .where(eq(groupMembers.userId, actor.userId)),
-    ])
     const band = ageBand(who?.birth ?? null, day)
     const lines = [
       ...feeRows
