@@ -163,7 +163,43 @@ export const groupMembers = pgTable(
       .references(() => groups.id, { onDelete: 'cascade' }),
     titleFr: text('title_fr'),
     titleEn: text('title_en'),
+    /** The member ticked « share my number with this group's leaders » (decision 0049); never pre-ticked. */
+    sharePhone: boolean('share_phone').notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.groupId] })],
+)
+
+/**
+ * A request to join a group (decision 0049). Kept apart from `group_members` so a person who is only waiting is never counted or listed
+ * as a member by any existing query. Decided requests are erased 12 months after the decision, pending ones after 6 months.
+ */
+export const groupRequests = pgTable(
+  'group_requests',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    groupId: uuid('group_id')
+      .notNull()
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    status: text('status', { enum: ['pending', 'approved', 'declined', 'withdrawn'] })
+      .notNull()
+      .default('pending'),
+    /** What the member chose for their phone number if they are accepted. */
+    sharePhone: boolean('share_phone').notNull().default(false),
+    /** The leader's answer, shown to the member. */
+    decisionMessage: text('decision_message'),
+    requestedAt: tz('requested_at').notNull().defaultNow(),
+    decidedBy: uuid('decided_by').references(() => user.id, { onDelete: 'set null' }),
+    decidedAt: tz('decided_at'),
+  },
+  (t) => [
+    index('group_requests_group_idx').on(t.groupId, t.status),
+    // one waiting request per person and group
+    uniqueIndex('group_requests_pending_idx')
+      .on(t.userId, t.groupId)
+      .where(sql`${t.status} = 'pending'`),
+  ],
 )
