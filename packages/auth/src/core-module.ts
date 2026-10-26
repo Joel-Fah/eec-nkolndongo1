@@ -86,6 +86,12 @@ export const systemRoles = [
       'announcements:read',
       'announcements:edit',
       'announcements:publish',
+      // Communion cards: the secretariat proposes, confirms baptism, suspends and restores; it reads the register (decision 0050).
+      'communion:read',
+      'communion:issue',
+      'communion:suspend',
+      'communion:register-read',
+      'communion:verify',
       'core:system-outbox',
       'core:validation-read',
       'settings:read',
@@ -162,7 +168,28 @@ export const systemRoles = [
       'Un pasteur ou une pasteure. Sans droit d’administration : sert à proposer les noms pour la prédication.',
     descEn: 'A pastor. No admin rights: used to suggest names for preaching.',
     // Reads the Sunday reports and trends (decision 0043).
-    grants: ['sundays:read'] as string[],
+    grants: [
+      'sundays:read',
+      // The second person of the card: approves, renews and withdraws; also confirms baptism and checks cards.
+      'communion:read',
+      'communion:issue',
+      'communion:approve',
+      'communion:verify',
+    ] as string[],
+  },
+  {
+    key: 'ancien',
+    fr: 'Ancien d’Église',
+    en: 'Church Elder',
+    descFr: 'Vise la carte de Sainte-Cène du mois et note les cotisations reçues.',
+    descEn: 'Signs the month on the Communion card and notes the contributions received.',
+    grants: [
+      'communion:read',
+      'communion:visa',
+      'communion:register-read',
+      'communion:register-write',
+      'communion:verify',
+    ] as string[],
   },
   {
     key: 'responsable-groupe',
@@ -194,7 +221,15 @@ export const systemRoles = [
     descFr: 'Suit les dons et les finances.',
     descEn: 'Follows gifts and finances.',
     // Enters the amounts of the Moissons; someone else validates them.
-    grants: ['campaigns:read', 'campaigns:progress', 'sundays:read', 'sundays:offerings'],
+    grants: [
+      'campaigns:read',
+      'campaigns:progress',
+      'sundays:read',
+      'sundays:offerings',
+      'communion:read',
+      'communion:fees',
+      'communion:register-read',
+    ],
   },
   {
     key: 'membre',

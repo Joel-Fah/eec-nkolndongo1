@@ -3,6 +3,7 @@ import type { AppEnv } from '@eec/api-kit'
 import { announcementsApi } from '@eec/module-announcements/api'
 import { bulletinApi } from '@eec/module-bulletin/api'
 import { campaignsApi } from '@eec/module-campaigns/api'
+import { communionApi } from '@eec/module-communion/api'
 import { contactApi } from '@eec/module-contact/api'
 import { departmentsApi } from '@eec/module-departments/api'
 import { eventsApi } from '@eec/module-events/api'
@@ -25,6 +26,7 @@ import type { Hono } from 'hono'
 export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   contact: contactApi,
   announcements: announcementsApi,
+  communion: communionApi,
   departments: departmentsApi,
   guides: guidesApi,
   legal: legalApi,

@@ -32,6 +32,9 @@ describe('schema conventions', () => {
       'system_marks',
       // the request time is requested_at
       'group_requests',
+      // signed_at / noted_at are the creation
+      'communion_visas',
+      'communion_contributions',
     ])
     const missing = config
       .filter((t) => !exempt.has(t.name) && !t.columns.some((c) => c.name === 'created_at'))

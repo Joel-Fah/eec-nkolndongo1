@@ -8,6 +8,7 @@ import { coreModule } from '@eec/auth/core-module'
 import { announcementsModule } from '@eec/module-announcements'
 import { bulletinModule } from '@eec/module-bulletin'
 import { campaignsModule } from '@eec/module-campaigns'
+import { communionModule } from '@eec/module-communion'
 import { contactModule } from '@eec/module-contact'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
@@ -47,6 +48,7 @@ export const modules: readonly DefinedModule[] = [
   contactModule,
   legalModule,
   announcementsModule,
+  communionModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

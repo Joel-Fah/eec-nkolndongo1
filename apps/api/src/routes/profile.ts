@@ -55,6 +55,9 @@ const CLEARED = {
   photoKey: null,
   photoAsAvatar: false,
   photoUpdatedAt: null,
+  // what the member said about their baptism and confirmation goes with the consent (the parish's own confirmation stays)
+  baptised: null,
+  confirmed: null,
 }
 
 type Db = Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>
