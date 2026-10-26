@@ -34,7 +34,7 @@ the backup error message, the service-worker cache keep-list (+ test), the decis
 ## Carry-overs
 - « Mes inscriptions » in Mon espace (planned in Phase 05 Checkpoint A); the per-event `.ics` on the registration confirmation page.
 - **Tell the Bible service:** the parish's 2026 calendar has an error at **Hébreux 8, 19** (flagged by the import checks), and two psalm-column warnings (2026-09-16 and 09-17: « 1-22 » / « 23-43 » have no psalm number).
-- The carte de Sainte-Cène: decision **0050** is proposed with Joël's answers (Anciens d'Église visa + contribution register, baptism declared then confirmed, fees expected not owed, streak on Communion Sundays). The **seven parish questions** in it must be answered before Checkpoint C.
+- The carte de Sainte-Cène: decision **0050** is proposed with Joël's answers (Anciens d'Église visa + contribution register, baptism declared then confirmed, fees expected not owed, streak on Communion Sundays). Parish answers received 2026-10-26 (second Sunday, no quartiers, all Elders write, member-declared excuse, secretariat handles suspension); two small questions remain in the decision.
 
 ## History
 Phase reports: `docs/phases/PHASE_01_REPORT.md` … `PHASE_04_REPORT.md`. Decisions: `docs/decisions/README.md`.

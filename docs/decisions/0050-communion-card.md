@@ -10,15 +10,15 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
   **confirme** d'après le registre des baptêmes avant l'émission d'une carte.
 - **Cotisations** : le membre voit **ce qui est attendu** pour sa tranche d'âge et son groupe, **jamais un solde ni un arriéré**. Barèmes réglés en administration
   (rôle trésorier), jamais en dur.
-- **Série (streak)** : seuls comptent les mois **avec une Sainte-Cène** ; une absence excusée, notée par les Anciens, **met la série en pause** sans la casser. Ton encourageant.
+- **Série (streak)** : seuls comptent les mois **avec une Sainte-Cène** ; une absence excusée, **déclarée par le membre**, **met la série en pause** sans la casser. Ton encourageant.
 - Rappel au membre avant la fin de la **semaine de préparation**.
 
 ## Esquisse (module `communion`, rien n'est créé)
 - `communion_cards` (membre, statut : émise / suspendue / retirée, émise par, date), émission et retrait à **deux personnes** (secrétariat + pasteur).
-- `communion_visas` (carte, mois, visé par, date, `excused`), jamais modifiable par le membre ; journal d'audit.
+- `communion_visas` (carte, mois, visé par, date) et `communion_excuses` (carte, mois, déclarée par le membre, sans motif) ; le visa n'est jamais modifiable par le membre ; journal d'audit.
 - `fee_schedules` (tranche d'âge ou groupe → montant en XAF) ; `contribution_register` (carte, mois, montant reçu, noté par) **visible des Anciens du quartier et du trésorier seulement**.
 - `profiles` : déclaration facultative `baptised`, `confirmed` + `sacrament_confirmed_by/at` (effacées avec le consentement `profile`).
-- Rôles : **Ancien d'Église** (limité à son quartier/groupe), secrétariat, pasteur, trésorier. « Quartier » = groupe de type nouveau (`quartier`) à confirmer.
+- Rôles : **Ancien d'Église** (le groupe, sans portée par quartier), secrétariat, pasteur, trésorier.
 - Notification de membre (nouveau type) pour le rappel ; dates de préparation saisies par le secrétariat.
 - Suspension : le membre voit « carte suspendue, voyez le pasteur », **jamais le motif**.
 - Vérification (QR signé, copie hors ligne) : plan de la phase 05, point C ; amende 0037.
@@ -27,11 +27,20 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
 « Baptisé/confirmé » révèle une appartenance religieuse : donnée sensible (loi n°2024/017). Il faut : consentement explicite distinct, accès limité, ligne dans
 `docs/legal/register.md`, mise à jour de la politique de confidentialité, question au juriste (`docs/legal/questions-pour-un-juriste.md`).
 
-## Questions pour la paroisse
-1. Quel dimanche est celui de la Sainte-Cène (premier du mois ?) et quelles sont les dates exactes de la **semaine de préparation** ?
-2. Comment s'appellent les quartiers/annexes ici, et sont-ils les groupes auxquels les Anciens sont rattachés ?
-3. Qui siège parmi les Anciens d'Église, et qui peut noter le registre des cotisations (tous, ou un Ancien trésorier) ?
-4. Barème : tranches d'âge et montants, groupes avec cotisation propre ; le visa reste-t-il refusé sans cotisation (règle pastorale que la carte ne doit pas afficher comme une dette) ?
-5. Qu'est-ce qu'une absence excusée, qui la note ; transfert vers une autre paroisse (que dit la carte, combien de temps) ?
-6. Discipline : que dit-on au membre quand sa carte est suspendue, et qui peut la rétablir ?
-7. Combien de temps garder l'historique des visas après le départ d'un membre ? La carte papier continue-t-elle en parallèle ?
+## Réponses de la paroisse (2026-10-26)
+1. **Dimanche de Sainte-Cène = le deuxième dimanche de chaque mois** (calculé, pas saisi). La **préparation** dure la semaine qui y mène, du lundi ou mardi au samedi ou dimanche :
+   par défaut du **lundi au samedi** précédant ce dimanche, ajustable par mois par le secrétariat.
+2. **Pas de quartiers ni d'annexes** : ils sortent du modèle (pas de type de groupe `quartier`, pas de portée par quartier sur la carte).
+3. **Tous les Anciens peuvent écrire** (visa et registre). Les « équipes de travail par mois » restent une organisation interne, non imposée par l'application ; chaque écriture
+   est auditée (qui, quand). Conséquence : les Anciens voient tous les porteurs de carte (strict nécessaire) ; à valider avec le Conseil.
+4. **Jamais présenté comme une dette, et le visa n'est jamais refusé pour défaut de paiement** : le registre des cotisations est tenu à part et ne bloque rien. Tranches d'âge et
+   montants **entièrement réglés en administration**.
+5. **L'excuse est déclarée par le membre** (« excusé » ou non, **sans motif**) ; l'administration ne fait que la **voir**. Elle met la série en pause. *(Cela remplace « noté par les Anciens » plus haut.)*
+6. **Suspension/rétablissement : le secrétariat s'en charge** (avec le pasteur pour le retrait), sans motif montré au membre.
+7. **Conservation (recommandation de Claude, à valider)** : garder l'historique des visas **tant que le compte existe**, puis **12 mois** après la clôture du compte ou le départ (pour
+   répondre à une question du Conseil), puis l'effacer ; seule une **statistique anonyme** (nombre de visas par mois) peut rester. Les excuses et le registre suivent la même durée.
+   La **carte papier continue en parallèle** : le numérique l'accompagne et ne la remplace pas tant que le Conseil ne l'a pas décidé ; le visa papier reste la référence.
+
+## Reste à trancher (petit)
+Le secrétariat peut-il voir le registre des cotisations, ou seulement les Anciens et le trésorier ? Un membre sans carte (non baptisé) voit-il quelque chose dans Mon espace
+(par exemple un mot d'accueil sur le chemin vers le baptême, à rédiger avec le pasteur) ?
