@@ -530,7 +530,8 @@ const doc = (id: Id) => ({
 
     <DocBlock {...doc('headerbell')}>
       <div class="flex items-center gap-4">
-        <span class="btn btn-ghost btn-icon nav-bell" aria-hidden="true"><Icon name="bell" /><span class="nav-bell-count">3</span></span>
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge acct-count">3</span></span>
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(7)} /><span class="acct-badge acct-count">9+</span></span>
       </div>
     </DocBlock>
 

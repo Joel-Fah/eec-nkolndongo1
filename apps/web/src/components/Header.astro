@@ -122,10 +122,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
         {other.toUpperCase()}
       </a>
       <span class="site-tool-desktop"><ThemeToggle /></span>
-      <a href={`${href(locale, accountPath)}#notifications`} class="btn btn-ghost btn-icon site-tool-desktop nav-bell" aria-label={t('member.me.nav_notifs')} data-tip={t('member.me.nav_notifs')} data-bell hidden>
-        <Icon name="bell" /><span class="nav-bell-count" data-bell-count hidden></span>
-      </a>
-      <a href={href(locale, accountPath)} class="btn btn-secondary btn-icon site-tool-desktop nav-account" aria-label={t('nav.account')} data-tip={t('nav.account')} data-tip-end data-account-link data-incomplete-label={t('nav.account_incomplete')}>
+      <a href={href(locale, accountPath)} class="btn btn-secondary btn-icon site-tool-desktop nav-account" aria-label={t('nav.account')} data-tip={t('nav.account')} data-tip-end data-account-link data-incomplete-label={t('nav.account_incomplete')} data-unread-label={t('nav.account_unread', { n: '{n}' })}>
         <span class="inline-flex" data-account-icon><Icon name="account" /></span>
       </a>
       <button type="button" class="btn btn-ghost btn-icon site-menu-button" data-dialog-open="mobile-menu" aria-haspopup="dialog" aria-label={t('nav.open_menu')}>
@@ -171,7 +168,7 @@ const active = (slug: string) => current.startsWith(`/${locale}/${slug}`)
       </nav>
       <div class="mobile-menu-tools" role="group" aria-label={t('nav.utilities')}>
         <button type="button" class="btn btn-secondary" data-dialog-open="search-dialog" aria-haspopup="dialog"><Icon name="search" />{t('nav.search')}</button>
-        <a href={href(locale, accountPath)} class="btn btn-secondary nav-account" data-account-link data-incomplete-label={t('nav.account_incomplete')}><span class="inline-flex" data-account-icon><Icon name="account" /></span>{t('nav.account')}</a>
+        <a href={href(locale, accountPath)} class="btn btn-secondary nav-account" data-account-link data-incomplete-label={t('nav.account_incomplete')} data-unread-label={t('nav.account_unread', { n: '{n}' })}><span class="inline-flex" data-account-icon><Icon name="account" /></span>{t('nav.account')}</a>
         <a href={switchHref} hreflang={other} lang={other} class="btn btn-ghost"><Icon name="language" />{t('common.language.switch_to')}</a>
         <ThemeToggle />
       </div>

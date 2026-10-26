@@ -93,15 +93,21 @@ async function qrFor(
 
 export const communionApi = new Hono<AppEnv>()
   // ——— Staff: people ————————————————————————————————————————————
+  // People to propose a card for. Without a search: those who declared a baptism or confirmation and wait for the parish to confirm it.
+  // With one: matches by name or e-mail. Each tile carries what tells two people with the same name apart.
   .get('/people', requirePermission('communion:issue'), async (c) => {
     const q = (c.req.query('q') ?? '').trim()
-    if (q.length < 2) return c.json({ items: [] })
     const db = await c.var.deps.db()
     const like = `%${q.replace(/[%_]/g, '')}%`
     const rows = await db
       .select({
         id: user.id,
         name: user.name,
+        email: user.email,
+        phone: profiles.phone,
+        neighbourhood: profiles.neighbourhood,
+        city: profiles.city,
+        joinedAt: user.createdAt,
         baptised: profiles.baptised,
         confirmed: profiles.confirmed,
         confirmedAt: profiles.sacramentConfirmedAt,
@@ -110,10 +116,18 @@ export const communionApi = new Hono<AppEnv>()
       .from(user)
       .innerJoin(profiles, eq(profiles.userId, user.id))
       .leftJoin(cards, eq(cards.userId, user.id))
-      .where(or(ilike(user.name, like), ilike(user.email, like)))
+      .where(
+        q.length >= 2
+          ? or(ilike(user.name, like), ilike(user.email, like), ilike(profiles.phone, like))
+          : and(
+              or(eq(profiles.baptised, true), eq(profiles.confirmed, true)),
+              isNull(profiles.sacramentConfirmedAt),
+              isNull(cards.id),
+            ),
+      )
       .orderBy(asc(user.name))
-      .limit(20)
-    return c.json({ items: rows })
+      .limit(q.length >= 2 ? 20 : 60)
+    return c.json({ mode: q.length >= 2 ? 'search' : 'pending', items: rows })
   })
 
   // The baptism register says so: the secretariat or pasteur confirms (or takes back) a person's sacrament record.
@@ -589,10 +603,17 @@ export const communionApi = new Hono<AppEnv>()
   // My declaration (needs the profile consent): baptised, confirmed. The parish's confirmation is separate.
   .put('/me/sacrament', requireSelf(), async (c) => {
     const body = z
-      .object({ baptised: z.boolean().nullable(), confirmed: z.boolean().nullable() })
+      .object({
+        baptised: z.boolean().nullable(),
+        confirmed: z.boolean().nullable(),
+        // saying « yes » is a statement about belief: the person has read what it means and agreed
+        ack: z.boolean().default(false),
+      })
       .strict()
       .safeParse(await c.req.json().catch(() => null))
     if (!body.success) return fail(c, 400, 'invalid')
+    if ((body.data.baptised || body.data.confirmed) && !body.data.ack)
+      return fail(c, 400, 'ack_required')
     const actor = await c.var.deps.actor()
     if (!actor) return fail(c, 401, 'unauthenticated')
     const db = await c.var.deps.db()

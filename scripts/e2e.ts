@@ -950,7 +950,7 @@ const stamp = Date.now().toString(36)
     })
     const decl = await member.as('/communion/me/sacrament', {
       method: 'PUT',
-      body: JSON.stringify({ baptised: true, confirmed: null }),
+      body: JSON.stringify({ baptised: true, confirmed: null, ack: true }),
     })
     ok(
       'communion: a member can say they are baptised (with the profile consent)',

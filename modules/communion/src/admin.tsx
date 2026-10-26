@@ -1,7 +1,8 @@
 /**
- * Communion cards (admin, /m/communion): the cards and the month's visa (Elders), the contributions register, proposing a card (secretariat)
- * and approving it (a second person), the expected-fee schedule (treasurer) and the scanner check. Each part appears only to people who
- * hold its right; the API is the authority.
+ * Communion cards (admin, /m/communion). Five tabs, each for one job: Cartes (the month's work: visa, contributions, status), Nouvelle
+ * carte (confirm a baptism, propose a card), Cotisations attendues (what each age band and group is expected to give), Vérifier une
+ * carte (the scanner) and Aide (what every tab, status and action means, with scenarios). Each part appears only to people who hold its right;
+ * the API is the authority.
  */
 import { api, hasPermission, useLocale, useMe } from '@eec/admin-kit'
 import type { MessageKey } from '@eec/i18n'
@@ -9,6 +10,7 @@ import {
   Badge,
   Button,
   EmptyState,
+  MenuButton,
   SelectField,
   TabsBox,
   TextField,
@@ -21,12 +23,13 @@ const k = (key: string) => `communion.${key}` as MessageKey
 const notify = (title: string, tone: 'success' | 'error' = 'success') =>
   toastManager.add({ title, data: { tone } })
 
+type State = 'proposed' | 'valid' | 'expired' | 'suspended' | 'withdrawn'
 type Row = {
   id: string
   userId: string
   name: string
   status: string
-  state: 'proposed' | 'valid' | 'expired' | 'suspended' | 'withdrawn'
+  state: State
   validUntil: string
   proposedBy: string | null
   visa: boolean
@@ -47,6 +50,7 @@ const TONE = {
   suspended: 'danger',
   withdrawn: 'info',
 } as const
+const STATES: State[] = ['proposed', 'valid', 'suspended', 'expired', 'withdrawn']
 const BANDS = ['under18', '18-25', '26-35', '36-50', '51-65', 'over65']
 
 const monthOptions = () => {
@@ -70,6 +74,7 @@ export default function Communion() {
       content: <FeesTab canEdit={can('fees')} />,
     },
     can('verify') && { id: 'check', label: t(k('tab_check')), content: <CheckTab /> },
+    { id: 'help', label: t(k('tab_help')), content: <HelpTab /> },
   ].filter(Boolean) as { id: string; label: string; content: React.ReactNode }[]
   return (
     <div className="grid gap-4">
@@ -77,9 +82,24 @@ export default function Communion() {
         <h1 className="text-3xl">{t(k('title'))}</h1>
         <p className="max-w-[62ch] text-ink-muted">{t(k('lead'))}</p>
       </header>
-      {tabs.length ? <TabsBox tabs={tabs} /> : <EmptyState title={t(k('no_access'))} />}
+      <TabsBox tabs={tabs} />
     </div>
   )
+}
+
+/** What this tab is for, in one sentence, and when to use it. */
+function Intro({ id }: { id: string }) {
+  const { t } = useLocale()
+  return (
+    <p className="cm-intro">
+      <strong>{t(k(`intro_${id}_t`))}</strong> {t(k(`intro_${id}_p`))}
+    </p>
+  )
+}
+
+function StateBadge({ state }: { state: State }) {
+  const { t } = useLocale()
+  return <Badge tone={TONE[state]}>{t(k(`state_${state}`))}</Badge>
 }
 
 function CardsTab() {
@@ -89,6 +109,7 @@ function CardsTab() {
   const qc = useQueryClient()
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7))
   const [q, setQ] = useState('')
+  const [filter, setFilter] = useState('all')
   const list = useQuery({
     queryKey: ['communion', 'cards', month, q],
     queryFn: () =>
@@ -111,23 +132,24 @@ function CardsTab() {
     },
     onError: (e) =>
       notify(
-        String(
-          (e as { code?: string }).code === 'second_person_required'
-            ? t(k('second_person'))
-            : t(k('error')),
-        ),
+        (e as { code?: string }).code === 'second_person_required'
+          ? t(k('second_person'))
+          : t(k('error')),
         'error',
       ),
   })
   const [amounts, setAmounts] = useState<Record<string, string>>({})
   const data = list.data
+  const items = (data?.items ?? []).filter((r) => filter === 'all' || r.state === filter)
   const day = (iso: string) =>
     new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(
       new Date(`${iso}T12:00:00Z`),
     )
+  const count = (st: State) => (data?.items ?? []).filter((r) => r.state === st).length
   return (
-    <div className="grid gap-3">
-      <div className="flex flex-wrap items-end gap-3">
+    <div className="grid gap-4">
+      <Intro id="cards" />
+      <div className="cm-filters">
         <SelectField
           label={t(k('month'))}
           value={month}
@@ -139,6 +161,15 @@ function CardsTab() {
             ),
           }))}
         />
+        <SelectField
+          label={t(k('status'))}
+          value={filter}
+          onValueChange={(v) => v && setFilter(v)}
+          options={[
+            { value: 'all', label: `${t(k('all'))} (${data?.items.length ?? 0})` },
+            ...STATES.map((st) => ({ value: st, label: `${t(k(`state_${st}`))} (${count(st)})` })),
+          ]}
+        />
         <TextField
           label={t(k('search'))}
           placeholder={t(k('search_ph'))}
@@ -147,164 +178,188 @@ function CardsTab() {
         />
       </div>
       {data && (
-        <p className="text-ink-muted">
+        <p className="cm-month">
           {t(k('sunday_is'), { date: day(data.sunday) })} ·{' '}
           {t(k('prep_is'), { from: day(data.prep.from), to: day(data.prep.to) })}
         </p>
       )}
-      {data && !data.items.length && <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />}
-      <ul className="grid gap-2">
-        {(data?.items ?? []).map((r) => (
-          <li key={r.id} className="admin-panel grid gap-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <strong>{r.name}</strong>
-              <span className="flex items-center gap-2">
-                {r.excused && <Badge tone="info">{t(k('excused'))}</Badge>}
-                <Badge tone={TONE[r.state]}>{t(k(`state_${r.state}`))}</Badge>
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {can('visa') && r.state === 'valid' && (
-                <Button
-                  size="sm"
-                  variant={r.visa ? 'secondary' : 'primary'}
-                  onClick={() =>
-                    act.mutate({
-                      path: `/communion/cards/${r.id}/visa`,
-                      method: 'PUT',
-                      body: { month, signed: !r.visa },
-                    })
-                  }
-                >
-                  {r.visa ? t(k('unvisa')) : t(k('visa'))}
-                </Button>
-              )}
-              {!can('visa') && r.visa && <Badge tone="success">{t(k('visa_done'))}</Badge>}
+      {data && !items.length && <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />}
+      <ul className="cm-list">
+        {items.map((r) => {
+          const menu = [
+            can('suspend') &&
+              r.state === 'valid' && {
+                id: 'suspend',
+                label: t(k('suspend')),
+                onSelect: () => setAsk({ row: r, kind: 'suspend' }),
+              },
+            can('approve') &&
+              (r.state === 'valid' || r.state === 'expired') && {
+                id: 'renew',
+                label: t(k('renew')),
+                onSelect: () => setAsk({ row: r, kind: 'renew' }),
+              },
+            can('approve') &&
+              r.state !== 'withdrawn' && {
+                id: 'withdraw',
+                label: t(k('withdraw')),
+                onSelect: () => setAsk({ row: r, kind: 'withdraw' }),
+              },
+          ].filter(Boolean) as { id: string; label: string; onSelect: () => void }[]
+          return (
+            <li key={r.id} className="cm-row" data-state={r.state}>
+              <div className="cm-who">
+                <strong>{r.name}</strong>
+                <span className="cm-meta">
+                  <StateBadge state={r.state} />
+                  {r.excused && <Badge tone="info">{t(k('excused'))}</Badge>}
+                  <span>{t(k('until_short'), { date: r.validUntil })}</span>
+                </span>
+              </div>
+              <div className="cm-cell">
+                <span className="cm-label">{t(k('col_visa'))}</span>
+                <div className="cm-inline">
+                  {r.state === 'valid' ? (
+                    <>
+                      <Badge tone={r.visa ? 'success' : 'warning'}>
+                        {r.visa ? t(k('visa_done')) : t(k('visa_not'))}
+                      </Badge>
+                      {can('visa') && (
+                        <Button
+                          size="sm"
+                          variant={r.visa ? 'secondary' : 'primary'}
+                          onClick={() =>
+                            act.mutate({
+                              path: `/communion/cards/${r.id}/visa`,
+                              method: 'PUT',
+                              body: { month, signed: !r.visa },
+                            })
+                          }
+                        >
+                          {r.visa ? t(k('unvisa')) : t(k('visa'))}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <span className="cm-dash">—</span>
+                  )}
+                </div>
+              </div>
               {data?.mayRegister && (
-                <span className="flex items-end gap-2">
-                  <TextField
-                    label={t(k('amount'))}
-                    placeholder="5000"
-                    inputMode="numeric"
-                    value={amounts[r.id] ?? (r.amount ?? '').toString()}
-                    onChange={(e: { target: { value: string } }) =>
-                      setAmounts({ ...amounts, [r.id]: e.target.value.replace(/\D/g, '') })
-                    }
-                    disabled={!can('register-write')}
+                <div className="cm-cell">
+                  <label className="cm-label" htmlFor={`amt-${r.id}`}>
+                    {t(k('amount'))}
+                  </label>
+                  <div className="cm-inline">
+                    <input
+                      id={`amt-${r.id}`}
+                      className="input cm-input"
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={amounts[r.id] ?? (r.amount ?? '').toString()}
+                      disabled={!can('register-write')}
+                      onChange={(e) =>
+                        setAmounts({ ...amounts, [r.id]: e.target.value.replace(/\D/g, '') })
+                      }
+                    />
+                    {can('register-write') && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          act.mutate({
+                            path: `/communion/cards/${r.id}/contribution`,
+                            method: 'PUT',
+                            body: {
+                              month,
+                              amountXaf:
+                                (amounts[r.id] ?? '') === '' ? null : Number(amounts[r.id]),
+                            },
+                          })
+                        }
+                      >
+                        {t(k('note'))}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="cm-actions">
+                {can('approve') && r.state === 'proposed' && (
+                  <Button
+                    size="sm"
+                    onClick={() => act.mutate({ path: `/communion/cards/${r.id}/approve` })}
+                  >
+                    {t(k('approve'))}
+                  </Button>
+                )}
+                {can('suspend') && r.state === 'suspended' && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => act.mutate({ path: `/communion/cards/${r.id}/restore` })}
+                  >
+                    {t(k('restore'))}
+                  </Button>
+                )}
+                {menu.length > 0 && (
+                  <MenuButton
+                    label={t(k('more'))}
+                    items={menu}
+                    className="btn btn-secondary btn-sm"
                   />
-                  {can('register-write') && (
+                )}
+              </div>
+              {ask?.row.id === r.id && (
+                <fieldset className="cm-ask" aria-label={t(k(ask.kind))}>
+                  <strong>{t(k(ask.kind))}</strong>
+                  <p className="text-ink-muted">{t(k(`${ask.kind}_p`))}</p>
+                  {ask.kind === 'withdraw' && (
+                    <TextField
+                      label={t(k('reason'))}
+                      placeholder={t(k('reason_ph'))}
+                      value={reason}
+                      onChange={(e: { target: { value: string } }) => setReason(e.target.value)}
+                    />
+                  )}
+                  {ask.kind === 'renew' && (
+                    <TextField
+                      label={t(k('until'))}
+                      placeholder="2027-12-31"
+                      value={until}
+                      onChange={(e: { target: { value: string } }) => setUntil(e.target.value)}
+                    />
+                  )}
+                  <div className="cm-inline">
                     <Button
                       size="sm"
-                      variant="secondary"
+                      variant={ask.kind === 'withdraw' ? 'danger' : 'primary'}
+                      loading={act.isPending}
+                      disabled={ask.kind === 'withdraw' && reason.trim().length < 3}
                       onClick={() =>
                         act.mutate({
-                          path: `/communion/cards/${r.id}/contribution`,
-                          method: 'PUT',
-                          body: {
-                            month,
-                            amountXaf: (amounts[r.id] ?? '') === '' ? null : Number(amounts[r.id]),
-                          },
+                          path: `/communion/cards/${r.id}/${ask.kind}`,
+                          body:
+                            ask.kind === 'withdraw'
+                              ? { reason }
+                              : ask.kind === 'renew'
+                                ? { validUntil: until }
+                                : {},
                         })
                       }
                     >
-                      {t(k('note'))}
+                      {t(k(ask.kind))}
                     </Button>
-                  )}
-                </span>
+                    <Button size="sm" variant="secondary" onClick={() => setAsk(null)}>
+                      {t(k('cancel'))}
+                    </Button>
+                  </div>
+                </fieldset>
               )}
-              {can('approve') && r.state === 'proposed' && (
-                <Button
-                  size="sm"
-                  onClick={() => act.mutate({ path: `/communion/cards/${r.id}/approve` })}
-                >
-                  {t(k('approve'))}
-                </Button>
-              )}
-              {can('suspend') && r.state === 'valid' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setAsk({ row: r, kind: 'suspend' })}
-                >
-                  {t(k('suspend'))}
-                </Button>
-              )}
-              {can('suspend') && r.state === 'suspended' && (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => act.mutate({ path: `/communion/cards/${r.id}/restore` })}
-                >
-                  {t(k('restore'))}
-                </Button>
-              )}
-              {can('approve') && (r.state === 'valid' || r.state === 'expired') && (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setAsk({ row: r, kind: 'renew' })}
-                >
-                  {t(k('renew'))}
-                </Button>
-              )}
-              {can('approve') && r.state !== 'withdrawn' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setAsk({ row: r, kind: 'withdraw' })}
-                >
-                  {t(k('withdraw'))}
-                </Button>
-              )}
-            </div>
-          </li>
-        ))}
+            </li>
+          )
+        })}
       </ul>
-      {ask && (
-        <fieldset className="admin-panel grid gap-3" aria-label={t(k(ask.kind))}>
-          <strong>{`${t(k(ask.kind))} : ${ask.row.name}`}</strong>
-          <p className="text-ink-muted">{t(k(`${ask.kind}_p`))}</p>
-          {ask.kind === 'withdraw' && (
-            <TextField
-              label={t(k('reason'))}
-              placeholder={t(k('reason_ph'))}
-              value={reason}
-              onChange={(e: { target: { value: string } }) => setReason(e.target.value)}
-            />
-          )}
-          {ask.kind === 'renew' && (
-            <TextField
-              label={t(k('until'))}
-              placeholder="2027-12-31"
-              value={until}
-              onChange={(e: { target: { value: string } }) => setUntil(e.target.value)}
-            />
-          )}
-          <div className="flex gap-2">
-            <Button
-              variant={ask.kind === 'withdraw' ? 'danger' : 'primary'}
-              loading={act.isPending}
-              disabled={ask.kind === 'withdraw' && reason.trim().length < 3}
-              onClick={() =>
-                act.mutate({
-                  path: `/communion/cards/${ask.row.id}/${ask.kind}`,
-                  body:
-                    ask.kind === 'withdraw'
-                      ? { reason }
-                      : ask.kind === 'renew'
-                        ? { validUntil: until }
-                        : {},
-                })
-              }
-            >
-              {t(k(ask.kind))}
-            </Button>
-            <Button variant="secondary" onClick={() => setAsk(null)}>
-              {t(k('cancel'))}
-            </Button>
-          </div>
-        </fieldset>
-      )}
     </div>
   )
 }
@@ -312,19 +367,26 @@ function CardsTab() {
 type Person = {
   id: string
   name: string
+  email: string
+  phone: string | null
+  neighbourhood: string | null
+  city: string | null
+  joinedAt: string
   baptised: boolean | null
   confirmed: boolean | null
   confirmedAt: string | null
   cardStatus: string | null
 }
 function NewTab() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const qc = useQueryClient()
   const [q, setQ] = useState('')
   const people = useQuery({
-    queryKey: ['communion', 'people', q],
-    enabled: q.trim().length >= 2,
-    queryFn: () => api<{ items: Person[] }>(`/communion/people?q=${encodeURIComponent(q.trim())}`),
+    queryKey: ['communion', 'people', q.trim().length >= 2 ? q.trim() : ''],
+    queryFn: () =>
+      api<{ mode: 'search' | 'pending'; items: Person[] }>(
+        `/communion/people${q.trim().length >= 2 ? `?q=${encodeURIComponent(q.trim())}` : ''}`,
+      ),
   })
   const act = useMutation({
     mutationFn: (v: { path: string; method?: string; body: unknown }) =>
@@ -335,56 +397,94 @@ function NewTab() {
     },
     onError: () => notify(t(k('error')), 'error'),
   })
+  const items = people.data?.items ?? []
+  const when = (iso: string) =>
+    new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(new Date(iso))
   return (
-    <div className="grid gap-3">
-      <p className="text-ink-muted">{t(k('new_p'))}</p>
+    <div className="grid gap-4">
+      <Intro id="new" />
       <TextField
         label={t(k('search'))}
+        hint={t(k('search_hint'))}
         placeholder={t(k('search_ph'))}
         value={q}
         onChange={(e: { target: { value: string } }) => setQ(e.target.value)}
       />
-      <ul className="grid gap-2">
-        {(people.data?.items ?? []).map((p) => (
-          <li key={p.id} className="admin-panel flex flex-wrap items-center justify-between gap-2">
-            <div className="grid">
-              <strong>{p.name}</strong>
-              <span className="text-sm text-ink-muted">
-                {p.baptised ? t(k('declared_baptised')) : t(k('not_declared'))}
-                {p.confirmed ? ` · ${t(k('declared_confirmed'))}` : ''}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {p.cardStatus ? (
-                <Badge tone="info">{t(k('has_card'))}</Badge>
-              ) : p.confirmedAt ? (
-                <>
-                  <Badge tone="success">{t(k('baptism_confirmed'))}</Badge>
+      <h2 className="text-xl">
+        {people.data?.mode === 'search'
+          ? t(k('results'))
+          : t(k('pending_title'), { n: String(items.length) })}
+      </h2>
+      {people.data?.mode === 'pending' && <p className="text-ink-muted">{t(k('pending_p'))}</p>}
+      {people.isSuccess && !items.length && (
+        <EmptyState
+          title={people.data?.mode === 'search' ? t(k('no_result')) : t(k('pending_empty_t'))}
+          text={people.data?.mode === 'search' ? undefined : t(k('pending_empty_p'))}
+        />
+      )}
+      <ul className="cm-list">
+        {items.map((p) => {
+          const step = p.cardStatus ? (p.cardStatus === 'proposed' ? 3 : 4) : p.confirmedAt ? 2 : 1
+          return (
+            <li key={p.id} className="cm-row cm-person">
+              <div className="cm-who">
+                <strong>{p.name}</strong>
+                <span className="cm-meta">
+                  <span>{p.email}</span>
+                  {p.phone && <span>{p.phone}</span>}
+                  {(p.neighbourhood || p.city) && (
+                    <span>{[p.neighbourhood, p.city].filter(Boolean).join(', ')}</span>
+                  )}
+                  <span>{t(k('member_since'), { date: when(p.joinedAt) })}</span>
+                </span>
+                <span className="cm-meta">
+                  {p.baptised && <Badge tone="info">{t(k('declared_baptised'))}</Badge>}
+                  {p.confirmed && <Badge tone="info">{t(k('declared_confirmed'))}</Badge>}
+                  {!p.baptised && !p.confirmed && <span>{t(k('not_declared'))}</span>}
+                </span>
+              </div>
+              <ol className="cm-steps" aria-label={t(k('steps'))}>
+                {[1, 2, 3].map((n) => (
+                  <li
+                    key={n}
+                    data-done={step > n ? '' : undefined}
+                    data-now={step === n ? '' : undefined}
+                  >
+                    {t(k(`step_${n}`))}
+                  </li>
+                ))}
+              </ol>
+              <div className="cm-actions">
+                {p.cardStatus ? (
+                  <Badge tone="info">
+                    {t(k(p.cardStatus === 'proposed' ? 'waiting_approval' : 'has_card'))}
+                  </Badge>
+                ) : p.confirmedAt ? (
                   <Button
                     size="sm"
                     onClick={() => act.mutate({ path: '/communion/cards', body: { userId: p.id } })}
                   >
                     {t(k('propose'))}
                   </Button>
-                </>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() =>
-                    act.mutate({
-                      path: `/communion/sacrament/${p.id}`,
-                      method: 'PUT',
-                      body: { confirmed: true },
-                    })
-                  }
-                >
-                  {t(k('confirm_baptism'))}
-                </Button>
-              )}
-            </div>
-          </li>
-        ))}
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() =>
+                      act.mutate({
+                        path: `/communion/sacrament/${p.id}`,
+                        method: 'PUT',
+                        body: { confirmed: true },
+                      })
+                    }
+                  >
+                    {t(k('confirm_baptism'))}
+                  </Button>
+                )}
+              </div>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
@@ -415,53 +515,86 @@ function FeesTab({ canEdit }: { canEdit: boolean }) {
     draft[`${kind}:${key}`] ??
     (fees.data?.items.find((f) => f.kind === kind && f.key === key)?.amountXaf ?? '').toString()
   const row = (kind: 'age' | 'group', key: string, label: string) => (
-    <li
-      key={`${kind}:${key}`}
-      className="admin-panel flex flex-wrap items-end justify-between gap-2"
-    >
-      <span>{label}</span>
-      <span className="flex items-end gap-2">
-        <TextField
-          label={t(k('amount'))}
-          placeholder="5000"
-          inputMode="numeric"
-          value={value(kind, key)}
-          disabled={!canEdit}
-          onChange={(e: { target: { value: string } }) =>
-            setDraft({ ...draft, [`${kind}:${key}`]: e.target.value.replace(/\D/g, '') })
-          }
-        />
-        {canEdit && (
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() =>
-              save.mutate({
-                kind,
-                key,
-                amountXaf: value(kind, key) === '' ? null : Number(value(kind, key)),
-              })
+    <li key={`${kind}:${key}`} className="cm-row cm-fee">
+      <div className="cm-who">
+        <strong>{label}</strong>
+      </div>
+      <div className="cm-cell">
+        <label className="cm-label" htmlFor={`fee-${kind}-${key}`}>
+          {t(k('amount'))}
+        </label>
+        <div className="cm-inline">
+          <input
+            id={`fee-${kind}-${key}`}
+            className="input cm-input"
+            inputMode="numeric"
+            placeholder="0"
+            value={value(kind, key)}
+            disabled={!canEdit}
+            onChange={(e) =>
+              setDraft({ ...draft, [`${kind}:${key}`]: e.target.value.replace(/\D/g, '') })
             }
-          >
-            {t(k('save'))}
-          </Button>
-        )}
-      </span>
+          />
+          {canEdit && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                save.mutate({
+                  kind,
+                  key,
+                  amountXaf: value(kind, key) === '' ? null : Number(value(kind, key)),
+                })
+              }
+            >
+              {t(k('save'))}
+            </Button>
+          )}
+        </div>
+      </div>
     </li>
   )
   return (
-    <div className="grid gap-3">
-      <p className="text-ink-muted">{t(k('fees_p'))}</p>
+    <div className="grid gap-4">
+      <Intro id="fees" />
       <h2 className="text-xl">{t(k('fees_age'))}</h2>
-      <ul className="grid gap-2">
+      <ul className="cm-list">
         {BANDS.map((b) => row('age', b, t(`members.age_${b}` as MessageKey)))}
       </ul>
       <h2 className="text-xl">{t(k('fees_group'))}</h2>
-      <ul className="grid gap-2">
+      <ul className="cm-list">
         {(fees.data?.groups ?? []).map((g) =>
           row('group', g.id, (locale === 'en' && g.nameEn) || g.nameFr),
         )}
       </ul>
+    </div>
+  )
+}
+
+/** The guide: what each tab, status and action means, and four situations told step by step. */
+function HelpTab() {
+  const { t } = useLocale()
+  const lines = (key: string) => t(k(key)).split('\n')
+  return (
+    <div className="grid gap-5">
+      <p className="text-ink-muted">{t(k('help_lead'))}</p>
+      {['tabs', 'states', 'actions', 'scenarios'].map((sec) => (
+        <section key={sec} className="grid gap-2">
+          <h2 className="text-2xl">{t(k(`help_${sec}_t`))}</h2>
+          <dl className="cm-help">
+            {Array.from({ length: Number(t(k(`help_${sec}_n`))) }, (_, i) => i + 1).map((i) => (
+              <div key={i} className="cm-help-item">
+                <dt>{t(k(`help_${sec}_${i}_t`))}</dt>
+                <dd>
+                  {lines(`help_${sec}_${i}_p`).map((l) => (
+                    <p key={l}>{l}</p>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
     </div>
   )
 }

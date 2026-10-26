@@ -136,6 +136,21 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
   </details>
 </div>
 
+<dialog class="dialog acct-dialog" data-pf-sac-dialog aria-labelledby="pf-sac-t">
+  <form method="dialog" class="dialog-body" data-pf-sac-form>
+    <h2 id="pf-sac-t" class="dialog-title">{p('sac_modal_t')}</h2>
+    <p class="text-ink-muted">{p('sac_modal_p1')}</p>
+    <p class="text-ink-muted">{p('sac_modal_p2')}</p>
+    <p class="text-ink-muted">{p('sac_modal_p3')}</p>
+    <p class="text-ink-muted">{p('sac_modal_p4')}</p>
+    <Choice id="pf-sac-ack" name="ack" label={p('sac_modal_ack')} />
+    <div class="dialog-actions">
+      <Button variant="secondary" data-pf-sac-cancel>{p('sac_modal_cancel')}</Button>
+      <Button type="submit" data-pf-sac-go disabled>{p('sac_modal_go')}</Button>
+    </div>
+  </form>
+</dialog>
+
 <style is:global>
   .pf {
     display: grid;

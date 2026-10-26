@@ -3562,3 +3562,192 @@ html[data-nav-open] {
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+/* ——— Communion cards, Mon groupe and group announcements: list tiles ——————————————————————————— */
+.cm-intro {
+  max-width: 70ch;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--season) 10%, var(--surface));
+  color: var(--ink);
+}
+.cm-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+.cm-month {
+  color: var(--ink-muted);
+}
+.cm-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* One tile per card: who · month's visa · contribution · actions, each in its own labelled cell, all the same height. */
+.cm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr) minmax(0, 1.4fr) 13rem;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cm-row.cm-person {
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.6fr) 13rem;
+}
+.cm-row.cm-fee {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.cm-who {
+  display: grid;
+  gap: 0.375rem;
+  min-width: 0;
+}
+.cm-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.625rem;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+}
+.cm-cell {
+  display: grid;
+  gap: 0.25rem;
+}
+.cm-label {
+  color: var(--ink-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.cm-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+}
+.cm-input {
+  width: 8.5rem;
+  min-height: 2.5rem;
+}
+.cm-dash {
+  color: var(--ink-muted);
+}
+.cm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.cm-ask {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--gold) 14%, var(--surface));
+}
+.cm-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-xs);
+}
+.cm-steps li {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--ink) 7%, transparent);
+  color: var(--ink-muted);
+}
+.cm-steps li[data-done] {
+  background: color-mix(in oklab, var(--primary) 16%, var(--surface));
+  color: var(--ink);
+}
+.cm-steps li[data-now] {
+  box-shadow: inset 0 0 0 2px var(--season);
+  color: var(--ink);
+  font-weight: 600;
+}
+.cm-help {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.cm-help-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cm-help-item dt {
+  font-weight: 700;
+}
+.cm-help-item dd {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  color: var(--ink-muted);
+}
+/* Mon groupe and announcements: cards in a grid, four across on a wide screen. */
+.cm-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cm-grid-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+@media (min-width: 40rem) {
+  .cm-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .cm-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.cm-member {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  text-align: center;
+}
+.cm-member .acct-id-photo {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+@media (max-width: 63.99rem) {
+  .cm-row,
+  .cm-row.cm-person,
+  .cm-row.cm-fee {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cm-actions {
+    justify-content: flex-start;
+  }
+}

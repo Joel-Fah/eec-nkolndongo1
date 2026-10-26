@@ -150,7 +150,8 @@
       }
     },
     "language_short": "Changer de langue",
-    "account_incomplete": "Mon espace — votre profil est à compléter"
+    "account_incomplete": "Mon espace — votre profil est à compléter",
+    "account_unread": "Mon espace — {n} notification(s) non lue(s)"
   },
   "season": {
     "avent": "Avent",
@@ -1076,10 +1077,10 @@
         "a11y": "La barre est une navigation avec aria-current ; chaque section a un titre masqué ; les boutons font 44 px ; l’annulation et la sortie d’un groupe demandent une seconde confirmation ; les statuts sont dits en mots, jamais en couleur seule."
       },
       "headerbell": {
-        "name": "Cloche de l’en-tête (membre)",
-        "desc": "Une fois connecté, une cloche apparaît à côté de l’avatar dans l’en-tête du site, avec le nombre de notifications non lues (pastille d’avertissement) ; elle mène à la section Notifications de Mon espace.",
-        "use": "Site : scripts/account-badge.ts (réponse de /api/me/badge, gardée une minute). Classes .nav-bell et .nav-bell-count.",
-        "a11y": "Le bouton a un nom (Notifications) ; le nombre est décoratif, la liste est dans la page."
+        "name": "Notifications sur l’avatar (membre)",
+        "desc": "Il n’y a plus de cloche dans l’en-tête du site : quand un membre connecté a des notifications non lues, un compteur rouge s’affiche sur son avatar (9+ au-delà de neuf) et le bouton mène directement à l’onglet Notifications de Mon espace. Sans notification, la marque d’avertissement apparaît si le profil est incomplet ; un seul repère à la fois.",
+        "use": "Site : scripts/account-badge.ts (réponse de /api/me/badge, gardée une minute). Classes .acct-badge et .acct-count.",
+        "a11y": "Le libellé du bouton annonce le nombre de notifications non lues ; le compteur est décoratif, la liste est dans la page."
       },
       "communioncard": {
         "name": "Carte de Sainte-Cène",
@@ -1826,7 +1827,7 @@
     },
     "mygroup": {
       "title": "Mon groupe",
-      "lead": "Les personnes de votre groupe, les demandes pour le rejoindre et quelques chiffres. Vous ne voyez que votre groupe. Un numéro de téléphone n’apparaît que si la personne a choisi de le partager avec le groupe.",
+      "lead": "Cet écran est pour les responsables d’un groupe (et le secrétariat) : les personnes de VOTRE groupe, les demandes pour le rejoindre et quelques chiffres. Pour créer ou configurer les groupes eux-mêmes (nom, page publique, responsables), c’est l’écran « Groupes ». Un numéro de téléphone n’apparaît que si la personne a choisi de le partager avec le groupe.",
       "group": "Groupe",
       "announcements": "Annonces",
       "export": "Exporter la liste (CSV)",
@@ -2382,7 +2383,15 @@
       "sacrament_t": "Baptême et confirmation",
       "sacrament_p": "Facultatif. Seuls le secrétariat et le pasteur le voient, pour préparer votre carte de Sainte-Cène. La paroisse le confirme d’après son registre.",
       "baptised": "Je suis baptisé(e)",
-      "confirmed": "Je suis confirmé(e)"
+      "confirmed": "Je suis confirmé(e)",
+      "sac_modal_t": "Avant de déclarer votre baptême",
+      "sac_modal_p1": "Vous dites à la paroisse que vous êtes baptisé(e) ou confirmé(e). C’est une information sur votre appartenance religieuse : la loi camerounaise sur les données personnelles la considère comme sensible.",
+      "sac_modal_p2": "Ce qui se passe ensuite : seuls le secrétariat et le pasteur la voient. Ils la vérifient dans le registre des baptêmes. Une fois confirmée, ils peuvent vous proposer une carte de Sainte-Cène numérique, qu’une seconde personne doit approuver.",
+      "sac_modal_p3": "À l’avenir : sur votre carte, les Anciens d’Église visent chaque mois la Sainte-Cène ; vous voyez votre série, un rappel pendant la semaine de préparation et ce qui est attendu comme cotisation (jamais une dette). La carte de papier reste la référence.",
+      "sac_modal_p4": "Ce n’est pas une preuve : la paroisse vérifie toujours. Vous pouvez retirer votre déclaration quand vous voulez (en décochant ou en retirant le profil complet) ; la confirmation faite par la paroisse reste dans son registre.",
+      "sac_modal_ack": "J’ai compris et je confirme que ma déclaration est exacte.",
+      "sac_modal_go": "Enregistrer ma déclaration",
+      "sac_modal_cancel": "Annuler"
     },
     "me": {
       "nav_label": "Sections de Mon espace",

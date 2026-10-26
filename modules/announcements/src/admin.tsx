@@ -178,7 +178,7 @@ export default function Announcements() {
           {items.isSuccess && !items.data.items.length && !editing && (
             <EmptyState title={t(k('empty_t'))} text={t(k('empty_p'))} />
           )}
-          <ul className="grid gap-3">
+          <ul className="cm-grid">
             {(items.data?.items ?? []).map((a) => (
               <li key={a.id} className="admin-panel grid gap-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">

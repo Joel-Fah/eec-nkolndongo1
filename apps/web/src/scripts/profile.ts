@@ -277,15 +277,45 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
     }
   })
 
-  const saveSacrament = async () => {
+  // Declaring a baptism or confirmation is a statement about belief: the person reads what it means and agrees before it is saved.
+  const dialog = host.querySelector<HTMLDialogElement>('[data-pf-sac-dialog]')
+  const ack = dialog?.querySelector<HTMLInputElement>('#pf-sac-ack')
+  const go = dialog?.querySelector<HTMLButtonElement>('[data-pf-sac-go]')
+  let pending: HTMLInputElement | null = null
+  const saveSacrament = async (acknowledged: boolean) => {
     const r = await put('/communion/me/sacrament', {
       baptised: q<HTMLInputElement>('#pf-baptised')?.checked ? true : null,
       confirmed: q<HTMLInputElement>('#pf-confirmed')?.checked ? true : null,
+      ack: acknowledged,
     })
     if (r.ok) say(msgs.levelSaved ?? '')
+    else void load()
   }
-  q('#pf-baptised')?.addEventListener('change', saveSacrament)
-  q('#pf-confirmed')?.addEventListener('change', saveSacrament)
+  for (const id of ['#pf-baptised', '#pf-confirmed']) {
+    const box = q<HTMLInputElement>(id)
+    box?.addEventListener('change', () => {
+      if (!box.checked) return void saveSacrament(false)
+      // switched on: put it back until the person has read and agreed
+      box.checked = false
+      pending = box
+      if (ack) ack.checked = false
+      if (go) go.disabled = true
+      dialog?.showModal()
+    })
+  }
+  ack?.addEventListener('change', () => {
+    if (go) go.disabled = !ack.checked
+  })
+  host.querySelector('[data-pf-sac-cancel]')?.addEventListener('click', () => {
+    pending = null
+    dialog?.close()
+  })
+  host.querySelector('[data-pf-sac-form]')?.addEventListener('submit', () => {
+    if (!pending || !ack?.checked) return
+    pending.checked = true
+    pending = null
+    void saveSacrament(true)
+  })
 
   initPickers(host)
   void load()

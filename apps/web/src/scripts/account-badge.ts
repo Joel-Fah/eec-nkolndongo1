@@ -49,15 +49,6 @@ export async function initAccountBadge() {
   if (!links.length) return
   const b = await read()
   if (!b?.signedIn) return
-  // The bell: shown once signed in, with the number of unread notifications.
-  for (const bell of document.querySelectorAll<HTMLElement>('[data-bell]')) {
-    bell.hidden = false
-    const n = bell.querySelector<HTMLElement>('[data-bell-count]')
-    if (n && (b.unread ?? 0) > 0) {
-      n.hidden = false
-      n.textContent = (b.unread ?? 0) > 99 ? '99+' : String(b.unread)
-    }
-  }
   // A group's public page tells a member (and only them) that they belong to it.
   for (const e of document.querySelectorAll<HTMLElement>('[data-member-of]'))
     e.hidden = !(b.groups ?? []).includes(e.dataset.memberOf ?? '')
@@ -81,7 +72,19 @@ export async function initAccountBadge() {
       })
       icon.replaceWith(wrap)
     }
-    if (b.incomplete) {
+    // Unread notifications: a red count on the avatar (9+ above nine) and the link goes straight to them. Otherwise, an incomplete
+    // profile shows the warning mark. One badge at a time, so the avatar never gets crowded.
+    const n = b.unread ?? 0
+    if (n > 0) {
+      const dot = document.createElement('span')
+      dot.className = 'acct-badge acct-count'
+      dot.setAttribute('aria-hidden', 'true')
+      dot.textContent = n > 9 ? '9+' : String(n)
+      link.append(dot)
+      const label = link.dataset.unreadLabel
+      if (label) link.setAttribute('aria-label', label.replace('{n}', String(n)))
+      link.setAttribute('href', `${link.getAttribute('href')?.replace(/#.*$/, '')}#notifications`)
+    } else if (b.incomplete) {
       const dot = document.createElement('span')
       dot.className = 'acct-badge'
       dot.setAttribute('aria-hidden', 'true')

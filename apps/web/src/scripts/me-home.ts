@@ -70,7 +70,7 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
           `/api/events/public/item/${next.eventSlug}/event.ics?locale=${lang}`,
         ),
       )
-    acts.append(button(m.nav_regs ?? '', 'btn btn-ghost btn-sm', () => go('inscriptions')))
+    acts.append(button(m.nav_regs ?? '', 'btn btn-secondary btn-sm', () => go('inscriptions')))
     c.append(row, el('p', 'me-p', m.next_reg_p), acts)
     box.append(c)
   } else if (regs.ok) {
@@ -102,7 +102,7 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
           `${(lang === 'en' && g.nameEn) || g.nameFr} · ${(lang === 'en' && g.next?.titleEn) || g.next?.titleFr} · ${dayText(g.next?.startsAt ?? '', lang)}`,
         ),
       )
-    c.append(button(m.nav_groups ?? '', 'btn btn-ghost btn-sm', () => go('groupes')))
+    c.append(button(m.nav_groups ?? '', 'btn btn-secondary btn-sm', () => go('groupes')))
     box.append(c)
   } else if (groups.ok) {
     const c = card()
@@ -116,7 +116,7 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
     const c = card()
     if (comp.complete) {
       c.append(head('check', m.profile_k ?? '', m.profile_ok_t), el('p', 'me-p', m.profile_ok_p))
-      c.append(button(m.nav_profile ?? '', 'btn btn-ghost btn-sm', () => go('profil')))
+      c.append(button(m.nav_profile ?? '', 'btn btn-secondary btn-sm', () => go('profil')))
     } else {
       c.append(
         head(

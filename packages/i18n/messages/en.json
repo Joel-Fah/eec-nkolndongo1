@@ -150,7 +150,8 @@
       }
     },
     "language_short": "Change language",
-    "account_incomplete": "My space — your profile needs completing"
+    "account_incomplete": "My space — your profile needs completing",
+    "account_unread": "My space — {n} unread notification(s)"
   },
   "season": {
     "avent": "Advent",
@@ -1076,10 +1077,10 @@
         "a11y": "The bar is a navigation with aria-current; each section has a hidden heading; buttons are 44 px; cancelling and leaving a group ask for a second confirmation; statuses are said in words, never colour alone."
       },
       "headerbell": {
-        "name": "Header bell (member)",
-        "desc": "Once signed in, a bell appears next to the avatar in the site header, with the number of unread notifications (warning dot); it leads to the Notifications section of Mon espace.",
-        "use": "Site: scripts/account-badge.ts (answer of /api/me/badge, kept a minute). Classes .nav-bell and .nav-bell-count.",
-        "a11y": "The button has a name (Notifications); the number is decorative, the list is in the page."
+        "name": "Notifications on the avatar (member)",
+        "desc": "The site header no longer has a bell: when a signed-in member has unread notifications, a red count shows on their avatar (9+ above nine) and the button goes straight to the Notifications tab of Mon espace. With none, the warning mark shows if the profile is incomplete; one marker at a time.",
+        "use": "Site: scripts/account-badge.ts (answer of /api/me/badge, kept for a minute). Classes .acct-badge and .acct-count.",
+        "a11y": "The button’s label announces the number of unread notifications; the count is decorative, the list is in the page."
       },
       "communioncard": {
         "name": "Communion card",
@@ -1826,7 +1827,7 @@
     },
     "mygroup": {
       "title": "My group",
-      "lead": "The people in your group, the requests to join it and a few figures. You only see your own group. A phone number shows only if the person chose to share it with the group.",
+      "lead": "This screen is for a group’s leaders (and the secretariat): the people of YOUR group, the requests to join it and a few figures. To create or configure the groups themselves (name, public page, leaders), use the “Groups” screen. A phone number shows only if the person chose to share it with the group.",
       "group": "Group",
       "announcements": "Announcements",
       "export": "Export the list (CSV)",
@@ -2382,7 +2383,15 @@
       "sacrament_t": "Baptism and confirmation",
       "sacrament_p": "Optional. Only the secretariat and the pastor see it, to prepare your Communion card. The parish confirms it from its own register.",
       "baptised": "I am baptised",
-      "confirmed": "I am confirmed"
+      "confirmed": "I am confirmed",
+      "sac_modal_t": "Before you declare your baptism",
+      "sac_modal_p1": "You are telling the parish that you are baptised or confirmed. This is information about your religious belief: Cameroon’s personal-data law treats it as sensitive.",
+      "sac_modal_p2": "What happens next: only the secretariat and the pastor see it. They check it in the baptism register. Once confirmed, they can propose a digital Communion card for you, which a second person must approve.",
+      "sac_modal_p3": "In the future: on your card, the Church Elders sign each month’s Holy Supper; you see your streak, a reminder during the preparation week and what is expected as a contribution (never a debt). The paper card remains the reference.",
+      "sac_modal_p4": "It is not proof: the parish always checks. You can withdraw your declaration whenever you like (by unticking it or withdrawing the full profile); the confirmation the parish made stays in its register.",
+      "sac_modal_ack": "I have understood and I confirm my declaration is accurate.",
+      "sac_modal_go": "Save my declaration",
+      "sac_modal_cancel": "Cancel"
     },
     "me": {
       "nav_label": "Sections of My space",

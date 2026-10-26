@@ -219,32 +219,25 @@ function MyGroup() {
             {!d.members.length ? (
               <EmptyState title={k('roster_empty_t')} text={k('roster_empty_p')} />
             ) : (
-              <ul className="grid gap-2">
+              <ul className="cm-grid cm-grid-4">
                 {d.members.map((m) => (
-                  <li
-                    key={m.userId}
-                    className="admin-panel flex flex-wrap items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="acct-id-photo" aria-hidden="true">
-                        {m.photoUrl ? (
-                          <img src={m.photoUrl} alt="" referrerPolicy="no-referrer" />
-                        ) : (
-                          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
-                          <span dangerouslySetInnerHTML={{ __html: avatarSvg(m.seed) }} />
-                        )}
-                      </span>
-                      <div className="grid">
-                        <strong>{m.name}</strong>
-                        <span className="text-sm text-ink-muted">
-                          {k('joined')} {day(m.joinedAt)}
-                          {(locale === 'en' && m.titleEn) || m.titleFr
-                            ? ` · ${(locale === 'en' && m.titleEn) || m.titleFr}`
-                            : ''}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
+                  <li key={m.userId} className="cm-member">
+                    <span className="acct-id-photo" aria-hidden="true">
+                      {m.photoUrl ? (
+                        <img src={m.photoUrl} alt="" referrerPolicy="no-referrer" />
+                      ) : (
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: our own drawing, built from a number
+                        <span dangerouslySetInnerHTML={{ __html: avatarSvg(m.seed) }} />
+                      )}
+                    </span>
+                    <strong>{m.name}</strong>
+                    <span className="text-sm text-ink-muted">
+                      {(locale === 'en' && m.titleEn) || m.titleFr
+                        ? `${(locale === 'en' && m.titleEn) || m.titleFr} · `
+                        : ''}
+                      {k('joined')} {day(m.joinedAt)}
+                    </span>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                       {m.phone ? (
                         <>
                           <a
@@ -265,12 +258,12 @@ function MyGroup() {
                       ) : (
                         <Badge tone="info">{k('no_contact')}</Badge>
                       )}
-                      {d.canManage && (
-                        <Button size="sm" variant="ghost" onClick={() => setRemoving(m)}>
-                          {k('remove')}
-                        </Button>
-                      )}
                     </div>
+                    {d.canManage && (
+                      <Button size="sm" variant="ghost" onClick={() => setRemoving(m)}>
+                        {k('remove')}
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>

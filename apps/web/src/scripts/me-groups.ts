@@ -80,7 +80,7 @@ export async function initGroups(ctx: Ctx, box: HTMLElement, onChange: () => voi
         el('span', 'me-t', (en && a.titleEn) || a.titleFr),
         el('span', 'me-p', (en && a.bodyEn) || a.bodyFr),
       )
-      if (a.link) n.append(link(m.view_page ?? '', a.link, 'btn btn-ghost btn-sm'))
+      if (a.link) n.append(link(m.view_page ?? '', a.link, 'btn btn-secondary btn-sm'))
       c.append(n)
     }
     const phone = el('label', 'check-row')
