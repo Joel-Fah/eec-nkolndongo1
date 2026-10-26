@@ -1159,5 +1159,37 @@ const stamp = Date.now().toString(36)
   }
 }
 
+// 14. Data requests log (decision 0052): a request is logged with a deadline, closed with a word on what was done, and only staff see it
+{
+  const anon = await fetch(`${base}/api/rights`)
+  ok('rights: nobody without a session reads the log', anon.status === 401)
+  const made = await api('/rights', {
+    method: 'POST',
+    body: JSON.stringify({ kind: 'access', name: `E2E Demande ${stamp}`, channel: 'phone' }),
+  })
+  const id = made.json.id as string
+  ok('rights: a request is logged', made.status === 201 && !!id)
+  const list = await api('/rights?status=open')
+  const row = (
+    list.json.items as { id: string; dueOn: string; receivedOn: string; urgency: string }[]
+  )?.find((r) => r.id === id)
+  const days = row
+    ? Math.round((Date.parse(row.dueOn) - Date.parse(row.receivedOn)) / 86_400_000)
+    : 0
+  ok('rights: the deadline is 30 days from reception', days === 30 && row?.urgency === 'open')
+  const noWord = await api(`/rights/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'done' }),
+  })
+  ok('rights: closing needs a word on what was done', noWord.status === 400)
+  const closed = await api(`/rights/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'done', outcome: 'Copie remise en main propre' }),
+  })
+  ok('rights: it can be closed', closed.status === 200)
+  const gone = await api(`/rights/${id}`, { method: 'DELETE' })
+  ok('rights: the super admin can delete it', gone.status === 200)
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

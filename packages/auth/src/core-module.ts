@@ -92,6 +92,9 @@ export const systemRoles = [
       'communion:suspend',
       'communion:register-read',
       'communion:verify',
+      // The data-rights log (decision 0052).
+      'rights:read',
+      'rights:handle',
       'core:system-outbox',
       'core:validation-read',
       'settings:read',

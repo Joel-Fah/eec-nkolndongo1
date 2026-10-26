@@ -7,7 +7,9 @@ export const rightsRequests = pgTable(
   'rights_requests',
   {
     id: id(),
-    kind: text('kind', { enum: ['access', 'rectification', 'erasure', 'objection', 'other'] }).notNull(),
+    kind: text('kind', {
+      enum: ['access', 'rectification', 'erasure', 'objection', 'other'],
+    }).notNull(),
     /** Who asked: a name is enough to find the person; no more than needed. */
     name: text('name').notNull(),
     /** How to reach them to answer (a phone number or an e-mail), if they gave one. */

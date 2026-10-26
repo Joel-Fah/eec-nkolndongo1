@@ -154,3 +154,9 @@ what a parent provides for a specific activity.
   jamais un motif ni une dette.
 - **Conservation** : tout est effacé avec le compte (cascade). La carte de papier reste la référence.
 - **Sur l'appareil** : la dernière carte est gardée dans le navigateur (IndexedDB) pour s'ouvrir sans réseau ; effacée à la déconnexion, au bout de 45 jours ou à l'expiration.
+
+## Registre des demandes sur les données (décision 0052, Phase 05)
+- **Ce qui est gardé** : type de demande, nom de la personne, moyen de lui répondre (facultatif), canal, dates, issue en quelques mots (jamais les données), qui a traité.
+- **Qui voit** : secrétariat (`rights:read` / `handle`) ; suppression : super administrateur. Le journal d'activité garde le type, jamais la personne.
+- **Délai** : 30 jours (lecture prudente, **à confirmer** avec la loi). **Conservation** : 24 mois après la clôture (à confirmer).
+- Le registre complet des traitements est dans `docs/legal/register.md` (Phase 05 : entrées ajoutées, le reste au Checkpoint L).

@@ -26,6 +26,7 @@
     "@eec/module-announcements": "workspace:*",
     "@eec/module-communion": "workspace:*",
     "@eec/module-contact": "workspace:*",
+    "@eec/module-rights": "workspace:*",
     "@eec/module-departments": "workspace:*",
     "@eec/module-guides": "workspace:*",
     "@eec/module-legal": "workspace:*",

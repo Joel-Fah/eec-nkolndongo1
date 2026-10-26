@@ -69,3 +69,33 @@ describe('the Moissons roles', () => {
       expect(can(as(key), 'registrations:export'), key).toBe(false)
   })
 })
+
+describe('the group space (decision 0049)', () => {
+  const leader = (groupId: string | null): Principal => ({
+    userId: 'u',
+    status: 'active',
+    isSuperAdmin: false,
+    grants: [
+      {
+        roleKey: 'responsable-groupe',
+        groupId,
+        permissions: new Set(systemRoles.find((r) => r.key === 'responsable-groupe')?.grants ?? []),
+      },
+    ],
+  })
+  it('a leader sees and manages their own group only, and cannot export', () => {
+    const p = leader(A)
+    for (const k of ['core:group-roster', 'core:group-members'])
+      expect(can(p, k, { groupId: A }), `${k} on A`).toBe(true)
+    for (const k of ['core:group-roster', 'core:group-members']) {
+      expect(can(p, k, { groupId: B }), `${k} on B`).toBe(false)
+      expect(can(p, k, { groupId: null }), `${k} on the parish`).toBe(false)
+    }
+    expect(can(p, 'core:group-export', { groupId: A })).toBe(false)
+  })
+  it('a leader of one group never writes announcements for another', () => {
+    const p = leader(A)
+    expect(can(p, 'announcements:publish', { groupId: A })).toBe(true)
+    expect(can(p, 'announcements:publish', { groupId: B })).toBe(false)
+  })
+})

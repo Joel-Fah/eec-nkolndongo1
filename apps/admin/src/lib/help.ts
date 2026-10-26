@@ -52,6 +52,17 @@ export const GUIDES: Guide[] = [
     screens: ['/m/announcements'],
   },
   {
+    slug: 'demandes-donnees',
+    icon: 'shield',
+    summary: {
+      fr: 'Noter une demande d’accès, de correction ou d’effacement, et la clore à temps.',
+      en: 'Log an access, correction or erasure request and close it on time.',
+    },
+    title: { fr: 'Répondre à une demande sur les données', en: 'Answer a data request' },
+    permission: 'rights:read',
+    screens: ['/m/rights'],
+  },
+  {
     slug: 'bilan-dimanche',
     icon: 'chart',
     summary: {

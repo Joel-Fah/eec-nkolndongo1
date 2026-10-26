@@ -21,6 +21,7 @@ export const KINDS = [
   'sunday_report_due',
   'sunday_review',
   'campaign_review',
+  'rights_due',
 ] as const
 const todayLocal = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
@@ -177,6 +178,24 @@ export const notificationRoutes = new Hono<AppEnv>()
       'campaign_review',
       entries > 0
         ? [{ ref: week, params: { count: entries }, href: '/m/campaigns', weekOf: week }]
+        : [],
+    )
+
+    // 3b. Data requests overdue or due within five days (decision 0052): one line a week while there are any.
+    let rightsDue = 0
+    if (on('rights') && can(p, 'rights:read')) {
+      rightsDue = Number(
+        (
+          await db.execute<{ n: number }>(
+            sql`select count(*)::int as n from rights_requests where status in ('received','in_progress') and due_on <= (${today}::date + 5)`,
+          )
+        ).rows[0]?.n ?? 0,
+      )
+    }
+    await run(
+      'rights_due',
+      rightsDue > 0
+        ? [{ ref: week, params: { count: rightsDue }, href: '/m/rights', weekOf: week }]
         : [],
     )
 

@@ -23,7 +23,13 @@ type Item = {
   resolved: boolean
 }
 type Feed = { items: Item[]; unread: number; muted: string[] }
-const KINDS = ['week_nudge', 'sunday_report_due', 'sunday_review', 'campaign_review'] as const
+const KINDS = [
+  'week_nudge',
+  'sunday_report_due',
+  'sunday_review',
+  'campaign_review',
+  'rights_due',
+] as const
 const k = (key: string) => `admin.notifications.${key}` as MessageKey
 
 /** The summary of the week first, then what to validate, then what to fill in. */
@@ -114,6 +120,8 @@ export function NotificationsBell() {
   const title = (n: Item) => {
     const date = day(n.params.date ?? n.weekOf)
     if (n.kind === 'sunday_review') return t(k(n.resolved ? 'review_done_t' : 'review_t'), { date })
+    if (n.kind === 'rights_due')
+      return t(k(n.resolved ? 'rights_done_t' : 'rights_t'), { n: String(n.params.count ?? 0) })
     if (n.kind === 'campaign_review')
       return t(k(n.resolved ? 'campaign_done_t' : 'campaign_t'), {
         n: String(n.params.count ?? 0),
@@ -127,6 +135,7 @@ export function NotificationsBell() {
   const detail = (n: Item) => {
     if (n.resolved) return t(k('done'))
     if (n.kind === 'sunday_review') return t(k(`review_${n.params.what ?? 'both'}`))
+    if (n.kind === 'rights_due') return t(k('rights_p'))
     if (n.kind === 'campaign_review') return t(k('campaign_p'))
     if (n.kind === 'week_nudge')
       return t(k('nudge_p'), {
@@ -141,11 +150,13 @@ export function NotificationsBell() {
       ? 'check'
       : n.kind === 'week_nudge'
         ? 'clock'
-        : n.kind === 'campaign_review'
-          ? 'gift'
-          : n.kind === 'sunday_review'
-            ? 'shield'
-            : 'notebook'
+        : n.kind === 'rights_due'
+          ? 'shield'
+          : n.kind === 'campaign_review'
+            ? 'gift'
+            : n.kind === 'sunday_review'
+              ? 'shield'
+              : 'notebook'
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger

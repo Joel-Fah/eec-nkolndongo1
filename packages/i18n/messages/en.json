@@ -1749,7 +1749,12 @@
       "kind_sunday_review": "Reports to validate",
       "kind_sunday_review_p": "Proposed figures waiting for your validation.",
       "kind_campaign_review": "Harvest entries to validate",
-      "kind_campaign_review_p": "Harvest festival entries waiting for validation."
+      "kind_campaign_review_p": "Harvest festival entries waiting for validation.",
+      "rights_t": "{n} data request(s) to handle",
+      "rights_done_t": "Data requests: all up to date",
+      "rights_p": "A request is overdue or due within 5 days.",
+      "kind_rights_due": "Data requests",
+      "kind_rights_due_p": "Access, correction or erasure requests close to their deadline."
     },
     "picker": {
       "open": "Choose",

@@ -55,3 +55,5 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0048 | System-role grants are offered once, by the seed (a ledger) | Accepted |
 | 0049 | Rejoindre un groupe, l'espace du responsable, les annonces | Accepted |
 | 0050 | La carte de Sainte-Cène | Accepted |
+| 0051 | Les notifications push : pas maintenant | Accepted |
+| 0052 | Le registre des demandes sur les données | Accepted |

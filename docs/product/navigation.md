@@ -28,3 +28,8 @@ Slugs are localised: `/fr/decouvrir/notre-histoire` ↔ `/en/discover/our-story`
 ## Admin navigation
 Sidebar generated from module manifests, grouped: Contenu · Vie paroissiale · Membres · Finances ·
 Paramètres. Items hidden when the user lacks permission. Command palette (⌘K / Ctrl+K) for quick actions.
+Phase 05 entries: **Mon groupe** (leaders), **Annonces de groupe**, **Cartes de Sainte-Cène**, **Demandes sur les données** (Membres). Each has its guide in the top-bar « ? » (`apps/admin/help`).
+
+## Mon espace (members)
+Five sections, one at a time, each at its anchor: **Accueil** (#accueil) · **Inscriptions** · **Groupes** · **Notifications** · **Profil**. Desktop: a sticky side menu that gets a « Mon espace » title once the welcome has scrolled away;
+phone: a bar of five icons. The public header shows an avatar with a red unread count (9+), which leads to Notifications; there is no bell.

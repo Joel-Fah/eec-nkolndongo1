@@ -115,6 +115,14 @@ By hand: `pnpm --filter @eec/api retention`.
 6. `CF_ANALYTICS_TOKEN` only if visit counts are wanted. **Never set `SITE_INDEXABLE=1`** before the launch decision (`docs/ops/launch.md`).
 7. Smoke test and device pass: `docs/ops/device-pass.md`.
 
+## Phase 05: groups, Communion cards, data requests
+- **After the deploy** (`pnpm db:seed` in the prod shell): the ledger offers the new grants once (Responsable de groupe: roster, members, announcements; Secrétariat: cards, register, data requests; Pasteur, Trésorier) and creates the **Ancien d'Église** role. Then grant **Ancien d'Église** to the Elders, and **Responsable de groupe** (with the group) to each leader.
+- **Start of a year (cards):** in *Cartes de Sainte-Cène*, filter « Expirée » and renew each card with a second person (the pasteur): the old QR code stops working. Cards are proposed by the secretariat after the baptism is confirmed from the register.
+- **At the door:** *Vérifier une carte* on a phone (camera) or scan the QR with any reader: the page says « valide jusqu'au … » or « non valide ». Offline, the member's own phone still shows their last card (« vérifiée le … »).
+- **Fees:** set once by the treasurer in *Cotisations attendues* (age bands and groups). Members only ever see « attendu ».
+- **Data requests:** log them in *Demandes sur les données*; the 30-day deadline is the cautious reading, to confirm with the legal notes.
+- **Push:** not built (decision 0051). No VAPID keys to manage.
+
 ## Monitoring and limits to watch (Free plans)
 Workers: 100 000 requests/day, 10 ms CPU per request. Neon: storage and the 5 GB/month egress shared with the media
 bucket (the library shows the space used and warns at 70 %). Check Cloudflare's usage page monthly.

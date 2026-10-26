@@ -11,7 +11,7 @@
  *   - registrations (module `registrations`, decision 0035): 6 months after the event, at most 12 months after the form closed;
  *     the anonymous totals per form are written first and kept
  *   - group requests (decision 0049): decided ones 12 months after the decision, waiting ones after 6 months; expired group
- *     announcements 12 months after they expired
+ *     announcements 12 months after they expired; closed data-rights requests 24 months after closing
  *   - member accounts whose deletion was requested more than 30 days ago (team accounts are never purged here)
  */
 import { dbUrl, type Env } from '@eec/api-kit'
@@ -148,7 +148,13 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
         `delete from announcements_items where state = 'expired' and updated_at < now() - interval '12 months' returning id`,
       ),
     )
-    result.groups = gr.rows.length + an.rows.length
+    // Closed data-rights requests: 24 months after they were closed (decision 0052; duration to confirm with the legal notes).
+    const dr = await db.execute(
+      sql.raw(
+        `delete from rights_requests where closed_on is not null and closed_on < current_date - interval '24 months' returning id`,
+      ),
+    )
+    result.groups = gr.rows.length + an.rows.length + dr.rows.length
 
     // Accounts past their grace period. Anyone holding a role other than « membre » is a team account: skipped.
     const dueAccounts = await db

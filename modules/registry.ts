@@ -20,6 +20,7 @@ import { meditationsModule } from '@eec/module-meditations'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
 import { registrationsModule } from '@eec/module-registrations'
+import { rightsModule } from '@eec/module-rights'
 import { scheduleModule } from '@eec/module-schedule'
 import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
@@ -49,6 +50,7 @@ export const modules: readonly DefinedModule[] = [
   legalModule,
   announcementsModule,
   communionModule,
+  rightsModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)
