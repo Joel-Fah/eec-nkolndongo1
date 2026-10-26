@@ -254,6 +254,7 @@ const tiles = [
     const root: HTMLElement = found
     const errors = JSON.parse(root.dataset.errors ?? '{}') as Record<string, string>
     const show = (state: 'in' | 'out' | 'loading') => {
+      root.dataset.state = state
       for (const el of root.querySelectorAll<HTMLElement>('[data-when]')) el.hidden = el.dataset.when !== state
     }
     const msg = (code: string) => errors[code] ?? errors.generic ?? ''
@@ -827,6 +828,30 @@ const tiles = [
     font-size: var(--text-sm);
     color: var(--ink-muted);
     text-align: center;
+  }
+
+  /* Signed in: the intro and the sign-up card give way to the whole width for Mon espace. */
+  .acct[data-state='in'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "card";
+    grid-template-rows: auto;
+    max-width: 80rem;
+  }
+  .acct[data-state='in'] .acct-intro,
+  .acct[data-state='in'] .acct-side {
+    display: none;
+  }
+  .acct-card.acct-home {
+    position: static;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+  @media (min-width: 64rem) {
+    .acct[data-state='in'] .acct-panels {
+      grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+      align-items: start;
+    }
   }
   .acct-hello {
     display: flex;

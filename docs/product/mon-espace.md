@@ -42,3 +42,10 @@ Une barre de sections collée en haut (défilable sur 360 px, icône + libellé,
 4. **Inscription au compte avec les groupes** : le champ `groupKeys` existe dans l'API mais l'interface ne l'envoie pas. Retenu : ne pas le brancher ici ; « demander à rejoindre » arrive au Checkpoint B (décision 0049).
 5. **Carte de Sainte-Cène** : tuile « bientôt » seulement, tant que la paroisse n'a pas défini ce qu'elle atteste (Checkpoint C).
 6. **Données personnelles** : A n'ajoute aucune nouvelle donnée ; il montre au membre ce que le site a déjà (ses inscriptions, ses groupes). Le volet légal (Checkpoint L) est reporté à la demande de Joël ; la **lecture la plus prudente** s'applique : accès minimal, accord explicite, rien de sensible en plus.
+
+## 7. Mise en page revue (Joël, 2026-10-26)
+
+- **Connecté = pleine largeur.** L'introduction et la carte d'inscription (colonne étroite) s'effacent ; Mon espace occupe toute la largeur (80 rem max).
+- **Ordinateur (≥ 64 rem)** : navigation verticale collante à gauche (5 entrées, pastille de notifications), contenu à droite en grille de cartes qui s'adapte (colonnes de 19 rem mini). Les notifications restent en une colonne de lecture.
+- **Téléphone** : barre collante des 5 sections toujours visibles (icône au-dessus d'un court libellé), plus de défilement horizontal caché.
+- **Chargement** : la première section s'affiche seule, puis les autres se chargent au repos du navigateur (`requestIdleCallback`) et restent en mémoire de la page ; changer d'onglet est instantané. Les notifications se rafraîchissent à l'ouverture si les données ont plus de 30 s. Toujours `private, no-store`, jamais en cache du service worker ; le JS reste en imports dynamiques (aucune section chargée avant l'ouverture de la page).

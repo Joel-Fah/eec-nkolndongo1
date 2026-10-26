@@ -202,6 +202,35 @@ const links = {
   .me-cards {
     display: grid;
     gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    align-items: start;
+  }
+  .me-cards > * {
+    min-width: 0;
+  }
+  /* A long list of notifications reads better as one column. */
+  .me-cards[data-me-notifs] {
+    grid-template-columns: minmax(0, 46rem);
+  }
+  @media (min-width: 64rem) {
+    .me {
+      grid-template-columns: 14.5rem minmax(0, 1fr);
+      gap: 1.5rem 2.5rem;
+      align-items: start;
+    }
+    .me-nav {
+      inset-block-start: 6.5rem;
+      flex-direction: column;
+      overflow: visible;
+      padding: 0.5rem;
+    }
+    .me-tab {
+      min-height: 3rem;
+      padding-inline: 1rem;
+    }
+    .me-count {
+      margin-inline-start: auto;
+    }
   }
   .me-skel {
     height: 5rem;
@@ -319,6 +348,25 @@ const links = {
     .me-nav {
       inset-block-start: 4rem;
       margin-inline: -0.5rem;
+      gap: 0.125rem;
+      overflow: visible;
+    }
+    /* All five sections stay in view on a phone: icon over a short label. */
+    .me-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.125rem;
+      padding-inline: 0.125rem;
+      font-size: 0.6875rem;
+    }
+    .me-count {
+      position: absolute;
+      inset-block-start: 0.125rem;
+      inset-inline-end: 0.25rem;
+      min-width: 1rem;
+      height: 1rem;
     }
   }
 </style>

@@ -19,6 +19,7 @@ export function initMonEspace(root: HTMLElement) {
     lang: host.dataset.lang ?? 'fr',
   }
   const loaded = new Set<Id>()
+  let notifsAt = 0
   const section = (id: Id) => host.querySelector<HTMLElement>(`[data-me-section="${id}"]`)
   const count = host.querySelector<HTMLElement>('[data-me-count]')
   const setCount = (n: number) => {
@@ -35,6 +36,7 @@ export function initMonEspace(root: HTMLElement) {
       return (await import('./me-regs')).initRegs(ctx, box, () => void load('accueil'))
     if (id === 'groupes')
       return (await import('./me-groups')).initGroups(ctx, box, () => void load('accueil'))
+    notifsAt = Date.now()
     return (await import('./me-notifs')).initNotifs(ctx, box, setCount)
   }
 
@@ -48,7 +50,7 @@ export function initMonEspace(root: HTMLElement) {
     if (!loaded.has(id)) {
       loaded.add(id)
       void load(id)
-    } else if (id === 'notifications') void load(id)
+    } else if (id === 'notifications' && Date.now() - notifsAt > 30_000) void load(id)
   }
 
   for (const a of host.querySelectorAll<HTMLAnchorElement>('[data-me-tab]'))
@@ -62,6 +64,16 @@ export function initMonEspace(root: HTMLElement) {
     })
   addEventListener('hashchange', () => show(location.hash.slice(1), false))
   show(location.hash.slice(1) || 'accueil', false)
+  // Warm the other sections once the first one is drawn, so switching tabs is instant afterwards.
+  const warm = () => {
+    for (const id of IDS)
+      if (!loaded.has(id)) {
+        loaded.add(id)
+        void load(id)
+      }
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 3000 })
+  else setTimeout(warm, 1500)
   // The unread count on the Notifications tab, without opening it.
   void api<{ unread: number }>('/me/notifications').then((r) => r.ok && setCount(r.json.unread))
 }
