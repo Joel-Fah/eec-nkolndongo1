@@ -108,6 +108,8 @@ export const registrations = pgTable(
   (t) => [
     uniqueIndex('registrations_code_idx').on(t.formId, t.code),
     index('registrations_form_idx').on(t.formId, t.status, t.createdAt),
+    // « Mes inscriptions » in Mon espace: a member's own registrations (decision 0035, Phase 05).
+    index('registrations_user_idx').on(t.userId),
   ],
 )
 
