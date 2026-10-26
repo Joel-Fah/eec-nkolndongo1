@@ -6,6 +6,7 @@ _Last updated: 2026-10-26. History lives in the phase reports (`docs/phases/PHAS
 Branch `feat/phase-05a-member-home` (from `main`). Brief: `docs/phases/PHASE_05_INSTRUCTIONS.md`. **Working on:** Checkpoint 0 (what Claude can do), then Checkpoint L
 (legal footing), then the Mon espace plan (IA + sketch) — each stops for Joël's approval.
 **Checkpoint A built on dev (2026-10-26):** Mon espace in five sections (Accueil, Inscriptions, Groupes, Notifications, Profil), my registrations with link-by-cancel-link, my groups (list, leave), member notifications and a header bell; migration 0037 (index). Plan: `docs/product/mon-espace.md`. **Checkpoint L (legal) is deferred at Joël's request:** the safer reading applies meanwhile.
+**Mon espace polish (2026-10-26):** full-width layout, welcome with slow waves and a polaroid photo, bento home, vertical Communion card preview, member footer invitation, `callName` (display name wins, else first name). YouTube: enter `https://www.youtube.com/@BCN-MEDIA` in Réglages (`parish.youtube`).
 Done on this branch so far: decision **0048** (system-role grants offered once through a ledger, migration 0036, dev only), the generated grants list
 (`docs/ops/release-phase-04.md`), the privacy-policy draft v2 (`docs/legal/privacy-policy-draft-v2.md`), the device-pass sheet (`docs/ops/device-pass.md`),
 the backup error message, the service-worker cache keep-list (+ test), the decisions index in order.
@@ -33,7 +34,7 @@ the backup error message, the service-worker cache keep-list (+ test), the decis
 ## Carry-overs
 - « Mes inscriptions » in Mon espace (planned in Phase 05 Checkpoint A); the per-event `.ics` on the registration confirmation page.
 - **Tell the Bible service:** the parish's 2026 calendar has an error at **Hébreux 8, 19** (flagged by the import checks), and two psalm-column warnings (2026-09-16 and 09-17: « 1-22 » / « 23-43 » have no psalm number).
-- The carte de Sainte-Cène (and what the card means) must be defined with the parish before it is built (Checkpoint C).
+- The carte de Sainte-Cène: decision **0050** is proposed with Joël's answers (Anciens d'Église visa + contribution register, baptism declared then confirmed, fees expected not owed, streak on Communion Sundays). The **seven parish questions** in it must be answered before Checkpoint C.
 
 ## History
 Phase reports: `docs/phases/PHASE_01_REPORT.md` … `PHASE_04_REPORT.md`. Decisions: `docs/decisions/README.md`.

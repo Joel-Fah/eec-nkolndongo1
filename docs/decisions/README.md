@@ -53,4 +53,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0046 | A person can silence a kind of notification | Accepted |
 | 0047 | Member profile details, a private photo, and the virtual member card | Accepted |
 | 0048 | System-role grants are offered once, by the seed (a ledger) | Accepted |
-| 0050 | La carte de Sainte-Cène | Proposée (brouillon) |
+| 0050 | La carte de Sainte-Cène | Proposée (à valider avec le Conseil) |

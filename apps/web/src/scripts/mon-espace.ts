@@ -92,12 +92,6 @@ export function initMonEspace(root: HTMLElement) {
     loaded.delete('accueil')
     if (!section('accueil')?.hidden) show('accueil', false)
   })
-  if (hero && matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches)
-    hero.addEventListener('pointermove', (e) => {
-      const r = hero.getBoundingClientRect()
-      hero.style.setProperty('--mx', String(((e.clientX - r.left) / r.width - 0.5) * 2))
-      hero.style.setProperty('--my', String(((e.clientY - r.top) / r.height - 0.5) * 2))
-    })
   // The menu gets its headline once the welcome has scrolled away.
   if (hero && 'IntersectionObserver' in window)
     new IntersectionObserver(([e]) => host.toggleAttribute('data-past-hero', !e?.isIntersecting), {

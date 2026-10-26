@@ -13,6 +13,7 @@ import google from '@eec/ui/brand/google-g.svg?raw'
 import { localeOf, useT } from '../lib/i18n'
 import { href, pages } from '../lib/nav'
 import { peoplePhotos, photoSrc } from '../lib/placeholders'
+import HeroWaves from './HeroWaves.astro'
 import MeSections from './MeSections.astro'
 import ProfileSection from './ProfileSection.astro'
 import '../styles/patterns.css'
@@ -140,9 +141,7 @@ const tiles = [
 
   <div class="acct-card acct-home" data-when="in" hidden>
     <section class="me-hero" data-me-hero aria-labelledby="me-hero-t" data-greets={JSON.stringify({ morning: t('member.me.hero_morning', { name: '{name}' }), afternoon: t('member.me.hero_afternoon', { name: '{name}' }), evening: t('member.me.hero_evening', { name: '{name}' }) })}>
-      <span class="me-orb me-orb-1" aria-hidden="true"></span>
-      <span class="me-orb me-orb-2" aria-hidden="true"></span>
-      <span class="me-orb me-orb-3" aria-hidden="true"></span>
+      <HeroWaves />
       <div class="me-hero-body">
         <span class="acct-avatar" data-hero-avatar aria-hidden="true">
           <img data-photo alt="" hidden width="96" height="96" referrerpolicy="no-referrer" />
@@ -866,8 +865,6 @@ const tiles = [
     border-radius: var(--radius-xl);
     background: linear-gradient(135deg, color-mix(in oklab, var(--season) 16%, var(--surface)), color-mix(in oklab, var(--gold) 14%, var(--surface)));
     box-shadow: inset 0 0 0 1px var(--line);
-    --mx: 0;
-    --my: 0;
   }
   .me-hero-body {
     position: relative;
@@ -876,18 +873,45 @@ const tiles = [
     align-items: center;
     gap: 1.25rem 1.5rem;
   }
+  /* The picture is an instant photo, a little askew: a square print in a frame that is thicker at the bottom. */
   .me-hero .acct-avatar {
-    width: 5rem;
-    height: 5rem;
+    position: relative;
+    width: 6.5rem;
+    height: 7.5rem;
+    padding: 0.4rem 0.4rem 1.5rem;
+    overflow: visible;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: var(--elevation-2), inset 0 0 0 1px var(--line);
+    transform: rotate(-4deg);
+    transform-origin: 50% 20%;
+    animation: me-bob 7s ease-in-out infinite;
+  }
+  .me-hero .acct-avatar > span:not([data-initials]),
+  .me-hero .acct-avatar > img {
+    display: block;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    box-shadow: 0 0 0 4px var(--surface), var(--elevation-2);
-    animation: me-bob 6s ease-in-out infinite;
+    border-radius: 2px;
   }
   .me-hero .acct-avatar img,
   .me-hero .acct-avatar svg {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  .me-hero .acct-avatar::before {
+    content: "";
+    position: absolute;
+    inset: -0.5rem auto auto 50%;
+    width: 2.5rem;
+    height: 1rem;
+    margin-inline-start: -1.25rem;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--gold) 45%, transparent);
+    transform: rotate(3deg);
   }
   .me-hero-t {
     font-family: var(--font-display);
@@ -898,44 +922,14 @@ const tiles = [
     max-width: 44ch;
     color: var(--ink-muted);
   }
-  .me-orb {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    transition: transform 0.6s var(--ease-out, ease);
-  }
-  .me-orb-1 {
-    inset: -3rem -2rem auto auto;
-    width: 12rem;
-    height: 12rem;
-    background: color-mix(in oklab, var(--gold) 28%, transparent);
-    transform: translate(calc(var(--mx) * -14px), calc(var(--my) * -14px));
-  }
-  .me-orb-2 {
-    inset: auto auto -3.5rem 30%;
-    width: 9rem;
-    height: 9rem;
-    background: color-mix(in oklab, var(--season) 22%, transparent);
-    transform: translate(calc(var(--mx) * 18px), calc(var(--my) * 18px));
-  }
-  .me-orb-3 {
-    inset: 35% 8% auto auto;
-    width: 3.5rem;
-    height: 3.5rem;
-    background: color-mix(in oklab, var(--clay, var(--gold)) 30%, transparent);
-    transform: translate(calc(var(--mx) * 26px), calc(var(--my) * 26px));
-  }
   @keyframes me-bob {
     50% {
-      transform: translateY(-4px);
+      transform: rotate(-3deg) translateY(-3px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .me-hero .acct-avatar {
       animation: none;
-    }
-    .me-orb {
-      transition: none;
     }
   }
   .acct-hello {

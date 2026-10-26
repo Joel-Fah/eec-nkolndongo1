@@ -1,0 +1,49 @@
+---
+/** The slow waves behind the Mon espace welcome (decorative; see lib/hero-waves.ts). Two layers slide left to right at different speeds. */
+import { WAVE_W, waveLayers } from '../lib/hero-waves'
+
+const layers = waveLayers()
+const H = 300
+---
+
+<div class="hero-waves" aria-hidden="true">
+  {
+    layers.map((paths, i) => (
+      <svg class={`hero-wave hero-wave-${i + 1}`} viewBox={`0 0 ${WAVE_W * 2} ${H}`} preserveAspectRatio="none" focusable="false">
+        <g set:html={paths} />
+        <g transform={`translate(${WAVE_W} 0)`} set:html={paths} />
+      </svg>
+    ))
+  }
+</div>
+
+<style is:global>
+  .hero-waves {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .hero-wave {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: -100%;
+    width: 200%;
+    height: 100%;
+    animation: hero-drift 110s linear infinite;
+  }
+  .hero-wave-2 {
+    animation-duration: 160s;
+  }
+  /* One tile is half the width: sliding by 50% of the element (one tile) and starting a tile to the left makes the loop seamless. */
+  @keyframes hero-drift {
+    to {
+      transform: translateX(50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-wave {
+      animation: none;
+    }
+  }
+</style>
