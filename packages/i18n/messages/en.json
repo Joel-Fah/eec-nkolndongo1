@@ -1338,7 +1338,8 @@
       "account": "My account",
       "validate": "To validate",
       "help": "Help",
-      "health": "Health"
+      "health": "Health",
+      "mygroup": "My group"
     },
     "user": {
       "menu": "Account menu",
@@ -1810,6 +1811,45 @@
       "avatar_use": "Use my photo as my avatar in the menu",
       "avatar_help": "Without it, a generated avatar represents you in the menu. The parish team who manage members always see the photo you add; the public never does.",
       "avatar_saved": "Choice saved."
+    },
+    "mygroup": {
+      "title": "My group",
+      "lead": "The people in your group, the requests to join it and a few figures. You only see your own group. A phone number shows only if the person chose to share it with the group.",
+      "group": "Group",
+      "announcements": "Announcements",
+      "export": "Export the list (CSV)",
+      "stats": "Figures",
+      "stat_members": "Members",
+      "stat_joins": "Joined this month",
+      "stat_ages": "Ages",
+      "stat_ages_hidden": "Shown from 5 people whose age is known.",
+      "requests": "Requests to join",
+      "requests_none": "No request waiting.",
+      "asked": "Asked on",
+      "shares_phone": "shares their number",
+      "accept": "Accept",
+      "decline": "Decline",
+      "decide_p": "The person will see your answer in their space. The message is optional.",
+      "message": "Message for the person (optional)",
+      "message_hint": "They will see it with the answer.",
+      "message_ph": "Welcome! Rehearsals are on Thursday.",
+      "accepted": "Request accepted.",
+      "declined": "Request declined.",
+      "error": "That could not be done. Try again.",
+      "roster": "Members",
+      "roster_empty_t": "Nobody yet",
+      "roster_empty_p": "Accepted people will appear here.",
+      "joined": "Joined",
+      "call": "Call",
+      "no_contact": "Number not shared",
+      "remove": "Remove",
+      "remove_p": "The person will be removed from the group. The reason stays in the activity log: it is shown neither to the person nor to the public.",
+      "reason": "Reason (required)",
+      "reason_hint": "Kept in the activity log only.",
+      "reason_ph": "Moved away",
+      "removed": "Person removed from the group.",
+      "none_t": "No group to follow",
+      "none_p": "You have no group yet. Ask the secretariat to give you the leader role for a group."
     }
   },
   "login": {
@@ -2422,7 +2462,21 @@
       "card_t": "Your card, always with you",
       "card_p": "Soon you will follow the year’s signed Communion Sundays here and be reminded before the preparation week ends. The parish is setting this up with the Council.",
       "card_parish": "Nkolndongo 1 Parish",
-      "card_preview": "Preview"
+      "card_preview": "Preview",
+      "share_phone": "Share my phone number with this group’s leaders (optional)",
+      "request_k": "Request waiting",
+      "request_p": "The group’s leaders have your request. Their answer will show here.",
+      "request_withdraw": "Withdraw my request",
+      "join_t": "Join a group",
+      "join_p": "Ask to join a group: its leaders accept or not. Belonging to a group never makes your name public anywhere.",
+      "request_ask": "Ask to join",
+      "request_send": "Send my request",
+      "request_declined": "Your last request was not accepted.",
+      "kind_group_decision": "Answers to my group requests",
+      "group_decision_t": "Answer to your request",
+      "group_decision_p": "{title}",
+      "group_announcement_t": "New announcement",
+      "group_announcement_p": "{title}"
     }
   },
   "hero": {

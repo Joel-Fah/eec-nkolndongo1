@@ -626,5 +626,250 @@ const stamp = Date.now().toString(36)
   await api(`/registrations/forms/${two.id}`, { method: 'DELETE' })
 }
 
+// 12. Groups (decision 0049): ask to join → the leader of THAT group decides → I am a member; announcements notify; scope; removal; export
+{
+  const pw = 'une-phrase-solide-2026-xyz'
+  const mkMember = async (tag: string, phone: string) => {
+    const mail = `e2e-${tag}-${stamp}@example.test`
+    const up = await fetch(`${base}/api/members/signup`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: base },
+      body: JSON.stringify({
+        firstName: 'E2E',
+        lastName: tag,
+        email: mail,
+        password: pw,
+        phone,
+        acceptPrivacy: true,
+        acceptNews: false,
+      }),
+    })
+    const si = await fetch(`${base}/api/auth/sign-in/email`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: base },
+      body: JSON.stringify({ email: mail, password: pw }),
+    })
+    const ck = si.headers
+      .getSetCookie()
+      .map((c) => c.split(';')[0])
+      .join('; ')
+    const as = async (path: string, init: RequestInit = {}) => {
+      const res = await fetch(`${base}/api${path}`, {
+        ...init,
+        headers: {
+          cookie: ck,
+          origin: base,
+          'content-type': 'application/json',
+          ...(init.headers ?? {}),
+        },
+      })
+      return {
+        status: res.status,
+        json: (await res.json().catch(() => ({}))) as Record<string, any>,
+        res,
+      }
+    }
+    const me = (await as('/me')).json.user?.id as string
+    return { up: up.status, as, id: me }
+  }
+  const leader = await mkMember('chef', '655000401')
+  const joiner = await mkMember('membre', '655000402')
+  if (!leader.id || !joiner.id)
+    ok(
+      'groups: test accounts could be created',
+      false,
+      `signup ${leader.up}/${joiner.up} (5 sign-ups per hour per address)`,
+    )
+  else {
+    const g1 = (
+      await api('/groups', {
+        method: 'POST',
+        body: JSON.stringify({ nameFr: `E2E Groupe A ${stamp}`, kind: 'other' }),
+      })
+    ).json.id as string
+    const g2 = (
+      await api('/groups', {
+        method: 'POST',
+        body: JSON.stringify({ nameFr: `E2E Groupe B ${stamp}`, kind: 'other' }),
+      })
+    ).json.id as string
+    await api(`/users/${leader.id}/roles`, {
+      method: 'POST',
+      body: JSON.stringify({ roleKey: 'responsable-groupe', groupId: g1 }),
+    })
+    // sessions of the leader were closed by the grant: sign in again through a fresh helper
+    const lead = await (async () => {
+      const si = await fetch(`${base}/api/auth/sign-in/email`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin: base },
+        body: JSON.stringify({ email: `e2e-chef-${stamp}@example.test`, password: pw }),
+      })
+      const ck = si.headers
+        .getSetCookie()
+        .map((c) => c.split(';')[0])
+        .join('; ')
+      return async (path: string, init: RequestInit = {}) => {
+        const res = await fetch(`${base}/api${path}`, {
+          ...init,
+          headers: {
+            cookie: ck,
+            origin: base,
+            'content-type': 'application/json',
+            ...(init.headers ?? {}),
+          },
+        })
+        return {
+          status: res.status,
+          json: (await res.json().catch(() => ({}))) as Record<string, any>,
+          res,
+        }
+      }
+    })()
+    const dir = await joiner.as('/me/groups/directory')
+    ok(
+      'groups: a member sees the active groups they can ask to join',
+      dir.status === 200 && (dir.json.items as { id: string }[]).some((g) => g.id === g1),
+    )
+    const ask = await joiner.as(`/me/groups/${g1}/request`, {
+      method: 'POST',
+      body: JSON.stringify({ sharePhone: true }),
+    })
+    const again = await joiner.as(`/me/groups/${g1}/request`, {
+      method: 'POST',
+      body: JSON.stringify({ sharePhone: true }),
+    })
+    ok(
+      'groups: a request is created once, a second one is refused',
+      ask.status === 201 && again.status === 409,
+    )
+    const mineBefore = await joiner.as('/me/groups')
+    ok(
+      'groups: waiting is not belonging (the member is in no group yet)',
+      (mineBefore.json.items as unknown[]).length === 0 &&
+        (mineBefore.json.pending as unknown[]).length === 1,
+    )
+    const own = await lead(`/group-space/mine`)
+    const space = await lead(`/group-space/${g1}`)
+    const reqId = (space.json.requests as { id: string }[])?.[0]?.id
+    ok(
+      'groups: the leader sees their group and the request, nothing else',
+      own.status === 200 &&
+        (own.json.groups as { id: string }[]).map((g) => g.id).join() === g1 &&
+        !!reqId,
+    )
+    ok(
+      'groups: a leader of one group is refused another group (scope)',
+      (await lead(`/group-space/${g2}`)).status === 403,
+    )
+    ok(
+      'groups: a plain member cannot open Mon groupe',
+      (await joiner.as(`/group-space/mine`)).status === 403,
+    )
+    const nobody = await joiner.as(`/group-space/requests/${reqId}/decide`, {
+      method: 'POST',
+      body: JSON.stringify({ approve: true }),
+    })
+    ok('groups: a member cannot decide a request', nobody.status === 403)
+    const yes = await lead(`/group-space/requests/${reqId}/decide`, {
+      method: 'POST',
+      body: JSON.stringify({ approve: true, message: 'Bienvenue' }),
+    })
+    const mineAfter = await joiner.as('/me/groups')
+    ok(
+      'groups: approving makes the member a member',
+      yes.status === 200 && (mineAfter.json.items as { id: string }[]).some((g) => g.id === g1),
+    )
+    const note = (await joiner.as('/me/notifications')).json.items as { kind: string }[]
+    ok(
+      'groups: the member is told the answer',
+      note.some((n) => n.kind === 'group_decision'),
+    )
+    const roster = (await lead(`/group-space/${g1}`)).json.members as {
+      userId: string
+      phone: string | null
+    }[]
+    ok(
+      'groups: the roster shows the number the member chose to share',
+      roster.find((r) => r.userId === joiner.id)?.phone === '655000402',
+    )
+    await joiner.as(`/me/groups/${g1}/share-phone`, {
+      method: 'PUT',
+      body: JSON.stringify({ sharePhone: false }),
+    })
+    const roster2 = (await lead(`/group-space/${g1}`)).json.members as {
+      userId: string
+      phone: string | null
+    }[]
+    ok(
+      'groups: stopping the sharing hides the number',
+      roster2.find((r) => r.userId === joiner.id)?.phone === null,
+    )
+    const ann = await lead('/announcements', {
+      method: 'POST',
+      body: JSON.stringify({
+        groupId: g1,
+        titleFr: 'Répétition déplacée',
+        bodyFr: 'Samedi, même heure.',
+      }),
+    })
+    const annId = ann.json.id as string
+    const pub = await lead(`/announcements/${annId}/publish`, { method: 'POST', body: '{}' })
+    const mine3 = await joiner.as('/me/groups')
+    const notes = (await joiner.as('/me/notifications')).json.items as { kind: string }[]
+    ok(
+      'groups: publishing notifies the members and shows in Mes groupes',
+      pub.status === 200 &&
+        pub.json.notified === 1 &&
+        notes.some((n) => n.kind === 'group_announcement') &&
+        (mine3.json.items as { announcements: unknown[] }[])[0]?.announcements.length === 1,
+    )
+    ok(
+      'groups: a leader cannot publish for another group',
+      (
+        await lead('/announcements', {
+          method: 'POST',
+          body: JSON.stringify({ groupId: g2, titleFr: 'Non', bodyFr: 'Non' }),
+        })
+      ).status === 403,
+    )
+    ok(
+      'groups: the group list export is refused to a leader (dangerous right)',
+      (await lead(`/group-space/${g1}/export`)).status === 403,
+    )
+    const exp = await fetch(`${base}/api/group-space/${g1}/export`, {
+      headers: { cookie, origin: base },
+    })
+    ok(
+      'groups: the super admin can export, as a file',
+      exp.status === 200 && (exp.headers.get('content-type') ?? '').includes('text/csv'),
+    )
+    const noReason = await lead(`/group-space/${g1}/members/${joiner.id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ reason: '' }),
+    })
+    const gone = await lead(`/group-space/${g1}/members/${joiner.id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ reason: 'Test e2e' }),
+    })
+    const leftOver = await joiner.as('/me/groups')
+    ok(
+      'groups: removing needs a reason and takes the person out',
+      noReason.status === 400 &&
+        gone.status === 200 &&
+        (leftOver.json.items as unknown[]).length === 0,
+    )
+    const audit = await api('/audit?q=group.member.remove')
+    ok('groups: the removal is in the activity log', audit.status === 200)
+    await api(`/groups/${g1}`, {
+      method: 'PUT',
+      body: JSON.stringify({ nameFr: `E2E Groupe A ${stamp}`, kind: 'other', isActive: false }),
+    })
+    await api(`/groups/${g2}`, {
+      method: 'PUT',
+      body: JSON.stringify({ nameFr: `E2E Groupe B ${stamp}`, kind: 'other', isActive: false }),
+    })
+  }
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

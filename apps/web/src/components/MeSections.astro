@@ -54,6 +54,20 @@ const messages = Object.fromEntries(
     'card_parish',
     'card_preview',
     'hero_title',
+    'share_phone',
+    'request_k',
+    'request_p',
+    'request_withdraw',
+    'join_t',
+    'join_p',
+    'request_ask',
+    'request_send',
+    'request_declined',
+    'kind_group_decision',
+    'group_decision_t',
+    'group_decision_p',
+    'group_announcement_t',
+    'group_announcement_p',
     'no_next',
     'regs_upcoming',
     'regs_past',
@@ -445,6 +459,26 @@ const links = {
     font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+  .me-head-sub,
+  .me-wide {
+    grid-column: 1 / -1;
+  }
+  .me-head-sub {
+    margin-block-start: 0.5rem;
+  }
+  .me-ann {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.125rem 0.625rem;
+    align-items: center;
+    padding: 0.625rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--gold) 14%, var(--surface));
+  }
+  .me-ann > .me-p,
+  .me-ann > a {
+    grid-column: 2;
   }
   .me-skel {
     height: 5rem;

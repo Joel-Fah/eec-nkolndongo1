@@ -1338,7 +1338,8 @@
       "account": "Mon compte",
       "validate": "À valider",
       "help": "Aide",
-      "health": "Santé"
+      "health": "Santé",
+      "mygroup": "Mon groupe"
     },
     "user": {
       "menu": "Menu du compte",
@@ -1810,6 +1811,45 @@
       "avatar_use": "Utiliser ma photo comme avatar dans le menu",
       "avatar_help": "Sans cela, un avatar généré vous représente dans le menu. L’équipe paroissiale qui gère les membres voit toujours la photo que vous avez ajoutée ; le public, jamais.",
       "avatar_saved": "Choix enregistré."
+    },
+    "mygroup": {
+      "title": "Mon groupe",
+      "lead": "Les personnes de votre groupe, les demandes pour le rejoindre et quelques chiffres. Vous ne voyez que votre groupe. Un numéro de téléphone n’apparaît que si la personne a choisi de le partager avec le groupe.",
+      "group": "Groupe",
+      "announcements": "Annonces",
+      "export": "Exporter la liste (CSV)",
+      "stats": "Chiffres",
+      "stat_members": "Membres",
+      "stat_joins": "Arrivées ce mois-ci",
+      "stat_ages": "Âges",
+      "stat_ages_hidden": "Affichés à partir de 5 personnes dont l’âge est connu.",
+      "requests": "Demandes pour rejoindre",
+      "requests_none": "Aucune demande en attente.",
+      "asked": "Demandé le",
+      "shares_phone": "partage son numéro",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "decide_p": "La personne recevra votre réponse dans son espace. Le message est facultatif.",
+      "message": "Message pour la personne (facultatif)",
+      "message_hint": "Elle le verra avec la réponse.",
+      "message_ph": "Bienvenue ! Les répétitions sont le jeudi.",
+      "accepted": "Demande acceptée.",
+      "declined": "Demande refusée.",
+      "error": "Cela n’a pas pu être fait. Réessayez.",
+      "roster": "Membres",
+      "roster_empty_t": "Personne pour l’instant",
+      "roster_empty_p": "Les personnes acceptées apparaîtront ici.",
+      "joined": "Arrivé(e) le",
+      "call": "Appeler",
+      "no_contact": "Numéro non partagé",
+      "remove": "Retirer",
+      "remove_p": "La personne sera retirée du groupe. Le motif reste dans le journal d’activité : il n’est montré ni à la personne ni au public.",
+      "reason": "Motif (obligatoire)",
+      "reason_hint": "Gardé dans le journal d’activité seulement.",
+      "reason_ph": "A déménagé",
+      "removed": "Personne retirée du groupe.",
+      "none_t": "Aucun groupe à suivre",
+      "none_p": "Vous n’avez pas encore de groupe. Demandez au secrétariat de vous attribuer le rôle de responsable pour un groupe."
     }
   },
   "login": {
@@ -2422,7 +2462,21 @@
       "card_t": "Votre carte, toujours avec vous",
       "card_p": "Vous suivrez bientôt ici les Saintes-Cènes signées de l’année et vous serez prévenu avant la fin de la semaine de préparation. La paroisse met cela en place avec le Conseil.",
       "card_parish": "Paroisse de Nkolndongo 1",
-      "card_preview": "Aperçu"
+      "card_preview": "Aperçu",
+      "share_phone": "Partager mon numéro de téléphone avec les responsables de ce groupe (facultatif)",
+      "request_k": "Demande en attente",
+      "request_p": "Les responsables du groupe ont reçu votre demande. Vous aurez leur réponse ici.",
+      "request_withdraw": "Retirer ma demande",
+      "join_t": "Rejoindre un groupe",
+      "join_p": "Demandez à rejoindre un groupe : ses responsables acceptent ou non. Appartenir à un groupe ne rend votre nom public nulle part.",
+      "request_ask": "Demander à rejoindre",
+      "request_send": "Envoyer ma demande",
+      "request_declined": "Votre dernière demande n’a pas été retenue.",
+      "kind_group_decision": "Réponses à mes demandes de groupe",
+      "group_decision_t": "Réponse à votre demande",
+      "group_decision_p": "{title}",
+      "group_announcement_t": "Nouvelle annonce",
+      "group_announcement_p": "{title}"
     }
   },
   "hero": {
