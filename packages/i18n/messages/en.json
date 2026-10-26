@@ -1827,7 +1827,7 @@
     },
     "mygroup": {
       "title": "My group",
-      "lead": "This screen is for a group’s leaders (and the secretariat): the people of YOUR group, the requests to join it and a few figures. To create or configure the groups themselves (name, public page, leaders), use the “Groups” screen. A phone number shows only if the person chose to share it with the group.",
+      "lead": "The people in your group and the requests to join it.",
       "group": "Group",
       "announcements": "Announcements",
       "export": "Export the list (CSV)",

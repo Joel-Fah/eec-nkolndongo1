@@ -3564,13 +3564,6 @@ html[data-nav-open] {
 }
 
 /* ——— Communion cards, Mon groupe and group announcements: list tiles ——————————————————————————— */
-.cm-intro {
-  max-width: 70ch;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md);
-  background: color-mix(in oklab, var(--season) 10%, var(--surface));
-  color: var(--ink);
-}
 .cm-filters {
   display: flex;
   flex-wrap: wrap;
@@ -3682,28 +3675,6 @@ html[data-nav-open] {
   box-shadow: inset 0 0 0 2px var(--season);
   color: var(--ink);
   font-weight: 600;
-}
-.cm-help {
-  display: grid;
-  gap: 0.75rem;
-  margin: 0;
-}
-.cm-help-item {
-  display: grid;
-  gap: 0.25rem;
-  padding: 0.875rem 1.125rem;
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line);
-}
-.cm-help-item dt {
-  font-weight: 700;
-}
-.cm-help-item dd {
-  display: grid;
-  gap: 0.25rem;
-  margin: 0;
-  color: var(--ink-muted);
 }
 /* Mon groupe and announcements: cards in a grid, four across on a wide screen. */
 .cm-grid {

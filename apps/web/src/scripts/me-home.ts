@@ -113,11 +113,29 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
 
   const comp = profile.json.completeness
   if (comp) {
-    const c = card()
     if (comp.complete) {
-      c.append(head('check', m.profile_k ?? '', m.profile_ok_t), el('p', 'me-p', m.profile_ok_p))
-      c.append(button(m.nav_profile ?? '', 'btn btn-secondary btn-sm', () => go('profil')))
+      // Said once, as a thank-you, with nothing to click; then the space makes room for what matters.
+      let seen = false
+      try {
+        seen = localStorage.getItem('eec-profile-done') === '1'
+        localStorage.setItem('eec-profile-done', '1')
+      } catch {
+        // storage blocked: show it, it is harmless
+      }
+      if (!seen) {
+        const c = card()
+        c.append(head('check', m.profile_k ?? '', m.profile_ok_t), el('p', 'me-p', m.profile_ok_p))
+        box.append(c)
+      }
     } else {
+      // Incomplete again: the next completion is worth saying once more.
+      try {
+        localStorage.removeItem('eec-profile-done')
+      } catch {
+        // ignore
+      }
+      const c = card()
+      c.dataset.span = '2'
       c.append(
         head(
           'userRoundPlus',
@@ -127,8 +145,8 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
         el('p', 'me-p', m.profile_p),
       )
       c.append(button(m.profile_go ?? '', 'btn btn-primary btn-sm', () => go('profil')))
+      box.append(c)
     }
-    box.append(c)
   }
 
   // The Communion card: only for a person who holds one; nobody else is shown anything about it.

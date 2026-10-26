@@ -19,6 +19,39 @@ export type Guide = {
 
 export const GUIDES: Guide[] = [
   {
+    slug: 'cartes-sainte-cene',
+    icon: 'church',
+    summary: {
+      fr: 'Proposer, approuver, viser le mois, noter les cotisations, vérifier une carte.',
+      en: 'Propose, approve, sign the month, note contributions, check a card.',
+    },
+    title: { fr: 'Gérer les cartes de Sainte-Cène', en: 'Manage the Communion cards' },
+    permission: 'communion:read',
+    screens: ['/m/communion'],
+  },
+  {
+    slug: 'mon-groupe',
+    icon: 'users',
+    summary: {
+      fr: 'Les membres de votre groupe, les demandes pour le rejoindre, les chiffres.',
+      en: 'Your group’s members, the requests to join it, the figures.',
+    },
+    title: { fr: 'Suivre mon groupe', en: 'Follow my group' },
+    permission: 'core:group-roster',
+    screens: ['/my-group'],
+  },
+  {
+    slug: 'annonces-groupe',
+    icon: 'megaphone',
+    summary: {
+      fr: 'Un court message pour les membres d’un groupe, avec notification.',
+      en: 'A short message for a group’s members, with a notification.',
+    },
+    title: { fr: 'Écrire une annonce de groupe', en: 'Write a group announcement' },
+    permission: 'announcements:read',
+    screens: ['/m/announcements'],
+  },
+  {
     slug: 'bilan-dimanche',
     icon: 'chart',
     summary: {

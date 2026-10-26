@@ -74,7 +74,6 @@ export default function Communion() {
       content: <FeesTab canEdit={can('fees')} />,
     },
     can('verify') && { id: 'check', label: t(k('tab_check')), content: <CheckTab /> },
-    { id: 'help', label: t(k('tab_help')), content: <HelpTab /> },
   ].filter(Boolean) as { id: string; label: string; content: React.ReactNode }[]
   return (
     <div className="grid gap-4">
@@ -84,16 +83,6 @@ export default function Communion() {
       </header>
       <TabsBox tabs={tabs} />
     </div>
-  )
-}
-
-/** What this tab is for, in one sentence, and when to use it. */
-function Intro({ id }: { id: string }) {
-  const { t } = useLocale()
-  return (
-    <p className="cm-intro">
-      <strong>{t(k(`intro_${id}_t`))}</strong> {t(k(`intro_${id}_p`))}
-    </p>
   )
 }
 
@@ -148,7 +137,6 @@ function CardsTab() {
   const count = (st: State) => (data?.items ?? []).filter((r) => r.state === st).length
   return (
     <div className="grid gap-4">
-      <Intro id="cards" />
       <div className="cm-filters">
         <SelectField
           label={t(k('month'))}
@@ -402,7 +390,6 @@ function NewTab() {
     new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' }).format(new Date(iso))
   return (
     <div className="grid gap-4">
-      <Intro id="new" />
       <TextField
         label={t(k('search'))}
         hint={t(k('search_hint'))}
@@ -556,7 +543,6 @@ function FeesTab({ canEdit }: { canEdit: boolean }) {
   )
   return (
     <div className="grid gap-4">
-      <Intro id="fees" />
       <h2 className="text-xl">{t(k('fees_age'))}</h2>
       <ul className="cm-list">
         {BANDS.map((b) => row('age', b, t(`members.age_${b}` as MessageKey)))}
@@ -567,34 +553,6 @@ function FeesTab({ canEdit }: { canEdit: boolean }) {
           row('group', g.id, (locale === 'en' && g.nameEn) || g.nameFr),
         )}
       </ul>
-    </div>
-  )
-}
-
-/** The guide: what each tab, status and action means, and four situations told step by step. */
-function HelpTab() {
-  const { t } = useLocale()
-  const lines = (key: string) => t(k(key)).split('\n')
-  return (
-    <div className="grid gap-5">
-      <p className="text-ink-muted">{t(k('help_lead'))}</p>
-      {['tabs', 'states', 'actions', 'scenarios'].map((sec) => (
-        <section key={sec} className="grid gap-2">
-          <h2 className="text-2xl">{t(k(`help_${sec}_t`))}</h2>
-          <dl className="cm-help">
-            {Array.from({ length: Number(t(k(`help_${sec}_n`))) }, (_, i) => i + 1).map((i) => (
-              <div key={i} className="cm-help-item">
-                <dt>{t(k(`help_${sec}_${i}_t`))}</dt>
-                <dd>
-                  {lines(`help_${sec}_${i}_p`).map((l) => (
-                    <p key={l}>{l}</p>
-                  ))}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ))}
     </div>
   )
 }
@@ -660,7 +618,6 @@ function CheckTab() {
   }, [camera])
   return (
     <div className="grid gap-3">
-      <p className="text-ink-muted">{t(k('check_p'))}</p>
       {supported && (
         <Button
           onClick={() => {
