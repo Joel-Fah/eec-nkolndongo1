@@ -9,7 +9,7 @@ Phase 04 was released on 2026-10-25 (PR #6; the deploy applied migrations 0019�
 Not done (needs a real Android phone and an iPhone). The sheet and the post-release smoke test are ready: `docs/ops/device-pass.md`. New rows to add for Phase 05: Mon espace on a 360 px phone, the card offline (airplane mode), the QR scanned by another phone, the admin scanner on a phone.
 
 ## 3. Legal notes status
-Checkpoint L (the official text of Loi n°2024/017, the register built from module READMEs, questions for a lawyer) was **deferred by Joël**. In its place: decisions 0049, 0050, 0052; `docs/legal/register.md` (Phase 05 rows only); `data-protection.md` updated; privacy policy draft v2 extended (groups, cards, baptism declaration). The deadlines and retention durations marked « à confirmer » wait for the legal text.
+Checkpoint L was done afterwards, within what could be reached: the **official text of Loi n°2024/017 could not be retrieved** (only secondary summaries, which disagree on the declaration regime and the DPO, and give no deadline for data-subject requests), so `member-data-legal-notes.md` marks each point « certain » or « à confirmer ». The six missing module READMEs were written and `pnpm --filter @eec/scripts legal:register` builds the module table of `register.md`; `questions-pour-un-juriste.md` lists ten questions. Also: decisions 0049, 0050, 0052; `docs/legal/register.md` (Phase 05 rows only); `data-protection.md` updated; privacy policy draft v2 extended (groups, cards, baptism declaration). The deadlines and retention durations marked « à confirmer » wait for the legal text.
 
 ## 4. What was built
 - **Decision 0048:** system-role grants offered once (ledger); the seed now also creates roles (**Ancien d'Église**).
@@ -35,7 +35,7 @@ Checkpoint L (the official text of Loi n°2024/017, the register built from modu
 - The staff bell in the admin stays; only the public header lost its bell.
 
 ## 7. Known issues and open points
-- Checkpoint L deferred (legal footing); deadlines/retention « à confirmer ».
+- The legal footing rests on secondary sources: a lawyer must read the official text; deadlines and retention are « à confirmer ».
 - Preparation-week dates are not editable per month (the default Monday–Saturday applies).
 - The device pass, airplane-mode card test and phone scanner test are Joël's.
 - `pickers` JavaScript weight in Mon espace (above).

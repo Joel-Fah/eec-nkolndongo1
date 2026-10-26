@@ -21,9 +21,9 @@
 | Contact form messages | 12 months after closure |
 | Member account | While active; deleted 30 days after deletion request |
 | Event registrations | 6 months after the event |
-| Newsletter subscription | Until unsubscribe |
+| Newsletter subscription | **Not built** (no domain yet): nothing is kept |
 | Audit log | 24 months |
-| Server logs | 30 days |
+| Server logs | **Not kept by the site** (no application logs of visitors; Cloudflare's own logs are outside our control, to confirm) |
 
 ## Implemented in Phase 02 (2026-10)
 - Consents stored per person with the policy version, the optional one withdrawable (Mon espace); the privacy page
@@ -160,3 +160,11 @@ what a parent provides for a specific activity.
 - **Qui voit** : secrétariat (`rights:read` / `handle`) ; suppression : super administrateur. Le journal d'activité garde le type, jamais la personne.
 - **Délai** : 30 jours (lecture prudente, **à confirmer** avec la loi). **Conservation** : 24 mois après la clôture (à confirmer).
 - Le registre complet des traitements est dans `docs/legal/register.md` (Phase 05 : entrées ajoutées, le reste au Checkpoint L).
+
+## Ce que ce document ne disait pas encore (corrigé 2026-10-27)
+- **Notifications** dans le site (`notifications`, `notification_mutes`) : un type, un titre court, un lien ; gardées avec le compte.
+- **Boîte d'envoi** (`mail_outbox`) : messages à transmettre à la main, effacés après 90 jours.
+- **Sessions** : appareil et date de chaque connexion, visibles et fermables par la personne ; expirées effacées chaque jour.
+- **Sauvegardes** : une copie chiffrée hebdomadaire de la base ; **une personne supprimée peut rester dans les dernières sauvegardes (jusqu'à 12 sauvegardes hebdomadaires)** : à dire dans la politique de confidentialité.
+- **Groupes, demandes, annonces, carte de Sainte-Cène, demandes sur les données** : voir les sections ci-dessus.
+- **Cadre légal** : voir `member-data-legal-notes.md` (lecture de sources secondaires, points à confirmer) et `questions-pour-un-juriste.md`.

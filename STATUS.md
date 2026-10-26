@@ -4,7 +4,7 @@ _Last updated: 2026-10-27. History lives in the phase reports (`docs/phases/PHAS
 
 ## Current phase: 05 — built on dev, waiting for review and the merge
 Branch `feat/phase-05a-member-home` (PR open, **not merged**). Report: `docs/phases/PHASE_05_REPORT.md`. Built: Mon espace as the member's home, groups with join requests, « Mon groupe », announcements, the carte de Sainte-Cène
-(cards, visas, contributions register, QR check, offline copy), the data-rights log. Push: « not now » (0051). Checkpoint L (legal footing) deferred by Joël. Migrations 0035–0040 are on the dev branch only.
+(cards, visas, contributions register, QR check, offline copy), the data-rights log. Push: « not now » (0051). Checkpoint L (legal footing) done as far as the sources allow: the official text could not be retrieved, so the notes mark every point « certain » or « à confirmer » (`docs/legal/member-data-legal-notes.md`, `questions-pour-un-juriste.md`, `register.md`). Migrations 0035–0040 are on the dev branch only.
 
 ## Production
 - **Phase 04 is live** (PR #6 merged 2026-10-25; the deploy workflow applied the migrations; `db:seed` and `bible:seed` ran). `SITE_INDEXABLE` is **not** set (noindex).
@@ -20,7 +20,7 @@ Branch `feat/phase-05a-member-home` (PR open, **not merged**). Report: `docs/pha
 5. Content validation partner: service times, history, council members, department list, address, socials. Real parish photos with consent. MoMo / Orange Money merchant
    details and the bank account (Donner). Real figures for the home (`apps/web/src/lib/stats.ts`). The Conseil's review of the brand-voice text.
 6. Domain: **on hold**, do not register.
-7. **Phase 05 on production (after review):** Neon backup branch `pre-phase-05` + a working backup; merge (the deploy migrates); `pnpm db:seed` in the prod shell; grant « Ancien d'Église » to the Elders and « Responsable de groupe » (with the group) to leaders; enter `https://www.youtube.com/@BCN-MEDIA` in Réglages (`parish.youtube`); publish the privacy text (now covering groups, cards, baptism declaration) after the Conseil reads it; the device pass incl. the card offline and the QR scanner; Checkpoint L (legal notes) whenever you want it.
+7. **Phase 05 on production (after review):** Neon backup branch `pre-phase-05` + a working backup; merge (the deploy migrates); `pnpm db:seed` in the prod shell; grant « Ancien d'Église » to the Elders and « Responsable de groupe » (with the group) to leaders; enter `https://www.youtube.com/@BCN-MEDIA` in Réglages (`parish.youtube`); publish the privacy text (now covering groups, cards, baptism declaration) after the Conseil reads it; the device pass incl. the card offline and the QR scanner; Send `docs/legal/questions-pour-un-juriste.md` to a lawyer and get the official text.
 
 ## Open questions
 - Épiphanie / Pentecôte season end dates and colours (proposed, to confirm); is the Délivrance ministry presented publicly (council); the parish signature line (candidates in `/_brand` → Identité).
