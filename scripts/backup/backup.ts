@@ -67,7 +67,11 @@ try {
     const base = `${endpoint.replace(/\/$/, '')}/${bucket}`
     const name = `db/eec-${stamp}.ndjson.gz.age`
     const put = await aws.fetch(`${base}/${name}`, { method: 'PUT', body: encrypted })
-    if (!put.ok) throw new Error(`upload failed: ${put.status}`)
+    if (!put.ok) {
+      // Say what the store answered (a 403 is usually a key without write access to this bucket), never the keys.
+      const why = (await put.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 200)
+      throw new Error(`upload failed: ${put.status} ${put.statusText} — bucket "${bucket}" ${why}`)
+    }
     console.log(`backup uploaded: ${bucket}/${name} (${(encrypted.length / 1024).toFixed(0)} KB)`)
     // Tell the app (Admin → Santé reads « last backup age »). Never fails the backup: the table may not exist yet.
     await c

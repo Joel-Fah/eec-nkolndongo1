@@ -10,6 +10,7 @@
 const BUILD = '__BUILD__'
 const PAGES = `pages-${BUILD}`
 const SHELL = `shell-${BUILD}`
+const IMG = `img-${BUILD}`
 const MAX_PAGES = 40
 const MAX_IMAGES = 30
 const TIMEOUT = 4000
@@ -55,8 +56,13 @@ const keepableImage = (res) =>
   /^image\//.test(res.headers.get('content-type') || '') &&
   !/\b(private|no-store)\b/i.test(res.headers.get('cache-control') || '')
 
+/** The caches to delete when a new worker takes over: every one that is not on the keep list (a new cache must be added to it). */
+function stale(names, keep) {
+  return names.filter((n) => !keep.includes(n))
+}
+
 if (typeof globalThis !== 'undefined')
-  globalThis.__swRules = { decide, keepable, keepableImage, MAX_PAGES }
+  globalThis.__swRules = { decide, keepable, keepableImage, MAX_PAGES, stale }
 
 if (
   typeof self !== 'undefined' &&
@@ -121,8 +127,8 @@ if (
   self.addEventListener('activate', (event) => {
     event.waitUntil(
       (async () => {
-        for (const name of await caches.keys())
-          if (name !== PAGES && name !== SHELL) await caches.delete(name)
+        for (const name of stale(await caches.keys(), [PAGES, SHELL, IMG]))
+          await caches.delete(name)
         await self.clients.claim()
       })(),
     )
@@ -158,7 +164,7 @@ if (
           if (hit) return hit
           const res = await fetch(req)
           if (!saveData() && keepableImage(res)) {
-            const c = await caches.open(`img-${BUILD}`)
+            const c = await caches.open(IMG)
             await c.put(req, res.clone())
             await trim(c, MAX_IMAGES)
           }

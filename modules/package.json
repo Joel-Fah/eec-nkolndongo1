@@ -15,7 +15,8 @@
     "test": "vitest run",
     "db:seed": "node --env-file-if-exists=../.env.local --dns-result-order=ipv4first cli/seed.ts",
     "bible:seed": "node --env-file-if-exists=../.env.local --dns-result-order=ipv4first cli/seed-bible.ts",
-    "content:seed-dev": "node --env-file-if-exists=../.env.local cli/seed-dev-content.ts"
+    "content:seed-dev": "node --env-file-if-exists=../.env.local cli/seed-dev-content.ts",
+    "grants:report": "node cli/grants-report.ts"
   },
   "dependencies": {
     "@eec/api-kit": "workspace:*",

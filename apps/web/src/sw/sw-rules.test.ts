@@ -14,6 +14,7 @@ const rules = ctx.__swRules as {
   keepable: (r: Response) => boolean
   keepableImage: (r: Response) => boolean
   MAX_PAGES: number
+  stale: (names: string[], keep: string[]) => string[]
 }
 const origin = 'https://site.test'
 const nav = (path: string, extra: Record<string, unknown> = {}) =>
@@ -134,4 +135,14 @@ describe('what may be kept', () => {
     expect(rules.keepableImage(res({ type: 'text/html' }))).toBe(false)
   })
   it('caps the pages kept', () => expect(rules.MAX_PAGES).toBe(40))
+
+  it('on activation deletes the caches of older builds and keeps every cache of this one (images included)', () => {
+    const keep = ['pages-b2', 'shell-b2', 'img-b2']
+    expect(rules.stale(['pages-b1', 'shell-b1', 'img-b1', ...keep], keep)).toEqual([
+      'pages-b1',
+      'shell-b1',
+      'img-b1',
+    ])
+    expect(rules.stale(keep, keep)).toEqual([])
+  })
 })
