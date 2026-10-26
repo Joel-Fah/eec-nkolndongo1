@@ -12,6 +12,7 @@ import { groupRoutes } from './routes/groups.ts'
 import { healthRoutes } from './routes/health.ts'
 import { invitationRoutes } from './routes/invitations.ts'
 import { meRoutes } from './routes/me.ts'
+import { memberSpaceRoutes } from './routes/member-space.ts'
 import { memberRoutes } from './routes/members.ts'
 import { notificationRoutes } from './routes/notifications.ts'
 import { outboxRoutes } from './routes/outbox.ts'
@@ -32,6 +33,7 @@ export function createApp() {
   app.route('/auth', authRoutes)
   app.route('/me', meRoutes)
   app.route('/me', profileRoutes)
+  app.route('/me', memberSpaceRoutes)
   app.route('/members', memberRoutes)
   app.route('/', invitationRoutes)
   // Core administration (always on).
