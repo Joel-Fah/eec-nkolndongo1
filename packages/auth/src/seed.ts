@@ -5,9 +5,22 @@ import { eq, notInArray, sql } from 'drizzle-orm'
 import { systemRoles } from './core-module.ts'
 
 /**
- * Idempotent: running it twice changes nothing. Permissions follow the manifests (removed ones are marked
- * `deprecated`, never deleted). A system role's grants are written only when the role is first created, so
- * edits made in the admin are never overwritten by a re-seed.
+ * The grants of a system role that have never been offered yet (decision 0048): the grants in code that the manifests declare, minus
+ * those already in the ledger. Pure, so it can be tested without a database.
+ */
+export function missingGrants(
+  inCode: readonly string[],
+  offered: ReadonlySet<string>,
+  known: ReadonlySet<string>,
+): string[] {
+  return [...new Set(inCode)].filter((k) => known.has(k) && !offered.has(k))
+}
+
+/**
+ * Idempotent: running it twice changes nothing. Permissions follow the manifests (removed ones are marked `deprecated`, never
+ * deleted). Each grant of a system role is **offered once** (decision 0048): a permission added to the code reaches every environment
+ * on its next seed, a grant someone removed on purpose in Rôles never comes back (it is in the ledger), and a grant added by hand is
+ * never touched. Nothing is ever deleted.
  */
 export async function seedRbac(db: Db, modules: readonly DefinedModule[]) {
   const defs = modules.flatMap((m) =>
@@ -51,6 +64,7 @@ export async function seedRbac(db: Db, modules: readonly DefinedModule[]) {
 
   const known = new Set(defs.map((d) => d.key))
   let createdRoles = 0
+  let offeredGrants = 0
   for (const role of systemRoles) {
     const inserted = await db
       .insert(schema.roles)
@@ -65,20 +79,42 @@ export async function seedRbac(db: Db, modules: readonly DefinedModule[]) {
       .onConflictDoNothing({ target: schema.roles.key })
       .returning({ id: schema.roles.id })
     const created = inserted[0]
-    if (created) {
-      createdRoles++
-      const grants = role.grants
-        .filter((k) => known.has(k))
-        .map((permissionKey) => ({ roleId: created.id, permissionKey }))
-      if (grants.length)
-        await db.insert(schema.rolePermissions).values(grants).onConflictDoNothing()
-    } else {
-      await db.update(schema.roles).set({ isSystem: true }).where(eq(schema.roles.key, role.key))
+    let roleId = created?.id
+    if (created) createdRoles++
+    else {
+      const [row] = await db
+        .update(schema.roles)
+        .set({ isSystem: true })
+        .where(eq(schema.roles.key, role.key))
+        .returning({ id: schema.roles.id })
+      roleId = row?.id
+    }
+    if (!roleId) continue
+    const offered = new Set(
+      (
+        await db
+          .select({ k: schema.rolePermissionOffers.permissionKey })
+          .from(schema.rolePermissionOffers)
+          .where(eq(schema.rolePermissionOffers.roleId, roleId))
+      ).map((r) => r.k),
+    )
+    const fresh = missingGrants(role.grants, offered, known)
+    if (fresh.length) {
+      await db
+        .insert(schema.rolePermissions)
+        .values(fresh.map((permissionKey) => ({ roleId, permissionKey })))
+        .onConflictDoNothing()
+      await db
+        .insert(schema.rolePermissionOffers)
+        .values(fresh.map((permissionKey) => ({ roleId, permissionKey })))
+        .onConflictDoNothing()
+      offeredGrants += fresh.length
     }
   }
   return {
     permissions: defs.length,
     createdRoles,
+    offeredGrants,
     modules: [...new Set(defs.map((d) => splitPermission(d.key).module))],
   }
 }

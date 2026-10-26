@@ -35,6 +35,14 @@ describe('a right for one group stays in that group', () => {
   }
 })
 
+describe('system roles', () => {
+  it('every grant in code is a permission some manifest declares (the seed would drop it silently)', () => {
+    const known = new Set(modules.flatMap((m) => m.permissions.map((p) => `${m.id}:${p.action}`)))
+    for (const r of systemRoles)
+      for (const g of r.grants) expect(known.has(g), `${r.key} grants ${g}`).toBe(true)
+  })
+})
+
 describe('the Moissons roles', () => {
   const grants = (key: string) => new Set(systemRoles.find((r) => r.key === key)?.grants ?? [])
   const as = (key: string): Principal => ({
