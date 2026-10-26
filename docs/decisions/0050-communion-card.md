@@ -16,7 +16,7 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
 ## Esquisse (module `communion`, rien n'est créé)
 - `communion_cards` (membre, statut : émise / suspendue / retirée, émise par, date), émission et retrait à **deux personnes** (secrétariat + pasteur).
 - `communion_visas` (carte, mois, visé par, date) et `communion_excuses` (carte, mois, déclarée par le membre, sans motif) ; le visa n'est jamais modifiable par le membre ; journal d'audit.
-- `fee_schedules` (tranche d'âge ou groupe → montant en XAF) ; `contribution_register` (carte, mois, montant reçu, noté par) **visible des Anciens du quartier et du trésorier seulement**.
+- `fee_schedules` (tranche d'âge ou groupe → montant en XAF) ; `contribution_register` (carte, mois, montant reçu, noté par) **visible des Anciens, du secrétariat et du trésorier (lecture ; écriture : Anciens)**.
 - `profiles` : déclaration facultative `baptised`, `confirmed` + `sacrament_confirmed_by/at` (effacées avec le consentement `profile`).
 - Rôles : **Ancien d'Église** (le groupe, sans portée par quartier), secrétariat, pasteur, trésorier.
 - Notification de membre (nouveau type) pour le rappel ; dates de préparation saisies par le secrétariat.
@@ -41,6 +41,9 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
    répondre à une question du Conseil), puis l'effacer ; seule une **statistique anonyme** (nombre de visas par mois) peut rester. Les excuses et le registre suivent la même durée.
    La **carte papier continue en parallèle** : le numérique l'accompagne et ne la remplace pas tant que le Conseil ne l'a pas décidé ; le visa papier reste la référence.
 
-## Reste à trancher (petit)
-Le secrétariat peut-il voir le registre des cotisations, ou seulement les Anciens et le trésorier ? Un membre sans carte (non baptisé) voit-il quelque chose dans Mon espace
-(par exemple un mot d'accueil sur le chemin vers le baptême, à rédiger avec le pasteur) ?
+## Dernières réponses (2026-10-26)
+- **Le secrétariat peut voir le registre des cotisations**, comme les Anciens et le trésorier (lecture ; l'écriture reste aux Anciens).
+- **Un membre non baptisé n'a simplement pas de carte** : rien n'est affiché à la place (pas de message, pas de carte « en attente »). L'aperçu « Bientôt » ne s'affiche que
+  tant que la fonction n'existe pas ; ensuite la carte n'apparaît que pour les porteurs.
+
+Plus aucune question ouverte : le texte peut passer en **Acceptée** quand Joël l'approuve ; la construction se fera au point C.
