@@ -8,6 +8,7 @@ import { auditRoutes } from './routes/audit.ts'
 import { authRoutes } from './routes/auth.ts'
 import { bannerRoutes } from './routes/banner.ts'
 import { flagRoutes, flagsFor } from './routes/flags.ts'
+import { groupSpaceRoutes } from './routes/group-space.ts'
 import { groupRoutes } from './routes/groups.ts'
 import { healthRoutes } from './routes/health.ts'
 import { invitationRoutes } from './routes/invitations.ts'
@@ -40,6 +41,7 @@ export function createApp() {
   app.route('/users', userRoutes)
   app.route('/roles', roleRoutes)
   app.route('/groups', groupRoutes)
+  app.route('/group-space', groupSpaceRoutes)
   app.route('/audit', auditRoutes)
   app.route('/outbox', outboxRoutes)
   app.route('/flags', flagRoutes)

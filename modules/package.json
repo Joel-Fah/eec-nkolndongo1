@@ -23,6 +23,7 @@
     "@eec/auth": "workspace:*",
     "@eec/core": "workspace:*",
     "@eec/db": "workspace:*",
+    "@eec/module-announcements": "workspace:*",
     "@eec/module-contact": "workspace:*",
     "@eec/module-departments": "workspace:*",
     "@eec/module-guides": "workspace:*",

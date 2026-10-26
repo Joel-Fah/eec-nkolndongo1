@@ -125,7 +125,12 @@ export const profileRoutes = new Hono<AppEnv>()
       .where(
         and(
           eq(notifications.userId, actor.userId),
-          inArray(notifications.kind, ['waitlist_promoted', 'policy_change', 'group_announcement']),
+          inArray(notifications.kind, [
+            'waitlist_promoted',
+            'policy_change',
+            'group_announcement',
+            'group_decision',
+          ]),
           isNull(notifications.readAt),
           isNull(notifications.resolvedAt),
           isNull(notifications.dismissedAt),

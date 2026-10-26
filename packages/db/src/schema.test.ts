@@ -30,6 +30,8 @@ describe('schema conventions', () => {
       // their own timestamp is the creation (checked_at) or the fact itself (at)
       'system_health',
       'system_marks',
+      // the request time is requested_at
+      'group_requests',
     ])
     const missing = config
       .filter((t) => !exempt.has(t.name) && !t.columns.some((c) => c.name === 'created_at'))

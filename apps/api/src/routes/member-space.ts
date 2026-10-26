@@ -13,10 +13,15 @@ import { z } from 'zod'
 import { currentPolicy } from '../policy.ts'
 import { sync, type Want } from './notifications.ts'
 
-const { groupMembers, groups, notifications, notificationMutes, consents } = schema
+const { groupMembers, groupRequests, groups, notifications, notificationMutes, consents } = schema
 
 /** What can be raised for a member, and silenced by them (decision 0046 for the staff kinds). */
-export const MEMBER_KINDS = ['waitlist_promoted', 'policy_change', 'group_announcement'] as const
+export const MEMBER_KINDS = [
+  'waitlist_promoted',
+  'policy_change',
+  'group_announcement',
+  'group_decision',
+] as const
 
 const mondayOf = (d: Date) =>
   new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 86_400_000).toISOString().slice(0, 10)
@@ -37,6 +42,7 @@ export const memberSpaceRoutes = new Hono<AppEnv>()
         kind: groups.kind,
         titleFr: groupMembers.titleFr,
         titleEn: groupMembers.titleEn,
+        sharePhone: groupMembers.sharePhone,
       })
       .from(groupMembers)
       .innerJoin(groups, eq(groups.id, groupMembers.groupId))
@@ -90,8 +96,173 @@ export const memberSpaceRoutes = new Hono<AppEnv>()
           startsAt: occ.startsAt,
         })
     }
-    return c.json({ items: mine.map((g) => ({ ...g, next: next.get(g.id) ?? null })) })
+    // The latest announcements of my groups (published, not past their last day), three per group at most.
+    const anns = ids.length
+      ? await db.execute<{
+          id: string
+          group_id: string
+          title_fr: string
+          title_en: string | null
+          body_fr: string
+          body_en: string | null
+          link_url: string | null
+          published_at: Date
+        }>(
+          sql`select id, group_id, title_fr, title_en, body_fr, body_en, link_url, published_at
+              from announcements_items
+              where state = 'published' and (expires_at is null or expires_at > now()) and group_id in (${sql.join(
+                ids.map((i) => sql`${i}::uuid`),
+                sql`, `,
+              )})
+              order by published_at desc limit 30`,
+        )
+      : { rows: [] }
+    const pending = await db
+      .select({
+        id: groupRequests.id,
+        groupId: groups.id,
+        nameFr: groups.nameFr,
+        nameEn: groups.nameEn,
+        requestedAt: groupRequests.requestedAt,
+      })
+      .from(groupRequests)
+      .innerJoin(groups, eq(groups.id, groupRequests.groupId))
+      .where(and(eq(groupRequests.userId, actor.userId), eq(groupRequests.status, 'pending')))
+    return c.json({
+      items: mine.map((g) => ({
+        ...g,
+        next: next.get(g.id) ?? null,
+        announcements: anns.rows
+          .filter((a) => a.group_id === g.id)
+          .slice(0, 3)
+          .map((a) => ({
+            id: a.id,
+            titleFr: a.title_fr,
+            titleEn: a.title_en ?? a.title_fr,
+            bodyFr: a.body_fr,
+            bodyEn: a.body_en ?? a.body_fr,
+            link: a.link_url,
+            publishedAt: a.published_at,
+          })),
+      })),
+      pending,
+    })
   })
+  // The active groups I am not in, to ask to join one. My last answer (accepted or not) shows with its message.
+  .get('/groups/directory', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    c.header('cache-control', 'private, no-store')
+    const db = await c.var.deps.db()
+    const [all, mine, reqs] = await Promise.all([
+      db.select().from(groups).where(eq(groups.isActive, true)).orderBy(groups.nameFr),
+      db
+        .select({ groupId: groupMembers.groupId })
+        .from(groupMembers)
+        .where(eq(groupMembers.userId, actor.userId)),
+      db
+        .select()
+        .from(groupRequests)
+        .where(eq(groupRequests.userId, actor.userId))
+        .orderBy(desc(groupRequests.requestedAt)),
+    ])
+    const inGroup = new Set(mine.map((m) => m.groupId))
+    return c.json({
+      items: all
+        .filter((g) => !inGroup.has(g.id))
+        .map((g) => {
+          const last = reqs.find((r) => r.groupId === g.id)
+          return {
+            id: g.id,
+            nameFr: g.nameFr,
+            nameEn: g.nameEn,
+            kind: g.kind,
+            descriptionFr: g.descriptionFr,
+            descriptionEn: g.descriptionEn,
+            request: last
+              ? { id: last.id, status: last.status, message: last.decisionMessage }
+              : null,
+          }
+        }),
+    })
+  })
+  .post(
+    '/groups/:id/request',
+    requireSelf(),
+    zValidator('json', z.object({ sharePhone: z.boolean() }).strict()),
+    async (c) => {
+      const actor = await c.var.deps.actor()
+      if (!actor) return fail(c, 401, 'unauthenticated')
+      const id = c.req.param('id')
+      if (!/^[0-9a-f-]{36}$/.test(id)) return fail(c, 400, 'invalid')
+      const db = await c.var.deps.db()
+      const [g] = await db
+        .select()
+        .from(groups)
+        .where(and(eq(groups.id, id), eq(groups.isActive, true)))
+      if (!g) return fail(c, 404, 'not_found')
+      const [already] = await db
+        .select({ u: groupMembers.userId })
+        .from(groupMembers)
+        .where(and(eq(groupMembers.userId, actor.userId), eq(groupMembers.groupId, id)))
+      if (already) return fail(c, 409, 'already_member')
+      const [waiting] = await db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(groupRequests)
+        .where(and(eq(groupRequests.userId, actor.userId), eq(groupRequests.status, 'pending')))
+      if ((waiting?.n ?? 0) >= 5) return fail(c, 429, 'rate_limited')
+      const inserted = await db
+        .insert(groupRequests)
+        .values({ userId: actor.userId, groupId: id, sharePhone: c.req.valid('json').sharePhone })
+        .onConflictDoNothing()
+        .returning({ id: groupRequests.id })
+      if (!inserted.length) return fail(c, 409, 'already_requested')
+      await audit(c, {
+        action: 'group.request.create',
+        entityType: 'group',
+        entityId: id,
+        summaryFr: 'Demande pour rejoindre un groupe',
+        summaryEn: 'Request to join a group',
+      })
+      return c.json({ ok: true }, 201)
+    },
+  )
+  .delete('/groups/requests/:rid', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const rid = c.req.param('rid')
+    if (!/^[0-9a-f-]{36}$/.test(rid)) return fail(c, 400, 'invalid')
+    const db = await c.var.deps.db()
+    await db
+      .update(groupRequests)
+      .set({ status: 'withdrawn', decidedAt: new Date() })
+      .where(
+        and(
+          eq(groupRequests.id, rid),
+          eq(groupRequests.userId, actor.userId),
+          eq(groupRequests.status, 'pending'),
+        ),
+      )
+    return c.json({ ok: true })
+  })
+  // Share, or stop sharing, my phone number with the leaders of a group I am in.
+  .put(
+    '/groups/:id/share-phone',
+    requireSelf(),
+    zValidator('json', z.object({ sharePhone: z.boolean() }).strict()),
+    async (c) => {
+      const actor = await c.var.deps.actor()
+      if (!actor) return fail(c, 401, 'unauthenticated')
+      const id = c.req.param('id')
+      if (!/^[0-9a-f-]{36}$/.test(id)) return fail(c, 400, 'invalid')
+      const db = await c.var.deps.db()
+      await db
+        .update(groupMembers)
+        .set({ sharePhone: c.req.valid('json').sharePhone })
+        .where(and(eq(groupMembers.userId, actor.userId), eq(groupMembers.groupId, id)))
+      return c.json({ ok: true })
+    },
+  )
   // Leaving is immediate. Nothing is kept about it.
   .delete('/groups/:id', requireSelf(), async (c) => {
     const actor = await c.var.deps.actor()

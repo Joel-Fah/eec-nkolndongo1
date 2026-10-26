@@ -137,3 +137,10 @@ what a parent provides for a specific activity.
 - Politique de confidentialité (draft in `docs/research/`, to rewrite)
 - Mentions légales
 - Cookie notice: none needed if we use no tracking cookies (only essential session cookies) — keep it that way.
+
+## Groupes, demandes et annonces (décision 0049, Phase 05)
+- **Ce qui est gardé** : l'appartenance à un groupe (`group_members`, avec la case « partager mon numéro avec les responsables » décochée par défaut), les demandes pour rejoindre (`group_requests` : qui, quel groupe, message du membre et de la décision, dates), les annonces d'un groupe (`announcements_items`).
+- **Pourquoi** : que chaque responsable connaisse son groupe sans passer par le secrétariat ; prévenir les membres.
+- **Qui voit quoi** : un responsable ne voit que son groupe (nom, avatar, arrivée, titre, numéro si partagé, tranche d'âge si ≥ 5 personnes) ; jamais l'e-mail ni la date de naissance. Le secrétariat voit tous les groupes. Rien n'est public.
+- **Export** de la liste d'un groupe : droit dangereux `core:group-export`, limité au groupe, journalisé.
+- **Conservation** : demande décidée effacée après 12 mois, demande en attente effacée après 6 mois, tout effacé avec le compte. Le motif d'un retrait reste dans le journal d'activité (24 mois), jamais montré au membre.
