@@ -281,6 +281,13 @@
       "when": 1793006973024,
       "tag": "0039_classy_zarda",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1793040145777,
+      "tag": "0040_confused_valkyrie",
+      "breakpoints": true
     }
   ]
 }
