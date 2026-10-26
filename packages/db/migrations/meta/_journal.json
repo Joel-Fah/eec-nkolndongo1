@@ -274,6 +274,13 @@
       "when": 1793004951833,
       "tag": "0038_nappy_mulholland_black",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1793006973024,
+      "tag": "0039_classy_zarda",
+      "breakpoints": true
     }
   ]
 }

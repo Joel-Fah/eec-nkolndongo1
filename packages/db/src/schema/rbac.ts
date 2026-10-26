@@ -48,6 +48,14 @@ export const profiles = pgTable('profiles', {
   /** The member's choice: their photo as the avatar in the navbar (true), or a generated avatar (false, the default). */
   photoAsAvatar: boolean('photo_as_avatar').notNull().default(false),
   photoUpdatedAt: tz('photo_updated_at'),
+  /**
+   * The carte de Sainte-Cène (decision 0050): what the member says about their baptism and confirmation (only with the `profile` consent),
+   * and who confirmed it from the baptism register. Religious-belief data: never shown beyond the people who issue cards.
+   */
+  baptised: boolean('baptised'),
+  confirmed: boolean('confirmed'),
+  sacramentConfirmedBy: uuid('sacrament_confirmed_by'),
+  sacramentConfirmedAt: tz('sacrament_confirmed_at'),
   lastSeenAt: tz('last_seen_at'),
   /** Set when the person asked to delete their account (30-day grace, then purged). */
   deletionRequestedAt: tz('deletion_requested_at'),
