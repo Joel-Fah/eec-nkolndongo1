@@ -4,7 +4,7 @@
  * by request comes with decision 0049 (Checkpoint B); for now a member sees their groups and can leave one.
  */
 import { type AppEnv, audit, fail, requireSelf } from '@eec/api-kit'
-import { type Exception, nextOccurrence, type Recurrence } from '@eec/core'
+import { type Exception, nextOccurrence, preparationMonthOn, type Recurrence } from '@eec/core'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
 import { and, desc, eq, inArray, isNull, notInArray, sql } from 'drizzle-orm'
@@ -21,6 +21,7 @@ export const MEMBER_KINDS = [
   'policy_change',
   'group_announcement',
   'group_decision',
+  'communion_reminder',
 ] as const
 
 const mondayOf = (d: Date) =>
@@ -320,6 +321,35 @@ export const memberSpaceRoutes = new Hono<AppEnv>()
           ]
         : []
     if (!muted.has('policy_change')) await sync(db, me, 'policy_change', changed)
+    // The preparation week is on and my card has no visa for the month and no excuse: a reminder, resolved as soon as it is signed or excused.
+    if (!muted.has('communion_reminder')) {
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
+      const prep = preparationMonthOn(day)
+      let due: Want[] = []
+      if (prep) {
+        const r = await db.execute<{ ok: boolean }>(
+          sql`select (c.status = 'active' and c.valid_until >= ${day}::date
+              and not exists (select 1 from communion_visas v where v.card_id = c.id and v.month = ${prep})
+              and not exists (select 1 from communion_excuses e where e.card_id = c.id and e.month = ${prep})) as ok
+            from communion_cards c where c.user_id = ${me}`,
+        )
+        if (r.rows[0]?.ok)
+          due = [
+            {
+              ref: prep,
+              params: {
+                title:
+                  'La semaine de préparation de la Sainte-Cène est en cours : pensez à faire viser votre carte avant dimanche.',
+                titleEn:
+                  'The Holy Supper preparation week is on: remember to have your card signed before Sunday.',
+              },
+              href: 'account:accueil',
+              weekOf: mondayOf(new Date()),
+            },
+          ]
+      }
+      await sync(db, me, 'communion_reminder', due)
+    }
     const hide = muted.size ? notInArray(notifications.kind, [...muted]) : undefined
     const items = await db
       .select()

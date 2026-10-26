@@ -13,6 +13,8 @@ type Badge = {
   /** The address of the photo, only when its owner chose it as their avatar. */
   photo?: string | null
   unread?: number
+  /** The keys of the groups the member belongs to. */
+  groups?: string[]
 }
 const KEY = 'eec-badge'
 const TTL = 60_000
@@ -56,6 +58,9 @@ export async function initAccountBadge() {
       n.textContent = (b.unread ?? 0) > 99 ? '99+' : String(b.unread)
     }
   }
+  // A group's public page tells a member (and only them) that they belong to it.
+  for (const e of document.querySelectorAll<HTMLElement>('[data-member-of]'))
+    e.hidden = !(b.groups ?? []).includes(e.dataset.memberOf ?? '')
   // The invitation above the footer speaks to a member differently.
   for (const e of document.querySelectorAll<HTMLElement>('[data-cta-guest]')) e.hidden = true
   for (const e of document.querySelectorAll<HTMLElement>('[data-cta-member]')) e.hidden = false

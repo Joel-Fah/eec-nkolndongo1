@@ -49,3 +49,10 @@ Une barre de sections collée en haut (défilable sur 360 px, icône + libellé,
 - **Ordinateur (≥ 64 rem)** : navigation verticale collante à gauche (5 entrées, pastille de notifications), contenu à droite en grille de cartes qui s'adapte (colonnes de 19 rem mini). Les notifications restent en une colonne de lecture.
 - **Téléphone** : barre collante des 5 sections toujours visibles (icône au-dessus d'un court libellé), plus de défilement horizontal caché.
 - **Chargement** : la première section s'affiche seule, puis les autres se chargent au repos du navigateur (`requestIdleCallback`) et restent en mémoire de la page ; changer d'onglet est instantané. Les notifications se rafraîchissent à l'ouverture si les données ont plus de 30 s. Toujours `private, no-store`, jamais en cache du service worker ; le JS reste en imports dynamiques (aucune section chargée avant l'ouverture de la page).
+
+## 8. Groupes et carte de Sainte-Cène (Checkpoints B et C, construits en dev)
+- **Mes groupes** : mes groupes avec leurs annonces récentes et leur prochain événement, la case « partager mon numéro » (décochée), mes demandes en attente (retirables), les groupes que je peux demander à rejoindre (réponse et message du responsable visibles). Une page publique de groupe me dit, à moi seul, « Vous êtes membre de ce groupe ».
+- **Accueil** : la carte de Sainte-Cène n'apparaît **que** pour qui en détient une (colonne de droite du bento) ; sans carte, rien n'est affiché. Hors réseau, la dernière carte vue s'ouvre depuis l'appareil (« vérifiée le … »).
+- **Notifications** : `group_announcement`, `group_decision` (réponse à ma demande), `communion_reminder` (semaine de préparation), chacun coupable.
+- **Profil** : « Baptême et confirmation » (facultatif, sous le profil complet).
+- **Administration** : « Mon groupe », « Annonces de groupe », « Cartes de Sainte-Cène » (cartes, nouvelle carte, cotisations attendues, vérifier une carte).

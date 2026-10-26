@@ -45,6 +45,17 @@ La paroisse EEC Nkolndongo 1 (Église Évangélique du Cameroun), à Yaoundé. C
   le menu ; sinon, un avatar généré vous représente. Si vous avez une photo Google, elle compte comme votre photo tant que vous n’en choisissez pas une autre.
 - **Retirer l’accord efface ces informations et la photo.**
 
+**Si vous demandez à rejoindre un groupe**
+- Votre demande (quel groupe, quand, votre case « partager mon numéro » décochée par défaut) et la réponse des responsables. Les responsables d’un groupe voient les
+  noms, l’avatar et la date d’arrivée des membres de **leur** groupe, et votre numéro **seulement si vous l’avez partagé avec ce groupe**. Rien n’est public. Une demande décidée
+  est effacée 12 mois après la réponse, une demande restée sans réponse après 6 mois. Les annonces d’un groupe ne sont lues que par ses membres.
+
+**Si vous avez une carte de Sainte-Cène**
+- Votre carte (valable jusqu’à une date), les mois visés par les Anciens d’Église, les mois où vous vous êtes déclaré(e) excusé(e) (sans motif), et ce qui a été reçu comme
+  cotisation (visible des Anciens, du secrétariat et du trésorier ; vous ne voyez que ce qui est attendu, jamais une dette). Si vous le déclarez (profil complet), votre baptême
+  et votre confirmation, que le secrétariat ou le pasteur confirme d’après son registre : **donnée sensible**, vue seulement des personnes qui émettent les cartes. Tout est effacé
+  avec votre compte. Le code QR de votre carte ne révèle, à qui le scanne, que « valide jusqu’au … » ou « non valide », avec votre prénom et l’initiale de votre nom.
+
 **Si vous vous inscrivez à une activité**
 - Votre nom, un numéro de téléphone, une adresse e-mail (facultative), le nombre de personnes, et pour des enfants leur prénom et leur tranche d’âge. Gardé jusqu’à
   6 mois après l’activité (12 mois au plus après la fermeture du formulaire) ; seuls des totaux anonymes restent.
@@ -113,6 +124,17 @@ The EEC Nkolndongo 1 parish (Evangelical Church of Cameroon), in Yaoundé. Conta
 - A photo: **the parish team who manage members see it**, to recognise you; it is never public. You decide whether it becomes your avatar in the menu; otherwise a generated avatar
   represents you. If you have a Google photo, it counts as your photo until you choose another.
 - **Withdrawing the agreement erases this information and the photo.**
+
+**If you ask to join a group**
+- Your request (which group, when, your « share my number » box unticked by default) and the leaders’ answer. A group’s leaders see the names, avatar and joining date of the members
+  of **their** group, and your number **only if you shared it with that group**. Nothing is public. A decided request is erased 12 months after the answer, a request left
+  unanswered after 6 months. A group’s announcements are read only by its members.
+
+**If you have a Communion card**
+- Your card (valid until a date), the months signed by the Church Elders, the months you declared yourself excused (no reason), and what was received as a contribution
+  (visible to the Elders, the secretariat and the treasurer; you only see what is expected, never a debt). If you declare it (full profile), your baptism and confirmation, which the
+  secretariat or the pastor confirms from their register: **sensitive data**, seen only by the people who issue cards. Everything is erased with your account. Your card’s QR code
+  only tells whoever scans it « valid until … » or « not valid », with your first name and the initial of your last name.
 
 **If you register for an activity**
 - Your name, a phone number, an email address (optional), the number of people, and for children their first name and age band. Kept until 6 months after the activity

@@ -44,14 +44,14 @@ describe('what the service worker may touch', () => {
     ])
       expect(nav(p), p).toBe('page')
   })
-  it('never touches the admin, the API, auth, Mon espace, previews, registrations, search, tokens', () => {
+  it('never touches the admin, the API, auth, card checks, previews, registrations, search, tokens', () => {
     for (const p of [
       '/admin/',
       '/gestion/m/news',
       '/api/members/me',
       '/api/auth/get-session',
-      '/fr/mon-espace/',
-      '/en/my-space/',
+      '/fr/verifier/abc.def',
+      '/en/verify/abc.def',
       '/fr/actualites/nouvelles/apercu/?t=abc',
       '/en/news/latest/preview/',
       '/fr/agenda/evenements/inscription/camp/',
@@ -69,6 +69,21 @@ describe('what the service worker may touch', () => {
         }),
         p,
       ).toBe('skip')
+  })
+  it('keeps only the empty shell of Mon espace (decision 0050): the page holds nothing personal, its data comes from /api and is never kept', () => {
+    expect(nav('/fr/mon-espace/')).toBe('page')
+    expect(nav('/en/my-space/')).toBe('page')
+    expect(nav('/fr/mon-espace/?t=abc')).toBe('skip')
+    expect(
+      rules.decide({
+        url: `${origin}/api/communion/me`,
+        method: 'GET',
+        mode: 'cors',
+        destination: '',
+        origin,
+        headers: new Headers(),
+      }),
+    ).toBe('skip')
   })
   it('ignores anything that is not a plain GET from our own origin, and ranges', () => {
     expect(nav('/fr/', { method: 'POST' })).toBe('skip')

@@ -15,8 +15,8 @@ baptism the parish confirmed.
 **Exposure.** The member sees their own card. The Elders, the secretariat, the pasteur and the treasurer see the cards (not the profile). The contributions register:
 the Elders, the secretariat and the treasurer. The public check shows a first name and an initial and nothing else, no account needed, rate-limited, never cached.
 
-**Retention.** Visas, excuses and contributions are kept while the account exists and 12 months after it is closed or the person leaves (decision 0050), then erased
-(daily job). A withdrawn card is kept as history for the same time. Everything goes with a deleted account.
+**Retention.** Visas, excuses, contributions and the card (even a withdrawn one) are kept while the account exists and erased with it (30 days after a deletion request, by cascade;
+the daily job in `apps/api/src/retention.ts` purges the account). Nothing is kept longer than the account (decision 0050).
 
 **Rights.** `communion:read`, `issue`, `approve` (dangerous), `suspend` (dangerous), `visa`, `register-read`, `register-write`, `fees`, `verify`.
 

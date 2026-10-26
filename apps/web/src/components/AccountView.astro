@@ -139,6 +139,10 @@ const tiles = [
     </Tabs>
   </div>
 
+  <div class="acct-card acct-offline" data-when="offline" hidden>
+    <div class="me-cards" data-offline-card></div>
+  </div>
+
   <div class="acct-card acct-home" data-when="in" hidden>
     <section class="me-hero" data-me-hero aria-labelledby="me-hero-t" data-greets={JSON.stringify({ morning: t('member.me.hero_morning', { name: '{name}' }), afternoon: t('member.me.hero_afternoon', { name: '{name}' }), evening: t('member.me.hero_evening', { name: '{name}' }) })}>
       <HeroWaves />
@@ -259,7 +263,7 @@ const tiles = [
   if (found) {
     const root: HTMLElement = found
     const errors = JSON.parse(root.dataset.errors ?? '{}') as Record<string, string>
-    const show = (state: 'in' | 'out' | 'loading') => {
+    const show = (state: 'in' | 'out' | 'loading' | 'offline') => {
       root.dataset.state = state
       for (const el of root.querySelectorAll<HTMLElement>('[data-when]')) el.hidden = el.dataset.when !== state
     }
@@ -294,6 +298,16 @@ const tiles = [
           initProfile(root, me.json.user)
           initMonEspace(root)
         }
+      } else if (me.code === 'network') {
+        // No network: a member who holds a card still gets it, from the copy kept on this device (decision 0050).
+        const { cachedCard, cardEl } = await import('../scripts/me-card')
+        const kept = await cachedCard()
+        const host = root.querySelector<HTMLElement>('[data-offline-card]')
+        const meBox = root.querySelector<HTMLElement>('[data-me]')
+        if (kept && host && meBox) {
+          host.replaceChildren(cardEl(kept, { msgs: JSON.parse(meBox.dataset.msgs ?? '{}'), lang: root.dataset.lang ?? 'fr', offline: true, onChange: () => {} }))
+          show('offline')
+        } else show('out')
       } else show('out')
     }
     const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement | null
@@ -563,6 +577,7 @@ const tiles = [
       await Promise.all([call('/auth/sign-out', {}), new Promise((r) => setTimeout(r, 1600))])
       // The header was drawn for a signed-in person: forget it and start the page over, signed out.
       forgetBadge()
+      await (await import('../scripts/me-card')).forgetCard()
       location.reload()
     })
     refresh()
@@ -835,17 +850,18 @@ const tiles = [
   }
 
   /* Signed in: the intro and the sign-up card give way to the whole width for Mon espace. */
-  .acct[data-state='in'] {
+  .acct:is([data-state='in'], [data-state='offline']) {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "card";
     grid-template-rows: auto;
     max-width: 80rem;
   }
-  .acct[data-state='in'] .acct-intro,
-  .acct[data-state='in'] .acct-side {
+  .acct:is([data-state='in'], [data-state='offline']) .acct-intro,
+  .acct:is([data-state='in'], [data-state='offline']) .acct-side {
     display: none;
   }
-  .acct-card.acct-home {
+  .acct-card.acct-home,
+  .acct-card.acct-offline {
     position: static;
     padding: 0;
     background: none;

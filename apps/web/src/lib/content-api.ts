@@ -17,10 +17,18 @@ export type ApiResult<T> =
 
 type Ctx = { url: URL; locals: unknown }
 
-export async function publicJson<T>({ url, locals }: Ctx, path: string): Promise<ApiResult<T>> {
+export async function publicJson<T>(
+  { url, locals }: Ctx,
+  path: string,
+  /** The visitor's request, when the answer is rate-limited per address (the API reads it from these headers). */
+  from?: Request,
+): Promise<ApiResult<T>> {
   try {
+    const headers = new Headers()
+    for (const name of ['cf-connecting-ip', 'x-forwarded-for', 'user-agent'])
+      if (from?.headers.has(name)) headers.set(name, from.headers.get(name) as string)
     const res = await app.fetch(
-      new Request(new URL(path, url)),
+      new Request(new URL(path, url), { headers }),
       env as unknown as Env,
       (locals as { cfContext?: ExecutionContext }).cfContext,
     )

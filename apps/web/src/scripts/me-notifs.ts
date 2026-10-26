@@ -10,7 +10,13 @@ type N = {
   read: boolean
   resolved: boolean
 }
-const KINDS = ['waitlist_promoted', 'policy_change', 'group_announcement', 'group_decision']
+const KINDS = [
+  'waitlist_promoted',
+  'policy_change',
+  'group_announcement',
+  'group_decision',
+  'communion_reminder',
+]
 const DAY = 86_400_000
 const monday = (d: Date) =>
   new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * DAY).toISOString().slice(0, 10)

@@ -871,5 +871,275 @@ const stamp = Date.now().toString(36)
   }
 }
 
+// 13. Communion card (decision 0050): propose → a second person approves → the Elders sign the month → the QR code verifies → suspend, renew, withdraw
+{
+  const pw = 'une-phrase-solide-2026-xyz'
+  const mk = async (tag: string, phone: string, role?: string) => {
+    const mail = `e2e-${tag}-${stamp}@example.test`
+    const up = await fetch(`${base}/api/members/signup`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: base },
+      body: JSON.stringify({
+        firstName: 'E2E',
+        lastName: tag,
+        email: mail,
+        password: pw,
+        phone,
+        acceptPrivacy: true,
+        acceptNews: false,
+      }),
+    })
+    const signIn = async () => {
+      const si = await fetch(`${base}/api/auth/sign-in/email`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin: base },
+        body: JSON.stringify({ email: mail, password: pw }),
+      })
+      return si.headers
+        .getSetCookie()
+        .map((c) => c.split(';')[0])
+        .join('; ')
+    }
+    let ck = await signIn()
+    const as = async (path: string, init: RequestInit = {}) => {
+      const res = await fetch(`${base}/api${path}`, {
+        ...init,
+        headers: {
+          cookie: ck,
+          origin: base,
+          'content-type': 'application/json',
+          ...(init.headers ?? {}),
+        },
+      })
+      return {
+        status: res.status,
+        json: (await res.json().catch(() => ({}))) as Record<string, any>,
+      }
+    }
+    const id = (await as('/me')).json.user?.id as string
+    if (role && id) {
+      await api(`/users/${id}/roles`, { method: 'POST', body: JSON.stringify({ roleKey: role }) })
+      ck = await signIn()
+    }
+    return { up: up.status, as, id }
+  }
+  const member = await mk('fidele', '655000501')
+  const pastor = await mk('pasteur', '655000502', 'pasteur')
+  const elder = await mk('ancien', '655000503', 'ancien')
+  if (!member.id || !pastor.id || !elder.id)
+    ok(
+      'communion: test accounts could be created',
+      false,
+      `signup ${member.up}/${pastor.up}/${elder.up} (5 sign-ups per hour per address)`,
+    )
+  else {
+    await member.as('/me/profile/consent', {
+      method: 'POST',
+      body: JSON.stringify({ granted: true }),
+    })
+    const decl = await member.as('/communion/me/sacrament', {
+      method: 'PUT',
+      body: JSON.stringify({ baptised: true, confirmed: null }),
+    })
+    ok(
+      'communion: a member can say they are baptised (with the profile consent)',
+      decl.status === 200,
+    )
+    ok(
+      'communion: a member without a card has none, and nothing is said about it',
+      (await member.as('/communion/me')).json.card === null,
+    )
+    const noConfirm = await api('/communion/cards', {
+      method: 'POST',
+      body: JSON.stringify({ userId: member.id }),
+    })
+    ok(
+      'communion: a card needs the baptism confirmed by the parish first',
+      noConfirm.status === 409,
+    )
+    ok(
+      'communion: a member cannot confirm baptism or propose a card',
+      (
+        await member.as(`/communion/sacrament/${member.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ confirmed: true }),
+        })
+      ).status === 403,
+    )
+    await api(`/communion/sacrament/${member.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ confirmed: true }),
+    })
+    const prop = await api('/communion/cards', {
+      method: 'POST',
+      body: JSON.stringify({ userId: member.id }),
+    })
+    const cardId = prop.json.id as string
+    ok('communion: the secretariat side proposes a card', prop.status === 201 && !!cardId)
+    ok(
+      'communion: a proposed card is not shown to the member',
+      (await member.as('/communion/me')).json.card === null,
+    )
+    ok(
+      'communion: the proposer cannot approve their own proposal',
+      (await api(`/communion/cards/${cardId}/approve`, { method: 'POST', body: '{}' })).status ===
+        403,
+    )
+    ok(
+      'communion: an Elder cannot approve',
+      (await elder.as(`/communion/cards/${cardId}/approve`, { method: 'POST', body: '{}' }))
+        .status === 403,
+    )
+    ok(
+      'communion: a second person (the pastor) approves',
+      (await pastor.as(`/communion/cards/${cardId}/approve`, { method: 'POST', body: '{}' }))
+        .status === 200,
+    )
+    const mine = (await member.as('/communion/me')).json.card as Record<string, any>
+    ok(
+      'communion: the member sees a valid card with a QR code and twelve months',
+      mine?.state === 'valid' && !!mine.qr && mine.months.length === 12 && !!mine.verifyUrl,
+    )
+    const month = new Date().toISOString().slice(0, 7)
+    ok(
+      'communion: a plain member cannot sign a month',
+      (
+        await member.as(`/communion/cards/${cardId}/visa`, {
+          method: 'PUT',
+          body: JSON.stringify({ month, signed: true }),
+        })
+      ).status === 403,
+    )
+    ok(
+      'communion: an Elder signs the month',
+      (
+        await elder.as(`/communion/cards/${cardId}/visa`, {
+          method: 'PUT',
+          body: JSON.stringify({ month, signed: true }),
+        })
+      ).status === 200,
+    )
+    const next = new Date()
+    next.setUTCMonth(next.getUTCMonth() + 1)
+    ok(
+      'communion: a month that has not started cannot be signed',
+      (
+        await elder.as(`/communion/cards/${cardId}/visa`, {
+          method: 'PUT',
+          body: JSON.stringify({ month: next.toISOString().slice(0, 7), signed: true }),
+        })
+      ).status === 400,
+    )
+    const after = (await member.as('/communion/me')).json.card as Record<string, any>
+    ok(
+      'communion: the signed month counts in the streak',
+      after.months.find((m: any) => m.month === month)?.state === 'signed' && after.streak >= 1,
+    )
+    const exc = await member.as('/communion/me/excuse', {
+      method: 'PUT',
+      body: JSON.stringify({ month, excused: true }),
+    })
+    ok('communion: a signed month cannot be excused', exc.status === 409)
+    ok(
+      'communion: an Elder notes a contribution, a member never sees amounts',
+      (
+        await elder.as(`/communion/cards/${cardId}/contribution`, {
+          method: 'PUT',
+          body: JSON.stringify({ month, amountXaf: 5000 }),
+        })
+      ).status === 200 && !JSON.stringify((await member.as('/communion/me')).json).includes('5000'),
+    )
+    ok(
+      'communion: a plain member cannot read the list of cards',
+      (await member.as('/communion/cards')).status === 403,
+    )
+    // The QR code
+    const tokenOf = (url: string) => new URL(url).searchParams.get('t') as string
+    const pub = async (tk: string) =>
+      (await (
+        await fetch(`${base}/api/communion/verify/${encodeURIComponent(tk)}`)
+      ).json()) as Record<string, any>
+    const t1 = tokenOf(mine.verifyUrl)
+    const v1 = await pub(t1)
+    ok(
+      'communion: scanning the code says « valid », a first name and an initial, nothing else',
+      v1.valid === true &&
+        v1.name === 'E2E F.' &&
+        Object.keys(v1).sort().join() === 'name,until,valid',
+    )
+    ok(
+      'communion: a forged code is not valid',
+      (await pub(`${t1.slice(0, -3)}abc`)).valid === false,
+    )
+    const page = await fetch(`${base}/fr/verifier/?t=${encodeURIComponent(t1)}`)
+    ok(
+      'communion: the check page is never cached nor indexed',
+      page.status === 200 &&
+        (page.headers.get('cache-control') ?? '').includes('no-store') &&
+        (page.headers.get('x-robots-tag') ?? '').includes('noindex'),
+    )
+    ok(
+      'communion: the check is open to a scanner account too',
+      (await elder.as(`/communion/check/${encodeURIComponent(t1)}`)).json.state === 'valid',
+    )
+    ok(
+      'communion: a member cannot use the scanner route',
+      (await member.as(`/communion/check/${encodeURIComponent(t1)}`)).status === 403,
+    )
+    // Suspend, restore, renew, withdraw
+    ok(
+      'communion: suspending (secretariat) makes the code not valid',
+      (await api(`/communion/cards/${cardId}/suspend`, { method: 'POST', body: '{}' })).status ===
+        200 && (await pub(t1)).valid === false,
+    )
+    const sus = (await member.as('/communion/me')).json.card as Record<string, any>
+    ok(
+      'communion: the member sees « suspended » and no reason',
+      sus.state === 'suspended' && !JSON.stringify(sus).toLowerCase().includes('reason') && !sus.qr,
+    )
+    await api(`/communion/cards/${cardId}/restore`, { method: 'POST', body: '{}' })
+    ok('communion: restoring makes it valid again', (await pub(t1)).valid === true)
+    await pastor.as(`/communion/cards/${cardId}/renew`, {
+      method: 'POST',
+      body: JSON.stringify({ validUntil: `${new Date().getFullYear() + 1}-12-31` }),
+    })
+    ok('communion: renewing stops the old code from working', (await pub(t1)).valid === false)
+    const renewed = (await member.as('/communion/me')).json.card as Record<string, any>
+    ok('communion: the new code works', (await pub(tokenOf(renewed.verifyUrl))).valid === true)
+    ok(
+      'communion: withdrawing needs a reason, and only the approver can',
+      (await pastor.as(`/communion/cards/${cardId}/withdraw`, { method: 'POST', body: '{}' }))
+        .status === 400 &&
+        (
+          await elder.as(`/communion/cards/${cardId}/withdraw`, {
+            method: 'POST',
+            body: JSON.stringify({ reason: 'Test e2e' }),
+          })
+        ).status === 403,
+    )
+    await pastor.as(`/communion/cards/${cardId}/withdraw`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: 'Test e2e' }),
+    })
+    ok(
+      'communion: after a withdrawal the member simply has no card',
+      (await member.as('/communion/me')).json.card === null,
+    )
+    const fee = await api('/communion/fees', {
+      method: 'PUT',
+      body: JSON.stringify({ kind: 'age', key: '18-25', amountXaf: 2000 }),
+    })
+    ok('communion: fees are set in the admin', fee.status === 200)
+    await api('/communion/fees', {
+      method: 'PUT',
+      body: JSON.stringify({ kind: 'age', key: '18-25', amountXaf: null }),
+    })
+    ok(
+      'communion: nobody without a session sees a card',
+      (await fetch(`${base}/api/communion/me`)).status === 401,
+    )
+  }
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)

@@ -1080,6 +1080,18 @@
         "desc": "Une fois connecté, une cloche apparaît à côté de l’avatar dans l’en-tête du site, avec le nombre de notifications non lues (pastille d’avertissement) ; elle mène à la section Notifications de Mon espace.",
         "use": "Site : scripts/account-badge.ts (réponse de /api/me/badge, gardée une minute). Classes .nav-bell et .nav-bell-count.",
         "a11y": "Le bouton a un nom (Notifications) ; le nombre est décoratif, la liste est dans la page."
+      },
+      "communioncard": {
+        "name": "Carte de Sainte-Cène",
+        "desc": "Une carte verticale, comme le carnet de papier : la paroisse, le nom et le code du membre, les douze mois de l’année (✓ visé, ⏸ excusé, – non visé, • en cours), la série de Saintes-Cènes de suite, la prochaine Sainte-Cène avec sa semaine de préparation, ce qui est attendu (jamais une dette) et le QR code que la porte vérifie. Basculement de 1,5° au plus au survol, immobile au tactile et avec « réduire les animations ». La dernière carte reste sur l’appareil pour s’ouvrir sans réseau (« vérifiée le … »).",
+        "use": "scripts/me-card.ts (cardEl, loadCard, IndexedDB « eec-card », effacée à la déconnexion) ; classes .me-comm*. Le QR est dessiné par l’API (qrcode-generator) sur fond blanc dans les deux thèmes. Page de vérification : /verifier/?t=…",
+        "a11y": "Chaque mois a un mot (aria-label) en plus de son signe ; le statut est dit en mots ; le QR a un nom ; aucun montant n’est jamais montré comme une dette."
+      },
+      "groupspace": {
+        "name": "Groupes : demande, annonce",
+        "desc": "Dans Mon espace › Groupes : une carte par groupe avec les annonces récentes (pastille mégaphone), la case « partager mon numéro » (décochée par défaut) et « Quitter » en deux temps ; une carte dorée pour une demande en attente ; une liste des groupes à rejoindre avec « Demander à rejoindre ». Côté administration : « Mon groupe » (membres, demandes, chiffres, retrait avec motif, export).",
+        "use": "scripts/me-groups.ts ; admin : routes/_app/my-group.tsx et le module announcements. Classes .me-ann, .me-ico, .me-top.",
+        "a11y": "Les actions demandent une seconde confirmation ; le numéro n’est partagé qu’avec un choix explicite ; les réponses sont dites en mots."
       }
     },
     "rules": {
@@ -2366,7 +2378,11 @@
       "photo_back_google": "Revenir à ma photo Google",
       "avatar_use": "Utiliser ma photo comme avatar dans le menu",
       "avatar_help": "Sans cela, un avatar généré vous représente dans le menu. L’équipe paroissiale qui gère les membres voit toujours la photo que vous avez ajoutée ; le public, jamais.",
-      "avatar_saved": "Choix enregistré."
+      "avatar_saved": "Choix enregistré.",
+      "sacrament_t": "Baptême et confirmation",
+      "sacrament_p": "Facultatif. Seuls le secrétariat et le pasteur le voient, pour préparer votre carte de Sainte-Cène. La paroisse le confirme d’après son registre.",
+      "baptised": "Je suis baptisé(e)",
+      "confirmed": "Je suis confirmé(e)"
     },
     "me": {
       "nav_label": "Sections de Mon espace",
@@ -2476,7 +2492,44 @@
       "group_decision_t": "Réponse à votre demande",
       "group_decision_p": "{title}",
       "group_announcement_t": "Nouvelle annonce",
-      "group_announcement_p": "{title}"
+      "group_announcement_p": "{title}",
+      "kind_communion_reminder": "Rappel de la préparation de la Sainte-Cène",
+      "communion_reminder_t": "Sainte-Cène : préparation",
+      "communion_reminder_p": "{title}",
+      "card_valid_until": "Valide jusqu’au {date}",
+      "card_expired": "Expirée le {date}",
+      "card_suspended": "Suspendue : voyez le pasteur",
+      "card_streak": "{n} Sainte-Cène(s) de suite",
+      "card_streak_none": "Votre série commence au prochain visa",
+      "card_next": "Prochaine Sainte-Cène : {date}",
+      "card_prep": "Préparation du {from} au {to}",
+      "card_signed_now": "Mois visé",
+      "card_excuse": "Je serai excusé(e)",
+      "card_excused_now": "Vous êtes excusé(e) ce mois-ci",
+      "card_unexcuse": "Annuler mon excuse",
+      "card_expected": "Cotisation attendue",
+      "card_expected_p": "Un simple repère : ce n’est jamais une dette.",
+      "card_qr_t": "Présentez ce code à l’entrée",
+      "card_offline": "Hors ligne : carte vérifiée le {date}",
+      "card_m_signed": "visé",
+      "card_m_excused": "excusé",
+      "card_m_missed": "non visé",
+      "card_m_open": "en cours",
+      "card_m_future": "à venir",
+      "card_m_before": "avant la carte",
+      "card_state_valid": "Valide",
+      "card_state_expired": "Expirée",
+      "card_state_suspended": "Suspendue",
+      "card_name": "Nom",
+      "card_code": "Code",
+      "member_here": "Vous êtes membre de ce groupe"
+    },
+    "verify": {
+      "title": "Vérifier une carte",
+      "valid": "Carte valide",
+      "invalid": "Carte non valide",
+      "until": "Valable jusqu’au {date}",
+      "invalid_p": "Ce code n’est pas reconnu, la carte a expiré ou elle n’est pas valable. Adressez-vous au secrétariat."
     }
   },
   "hero": {

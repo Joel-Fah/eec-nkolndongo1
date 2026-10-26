@@ -1,0 +1,106 @@
+---
+/**
+ * What the QR code of a Communion card opens (decision 0050): no account, no menu of choices. It answers only « valid until … » or « not
+ * valid », with a first name and an initial. Never cached, never indexed; rate-limited by the API.
+ */
+import Icon from '@eec/ui/astro/Icon.astro'
+import Site from '../../layouts/Site.astro'
+import { publicJson } from '../../lib/content-api'
+import { localeOf, useT } from '../../lib/i18n'
+import UnavailableState from './UnavailableState.astro'
+
+const locale = localeOf(Astro.currentLocale)
+const t = useT(locale)
+const s = (key: string, vars?: Record<string, string>) =>
+  t(`member.verify.${key}` as 'member.verify.title', vars)
+Astro.response.headers.set('cache-control', 'private, no-store')
+Astro.response.headers.set('x-robots-tag', 'noindex, nofollow')
+
+const token = Astro.url.searchParams.get('t') ?? ''
+const r = token
+  ? await publicJson<{ valid: boolean; until?: string; name?: string }>(
+      Astro,
+      `/api/communion/verify/${encodeURIComponent(token)}`,
+      Astro.request,
+    )
+  : null
+const unavailable = r?.state === 'unavailable'
+const ok = r?.state === 'ok' && r.data.valid
+const data = r?.state === 'ok' ? r.data : null
+const until = data?.until
+  ? new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${data.until}T12:00:00Z`))
+  : ''
+---
+
+<Site title={s('title')} noindex>
+  <section class="vc">
+    <div class="vc-card" data-ok={ok ? '' : undefined} role="status">
+      {
+        unavailable ? (
+          <UnavailableState />
+        ) : (
+          <>
+            <span class="vc-icon" aria-hidden="true"><Icon name={ok ? 'check' : 'close'} size={24} /></span>
+            <h1>{ok ? s('valid') : s('invalid')}</h1>
+            {ok ? (
+              <>
+                <p class="vc-name">{data?.name}</p>
+                <p>{s('until', { date: until })}</p>
+              </>
+            ) : (
+              <p>{s('invalid_p')}</p>
+            )}
+          </>
+        )
+      }
+    </div>
+  </section>
+</Site>
+
+<style>
+  .vc {
+    display: grid;
+    width: min(100% - 2rem, 30rem);
+    margin-inline: auto;
+    padding-block: 3rem 5rem;
+  }
+  .vc-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    background: var(--danger-soft);
+    box-shadow: var(--elevation-1);
+    text-align: center;
+  }
+  .vc-card[data-ok] {
+    background: var(--success-soft);
+  }
+  .vc-card h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  .vc-name {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+  }
+  .vc-icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--danger);
+  }
+  .vc-card[data-ok] .vc-icon {
+    color: var(--success);
+  }
+</style>

@@ -131,7 +131,19 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
     box.append(c)
   }
 
-  box.append(communionCard(m, lang))
+  // The Communion card: only for a person who holds one; nobody else is shown anything about it.
+  const kept = await (await import('./me-card')).loadCard()
+  if (kept) {
+    const { cardEl } = await import('./me-card')
+    box.append(
+      cardEl(kept.card, {
+        msgs: m,
+        lang,
+        offline: kept.offline,
+        onChange: () => void initHome(ctx, box, go),
+      }),
+    )
+  }
   pack(box)
 }
 
@@ -143,7 +155,9 @@ function pack(box: HTMLElement) {
   const others = [...box.children].filter((c) => !c.classList.contains('me-comm')) as HTMLElement[]
   let row = 1
   let used = 0
-  const cap = () => (row <= 2 ? 2 : 3)
+  // With a Communion card, rows 1 and 2 have two columns beside it; without one, all three.
+  const hasCard = box.querySelector('.me-comm') !== null
+  const cap = () => (hasCard && row <= 2 ? 2 : 3)
   others.forEach((c, i) => {
     const w = i === 0 ? Math.min(2, cap()) : 1
     c.dataset.span = String(w)
@@ -156,22 +170,4 @@ function pack(box: HTMLElement) {
       used = 0
     }
   })
-}
-
-/** The Communion card, as it will look: a portrait card with the year's twelve months empty. Nothing here is a fact about the member. */
-function communionCard(m: Record<string, string>, lang: string) {
-  const c = el('div', 'me-card me-comm')
-  c.setAttribute('data-soon', '')
-  const top = el('div', 'me-row')
-  top.append(el('span', 'me-k', m.card_k), el('span', 'me-pill', m.card_soon))
-  const face = el('div', 'me-comm-face')
-  const head = el('div', 'me-comm-head')
-  head.append(ico('church', 'me-comm-ico'), el('span', 'me-comm-parish', m.card_parish))
-  const grid = el('ol', 'me-comm-grid')
-  grid.setAttribute('aria-hidden', 'true')
-  const fmt = new Intl.DateTimeFormat(lang, { month: 'short', timeZone: 'UTC' })
-  for (let i = 0; i < 12; i++) grid.append(el('li', '', fmt.format(new Date(Date.UTC(2026, i, 1)))))
-  face.append(head, el('span', 'me-comm-line'), grid, el('span', 'me-comm-tag', m.card_preview))
-  c.append(top, face, el('span', 'me-t', m.card_t), el('p', 'me-p', m.card_p))
-  return c
 }

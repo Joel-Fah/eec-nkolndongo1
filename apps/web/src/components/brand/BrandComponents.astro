@@ -81,6 +81,8 @@ type Id =
   | 'insetfields'
   | 'datepicker'
   | 'mespace'
+  | 'communioncard'
+  | 'groupspace'
   | 'headerbell'
   | 'identicon'
   | 'profilebadge'
@@ -488,6 +490,40 @@ const doc = (id: Id) => ({
         <div class="me-card">
           <div class="me-row"><span class="me-t">Concert de Noël</span><span class="me-pill" data-tone="warn">{t('member.me.status_waitlist')}</span></div>
           <span class="me-m">samedi 19 décembre · n° 1</span>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('communioncard')}>
+      <div class="grid max-w-[16rem] gap-3">
+        <MeSections />
+        <div class="me-card me-comm" data-state="valid">
+          <div class="me-row"><span class="me-k">{t('member.me.card_k')}</span><span class="me-pill">{t('member.me.card_state_valid')}</span></div>
+          <div class="me-comm-face">
+            <div class="me-comm-head"><span class="me-comm-parish">{t('member.me.card_parish')}</span></div>
+            <div class="me-comm-who"><span class="me-comm-name">Marie N.</span><span class="me-comm-code">EEC-7K2M-4Q9X</span></div>
+            <ol class="me-comm-grid" aria-hidden="true">
+              <li data-s="signed"><span class="me-comm-mo">Janv.</span><span class="me-comm-g">✓</span></li>
+              <li data-s="excused"><span class="me-comm-mo">Févr.</span><span class="me-comm-g">⏸</span></li>
+              <li data-s="missed"><span class="me-comm-mo">Mars</span><span class="me-comm-g">–</span></li>
+              <li data-s="open"><span class="me-comm-mo">Avr.</span><span class="me-comm-g">•</span></li>
+              <li data-s="future"><span class="me-comm-mo">Mai</span><span class="me-comm-g"></span></li>
+              <li data-s="before"><span class="me-comm-mo">Juin</span><span class="me-comm-g"></span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('groupspace')}>
+      <div class="grid max-w-[28rem] gap-3">
+        <div class="me-card">
+          <div class="me-top"><span class="me-ico" aria-hidden="true"><Icon name="users" /></span><div class="grid"><span class="me-t">Chorale</span></div><span class="me-pill">{t('member.me.member_badge')}</span></div>
+          <div class="me-ann"><span class="me-ico" aria-hidden="true"><Icon name="megaphone" /></span><span class="me-t">Répétition déplacée</span><span class="me-p">Samedi, même heure.</span></div>
+        </div>
+        <div class="me-card" data-tone="gold">
+          <div class="me-top"><span class="me-ico" aria-hidden="true"><Icon name="clock" /></span><div class="grid"><span class="me-k">{t('member.me.request_k')}</span><span class="me-t">Jeunesse</span></div></div>
+          <p class="me-p">{t('member.me.request_p')}</p>
         </div>
       </div>
     </DocBlock>

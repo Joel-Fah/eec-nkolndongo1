@@ -479,7 +479,12 @@ function CheckTab() {
   const [camera, setCamera] = useState(false)
   const check = useMutation({
     mutationFn: (raw: string) => {
-      const tk = raw.trim().split('/').pop()?.split('?')[0] ?? ''
+      let tk = raw.trim()
+      try {
+        tk = new URL(tk).searchParams.get('t') ?? tk
+      } catch {
+        // not an address: it is the token itself
+      }
       return api<{ state: string; until: string | null; name: string | null }>(
         `/communion/check/${encodeURIComponent(tk)}`,
       )

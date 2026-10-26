@@ -104,6 +104,7 @@ const phone = page?.contact.phone.replace(/[^\d+]/g, '') ?? ''
           <header class="dg-head">
             <h1 class="dg-title">{page.name}</h1>
             {page.tagline && <p class="dg-lead">{page.tagline}</p>}
+            <p class="dg-member" data-member-of={page.key} hidden><Icon name="check" size={16} />{t('member.me.member_here')}</p>
           </header>
           {page.fallback && <LangFallbackNote />}
           {page.cover && <Picture class="dg-cover" media={page.cover} sizes="(min-width: 64rem) 60rem, 100vw" eager decorative />}
@@ -188,6 +189,21 @@ const phone = page?.contact.phone.replace(/[^\d+]/g, '') ?? ''
 </Site>
 
 <style>
+  .dg-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    justify-self: start;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--success-soft);
+    color: var(--success);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .dg-member[hidden] {
+    display: none;
+  }
   .dg {
     display: grid;
     gap: 1.5rem;

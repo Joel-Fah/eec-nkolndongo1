@@ -1,6 +1,6 @@
-# 0050 — La carte de Sainte-Cène (proposée ; à valider avec le Conseil avant tout code)
+# 0050 — La carte de Sainte-Cène
 
-Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte verticale, douze mois vides, « Bientôt »). Les faits sur la pratique viennent de Joël
+Statut : **Acceptée** (Joël, 2026-10-26 : « c'est tout clair »), construite au Checkpoint C ; à relire par le Conseil avec le texte de confidentialité. Les faits sur la pratique viennent de Joël
 (2026-10-26) et d'un résumé général des EEC : **à confirmer par le Conseil et le pasteur** avant d'être écrits comme des faits publics.
 
 ## Ce qui est décidé (réponses de Joël)
@@ -37,8 +37,9 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
    montants **entièrement réglés en administration**.
 5. **L'excuse est déclarée par le membre** (« excusé » ou non, **sans motif**) ; l'administration ne fait que la **voir**. Elle met la série en pause. *(Cela remplace « noté par les Anciens » plus haut.)*
 6. **Suspension/rétablissement : le secrétariat s'en charge** (avec le pasteur pour le retrait), sans motif montré au membre.
-7. **Conservation (recommandation de Claude, à valider)** : garder l'historique des visas **tant que le compte existe**, puis **12 mois** après la clôture du compte ou le départ (pour
-   répondre à une question du Conseil), puis l'effacer ; seule une **statistique anonyme** (nombre de visas par mois) peut rester. Les excuses et le registre suivent la même durée.
+7. **Conservation** : l'historique des visas, les excuses et le registre sont gardés **tant que le compte existe** et **effacés avec le compte** (30 jours après la demande de
+   suppression, par cascade). *(Claude avait proposé 12 mois de plus après le départ ; ce n'est pas construit : cela demanderait de garder des données sans compte. À décider par le Conseil si
+   l'on en veut vraiment.)*
    La **carte papier continue en parallèle** : le numérique l'accompagne et ne la remplace pas tant que le Conseil ne l'a pas décidé ; le visa papier reste la référence.
 
 ## Dernières réponses (2026-10-26)
@@ -47,3 +48,9 @@ Statut : **Proposée.** Seul un **aperçu visuel** existe dans Mon espace (carte
   tant que la fonction n'existe pas ; ensuite la carte n'apparaît que pour les porteurs.
 
 Plus aucune question ouverte : le texte peut passer en **Acceptée** quand Joël l'approuve ; la construction se fera au point C.
+
+## Ce qui a été construit (Checkpoint C)
+Module `communion` (migration 0039) ; carte en portrait dans Mon espace ; page `/verifier/?t=…` ; scanner et écrans dans l'administration ; rôle système **Ancien d'Église** ; la carte reste sur l'appareil
+pour s'ouvrir sans réseau (on garde la coque de la page Mon espace dans le service worker, jamais de données : décision 0037 amendée) ; dépendance ajoutée : `qrcode-generator` 2.0.4 (MIT, côté API, ~20 Ko).
+Rappel de préparation : notification de membre `communion_reminder` pendant la semaine de préparation (lundi–samedi avant le deuxième dimanche) tant que le mois n'est ni visé ni excusé.
+Non construit : dates de préparation modifiables par mois (les valeurs par défaut s'appliquent), conservation de 12 mois après départ, message pour un membre sans carte (il n'a rien).

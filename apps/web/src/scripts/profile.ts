@@ -32,6 +32,7 @@ type Profile = {
     complete: boolean
   }
   seed: number
+  sacrament?: { baptised: boolean | null; confirmed: boolean | null }
 }
 
 async function api(path: string, init?: RequestInit) {
@@ -180,6 +181,15 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
     q<HTMLElement>('[data-pf-avatar-zone]')?.toggleAttribute('hidden', !p.photo.has)
     const sw = q<HTMLInputElement>('#pf-avatar')
     if (sw) sw.checked = p.photo.asAvatar
+    // Baptism and confirmation, as the member says them (the parish confirms from its own register).
+    const sac = q<HTMLElement>('[data-pf-sacrament]')
+    if (sac) {
+      sac.hidden = !p.consent
+      const b = q<HTMLInputElement>('#pf-baptised')
+      const cf = q<HTMLInputElement>('#pf-confirmed')
+      if (b) b.checked = p.sacrament?.baptised === true
+      if (cf) cf.checked = p.sacrament?.confirmed === true
+    }
   }
 
   async function load() {
@@ -266,6 +276,16 @@ export function initProfile(root: HTMLElement, user: { firstName?: string; name?
       await changed()
     }
   })
+
+  const saveSacrament = async () => {
+    const r = await put('/communion/me/sacrament', {
+      baptised: q<HTMLInputElement>('#pf-baptised')?.checked ? true : null,
+      confirmed: q<HTMLInputElement>('#pf-confirmed')?.checked ? true : null,
+    })
+    if (r.ok) say(msgs.levelSaved ?? '')
+  }
+  q('#pf-baptised')?.addEventListener('change', saveSacrament)
+  q('#pf-confirmed')?.addEventListener('change', saveSacrament)
 
   initPickers(host)
   void load()

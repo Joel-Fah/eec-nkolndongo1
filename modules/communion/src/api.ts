@@ -85,9 +85,10 @@ async function qrFor(
   )
   const token = await signPreview(secret, TOKEN, `${card.id}:${card.version}`, days * 86_400)
   const qr = qrcode(0, 'M')
-  qr.addData(`${origin}/fr/verifier/${token}`)
+  const url = `${origin}/fr/verifier/?t=${token}`
+  qr.addData(url)
   qr.make()
-  return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true })
+  return { svg: qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true }), url }
 }
 
 export const communionApi = new Hono<AppEnv>()
@@ -521,6 +522,7 @@ export const communionApi = new Hono<AppEnv>()
         }),
     ]
     const origin = new URL(c.req.url).origin
+    const qr = state === 'valid' ? await qrFor(c.env.AUTH_SECRET, origin, card) : null
     return c.json({
       card: {
         state,
@@ -545,7 +547,8 @@ export const communionApi = new Hono<AppEnv>()
         expected: lines.length
           ? { total: lines.reduce((s, l) => s + l.amountXaf, 0), lines }
           : null,
-        qr: state === 'valid' ? await qrFor(c.env.AUTH_SECRET, origin, card) : null,
+        qr: qr?.svg ?? null,
+        verifyUrl: qr?.url ?? null,
         checkedAt: new Date().toISOString(),
       },
     })

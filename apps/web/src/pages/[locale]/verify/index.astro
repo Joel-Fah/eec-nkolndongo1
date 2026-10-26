@@ -1,0 +1,11 @@
+---
+import VerifyCardPage from '../../../components/content/VerifyCardPage.astro'
+import { localeOf } from '../../../lib/i18n'
+import { rightVerifyPath } from '../../../lib/verify'
+
+export const prerender = false
+if (!rightVerifyPath(localeOf(Astro.currentLocale), Astro.url.pathname))
+  return Astro.rewrite('/404')
+---
+
+<VerifyCardPage />

@@ -1080,6 +1080,18 @@
         "desc": "Once signed in, a bell appears next to the avatar in the site header, with the number of unread notifications (warning dot); it leads to the Notifications section of Mon espace.",
         "use": "Site: scripts/account-badge.ts (answer of /api/me/badge, kept a minute). Classes .nav-bell and .nav-bell-count.",
         "a11y": "The button has a name (Notifications); the number is decorative, the list is in the page."
+      },
+      "communioncard": {
+        "name": "Communion card",
+        "desc": "A portrait card, like the paper booklet: the parish, the member’s name and code, the year’s twelve months (✓ signed, ⏸ excused, – not signed, • in progress), the streak of Holy Suppers in a row, the next Holy Supper with its preparation week, what is expected (never a debt) and the QR code the door checks. Tilts 1.5° at most on hover, still on touch and with “reduce motion”. The last card stays on the device so it opens with no network (“checked on …”).",
+        "use": "scripts/me-card.ts (cardEl, loadCard, IndexedDB “eec-card”, erased on sign-out); classes .me-comm*. The QR is drawn by the API (qrcode-generator) on white in both themes. Check page: /verifier/?t=…",
+        "a11y": "Each month has a word (aria-label) besides its mark; the status is said in words; the QR has a name; no amount is ever shown as a debt."
+      },
+      "groupspace": {
+        "name": "Groups: request, announcement",
+        "desc": "In Mon espace › Groups: a card per group with recent announcements (megaphone chip), the “share my number” box (unticked by default) and a two-step “Leave”; a gold card for a pending request; a list of groups to join with “Ask to join”. In the admin: “My group” (members, requests, figures, removal with a reason, export).",
+        "use": "scripts/me-groups.ts; admin: routes/_app/my-group.tsx and the announcements module. Classes .me-ann, .me-ico, .me-top.",
+        "a11y": "Actions ask a second confirmation; the number is shared only by explicit choice; answers are said in words."
       }
     },
     "rules": {
@@ -2366,7 +2378,11 @@
       "photo_back_google": "Go back to my Google photo",
       "avatar_use": "Use my photo as my avatar in the menu",
       "avatar_help": "Without it, a generated avatar represents you in the menu. The parish team who manage members always see the photo you add; the public never does.",
-      "avatar_saved": "Choice saved."
+      "avatar_saved": "Choice saved.",
+      "sacrament_t": "Baptism and confirmation",
+      "sacrament_p": "Optional. Only the secretariat and the pastor see it, to prepare your Communion card. The parish confirms it from its own register.",
+      "baptised": "I am baptised",
+      "confirmed": "I am confirmed"
     },
     "me": {
       "nav_label": "Sections of My space",
@@ -2476,7 +2492,44 @@
       "group_decision_t": "Answer to your request",
       "group_decision_p": "{title}",
       "group_announcement_t": "New announcement",
-      "group_announcement_p": "{title}"
+      "group_announcement_p": "{title}",
+      "kind_communion_reminder": "Holy Supper preparation reminder",
+      "communion_reminder_t": "Holy Supper: preparation",
+      "communion_reminder_p": "{title}",
+      "card_valid_until": "Valid until {date}",
+      "card_expired": "Expired on {date}",
+      "card_suspended": "Suspended: see the pastor",
+      "card_streak": "{n} Holy Supper(s) in a row",
+      "card_streak_none": "Your streak starts with the next visa",
+      "card_next": "Next Holy Supper: {date}",
+      "card_prep": "Preparation from {from} to {to}",
+      "card_signed_now": "Month signed",
+      "card_excuse": "I will be excused",
+      "card_excused_now": "You are excused this month",
+      "card_unexcuse": "Cancel my excuse",
+      "card_expected": "Expected contribution",
+      "card_expected_p": "Just a guide: it is never a debt.",
+      "card_qr_t": "Show this code at the entrance",
+      "card_offline": "Offline: card checked on {date}",
+      "card_m_signed": "signed",
+      "card_m_excused": "excused",
+      "card_m_missed": "not signed",
+      "card_m_open": "in progress",
+      "card_m_future": "upcoming",
+      "card_m_before": "before the card",
+      "card_state_valid": "Valid",
+      "card_state_expired": "Expired",
+      "card_state_suspended": "Suspended",
+      "card_name": "Name",
+      "card_code": "Code",
+      "member_here": "You are a member of this group"
+    },
+    "verify": {
+      "title": "Check a card",
+      "valid": "Valid card",
+      "invalid": "Card not valid",
+      "until": "Valid until {date}",
+      "invalid_p": "This code is not recognised, the card has expired or it is not valid. Please ask the secretariat."
     }
   },
   "hero": {

@@ -16,7 +16,7 @@ const MAX_IMAGES = 30
 const TIMEOUT = 4000
 const OFFLINE = { fr: '/fr/hors-ligne/', en: '/en/offline/' }
 const PRIVATE =
-  /\/(mon-espace|my-space|apercu|preview|inscription|register|recherche|search|_brand|fete-des-moissons|harvest-festival)(\/|$)/
+  /\/(apercu|preview|inscription|register|recherche|search|_brand|fete-des-moissons|harvest-festival|verifier|verify)(\/|$)/
 const PRIVATE_QUERY = /[?&](t|simule|token|q)=/
 
 /** What to do with a request: 'page' (navigation to keep), 'asset' (hashed build file, cache first), 'image', or 'skip'. */

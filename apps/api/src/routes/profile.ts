@@ -89,6 +89,8 @@ async function load(db: Db, userId: string) {
       photoKey: profiles.photoKey,
       photoAsAvatar: profiles.photoAsAvatar,
       photoUpdatedAt: profiles.photoUpdatedAt,
+      baptised: profiles.baptised,
+      confirmed: profiles.confirmed,
       createdAt: user.createdAt,
       // The picture Google gave at sign-in, if any: it counts as the person's photo until they choose another (decision 0047).
       image: user.image,
@@ -139,8 +141,15 @@ export const profileRoutes = new Hono<AppEnv>()
           isNull(notifications.dismissedAt),
         ),
       )
+    // The groups I am in, so a group's public page can say « vous êtes membre » to me alone (nothing public).
+    const mine = await db
+      .select({ key: schema.groups.key })
+      .from(schema.groupMembers)
+      .innerJoin(schema.groups, eq(schema.groups.id, schema.groupMembers.groupId))
+      .where(eq(schema.groupMembers.userId, actor.userId))
     return c.json({
       signedIn: true,
+      groups: mine.map((g) => g.key),
       unread: unread?.n ?? 0,
       seed: avatarSeed(actor.userId),
       incomplete: !completeness.complete,
@@ -184,6 +193,8 @@ export const profileRoutes = new Hono<AppEnv>()
           : (row?.image ?? null),
         asAvatar: !!row?.photoAsAvatar,
       },
+      // What the member said about their baptism and confirmation (decision 0050); not part of the completeness.
+      sacrament: { baptised: row?.baptised ?? null, confirmed: row?.confirmed ?? null },
       completeness,
       seed: avatarSeed(actor.userId),
     })

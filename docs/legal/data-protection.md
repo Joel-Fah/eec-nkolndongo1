@@ -144,3 +144,13 @@ what a parent provides for a specific activity.
 - **Qui voit quoi** : un responsable ne voit que son groupe (nom, avatar, arrivée, titre, numéro si partagé, tranche d'âge si ≥ 5 personnes) ; jamais l'e-mail ni la date de naissance. Le secrétariat voit tous les groupes. Rien n'est public.
 - **Export** de la liste d'un groupe : droit dangereux `core:group-export`, limité au groupe, journalisé.
 - **Conservation** : demande décidée effacée après 12 mois, demande en attente effacée après 6 mois, tout effacé avec le compte. Le motif d'un retrait reste dans le journal d'activité (24 mois), jamais montré au membre.
+
+## Carte de Sainte-Cène (décision 0050, Phase 05)
+- **Ce qui est gardé** : la carte (`communion_cards`), les visas mensuels, les excuses déclarées par le membre (sans motif), les cotisations reçues (registre), les montants attendus
+  (barèmes), et, sur le profil, la déclaration « baptisé / confirmé » du membre (avec le consentement `profile`) et la confirmation de la paroisse (qui, quand).
+- **Donnée sensible** : appartenance religieuse (baptême, confirmation, communiant). Accès : secrétariat et pasteur (émission, confirmation), Anciens (visa, registre), trésorier (barèmes, registre).
+  Jamais publique. Le contrôle par QR ne montre que « valide / non valide », un prénom et l'initiale du nom.
+- **Règles** : une carte est proposée par une personne et approuvée par une autre ; la suspension est du ressort du secrétariat, le retrait du pasteur (motif dans le journal seulement) ; le membre ne voit
+  jamais un motif ni une dette.
+- **Conservation** : tout est effacé avec le compte (cascade). La carte de papier reste la référence.
+- **Sur l'appareil** : la dernière carte est gardée dans le navigateur (IndexedDB) pour s'ouvrir sans réseau ; effacée à la déconnexion, au bout de 45 jours ou à l'expiration.

@@ -121,6 +121,13 @@ const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).fo
           </div>
         </div>
 
+        <div class="pf-photo" data-pf-sacrament hidden>
+          <p class="font-semibold">{p('sacrament_t')}</p>
+          <p class="text-sm text-ink-muted">{p('sacrament_p')}</p>
+          <Choice kind="switch" id="pf-baptised" name="baptised" label={p('baptised')} />
+          <Choice kind="switch" id="pf-confirmed" name="confirmed" label={p('confirmed')} />
+        </div>
+
         <div class="pf-withdraw" data-pf-withdraw-zone hidden>
           <Button variant="ghost" data-pf-withdraw>{p('withdraw')}</Button>
           <p class="text-sm text-ink-muted">{p('withdraw_help')}</p>
