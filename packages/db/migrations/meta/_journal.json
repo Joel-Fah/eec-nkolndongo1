@@ -253,6 +253,13 @@
       "when": 1792947319147,
       "tag": "0035_eager_next_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792987262954,
+      "tag": "0036_narrow_edwin_jarvis",
+      "breakpoints": true
     }
   ]
 }

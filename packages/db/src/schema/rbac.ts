@@ -65,6 +65,25 @@ export const roles = pgTable('roles', {
   ...timestamps(),
 })
 
+/**
+ * The ledger of system-role grants the seed has already offered (decision 0048): one row per (role, permission). The seed offers each
+ * grant of a system role once, so a permission added to the code reaches every environment on its next seed, while a grant someone
+ * removed on purpose in Rôles never comes back. Hand-added grants are never touched.
+ */
+export const rolePermissionOffers = pgTable(
+  'role_permission_offers',
+  {
+    roleId: uuid('role_id')
+      .notNull()
+      .references(() => roles.id, { onDelete: 'cascade' }),
+    permissionKey: text('permission_key')
+      .notNull()
+      .references(() => permissions.key, { onDelete: 'cascade' }),
+    offeredAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.roleId, t.permissionKey] })],
+)
+
 export const permissions = pgTable('permissions', {
   key: text('key').primaryKey(),
   module: text('module').notNull(),
