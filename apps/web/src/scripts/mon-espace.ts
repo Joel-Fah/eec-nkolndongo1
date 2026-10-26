@@ -3,7 +3,8 @@
  * anchor (#accueil, #inscriptions, #groupes, #notifications, #profil) and loaded only when first opened, so the page stays a small island.
  * Everything is private: drawn from /api/me/*, nothing kept in storage.
  */
-import { api, type Ctx, type Links, type Msgs } from './me-api'
+import { avatarSvg } from '@eec/ui/avatar-art'
+import { api, type Ctx, forgetProfile, type Links, type Msgs, profile, setIcons } from './me-api'
 
 const IDS = ['accueil', 'inscriptions', 'groupes', 'notifications', 'profil'] as const
 type Id = (typeof IDS)[number]
@@ -18,6 +19,7 @@ export function initMonEspace(root: HTMLElement) {
     links: JSON.parse(host.dataset.links ?? '{}') as Links,
     lang: host.dataset.lang ?? 'fr',
   }
+  setIcons(JSON.parse(host.dataset.icons ?? '{}') as Record<string, string>)
   const loaded = new Set<Id>()
   let notifsAt = 0
   const section = (id: Id) => host.querySelector<HTMLElement>(`[data-me-section="${id}"]`)
@@ -64,6 +66,43 @@ export function initMonEspace(root: HTMLElement) {
     })
   addEventListener('hashchange', () => show(location.hash.slice(1), false))
   show(location.hash.slice(1) || 'accueil', false)
+  // The welcome: the member's own picture if they have one, else the generated avatar; soft shapes follow the pointer.
+  const hero = root.querySelector<HTMLElement>('[data-me-hero]')
+  const paintHero = () =>
+    void profile().then((r) => {
+      const box = hero?.querySelector<HTMLElement>('[data-hero-avatar]')
+      if (!box || !r.ok) return
+      const fallback = () =>
+        box.replaceChildren(
+          Object.assign(document.createElement('span'), { innerHTML: avatarSvg(r.json.seed) }),
+        )
+      if (!r.json.photo.url) return fallback()
+      const img = Object.assign(new Image(96, 96), {
+        src: r.json.photo.url,
+        alt: '',
+        referrerPolicy: 'no-referrer',
+      })
+      img.addEventListener('error', fallback)
+      box.replaceChildren(img)
+    })
+  paintHero()
+  addEventListener('eec:profile-changed', () => {
+    forgetProfile()
+    paintHero()
+    loaded.delete('accueil')
+    if (!section('accueil')?.hidden) show('accueil', false)
+  })
+  if (hero && matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches)
+    hero.addEventListener('pointermove', (e) => {
+      const r = hero.getBoundingClientRect()
+      hero.style.setProperty('--mx', String(((e.clientX - r.left) / r.width - 0.5) * 2))
+      hero.style.setProperty('--my', String(((e.clientY - r.top) / r.height - 0.5) * 2))
+    })
+  // The menu gets its headline once the welcome has scrolled away.
+  if (hero && 'IntersectionObserver' in window)
+    new IntersectionObserver(([e]) => host.toggleAttribute('data-past-hero', !e?.isIntersecting), {
+      rootMargin: '-80px 0px 0px 0px',
+    }).observe(hero)
   // Warm the other sections once the first one is drawn, so switching tabs is instant afterwards.
   const warm = () => {
     for (const id of IDS)

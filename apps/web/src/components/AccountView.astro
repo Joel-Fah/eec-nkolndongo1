@@ -139,16 +139,22 @@ const tiles = [
   </div>
 
   <div class="acct-card acct-home" data-when="in" hidden>
-    <div class="acct-hello">
-      <span class="acct-avatar" aria-hidden="true">
-        <img data-photo alt="" hidden width="56" height="56" referrerpolicy="no-referrer" />
-        <span data-initials></span>
-      </span>
-      <div>
-        <h2 class="text-3xl" data-hello-target></h2>
-        <p class="text-ink-muted">{t('member.welcome')}</p>
+    <section class="me-hero" data-me-hero aria-labelledby="me-hero-t" data-greets={JSON.stringify({ morning: t('member.me.hero_morning', { name: '{name}' }), afternoon: t('member.me.hero_afternoon', { name: '{name}' }), evening: t('member.me.hero_evening', { name: '{name}' }) })}>
+      <span class="me-orb me-orb-1" aria-hidden="true"></span>
+      <span class="me-orb me-orb-2" aria-hidden="true"></span>
+      <span class="me-orb me-orb-3" aria-hidden="true"></span>
+      <div class="me-hero-body">
+        <span class="acct-avatar" data-hero-avatar aria-hidden="true">
+          <img data-photo alt="" hidden width="96" height="96" referrerpolicy="no-referrer" />
+          <span data-initials></span>
+        </span>
+        <div class="grid gap-2">
+          <p class="acct-eyebrow"><Icon name="sparkles" size={16} />{t('member.me.hero_title')}</p>
+          <h2 class="me-hero-t" id="me-hero-t" data-hello-target></h2>
+          <p class="me-hero-p">{t('member.me.hero_lead')}</p>
+        </div>
       </div>
-    </div>
+    </section>
     <MeSections>
       <ProfileSection />
     <div class="acct-panels">
@@ -246,6 +252,7 @@ const tiles = [
 </section>
 
 <script>
+  import { callName } from '@eec/core'
   import { forgetBadge, initAccountBadge } from '../scripts/account-badge'
   import { initMonEspace } from '../scripts/mon-espace'
   import { initProfile } from '../scripts/profile'
@@ -272,15 +279,13 @@ const tiles = [
     async function refresh() {
       const me = await call('/me')
       if (me.ok) {
-        const name: string = me.json.user.firstName || me.json.user.name || ''
-        const photo = root.querySelector<HTMLImageElement>('[data-photo]')
-        if (photo && me.json.user.image) {
-          photo.src = me.json.user.image
-          photo.hidden = false
-          root.querySelector<HTMLElement>('[data-initials]')?.setAttribute('hidden', '')
-        }
+        const name: string = callName(me.json.user)
         const target = root.querySelector('[data-hello-target]')
-        if (target) target.textContent = (root.dataset.hello ?? '').replace('{name}', name)
+        if (target) {
+          const g = JSON.parse(root.querySelector<HTMLElement>('[data-me-hero]')?.dataset.greets ?? '{}') as Record<string, string>
+          const h = Number(new Intl.DateTimeFormat('en', { hour: 'numeric', hour12: false, timeZone: 'Africa/Douala' }).format(new Date())) % 24
+          target.textContent = (g[h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening'] ?? root.dataset.hello ?? '').replace('{name}', name)
+        }
         const initials = root.querySelector('[data-initials]')
         if (initials) initials.textContent = name.slice(0, 1).toUpperCase()
         show('in')
@@ -851,6 +856,86 @@ const tiles = [
     .acct[data-state='in'] .acct-panels {
       grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
       align-items: start;
+    }
+  }
+  /* The welcome: a calm band with slow, soft shapes that lean a little towards the pointer. */
+  .me-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, color-mix(in oklab, var(--season) 16%, var(--surface)), color-mix(in oklab, var(--gold) 14%, var(--surface)));
+    box-shadow: inset 0 0 0 1px var(--line);
+    --mx: 0;
+    --my: 0;
+  }
+  .me-hero-body {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.5rem;
+  }
+  .me-hero .acct-avatar {
+    width: 5rem;
+    height: 5rem;
+    overflow: hidden;
+    box-shadow: 0 0 0 4px var(--surface), var(--elevation-2);
+    animation: me-bob 6s ease-in-out infinite;
+  }
+  .me-hero .acct-avatar img,
+  .me-hero .acct-avatar svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .me-hero-t {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: 1.1;
+  }
+  .me-hero-p {
+    max-width: 44ch;
+    color: var(--ink-muted);
+  }
+  .me-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.6s var(--ease-out, ease);
+  }
+  .me-orb-1 {
+    inset: -3rem -2rem auto auto;
+    width: 12rem;
+    height: 12rem;
+    background: color-mix(in oklab, var(--gold) 28%, transparent);
+    transform: translate(calc(var(--mx) * -14px), calc(var(--my) * -14px));
+  }
+  .me-orb-2 {
+    inset: auto auto -3.5rem 30%;
+    width: 9rem;
+    height: 9rem;
+    background: color-mix(in oklab, var(--season) 22%, transparent);
+    transform: translate(calc(var(--mx) * 18px), calc(var(--my) * 18px));
+  }
+  .me-orb-3 {
+    inset: 35% 8% auto auto;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: color-mix(in oklab, var(--clay, var(--gold)) 30%, transparent);
+    transform: translate(calc(var(--mx) * 26px), calc(var(--my) * 26px));
+  }
+  @keyframes me-bob {
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .me-hero .acct-avatar {
+      animation: none;
+    }
+    .me-orb {
+      transition: none;
     }
   }
   .acct-hello {

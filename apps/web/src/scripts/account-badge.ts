@@ -56,6 +56,9 @@ export async function initAccountBadge() {
       n.textContent = (b.unread ?? 0) > 99 ? '99+' : String(b.unread)
     }
   }
+  // The invitation above the footer speaks to a member differently.
+  for (const e of document.querySelectorAll<HTMLElement>('[data-cta-guest]')) e.hidden = true
+  for (const e of document.querySelectorAll<HTMLElement>('[data-cta-member]')) e.hidden = false
   for (const link of links) {
     if (link.dataset.badged) continue
     link.dataset.badged = '1'
@@ -92,4 +95,5 @@ export const forgetBadge = () => {
   } catch {
     // ignore
   }
+  dispatchEvent(new Event('eec:profile-changed'))
 }

@@ -1071,8 +1071,8 @@
       },
       "mespace": {
         "name": "Mon espace : sections et cartes",
-        "desc": "Pour un membre connecté : une barre de cinq sections (Accueil, Inscriptions, Groupes, Notifications, Profil), une à la fois, chacune adressable (#accueil…) et chargée à la demande, collée en haut et défilable sur 360 px. Le contenu est fait de cartes : kicker en capitales, titre, ligne de précision, pastille de statut (verte, d’avertissement ou grise) et actions. Les cartes dorées marquent ce qui compte maintenant ; vertes, ce dimanche ; une carte atténuée annonce ce qui vient (Carte de Sainte-Cène).",
-        "use": "<MeSections> (slot = section Profil) + scripts/mon-espace.ts, me-home / me-regs / me-groups / me-notifs.ts ; classes .me-nav, .me-tab, .me-card, .me-pill, .me-wk, .me-empty. Tout est privé (no-store) et dessiné depuis /api/me/*.",
+        "desc": "Pour un membre connecté, en pleine largeur : un accueil (bande douce, salutation selon l’heure, formes qui suivent doucement le pointeur, photo ou avatar), puis la navigation (menu vertical collé à gauche sur ordinateur, avec son titre « Mon espace » dès que l’accueil a défilé ; barre de cinq icônes sur téléphone) et la grille de cartes. Chaque section a son icône et sa phrase d’introduction ; chaque carte a une icône, un texte clair et une action. Les sections se préchargent au repos du navigateur : changer d’onglet est instantané. La carte de Sainte-Cène est un aperçu (douze mois vides) jusqu’à la décision 0050.",
+        "use": "<MeSections> + scripts/mon-espace.ts (accueil, préchargement, titre du menu), me-home / me-regs / me-groups / me-notifs.ts ; icônes dessinées à la construction (data-icons). Classes .me-hero, .me-nav, .me-head, .me-ico, .me-card, .me-comm. Tout est privé (no-store).",
         "a11y": "La barre est une navigation avec aria-current ; chaque section a un titre masqué ; les boutons font 44 px ; l’annulation et la sortie d’un groupe demandent une seconde confirmation ; les statuts sont dits en mots, jamais en couleur seule."
       },
       "headerbell": {
@@ -1306,7 +1306,11 @@
       "ordinaire": "Effleurez les feuilles",
       "moissons": "Effleurez les épis"
     },
-    "photo_credits": "Photos : Pexels"
+    "photo_credits": "Photos : Pexels",
+    "member_title": "Votre espace vous attend",
+    "member_text": "Retrouvez vos inscriptions, vos groupes et ce qui vous concerne cette semaine.",
+    "member_open": "Ouvrir mon espace",
+    "member_sunday": "Ce dimanche"
   },
   "admin": {
     "title": "Administration",
@@ -2393,7 +2397,32 @@
       "policy_change_t": "La politique de confidentialité a changé",
       "policy_change_p": "Lisez le résumé dans Profil, puis acceptez si on vous le demande.",
       "done": "Fait",
-      "loading": "Chargement…"
+      "loading": "Chargement…",
+      "hero_title": "Mon espace",
+      "hero_morning": "Bonne matinée, {name}",
+      "hero_afternoon": "Bon après-midi, {name}",
+      "hero_evening": "Bonsoir, {name}",
+      "hero_lead": "Prenez votre temps : tout ce qui vous concerne est ici, au calme.",
+      "intro_home": "Votre semaine en un coup d’œil.",
+      "intro_regs": "Les activités auxquelles vous êtes inscrit, et où vous en êtes sur la liste.",
+      "intro_groups": "Les groupes dont vous faites partie et ce qu’ils préparent.",
+      "intro_notifs": "Ce qui change pour vous : une place libérée, une annonce, un changement important.",
+      "intro_profile": "Vos informations, votre photo, vos choix et vos appareils. Vous gardez la main.",
+      "next_reg_p": "Ajoutez-la à votre calendrier pour ne pas l’oublier.",
+      "none_reg_t": "Rien de prévu pour l’instant",
+      "none_reg_p": "Les prochaines activités de la paroisse sont dans l’agenda : inscrivez-vous en quelques secondes.",
+      "sunday_p": "Le thème, les lectures et le déroulé du culte pour vous y préparer.",
+      "groups_p": "Le prochain rendez-vous de vos groupes.",
+      "groups_none_p": "Départements, chorales, comités : trouvez celui qui vous ressemble.",
+      "profile_p": "Quelques informations facultatives aident la paroisse à mieux vous accompagner. Vous pouvez tout effacer.",
+      "profile_ok_t": "Votre profil est à jour",
+      "profile_ok_p": "Merci. Vous pouvez tout modifier ou effacer quand vous le voulez.",
+      "card_k": "Carte de Sainte-Cène",
+      "card_soon": "Bientôt",
+      "card_t": "Votre carte, toujours avec vous",
+      "card_p": "Vous suivrez bientôt ici les Saintes-Cènes signées de l’année et vous serez prévenu avant la fin de la semaine de préparation. La paroisse met cela en place avec le Conseil.",
+      "card_parish": "Paroisse de Nkolndongo 1",
+      "card_preview": "Aperçu"
     }
   },
   "hero": {

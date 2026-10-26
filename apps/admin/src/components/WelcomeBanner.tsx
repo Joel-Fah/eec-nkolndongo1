@@ -1,4 +1,5 @@
 import { useLocale } from '@eec/admin-kit'
+import { callName } from '@eec/core'
 import { Link } from '@tanstack/react-router'
 import { useDashboardData, useInsights } from '../lib/dashboard'
 import { Icon } from './Icon'
@@ -28,8 +29,8 @@ export function WelcomeBanner() {
       <div className="welcome-copy">
         <p className="welcome-date">{today}</p>
         <h1 id="welcome-title" className="text-4xl">
-          {me?.user.firstName
-            ? t('common.greeting', { name: me.user.firstName })
+          {me && callName(me.user)
+            ? t('common.greeting', { name: callName(me.user) })
             : t('admin.dashboard')}
         </h1>
         <p className="max-w-[46ch] text-lg text-ink-muted">{t('admin.dashboard_text')}</p>

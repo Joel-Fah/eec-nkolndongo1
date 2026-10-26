@@ -75,3 +75,30 @@ export function empty(title: string, text: string, action?: HTMLElement) {
   return d
 }
 export const done = (box: HTMLElement) => box.removeAttribute('aria-busy')
+
+/** The icons the page drew at build time (data-icons), so no icon code ships in the scripts. */
+let icons: Record<string, string> = {}
+export const setIcons = (map: Record<string, string>) => {
+  icons = map
+}
+export function ico(name: string, cls = 'me-ico') {
+  const s = el('span', cls)
+  s.setAttribute('aria-hidden', 'true')
+  s.innerHTML = icons[name] ?? ''
+  return s
+}
+
+export type Profile = {
+  seed: number
+  photo: { url: string | null }
+  completeness: { filled: number; total: number; complete: boolean }
+}
+/** One read of the profile shared by the welcome and the home; forgotten when the profile changes. */
+let profileP: ReturnType<typeof api<Profile>> | null = null
+export const profile = () => {
+  profileP ??= api<Profile>('/me/profile')
+  return profileP
+}
+export const forgetProfile = () => {
+  profileP = null
+}

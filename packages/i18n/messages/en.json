@@ -1071,8 +1071,8 @@
       },
       "mespace": {
         "name": "Mon espace: sections and cards",
-        "desc": "For a signed-in member: a bar of five sections (Home, Registrations, Groups, Notifications, Profile), one at a time, each addressable (#accueil…) and loaded on demand, sticky and scrollable at 360 px. The content is made of cards: an uppercase kicker, a title, a detail line, a status pill (green, warning or grey) and actions. Gold cards mark what matters now; green ones this Sunday; a faded card announces what is coming (Communion card).",
-        "use": "<MeSections> (slot = Profile section) + scripts/mon-espace.ts, me-home / me-regs / me-groups / me-notifs.ts; classes .me-nav, .me-tab, .me-card, .me-pill, .me-wk, .me-empty. Everything is private (no-store) and drawn from /api/me/*.",
+        "desc": "Full width for a signed-in member: a welcome (soft band, greeting by time of day, shapes that gently follow the pointer, photo or avatar), then the navigation (vertical sticky menu on the left on desktop, with its “My space” title once the welcome has scrolled away; a five-icon bar on phones) and the card grid. Each section has its icon and an intro line; each card has an icon, clear text and an action. Sections are preloaded when the browser is idle: switching tabs is instant. The Communion card is a preview (twelve empty months) until decision 0050.",
+        "use": "<MeSections> + scripts/mon-espace.ts (home, preloading, menu title), me-home / me-regs / me-groups / me-notifs.ts; icons drawn at build time (data-icons). Classes .me-hero, .me-nav, .me-head, .me-ico, .me-card, .me-comm. Everything is private (no-store).",
         "a11y": "The bar is a navigation with aria-current; each section has a hidden heading; buttons are 44 px; cancelling and leaving a group ask for a second confirmation; statuses are said in words, never colour alone."
       },
       "headerbell": {
@@ -1306,7 +1306,11 @@
       "ordinaire": "Brush the leaves",
       "moissons": "Brush the ears of wheat"
     },
-    "photo_credits": "Photos: Pexels"
+    "photo_credits": "Photos: Pexels",
+    "member_title": "Your space is waiting",
+    "member_text": "Find your registrations, your groups and what matters to you this week.",
+    "member_open": "Open my space",
+    "member_sunday": "This Sunday"
   },
   "admin": {
     "title": "Administration",
@@ -2393,7 +2397,32 @@
       "policy_change_t": "The privacy policy changed",
       "policy_change_p": "Read the summary in Profile, then accept if asked.",
       "done": "Done",
-      "loading": "Loading…"
+      "loading": "Loading…",
+      "hero_title": "My space",
+      "hero_morning": "Good morning, {name}",
+      "hero_afternoon": "Good afternoon, {name}",
+      "hero_evening": "Good evening, {name}",
+      "hero_lead": "Take your time: everything that concerns you is here, quietly.",
+      "intro_home": "Your week at a glance.",
+      "intro_regs": "The activities you signed up for, and where you stand on the list.",
+      "intro_groups": "The groups you belong to and what they are preparing.",
+      "intro_notifs": "What changes for you: a freed place, an announcement, an important change.",
+      "intro_profile": "Your details, your photo, your choices and your devices. You stay in control.",
+      "next_reg_p": "Add it to your calendar so you don’t forget it.",
+      "none_reg_t": "Nothing planned yet",
+      "none_reg_p": "The parish’s upcoming activities are in the agenda: sign up in a few seconds.",
+      "sunday_p": "The theme, the readings and the order of service, to prepare for it.",
+      "groups_p": "The next gathering of your groups.",
+      "groups_none_p": "Departments, choirs, committees: find the one that suits you.",
+      "profile_p": "A few optional details help the parish look after you better. You can erase everything.",
+      "profile_ok_t": "Your profile is up to date",
+      "profile_ok_p": "Thank you. You can change or erase everything whenever you like.",
+      "card_k": "Communion card",
+      "card_soon": "Coming soon",
+      "card_t": "Your card, always with you",
+      "card_p": "Soon you will follow the year’s signed Communion Sundays here and be reminded before the preparation week ends. The parish is setting this up with the Council.",
+      "card_parish": "Nkolndongo 1 Parish",
+      "card_preview": "Preview"
     }
   },
   "hero": {

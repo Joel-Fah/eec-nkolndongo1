@@ -5,6 +5,7 @@
  * profile section is the slot (the existing profile, photo, data and devices panels, reorganised not rewritten).
  */
 import Icon from '@eec/ui/astro/Icon.astro'
+import { iconSvg } from '@eec/ui/icons'
 import { departmentHref, departmentsHref } from '../lib/departments-routes'
 import { eventHref, eventsListHref } from '../lib/events-routes'
 import { localeOf, useT } from '../lib/i18n'
@@ -37,8 +38,22 @@ const messages = Object.fromEntries(
     'profile_k',
     'profile_todo',
     'profile_go',
-    'soon_k',
-    'soon_t',
+    'next_reg_p',
+    'none_reg_t',
+    'none_reg_p',
+    'sunday_p',
+    'groups_p',
+    'groups_none_p',
+    'profile_p',
+    'profile_ok_t',
+    'profile_ok_p',
+    'card_k',
+    'card_soon',
+    'card_t',
+    'card_p',
+    'card_parish',
+    'card_preview',
+    'hero_title',
     'no_next',
     'regs_upcoming',
     'regs_past',
@@ -95,6 +110,31 @@ const messages = Object.fromEntries(
     'loading',
   ].map((k) => [k, m(k, ph)]),
 )
+const iconNames = [
+  'home',
+  'calendar',
+  'checklist',
+  'users',
+  'bell',
+  'account',
+  'sparkles',
+  'church',
+  'userRoundPlus',
+  'check',
+  'clock',
+  'location',
+  'heart',
+  'lock',
+  'arrowRight',
+] as const
+const icons = Object.fromEntries(iconNames.map((n) => [n, iconSvg(n, { size: 20 })]))
+const intros: Record<string, string> = {
+  accueil: m('intro_home'),
+  inscriptions: m('intro_regs'),
+  groupes: m('intro_groups'),
+  notifications: m('intro_notifs'),
+  profil: m('intro_profile'),
+}
 const links = {
   agenda: eventsListHref(locale),
   departments: departmentsHref(locale),
@@ -106,8 +146,9 @@ const links = {
 }
 ---
 
-<div class="me" data-me data-lang={locale} data-msgs={JSON.stringify(messages)} data-links={JSON.stringify(links)}>
+<div class="me" data-me data-lang={locale} data-msgs={JSON.stringify(messages)} data-links={JSON.stringify(links)} data-icons={JSON.stringify(icons)}>
   <nav class="me-nav" aria-label={m('nav_label')}>
+    <p class="me-nav-title" aria-hidden="true"><Icon name="sparkles" size={20} /><span>{m('hero_title')}</span></p>
     {
       sections.map(([id, icon, key], i) => (
         <a class="me-tab" href={`#${id}`} data-me-tab={id} aria-current={i === 0 ? 'page' : undefined}>
@@ -120,23 +161,23 @@ const links = {
   </nav>
 
   <section class="me-section" data-me-section="accueil" aria-labelledby="me-h-accueil">
-    <h3 class="sr-only" id="me-h-accueil">{m('nav_home')}</h3>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="home" size={20} /></span><div><h3 class="me-head-t" id="me-h-accueil">{m('nav_home')}</h3><p class="me-head-p">{intros.accueil}</p></div></header>
     <div class="me-cards" data-me-home aria-busy="true"><div class="me-skel"></div><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="inscriptions" hidden aria-labelledby="me-h-inscriptions">
-    <h3 class="sr-only" id="me-h-inscriptions">{m('nav_regs')}</h3>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="checklist" size={20} /></span><div><h3 class="me-head-t" id="me-h-inscriptions">{m('nav_regs')}</h3><p class="me-head-p">{intros.inscriptions}</p></div></header>
     <div class="me-cards" data-me-regs aria-busy="true"><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="groupes" hidden aria-labelledby="me-h-groupes">
-    <h3 class="sr-only" id="me-h-groupes">{m('nav_groups')}</h3>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="users" size={20} /></span><div><h3 class="me-head-t" id="me-h-groupes">{m('nav_groups')}</h3><p class="me-head-p">{intros.groupes}</p></div></header>
     <div class="me-cards" data-me-groups aria-busy="true"><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="notifications" hidden aria-labelledby="me-h-notifications">
-    <h3 class="sr-only" id="me-h-notifications">{m('nav_notifs')}</h3>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="bell" size={20} /></span><div><h3 class="me-head-t" id="me-h-notifications">{m('nav_notifs')}</h3><p class="me-head-p">{intros.notifications}</p></div></header>
     <div class="me-cards" data-me-notifs aria-busy="true"><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="profil" hidden aria-labelledby="me-h-profil">
-    <h3 class="sr-only" id="me-h-profil">{m('nav_profile')}</h3>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="account" size={20} /></span><div><h3 class="me-head-t" id="me-h-profil">{m('nav_profile')}</h3><p class="me-head-p">{intros.profil}</p></div></header>
     <slot />
   </section>
 </div>
@@ -195,6 +236,77 @@ const links = {
     font-size: 0.6875rem;
     font-weight: 700;
   }
+  .me-nav-title {
+    display: none;
+  }
+  .me-head {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+  .me-head-ico {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--season) 14%, var(--surface));
+    color: var(--season-ink);
+  }
+  .me-head-t {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1.15;
+  }
+  .me-head-p {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  .me-ico {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--season) 14%, transparent);
+    color: var(--season-ink);
+  }
+  .me-top {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .me-p {
+    color: var(--ink-muted);
+    font-size: var(--text-sm);
+  }
+  /* The headline of the menu: it appears once the welcome has scrolled out of view. */
+  @media (min-width: 64rem) {
+    .me-nav-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      padding-inline: 1rem;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      transition: max-height 0.3s var(--ease-out, ease), opacity 0.3s, padding 0.3s;
+    }
+    .me[data-past-hero] .me-nav-title {
+      max-height: 3rem;
+      opacity: 1;
+      padding-block: 0.5rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .me-nav-title {
+      transition: none;
+    }
+  }
   .me-section {
     display: grid;
     gap: 1rem;
@@ -232,6 +344,59 @@ const links = {
       margin-inline-start: auto;
     }
   }
+  .me-comm {
+    grid-column: 1 / -1;
+    max-width: 40rem;
+  }
+  .me-comm-face {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, color-mix(in oklab, var(--season) 22%, var(--surface-2)), color-mix(in oklab, var(--gold) 18%, var(--surface-2)));
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: transform 0.4s var(--ease-out, ease);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .me-comm-face:hover {
+      transform: perspective(40rem) rotateX(3deg) rotateY(-4deg);
+    }
+  }
+  .me-comm-ico {
+    display: inline-grid;
+    width: 1.5rem;
+    color: var(--season-ink);
+  }
+  .me-comm-parish {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+  }
+  .me-comm-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.375rem;
+    list-style: none;
+    padding: 0;
+  }
+  .me-comm-grid li {
+    display: grid;
+    place-items: center;
+    min-height: 2rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklab, var(--surface) 70%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--ink-muted);
+    font-size: 0.6875rem;
+    text-transform: capitalize;
+  }
+  .me-comm-tag {
+    justify-self: end;
+    color: var(--ink-muted);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
   .me-skel {
     height: 5rem;
     border-radius: var(--radius-lg);
@@ -250,9 +415,6 @@ const links = {
   }
   .me-card[data-tone='green'] {
     background: color-mix(in oklab, var(--primary) 10%, var(--surface));
-  }
-  .me-card[data-soon] {
-    opacity: 0.75;
   }
   .me-k {
     color: var(--ink-muted);
