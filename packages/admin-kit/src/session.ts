@@ -16,7 +16,16 @@ export type Me = {
     status: string
   }
   isSuperAdmin: boolean
-  roles: { role: string; groupId: string | null }[]
+  /** Staff with no password yet (signs in with Google only): sent to set one before anything else. */
+  needsPassword?: boolean
+  roles: {
+    role: string
+    groupId: string | null
+    nameFr: string
+    nameEn: string
+    groupFr: string | null
+    groupEn: string | null
+  }[]
   permissions: string[]
   /** Module id → switched on? (feature flags) */
   modules: Record<string, boolean>

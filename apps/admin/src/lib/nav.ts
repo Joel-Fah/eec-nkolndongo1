@@ -30,6 +30,15 @@ const ORDER: AdminNavEntry['group'][] = [
 
 const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
   {
+    id: 'mygroup',
+    group: 'members',
+    path: '/my-group',
+    icon: 'userMultiple',
+    label: 'admin.items.mygroup',
+    permission: 'core:group-roster',
+    order: 5,
+  },
+  {
     id: 'users',
     group: 'admin',
     path: '/users',

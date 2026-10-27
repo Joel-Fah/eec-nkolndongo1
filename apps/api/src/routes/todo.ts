@@ -3,7 +3,7 @@
  * for the admin home; tables are read by name (this is a roll-up across modules, not a module). Nothing here is public.
  */
 import { type AppEnv, requireSelf } from '@eec/api-kit'
-import { canAnywhere, type Principal } from '@eec/auth'
+import { canAnywhere, type Principal, scopeFor } from '@eec/auth'
 import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 
@@ -75,6 +75,42 @@ export const todoRoutes = new Hono<AppEnv>().get('/', requireSelf(), async (c) =
         : null,
     }
   }
+  // Colleagues asking this person to publish their news or events (they are closed when the item is published).
+  const asked = await db.execute<{ entity: string; n: number }>(
+    sql`select params->>'entity' as entity, count(*)::int as n from notifications
+      where user_id = ${me} and kind = 'publish_request' and resolved_at is null and dismissed_at is null
+      group by 1`,
+  )
+  out.publishRequests = {
+    news: asked.rows.find((r) => r.entity === 'news')?.n ?? 0,
+    events: asked.rows.find((r) => r.entity === 'events')?.n ?? 0,
+  }
+  // A leader's join requests waiting for an answer, in the groups they lead.
+  if (may('core:group-members')) {
+    const scope = scopeFor(p, 'core:group-members')
+    out.joinRequests =
+      scope === 'all'
+        ? await num(sql`select count(*)::int as n from group_requests where status = 'pending'`)
+        : scope.length
+          ? await num(
+              sql`select count(*)::int as n from group_requests where status = 'pending' and group_id in (${sql.join(
+                scope.map((g) => sql`${g}::uuid`),
+                sql`, `,
+              )})`,
+            )
+          : 0
+  }
+  // Communion cards: a second person's approval, and baptisms declared but not yet confirmed.
+  if (may('communion:approve'))
+    out.cardsToApprove = await num(
+      sql`select count(*)::int as n from communion_cards where status = 'proposed' and proposed_by is distinct from ${me}`,
+    )
+  if (may('communion:issue'))
+    out.baptismsToConfirm = await num(
+      sql`select count(*)::int as n from profiles p
+        where (p.baptised = true or p.confirmed = true) and p.sacrament_confirmed_at is null
+          and not exists (select 1 from communion_cards c where c.user_id = p.user_id)`,
+    )
   if (may('liturgy:read')) {
     const days = nextSundays(new Date(), 4)
     const rows = await db.execute<{ date: string }>(

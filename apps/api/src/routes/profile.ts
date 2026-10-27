@@ -4,7 +4,9 @@
  * and, at the photo's *staff* level, the picture (routes/members.ts). Audit lines never carry a value.
  */
 import { type AppEnv, audit, fail, requireSelf } from '@eec/api-kit'
+import { isStaff } from '@eec/auth'
 import {
+  adminBase,
   avatarSeed,
   type Completeness,
   emptyDetails,
@@ -16,13 +18,13 @@ import {
 } from '@eec/core'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { createPrivateStore, PHOTO_MAX_BYTES, sniffPhoto } from '../lib/private-store.ts'
 import { policyVersion } from '../policy.ts'
 
-const { profiles, consents, user, account } = schema
+const { profiles, consents, user, account, notifications } = schema
 const today = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 const text = (n: number) =>
@@ -55,6 +57,9 @@ const CLEARED = {
   photoKey: null,
   photoAsAvatar: false,
   photoUpdatedAt: null,
+  // what the member said about their baptism and confirmation goes with the consent (the parish's own confirmation stays)
+  baptised: null,
+  confirmed: null,
 }
 
 type Db = Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>
@@ -86,6 +91,8 @@ async function load(db: Db, userId: string) {
       photoKey: profiles.photoKey,
       photoAsAvatar: profiles.photoAsAvatar,
       photoUpdatedAt: profiles.photoUpdatedAt,
+      baptised: profiles.baptised,
+      confirmed: profiles.confirmed,
       createdAt: user.createdAt,
       // The picture Google gave at sign-in, if any: it counts as the person's photo until they choose another (decision 0047).
       image: user.image,
@@ -118,8 +125,34 @@ export const profileRoutes = new Hono<AppEnv>()
     if (actor?.principal.status !== 'active') return c.json({ signedIn: false })
     const db = await c.var.deps.db()
     const { row, completeness } = await load(db, actor.userId)
+    // Unread member notifications, for the bell in the header (a plain count: nothing is computed here).
+    const [unread] = await db
+      .select({ n: sql<number>`count(*)::int` })
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.userId, actor.userId),
+          inArray(notifications.kind, [
+            'waitlist_promoted',
+            'policy_change',
+            'group_announcement',
+            'group_decision',
+          ]),
+          isNull(notifications.readAt),
+          isNull(notifications.resolvedAt),
+          isNull(notifications.dismissedAt),
+        ),
+      )
+    // The groups I am in, so a group's public page can say « vous êtes membre » to me alone (nothing public).
+    const mine = await db
+      .select({ key: schema.groups.key })
+      .from(schema.groupMembers)
+      .innerJoin(schema.groups, eq(schema.groups.id, schema.groupMembers.groupId))
+      .where(eq(schema.groupMembers.userId, actor.userId))
     return c.json({
       signedIn: true,
+      groups: mine.map((g) => g.key),
+      unread: unread?.n ?? 0,
       seed: avatarSeed(actor.userId),
       incomplete: !completeness.complete,
       // The photo shows in the navbar only if its owner chose it as their avatar; otherwise the generated avatar does (the default).
@@ -141,7 +174,14 @@ export const profileRoutes = new Hono<AppEnv>()
       .from(account)
       .where(eq(account.userId, actor.userId))
     c.header('cache-control', 'private, no-store')
+    const principal = actor.principal
     return c.json({
+      // Mon espace points a team member to the admin, which they cannot be expected to guess (and tells one who still has to
+      // choose a password, whose rights wait, where to go). Everyone else gets nothing.
+      admin:
+        isStaff(principal) || principal.needsPassword
+          ? { url: adminBase(c.env.ADMIN_PATH), needsPassword: !!principal.needsPassword }
+          : null,
       // How this account signs in: Google, e-mail and password, or both.
       signIn: [
         ...new Set(
@@ -150,6 +190,8 @@ export const profileRoutes = new Hono<AppEnv>()
           ),
         ),
       ],
+      // Whether Google is set up at all (the link button is hidden otherwise).
+      googleEnabled: !!(c.env.GOOGLE_CLIENT_ID && c.env.GOOGLE_CLIENT_SECRET),
       consent,
       details,
       photo: {
@@ -162,6 +204,8 @@ export const profileRoutes = new Hono<AppEnv>()
           : (row?.image ?? null),
         asAvatar: !!row?.photoAsAvatar,
       },
+      // What the member said about their baptism and confirmation (decision 0050); not part of the completeness.
+      sacrament: { baptised: row?.baptised ?? null, confirmed: row?.confirmed ?? null },
       completeness,
       seed: avatarSeed(actor.userId),
     })

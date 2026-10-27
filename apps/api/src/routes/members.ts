@@ -7,6 +7,7 @@ import {
   type GoogleIntent,
   writeAudit,
 } from '@eec/auth'
+import { adminBase } from '@eec/core'
 import { schema } from '@eec/db'
 import { zValidator } from '@hono/zod-validator'
 import { eq, inArray } from 'drizzle-orm'
@@ -37,6 +38,8 @@ const google = z.object({
   /** Ticked by the person on the page (never pre-ticked). Without it, only existing members can sign in. */
   acceptPrivacy: z.boolean().default(false),
   acceptNews: z.boolean().default(false),
+  /** `admin`: started from the admin sign-in page; only staff who linked Google themselves come out signed in (0053). */
+  target: z.enum(['space', 'admin']).default('space'),
 })
 
 export const memberRoutes = new Hono<AppEnv>()
@@ -53,11 +56,12 @@ export const memberRoutes = new Hono<AppEnv>()
     return photoResponse(c.env, row.key)
   })
   // Starts "Continue with Google". The consent is carried through the redirect by a short-lived cookie and
-  // recorded (or refused) by the auth callback (packages/auth). Staff can never sign in this way.
+  // recorded (or refused) by the auth callback (packages/auth). Staff come in this way only with a Google account they
+  // linked themselves from Mon compte (decision 0053); the callback refuses a link made by an e-mail match.
   .post(
     '/google',
     publicRoute(
-      'Starts Google sign-in for members: rate-limited, consent is checked in the callback',
+      'Starts Google sign-in: rate-limited; consent and staff rules are checked in the callback',
     ),
     zValidator('json', google),
     async (c) => {
@@ -65,15 +69,18 @@ export const memberRoutes = new Hono<AppEnv>()
         return fail(c, 404, 'not_configured')
       const db = await c.var.deps.db()
       if (!(await allow(db, `google:${clientIp(c)}`, 20, 600))) return fail(c, 429, 'rate_limited')
-      const { locale, acceptPrivacy, acceptNews } = c.req.valid('json')
-      const here = `/${locale}/${locale === 'fr' ? 'mon-espace' : 'my-space'}/`
+      const { locale, acceptPrivacy, acceptNews, target } = c.req.valid('json')
+      const admin = adminBase(c.env.ADMIN_PATH)
+      const here =
+        target === 'admin' ? admin : `/${locale}/${locale === 'fr' ? 'mon-espace' : 'my-space'}/`
       const auth = await c.var.deps.auth()
       const res = await auth.api.signInSocial({
         body: {
           provider: 'google',
           callbackURL: here,
           newUserCallbackURL: here,
-          errorCallbackURL: `${here}?google=error`,
+          errorCallbackURL:
+            target === 'admin' ? `${admin}login?google=error` : `${here}?google=error`,
           disableRedirect: true,
         },
         asResponse: true,
@@ -86,6 +93,7 @@ export const memberRoutes = new Hono<AppEnv>()
         privacy: acceptPrivacy,
         news: acceptNews,
         v: await policyVersion(await c.var.deps.db()),
+        ...(target === 'admin' ? { a: 'admin' as const } : {}),
       }
       const headers = new Headers({ 'content-type': 'application/json' })
       for (const cookie of res.headers.getSetCookie()) headers.append('set-cookie', cookie)

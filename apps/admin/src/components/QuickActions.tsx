@@ -28,6 +28,13 @@ const ACTIONS: (Action & { end?: boolean })[] = [
     label: 'dash.qa_news',
   },
   {
+    permission: 'events:edit',
+    to: '/m/$module',
+    params: { module: 'events' },
+    icon: 'calendar',
+    label: 'dash.qa_event',
+  },
+  {
     permission: 'sundays:read',
     to: '/m/$module',
     params: { module: 'sundays' },

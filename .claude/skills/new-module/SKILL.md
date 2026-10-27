@@ -90,3 +90,11 @@ workspace package `@eec/module-<id>`. The reference implementation is `modules/s
 - **Admin strings:** the admin loads only the `admin.*` messages plus the module's own `i18n/*.json`; a key under `member.*` or `site.*` is missing there. After editing any message file run `pnpm --filter @eec/i18n build` (and restart `pnpm dev`).
 - **Anything private** (member data, photos, notifications) is `private, no-store`, in the service worker's private list, and audited without values. A new kind of personal data needs a decision record and a `data-protection.md` entry before code.
 - **Run the `owasp-security` skill** on every new route, upload or data field.
+
+## Lessons from Phase 05
+- **A person waiting is not a member:** model requests in their own table (`group_requests`), so no existing query can count or list them.
+- **Group-scoped rights in `core`:** use `requirePermissionAnywhere` then `mayOn(c, perm, groupId)` on the exact group; add the case to `modules/scope.test.ts`.
+- **Sensitive data (belief, discipline, money):** a decision record first; explicit acknowledgement in the UI and the API (`ack: true`); two-person rule for issuing; never a reason or a debt shown to the person; erased with the account.
+- **Help:** a guide in `apps/admin/help/{fr,en}/<slug>.md` and an entry in `GUIDES` (with `screens`) for the top-bar sheet; nothing instructional inline.
+- **Dev database is remote and slow:** a 5xx in `pnpm e2e` may be a timeout (the script retries); clear `rate_limit` rows if sign-ups hit 429.
+- **Raw hex** is not allowed in components; the one exception is the QR's white paper, so a scanner works in both themes.

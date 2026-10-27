@@ -31,7 +31,7 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
 ---
 
 <aside class="site-cta" aria-labelledby="site-cta-title">
-  <div class="site-cta-card">
+  <div class="site-cta-card" data-cta-guest>
     <div class="grid gap-2">
       <h2 id="site-cta-title" class="text-3xl" data-slot="home.invite_title">{t('footer.invite_title')}</h2>
       <p class="max-w-[48ch] text-ink-muted" data-slot="home.invite_text">{t('footer.invite_text')}</p>
@@ -39,6 +39,17 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
     <div class="flex flex-wrap gap-3">
       <Button href={href(locale, pathOf('trouver'))} size="lg"><Icon name="location" />{t('footer.invite_find')}</Button>
       <Button href={href(locale, pathOf('account'))} size="lg" variant="secondary">{t('footer.invite_account')}</Button>
+    </div>
+  </div>
+  {/* Shown instead of the invitation once the visitor is signed in (account-badge.ts). */}
+  <div class="site-cta-card" data-cta-member hidden>
+    <div class="grid gap-2">
+      <h2 class="text-3xl">{t('footer.member_title')}</h2>
+      <p class="max-w-[48ch] text-ink-muted">{t('footer.member_text')}</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <Button href={href(locale, pathOf('account'))} size="lg"><Icon name="home" />{t('footer.member_open')}</Button>
+      <Button href={href(locale, pathOf('dimanche'))} size="lg" variant="secondary">{t('footer.member_sunday')}</Button>
     </div>
   </div>
 </aside>
@@ -145,6 +156,9 @@ const mapTabs = tabs.filter((tab) => tab.children.length)
   .site-cta {
     margin-block-start: 6rem;
     padding-inline: 0.75rem;
+  }
+  .site-cta-card[hidden] {
+    display: none;
   }
   .site-cta-card {
     display: grid;

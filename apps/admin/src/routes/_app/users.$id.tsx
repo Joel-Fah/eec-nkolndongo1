@@ -33,6 +33,8 @@ type Detail = {
   roles: Grant[]
   groups: { groupId: string; nameFr: string; nameEn: string | null; titleFr: string | null }[]
   sessions: { id: string; createdAt: string; expiresAt: string; userAgent: string | null }[]
+  /** How the person signs in: Google, e-mail and password, or both. */
+  signIn: ('google' | 'email')[]
   activity: {
     id: string
     action: string
@@ -82,6 +84,7 @@ function Person() {
       .catch((e) => notify(t(errKey(e)), { tone: 'danger' }))
 
   const [confirmOff, setConfirmOff] = useState(false)
+  const [confirmGoogle, setConfirmGoogle] = useState(false)
   const [reset, setReset] = useState<{ url: string; expiresAt: string } | null>(null)
   const makeReset = useMutation({
     mutationFn: () =>
@@ -161,6 +164,30 @@ function Person() {
           run={run}
         />
         <section className="admin-panel">
+          <h2 className="text-xl">{t('admin.users.sign_in')}</h2>
+          <div className="flex flex-wrap gap-2">
+            {d.signIn.map((x) => (
+              <Badge key={x} tone={x === 'google' ? 'info' : 'primary'}>
+                {t(`admin.account.sign_${x}` as MessageKey)}
+              </Badge>
+            ))}
+          </div>
+          <p className="text-sm text-ink-muted">
+            {d.signIn.includes('google') && !d.signIn.includes('email')
+              ? t('admin.users.google_only')
+              : d.signIn.includes('google')
+                ? t('admin.users.google_both')
+                : t('admin.users.google_none')}
+          </p>
+          {hasPermission(me, 'core:users-deactivate') && !isSelf && d.signIn.includes('google') && (
+            <div>
+              <Button variant="secondary" size="sm" onClick={() => setConfirmGoogle(true)}>
+                {t('admin.users.google_remove')}
+              </Button>
+            </div>
+          )}
+        </section>
+        <section className="admin-panel">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-xl">{t('admin.users.sessions')}</h2>
             {hasPermission(me, 'core:users-deactivate') && d.sessions.length > 0 && (
@@ -226,6 +253,18 @@ function Person() {
             'admin.users.deactivated',
             () => api(`/users/${id}/reactivate`, { body: {} }),
           )
+        }}
+      />
+      <Confirm
+        open={confirmGoogle}
+        onOpenChange={setConfirmGoogle}
+        title={t('admin.users.google_remove')}
+        text={t('admin.users.google_remove_text', { name: u.name })}
+        confirmLabel={t('admin.users.google_remove')}
+        danger
+        onConfirm={() => {
+          setConfirmGoogle(false)
+          run(() => api(`/users/${id}/google`, { method: 'DELETE' }), 'admin.users.google_removed')
         }}
       />
       <Sheet
@@ -361,6 +400,9 @@ function Roles({
     <section className="admin-panel">
       <h2 className="text-xl">{t('admin.users.roles')}</h2>
       <p className="text-sm text-ink-muted">{t('admin.users.roles_help')}</p>
+      {canAssign && detail.signIn.includes('google') && !detail.signIn.includes('email') && (
+        <p className="text-sm text-ink-muted">{t('admin.users.roles_google_note')}</p>
+      )}
       <ul className="grid gap-2">
         {detail.roles.map((g) => (
           <li key={g.id} className="admin-row">

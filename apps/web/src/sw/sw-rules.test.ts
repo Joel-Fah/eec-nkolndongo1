@@ -14,6 +14,7 @@ const rules = ctx.__swRules as {
   keepable: (r: Response) => boolean
   keepableImage: (r: Response) => boolean
   MAX_PAGES: number
+  stale: (names: string[], keep: string[]) => string[]
 }
 const origin = 'https://site.test'
 const nav = (path: string, extra: Record<string, unknown> = {}) =>
@@ -43,14 +44,14 @@ describe('what the service worker may touch', () => {
     ])
       expect(nav(p), p).toBe('page')
   })
-  it('never touches the admin, the API, auth, Mon espace, previews, registrations, search, tokens', () => {
+  it('never touches the admin, the API, auth, card checks, previews, registrations, search, tokens', () => {
     for (const p of [
       '/admin/',
       '/gestion/m/news',
       '/api/members/me',
       '/api/auth/get-session',
-      '/fr/mon-espace/',
-      '/en/my-space/',
+      '/fr/verifier/abc.def',
+      '/en/verify/abc.def',
       '/fr/actualites/nouvelles/apercu/?t=abc',
       '/en/news/latest/preview/',
       '/fr/agenda/evenements/inscription/camp/',
@@ -68,6 +69,21 @@ describe('what the service worker may touch', () => {
         }),
         p,
       ).toBe('skip')
+  })
+  it('keeps only the empty shell of Mon espace (decision 0050): the page holds nothing personal, its data comes from /api and is never kept', () => {
+    expect(nav('/fr/mon-espace/')).toBe('page')
+    expect(nav('/en/my-space/')).toBe('page')
+    expect(nav('/fr/mon-espace/?t=abc')).toBe('skip')
+    expect(
+      rules.decide({
+        url: `${origin}/api/communion/me`,
+        method: 'GET',
+        mode: 'cors',
+        destination: '',
+        origin,
+        headers: new Headers(),
+      }),
+    ).toBe('skip')
   })
   it('ignores anything that is not a plain GET from our own origin, and ranges', () => {
     expect(nav('/fr/', { method: 'POST' })).toBe('skip')
@@ -134,4 +150,14 @@ describe('what may be kept', () => {
     expect(rules.keepableImage(res({ type: 'text/html' }))).toBe(false)
   })
   it('caps the pages kept', () => expect(rules.MAX_PAGES).toBe(40))
+
+  it('on activation deletes the caches of older builds and keeps every cache of this one (images included)', () => {
+    const keep = ['pages-b2', 'shell-b2', 'img-b2']
+    expect(rules.stale(['pages-b1', 'shell-b1', 'img-b1', ...keep], keep)).toEqual([
+      'pages-b1',
+      'shell-b1',
+      'img-b1',
+    ])
+    expect(rules.stale(keep, keep)).toEqual([])
+  })
 })
