@@ -1463,13 +1463,13 @@
       "err_already": "This role is already granted.",
       "err_email_taken": "An account already exists with this address.",
       "sign_in": "Sign-in",
-      "google_only": "This person signs in with Google only. After a role change they sign in again with Google: their team session lasts 12 h idle, 7 days at most.",
+      "google_only": "This person signs in with Google only. After a role change they sign in again with Google, then choose a password before using the admin (their rights wait until then). Their team session lasts 12 h idle, 7 days at most.",
       "google_both": "This person can sign in with Google or with their password.",
       "google_none": "Password only. Only the person can link Google, from their own account.",
       "google_remove": "Remove their Google account",
       "google_remove_text": "Remove the Google account of {name}? Their devices will be signed out. They can link it again, or ask for a password reset link.",
       "google_removed": "Google account removed.",
-      "roles_google_note": "This person signs in with Google only: the role applies at their next sign-in with Google."
+      "roles_google_note": "This person signs in with Google only: at their next sign-in they will have to choose a password before using the admin."
     },
     "roles": {
       "title": "Roles",
@@ -2279,6 +2279,14 @@
       "v3_cite": "John 3:16",
       "v4": "Haven’t I commanded you? Be strong and courageous. Don’t be afraid. Don’t be dismayed, for Yahweh your God is with you wherever you go.",
       "v4_cite": "Joshua 1:9"
+    },
+    "setpw": {
+      "title": "Choose a password",
+      "lead": "You are now part of the team. To keep the account safe, choose a password: it stays your back-up way in if Google is unavailable, even if your role changes later.",
+      "again": "The same password, once more",
+      "submit": "Save and continue",
+      "later": "Sign out",
+      "mismatch": "The two passwords do not match."
     }
   },
   "member": {

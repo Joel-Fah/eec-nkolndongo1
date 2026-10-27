@@ -75,6 +75,8 @@ export const meRoutes = new Hono<AppEnv>()
     return c.json({
       user: row,
       isSuperAdmin: p.isSuperAdmin,
+      // A staff member who has no password yet (decision 0053): the admin sends them to set one before anything else.
+      needsPassword: !!p.needsPassword,
       roles: p.grants.map((g) => ({ role: g.roleKey, groupId: g.groupId })),
       // The UI hides what you can't do; the API remains the authority.
       permissions: p.isSuperAdmin
@@ -134,6 +136,47 @@ export const meRoutes = new Hono<AppEnv>()
     })
     return c.json({ ok: true })
   })
+
+  // Set a first password (decision 0053): for a staff member who only signs in with Google. Nobody who already has one:
+  // they use "change password". Their other sessions are closed, like a change.
+  .post(
+    '/password/set',
+    requireSelf(),
+    zValidator('json', z.object({ next: z.string().max(200) })),
+    async (c) => {
+      const actor = await c.var.deps.actor()
+      if (!actor) return fail(c, 401, 'unauthenticated')
+      const db = await c.var.deps.db()
+      if (!(await allow(db, `password-set:${actor.userId}`, 10, 3600)))
+        return fail(c, 429, 'rate_limited')
+      const { next } = c.req.valid('json')
+      const problem = checkPassword(next)
+      if (problem) return fail(c, 400, `password_${problem}` as 'password_too_short')
+      const [have] = await db
+        .select({ id: account.id })
+        .from(account)
+        .where(and(eq(account.userId, actor.userId), eq(account.providerId, 'credential')))
+      if (have) return fail(c, 409, 'has_password')
+      await db.insert(account).values({
+        userId: actor.userId,
+        accountId: actor.userId,
+        providerId: 'credential',
+        password: sql`eec_hash_password(${next})`,
+      })
+      const keep = await currentSessionId(c)
+      await db
+        .delete(session)
+        .where(and(eq(session.userId, actor.userId), keep ? ne(session.id, keep) : undefined))
+      await audit(c, {
+        action: 'password.set',
+        entityType: 'account',
+        entityId: actor.userId,
+        summaryFr: 'Premier mot de passe choisi (autres sessions fermées)',
+        summaryEn: 'First password chosen (other sessions closed)',
+      })
+      return c.json({ ok: true })
+    },
+  )
 
   // Add Google to my own account (decision 0053): from a signed-in session only, with the password asked again when
   // there is one, so a stolen session cannot add someone else's Google. The Google address may differ from mine.

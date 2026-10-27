@@ -29,7 +29,7 @@ Vous pouvez relier votre compte Google pour vous connecter avec lui, **en plus**
 
 - Seule la personne connectée peut relier Google. Le secrétariat ne peut pas le faire à sa place, et Google n’est jamais relié par la seule adresse e-mail.
 - **Retirer Google** le détache à tout moment. Si Google est votre seul moyen de connexion, demandez un lien de réinitialisation au secrétariat pour choisir un mot de passe avant de le retirer.
-- Si vous vous êtes inscrit avec Google avant d’avoir un rôle dans l’équipe, il continue de fonctionner : reconnectez-vous avec Google après le changement de rôle.
+- Si vous vous êtes inscrit avec Google avant d’avoir un rôle dans l’équipe, Google continue de fonctionner : reconnectez-vous avec Google après le changement de rôle. L’administration vous demande alors de **choisir un mot de passe** (accès de secours, et compte protégé même si votre rôle change plus tard). Vos droits reviennent dès qu’il est enregistré.
 
 ## Bon à savoir
 

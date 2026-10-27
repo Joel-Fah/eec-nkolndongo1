@@ -30,7 +30,7 @@ You can link your Google account to sign in with it, **as well as** your passwor
 
 - Only the signed-in person can link Google. The secretariat cannot do it for you, and Google is never linked by the e-mail address alone.
 - **Remove Google** detaches it at any time. If Google is your only way in, ask the secretariat for a reset link to choose a password before removing it.
-- If you signed up with Google before you had a team role, it keeps working: sign in with Google again after the role change.
+- If you signed up with Google before you had a team role, Google keeps working: sign in with Google again after the role change. The admin then asks you to **choose a password** (a back-up way in, and a protected account even if your role changes later). Your rights come back as soon as it is saved.
 
 ## Good to know
 

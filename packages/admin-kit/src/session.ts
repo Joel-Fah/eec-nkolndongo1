@@ -16,6 +16,8 @@ export type Me = {
     status: string
   }
   isSuperAdmin: boolean
+  /** Staff with no password yet (signs in with Google only): sent to set one before anything else. */
+  needsPassword?: boolean
   roles: { role: string; groupId: string | null }[]
   permissions: string[]
   /** Module id → switched on? (feature flags) */

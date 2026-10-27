@@ -3,6 +3,7 @@ import { dbUrl } from '@eec/api-kit'
 import { createAuth, isStaff, loadPrincipal, slideSession } from '@eec/auth'
 import { adminBase } from '@eec/core'
 import { connect, type Db, schema } from '@eec/db'
+import { and, eq } from 'drizzle-orm'
 import type { MiddlewareHandler } from 'hono'
 import { policyVersion } from './policy.ts'
 
@@ -46,11 +47,27 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
     const a = await getAuth()
     const session = await a.api.getSession({ headers: c.req.raw.headers })
     if (!session) return null
-    const principal = await loadPrincipal(await db(), session.user.id)
+    const loaded = await loadPrincipal(await db(), session.user.id)
+    const staff = isStaff(loaded)
+    // A staff member with no password (a Google-only member given a role, decision 0053) has every right suspended until
+    // they set one: the request sees a member with nothing, and `needsPassword` tells the admin where to send them.
+    let principal = loaded
+    if (loaded && staff) {
+      const [pw] = await (await db())
+        .select({ id: schema.account.id })
+        .from(schema.account)
+        .where(
+          and(
+            eq(schema.account.userId, session.user.id),
+            eq(schema.account.providerId, 'credential'),
+          ),
+        )
+        .limit(1)
+      if (!pw) principal = { ...loaded, isSuperAdmin: false, grants: [], needsPassword: true }
+    }
     actor = principal ? { userId: session.user.id, principal } : undefined
     // Rolling session lifetime (staff 12 h idle / 7 days max; members 30 days).
-    if (principal)
-      await slideSession(await db(), session.session, isStaff(principal)).catch(() => {})
+    if (principal) await slideSession(await db(), session.session, staff).catch(() => {})
     return actor ?? null
   }
 

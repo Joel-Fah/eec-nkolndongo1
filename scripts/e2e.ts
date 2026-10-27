@@ -1211,6 +1211,15 @@ const stamp = Date.now().toString(36)
   })
   // 404 when Google is not set up on this environment, 400 when it is (the password is asked again)
   ok('google: linking asks for the password again', wrong.status === 400 || wrong.status === 404)
+  ok(
+    'google: a staff account with a password is not asked for one',
+    me.json.needsPassword === false,
+  )
+  const again = await api('/me/password/set', {
+    method: 'POST',
+    body: JSON.stringify({ next: 'une-autre-phrase-solide-2026' }),
+  })
+  ok('google: a first password cannot be set over an existing one', again.status === 409)
   const none = await api('/me/google', { method: 'DELETE' })
   ok('google: nothing to remove when none is linked', none.status === 404 || none.status === 409)
   const person = await api(`/users/${me.json.user?.id}`)

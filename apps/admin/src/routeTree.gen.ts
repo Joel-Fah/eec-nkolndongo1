@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAuditRouteImport } from './routes/_app/audit'
@@ -36,6 +37,11 @@ const AppRoute = AppRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetPasswordRoute = SetPasswordRouteImport.update({
+  id: '/set-password',
+  path: '/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -127,6 +133,7 @@ const AppUsersIdRoute = AppUsersIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/_app/account': typeof AppAccountRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/groups': typeof AppGroupsRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/set-password'
     | '/account'
     | '/audit'
     | '/groups'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/set-password'
     | '/account'
     | '/audit'
     | '/groups'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/login'
+    | '/set-password'
     | '/_app/account'
     | '/_app/audit'
     | '/_app/groups'
@@ -253,6 +265,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SetPasswordRoute: typeof SetPasswordRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ResetTokenRoute: typeof ResetTokenRoute
 }
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-password': {
+      id: '/set-password'
+      path: '/set-password'
+      fullPath: '/set-password'
+      preLoaderRoute: typeof SetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -436,6 +456,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  SetPasswordRoute: SetPasswordRoute,
   InviteTokenRoute: InviteTokenRoute,
   ResetTokenRoute: ResetTokenRoute,
 }

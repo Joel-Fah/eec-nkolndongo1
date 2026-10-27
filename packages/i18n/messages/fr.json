@@ -1463,13 +1463,13 @@
       "err_already": "Ce rôle est déjà attribué.",
       "err_email_taken": "Un compte existe déjà avec cette adresse.",
       "sign_in": "Connexion",
-      "google_only": "Cette personne se connecte avec Google uniquement. Après un changement de rôle, elle se reconnecte avec Google : sa session d’équipe dure 12 h d’inactivité, 7 jours au plus.",
+      "google_only": "Cette personne se connecte avec Google uniquement. Après un changement de rôle, elle se reconnecte avec Google, puis choisit un mot de passe avant d’utiliser l’administration (ses droits attendent jusque-là). Sa session d’équipe dure 12 h d’inactivité, 7 jours au plus.",
       "google_both": "Cette personne peut se connecter avec Google ou avec son mot de passe.",
       "google_none": "Mot de passe uniquement. Seule la personne peut relier Google, depuis son compte.",
       "google_remove": "Retirer son compte Google",
       "google_remove_text": "Retirer le compte Google de {name} ? Ses appareils seront déconnectés. La personne pourra le relier de nouveau, ou demander un lien de réinitialisation du mot de passe.",
       "google_removed": "Compte Google retiré.",
-      "roles_google_note": "Cette personne se connecte avec Google uniquement : le rôle s’applique à sa prochaine connexion avec Google."
+      "roles_google_note": "Cette personne se connecte avec Google uniquement : à sa prochaine connexion, elle devra choisir un mot de passe avant d’utiliser l’administration."
     },
     "roles": {
       "title": "Rôles",
@@ -2279,6 +2279,14 @@
       "v3_cite": "Jean 3 : 16",
       "v4": "Ne t’ai-je pas donné cet ordre : Fortifie-toi et prends courage ? Ne t’effraie point et ne t’épouvante point, car l’Éternel, ton Dieu, est avec toi dans tout ce que tu entreprendras.",
       "v4_cite": "Josué 1 : 9"
+    },
+    "setpw": {
+      "title": "Choisissez un mot de passe",
+      "lead": "Vous faites maintenant partie de l’équipe. Pour la sécurité du compte, choisissez un mot de passe : il reste votre accès de secours si Google n’est pas disponible, même si votre rôle change plus tard.",
+      "again": "Le même mot de passe, encore une fois",
+      "submit": "Enregistrer et continuer",
+      "later": "Me déconnecter",
+      "mismatch": "Les deux mots de passe ne sont pas identiques."
     }
   },
   "member": {
