@@ -100,6 +100,7 @@ import {
   PlusSignIcon,
   PrinterIcon,
   PulseRectangle01Icon,
+  QuillWrite01Icon,
   QuoteDownIcon,
   ReceiptTextIcon,
   Redo02Icon,
@@ -268,6 +269,8 @@ export const icons = {
   party: PartyIcon,
   mic: Mic01Icon,
   sparkles: SparklesIcon,
+  /** The « Le saviez-vous ? » cards on the admin dashboard. */
+  tip: QuillWrite01Icon,
   underline: TextUnderlineIcon,
   strike: TextStrikethroughIcon,
   highlight: HighlighterIcon,

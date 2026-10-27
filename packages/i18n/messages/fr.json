@@ -2670,7 +2670,6 @@
     "insight_groups": "Aucun groupe n’existe encore : créez-les pour classer les membres.",
     "insight_groups_do": "Créer les groupes",
     "insight_ok": "Tout est à jour : rien n’attend votre attention.",
-    "insight_ok_do": "Voir le tableau de bord",
     "quick": "Actions rapides",
     "qa_upload": "Ajouter une photo",
     "qa_settings": "Paramètres",
@@ -2731,7 +2730,20 @@
     "insight_messages_do": "Ouvrir la boîte",
     "insight_drafts_news": "{n} brouillon(s) d’actualité : demandez la publication quand c’est prêt.",
     "insight_drafts_events": "{n} brouillon(s) d’événement : demandez la publication quand c’est prêt.",
-    "insight_drafts_do": "Ouvrir mes brouillons"
+    "insight_drafts_do": "Ouvrir mes brouillons",
+    "tip_kicker": "Le saviez-vous ?",
+    "tip_search": "Tapez ⌘K (ou Ctrl K) pour aller n’importe où en quelques lettres.",
+    "tip_help": "L’icône ? en haut ouvre l’aide de la page où vous êtes.",
+    "tip_dark": "Le thème sombre se choisit en haut : plus doux pour les yeux le soir.",
+    "tip_roster": "Dans Mon groupe, un numéro n’apparaît que si le membre a choisi de le partager.",
+    "tip_announce": "Une annonce de groupe arrive dans l’espace de chaque membre.",
+    "tip_autosave": "Votre texte est enregistré tout seul : fermez l’onglet sans crainte.",
+    "tip_english": "Sans version anglaise, les visiteurs anglophones voient le français.",
+    "tip_register": "Un événement peut ouvrir ses inscriptions : cochez-le dans sa fiche.",
+    "tip_waitlist": "La liste d’attente avance d’elle-même quand une place se libère.",
+    "tip_twoeyes": "Une carte de Sainte-Cène se fait à deux : une personne propose, une autre approuve.",
+    "tip_figures": "Les chiffres saisis ne comptent nulle part tant qu’une autre personne ne les a pas validés.",
+    "tip_journal": "Le journal d’activité dit qui a changé quoi, sans garder de données personnelles."
   },
   "content": {
     "status": {

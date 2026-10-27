@@ -57,13 +57,16 @@ export function WelcomeBanner() {
               <span className="insight-icon" aria-hidden="true">
                 <Icon name={c.icon} size={20} />
               </span>
+              {c.tip && <p className="insight-kicker">{t('dash.tip_kicker')}</p>}
               <p className="insight-text">
                 {t(c.text as never, { n: String(c.n ?? '') } as never)}
               </p>
-              <Link to={c.to} params={c.params as never} className="insight-action">
-                {t(c.action as never, {} as never)}
-                <Icon name="arrowRight" size={16} />
-              </Link>
+              {c.to && c.action && (
+                <Link to={c.to} params={c.params as never} className="insight-action">
+                  {t(c.action as never, {} as never)}
+                  <Icon name="arrowRight" size={16} />
+                </Link>
+              )}
             </li>
           ))}
         </ul>

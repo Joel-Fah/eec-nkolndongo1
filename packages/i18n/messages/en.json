@@ -2670,7 +2670,6 @@
     "insight_groups": "No group exists yet: create them to sort members.",
     "insight_groups_do": "Create the groups",
     "insight_ok": "All up to date: nothing needs your attention.",
-    "insight_ok_do": "See the dashboard",
     "quick": "Quick actions",
     "qa_upload": "Add a photo",
     "qa_settings": "Settings",
@@ -2731,7 +2730,20 @@
     "insight_messages_do": "Open the inbox",
     "insight_drafts_news": "{n} news draft(s): ask for publication when ready.",
     "insight_drafts_events": "{n} event draft(s): ask for publication when ready.",
-    "insight_drafts_do": "Open my drafts"
+    "insight_drafts_do": "Open my drafts",
+    "tip_kicker": "Did you know?",
+    "tip_search": "Press ⌘K (or Ctrl K) to jump anywhere in a few letters.",
+    "tip_help": "The ? icon at the top opens help for the page you are on.",
+    "tip_dark": "Pick the dark theme at the top: easier on the eyes at night.",
+    "tip_roster": "In My group, a number only shows if the member chose to share it.",
+    "tip_announce": "A group announcement reaches every member in their space.",
+    "tip_autosave": "Your text saves itself: close the tab without worry.",
+    "tip_english": "Without an English version, English-speaking visitors see French.",
+    "tip_register": "An event can open registrations: tick it in its page.",
+    "tip_waitlist": "The waitlist moves up by itself when a place frees up.",
+    "tip_twoeyes": "A Communion card takes two people: one proposes, another approves.",
+    "tip_figures": "Figures you enter count nowhere until someone else validates them.",
+    "tip_journal": "The activity log says who changed what, without keeping personal data."
   },
   "content": {
     "status": {

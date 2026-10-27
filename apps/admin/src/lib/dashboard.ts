@@ -96,9 +96,64 @@ export type Insight = {
   /** i18n key for the sentence; `n` is filled in. */
   text: string
   n?: number
-  action: string
-  to: '/outbox' | '/validate' | '/health' | '/m/$module' | '/groups' | '/my-group' | '/'
+  /** A card that only informs (« Tout est à jour », « Le saviez-vous ? ») has no action and no link. */
+  action?: string
+  to?: '/outbox' | '/validate' | '/health' | '/m/$module' | '/groups' | '/my-group' | '/'
   params?: { module: string }
+  /** « Le saviez-vous ? »: a short piece of advice for the person's role. */
+  tip?: boolean
+}
+
+/**
+ * « Le saviez-vous ? »: short, true things about the admin that suit the person's rights, so the card is useful for any
+ * role. One is chosen per day (it changes slowly, and never between two renders of the same day).
+ */
+const TIPS: { key: string; needs?: string }[] = [
+  { key: 'search' },
+  { key: 'help' },
+  { key: 'dark' },
+  { key: 'roster', needs: 'core:group-roster' },
+  { key: 'announce', needs: 'announcements:publish' },
+  { key: 'autosave', needs: 'news:edit' },
+  { key: 'english', needs: 'news:edit' },
+  { key: 'register', needs: 'events:edit' },
+  { key: 'waitlist', needs: 'registrations:manage' },
+  { key: 'twoeyes', needs: 'communion:approve' },
+  { key: 'figures', needs: 'campaigns:edit' },
+  { key: 'journal', needs: 'core:audit-read' },
+]
+
+/** The date in Douala, `2026-10-27`: a new tip each day, whatever time zone the browser is in. */
+const dayKey = (offset = 0) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(
+    Date.now() + offset * 86_400_000,
+  )
+
+/** A small stable hash: the same person gets the same tip all day, a different one tomorrow (not the order of a list). */
+const hash = (text: string) => {
+  let h = 2166136261
+  for (const ch of text) h = Math.imul(h ^ ch.charCodeAt(0), 16777619)
+  return h >>> 0
+}
+
+/**
+ * One tip for this person today: chosen at random among those that suit their rights (the general ones only when nothing
+ * fits their role), never the same as yesterday's.
+ */
+export function tipFor(me: Parameters<typeof hasPermission>[0], today = dayKey()): Insight | null {
+  const mine = TIPS.filter((x) => !x.needs || hasPermission(me, x.needs))
+  const specific = mine.filter((x) => x.needs)
+  const pool = specific.length ? specific : mine
+  if (!pool.length) return null
+  const who = (me as { user?: { id?: string } } | null | undefined)?.user?.id ?? ''
+  const at = (day: string) => hash(`${day}:${who}`) % pool.length
+  let i = at(today)
+  // Yesterday's pick is worked out the same way, so tomorrow never repeats today's while there is a choice.
+  if (pool.length > 1 && i === at(dayKey(-1))) i = (i + 1) % pool.length
+  const pick = pool[i]
+  return pick
+    ? { key: `tip-${pick.key}`, icon: 'tip', text: `dash.tip_${pick.key}`, tip: true }
+    : null
 }
 
 /**
@@ -242,13 +297,11 @@ export function useInsights(): Insight[] {
       to: '/groups',
     })
   const loaded = !!(outbox.data || validation.data || media.data || members.data || todo.data)
-  if (loaded && out.length === 0)
-    out.push({
-      key: 'ok',
-      icon: 'check',
-      text: 'dash.insight_ok',
-      action: 'dash.insight_ok_do',
-      to: '/',
-    })
+  if (loaded && out.length === 0) out.push({ key: 'ok', icon: 'check', text: 'dash.insight_ok' })
+  // Never fewer than two cards: a quiet day gets « all good » and a tip for the person's role.
+  if (loaded && out.length < 2) {
+    const tip = tipFor(me)
+    if (tip) out.push(tip)
+  }
   return out.slice(0, 4)
 }
