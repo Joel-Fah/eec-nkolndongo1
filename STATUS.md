@@ -8,6 +8,8 @@ Branch `feat/phase-05a-member-home` (PR open, **not merged**). Report: `docs/pha
 
 **Since the PR was opened (local commit, not pushed):** Google for staff (0053). A staff member adds Google from Mon compte (password asked again) and then signs in with it from the admin page; a link made by an e-mail match is refused; a member who signed up with Google and later got a role keeps the link they made, but must choose a password on first admin use (rights suspended until then). No migration, no new secret. Needs `GOOGLE_CLIENT_ID/SECRET` on the environment (same as members). To try on dev: sign in as a staff account, Mon compte → Connexion avec Google.
 
+**Group leaders (local commit, run `pnpm db:seed` on each environment to apply):** « Responsable de groupe » can now write events (`events:read`, `events:edit`, for their group) as well as news; « Secrétariat » gets `events:read/edit/publish` and publishes what leaders draft. A leader's new news/event is created for their group (no more 403). The admin shows the role in the top bar, the profile menu and the welcome banner (same banner height for every role); Mon espace's group tab uses the user-multiple icon; the profile menu has leading icons.
+
 ## Production
 - **Phase 04 is live** (PR #6 merged 2026-10-25; the deploy workflow applied the migrations; `db:seed` and `bible:seed` ran). `SITE_INDEXABLE` is **not** set (noindex).
 - **Not yet applied on production:** migrations **0036–0040** and the seed (they ship with the Phase 05 merge). Before that merge: a Neon backup branch `pre-phase-05` and a working backup.

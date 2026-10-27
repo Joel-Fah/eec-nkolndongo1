@@ -59,7 +59,7 @@ export async function initGroups(ctx: Ctx, box: HTMLElement, onChange: () => voi
     const words = el('div', 'grid')
     words.append(el('span', 'me-t', nameOf(g)))
     top.append(
-      ico('users'),
+      ico('userMultiple'),
       words,
       el('span', 'me-pill', (en && g.titleEn) || g.titleFr || (m.member_badge ?? '')),
     )
@@ -141,7 +141,7 @@ export async function initGroups(ctx: Ctx, box: HTMLElement, onChange: () => voi
       const top = el('div', 'me-top')
       const words = el('div', 'grid')
       words.append(el('span', 'me-t', nameOf(g)))
-      top.append(ico('users'), words)
+      top.append(ico('userMultiple'), words)
       c.append(top)
       const desc = (en && g.descriptionEn) || g.descriptionFr
       if (desc) c.append(el('p', 'me-p', desc))

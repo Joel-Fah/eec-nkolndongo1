@@ -772,6 +772,22 @@ const stamp = Date.now().toString(36)
       'groups: a leader of one group is refused another group (scope)',
       (await lead(`/group-space/${g2}`)).status === 403,
     )
+    // A leader writes news and events for their own group as drafts; the secretariat publishes (validation).
+    for (const kind of ['news', 'events']) {
+      const made = await lead(`/${kind}`, { method: 'POST', body: '{}' })
+      const one = made.json.id ? await lead(`/${kind}/${made.json.id}`) : null
+      ok(
+        `groups: a leader's new ${kind} item is a draft of their group`,
+        made.status === 201 && one?.json.groupId === g1,
+      )
+      ok(
+        `groups: a leader cannot publish ${kind} (the secretariat does)`,
+        !!made.json.id &&
+          (await lead(`/${kind}/${made.json.id}/publish`, { method: 'POST', body: '{}' }))
+            .status === 403,
+      )
+      if (made.json.id) await api(`/${kind}/${made.json.id}`, { method: 'DELETE' })
+    }
     ok(
       'groups: a plain member cannot open Mon groupe',
       (await joiner.as(`/group-space/mine`)).status === 403,

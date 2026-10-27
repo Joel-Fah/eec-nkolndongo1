@@ -59,6 +59,7 @@ import {
   HighlighterIcon,
   Home03Icon,
   HourglassIcon,
+  IdIcon,
   Image01Icon,
   Image02Icon,
   ImageUpIcon,
@@ -142,6 +143,7 @@ import {
   UploadCircle01Icon,
   UserCircleIcon,
   UserGroupIcon,
+  UserMultipleIcon,
   UserRoundPlusIcon,
   ViewIcon,
   ViewOffIcon,
@@ -159,6 +161,8 @@ export const icons = {
   book: BookOpen01Icon,
   music: MusicNote03Icon,
   users: UserGroupIcon,
+  /** « Mes groupes » / « Mon groupe »: the member's own groups (not the parish's groups in general). */
+  userMultiple: UserMultipleIcon,
   print: PrinterIcon,
   department: DepartementIcon,
   heart: FavouriteIcon,
@@ -205,6 +209,8 @@ export const icons = {
   alert: Alert02Icon,
   clock: Clock01Icon,
   account: UserCircleIcon,
+  /** The name-and-address card at the top of the profile menu. */
+  id: IdIcon,
   settings: Settings02Icon,
   logout: Logout01Icon,
   command: CommandIcon,

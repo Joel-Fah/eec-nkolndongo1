@@ -93,7 +93,7 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
   const gs = (groups.json.items ?? []).filter((g) => g.next)
   if (gs.length) {
     const c = card()
-    c.append(head('users', m.groups_k ?? ''), el('p', 'me-p', m.groups_p))
+    c.append(head('userMultiple', m.groups_k ?? ''), el('p', 'me-p', m.groups_p))
     for (const g of gs.slice(0, 3))
       c.append(
         el(
@@ -106,7 +106,10 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
     box.append(c)
   } else if (groups.ok) {
     const c = card()
-    c.append(head('users', m.groups_k ?? '', m.groups_empty_t), el('p', 'me-p', m.groups_none_p))
+    c.append(
+      head('userMultiple', m.groups_k ?? '', m.groups_empty_t),
+      el('p', 'me-p', m.groups_none_p),
+    )
     c.append(link(m.groups_discover ?? '', links.departments, 'btn btn-secondary btn-sm'))
     box.append(c)
   }

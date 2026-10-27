@@ -33,7 +33,7 @@ const core: (NavItem & { group: AdminNavEntry['group'] })[] = [
     id: 'mygroup',
     group: 'members',
     path: '/my-group',
-    icon: 'users',
+    icon: 'userMultiple',
     label: 'admin.items.mygroup',
     permission: 'core:group-roster',
     order: 5,

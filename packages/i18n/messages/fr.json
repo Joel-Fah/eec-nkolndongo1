@@ -1359,7 +1359,8 @@
       "profile": "Mon profil",
       "signout": "Se déconnecter",
       "menu_incomplete": "Menu du compte — votre profil est à compléter",
-      "to_complete": "À compléter"
+      "to_complete": "À compléter",
+      "roles": "Vos rôles"
     },
     "palette": {
       "open": "Ouvrir la recherche rapide",
@@ -2712,7 +2713,8 @@
     "visits_top": "Pages les plus lues",
     "visits_gap": "Seules les pages servies à la demande sont comptées : la page d’accueil et les pages fixes ne le sont pas.",
     "qa_news": "Écrire une actualité",
-    "qa_sunday": "Bilan du dimanche"
+    "qa_sunday": "Bilan du dimanche",
+    "qa_event": "Créer un événement"
   },
   "content": {
     "status": {

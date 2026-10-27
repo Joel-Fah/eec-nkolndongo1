@@ -9,6 +9,7 @@ import { type FormEvent, useEffect, useState } from 'react'
 import { Confirm, deviceName, fmt, notify, PageHeader } from '../../components/kit'
 import { PasswordField } from '../../components/PasswordField'
 import { ProfilePanel, useMyProfile } from '../../components/ProfilePanel'
+import { roleLabels } from '../../lib/roles'
 import { type ThemeChoice, useTheme } from '../../lib/theme'
 
 export const Route = createFileRoute('/_app/account')({ component: Account })
@@ -108,11 +109,13 @@ function Account() {
                   {t(`admin.account.sign_${x}` as MessageKey)}
                 </Badge>
               ))}
-              {(me?.roles ?? []).slice(0, 3).map((r) => (
-                <Badge key={`${r.role}${r.groupId ?? ''}`} tone="gold">
-                  {r.role}
-                </Badge>
-              ))}
+              {roleLabels(me, locale)
+                .slice(0, 3)
+                .map((r) => (
+                  <Badge key={r.key} tone="gold">
+                    {r.label}
+                  </Badge>
+                ))}
             </div>
           </div>
 

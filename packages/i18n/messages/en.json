@@ -1359,7 +1359,8 @@
       "profile": "My profile",
       "signout": "Sign out",
       "menu_incomplete": "Account menu — your profile needs completing",
-      "to_complete": "To complete"
+      "to_complete": "To complete",
+      "roles": "Your roles"
     },
     "palette": {
       "open": "Open quick search",
@@ -2712,7 +2713,8 @@
     "visits_top": "Most read pages",
     "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not.",
     "qa_news": "Write a news post",
-    "qa_sunday": "Sunday report"
+    "qa_sunday": "Sunday report",
+    "qa_event": "Create an event"
   },
   "content": {
     "status": {

@@ -2,6 +2,7 @@ import { useLocale } from '@eec/admin-kit'
 import { callName } from '@eec/core'
 import { Link } from '@tanstack/react-router'
 import { useDashboardData, useInsights } from '../lib/dashboard'
+import { roleLabels } from '../lib/roles'
 import { Icon } from './Icon'
 import { Illustration } from './Illustration'
 
@@ -14,6 +15,7 @@ import { Illustration } from './Illustration'
 export function WelcomeBanner() {
   const { t, locale } = useLocale()
   const { me } = useDashboardData()
+  const roles = roleLabels(me, locale)
   const insights = useInsights()
   const long = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
@@ -34,6 +36,15 @@ export function WelcomeBanner() {
             : t('admin.dashboard')}
         </h1>
         <p className="max-w-[46ch] text-lg text-ink-muted">{t('admin.dashboard_text')}</p>
+        {roles.length > 0 && (
+          <ul className="welcome-roles" aria-label={t('admin.user.roles')}>
+            {roles.map((r) => (
+              <li key={r.key} className="admin-role">
+                {r.label}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       {insights.length > 0 && (
         <ul

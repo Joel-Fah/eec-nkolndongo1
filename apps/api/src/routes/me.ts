@@ -9,7 +9,7 @@ import { schema } from '@eec/db'
 import { modules } from '@eec/modules'
 import { isModuleEnabled } from '@eec/modules-kit'
 import { zValidator } from '@hono/zod-validator'
-import { and, desc, eq, ne, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm'
 import { type Context, Hono } from 'hono'
 import { z } from 'zod'
 import { currentPolicy, policyVersion } from '../policy.ts'
@@ -72,12 +72,40 @@ export const meRoutes = new Hono<AppEnv>()
       .where(eq(user.id, actor.userId))
     const p = actor.principal
     const flags = await readFlags(db)
+    // The role names (and the group of a scoped one), so the admin can say who you are here: « Responsable de groupe · Jeunesse ».
+    const keys = [...new Set(p.grants.map((g) => g.roleKey))]
+    const groupIds = [...new Set(p.grants.map((g) => g.groupId).filter((g): g is string => !!g))]
+    const [roleRows, groupRows] = await Promise.all([
+      keys.length
+        ? db
+            .select({ key: schema.roles.key, fr: schema.roles.nameFr, en: schema.roles.nameEn })
+            .from(schema.roles)
+            .where(inArray(schema.roles.key, keys))
+        : [],
+      groupIds.length
+        ? db
+            .select({ id: groups.id, fr: groups.nameFr, en: groups.nameEn })
+            .from(groups)
+            .where(inArray(groups.id, groupIds))
+        : [],
+    ])
     return c.json({
       user: row,
       isSuperAdmin: p.isSuperAdmin,
       // A staff member who has no password yet (decision 0053): the admin sends them to set one before anything else.
       needsPassword: !!p.needsPassword,
-      roles: p.grants.map((g) => ({ role: g.roleKey, groupId: g.groupId })),
+      roles: p.grants.map((g) => {
+        const r = roleRows.find((x) => x.key === g.roleKey)
+        const grp = groupRows.find((x) => x.id === g.groupId)
+        return {
+          role: g.roleKey,
+          groupId: g.groupId,
+          nameFr: r?.fr ?? g.roleKey,
+          nameEn: r?.en ?? r?.fr ?? g.roleKey,
+          groupFr: grp?.fr ?? null,
+          groupEn: grp?.en ?? grp?.fr ?? null,
+        }
+      }),
       // The UI hides what you can't do; the API remains the authority.
       permissions: p.isSuperAdmin
         ? ['*']

@@ -1102,6 +1102,19 @@ html[data-nav-open] {
   gap: 0.5rem;
   max-width: 36rem;
 }
+/* The same height with or without insight cards (a role that has none still shows the whole tree). */
+@media (min-width: 64rem) {
+  .welcome {
+    min-height: 27.5rem;
+    align-content: start;
+  }
+}
+.welcome-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-start: 0.25rem;
+}
 .welcome-date {
   font-size: var(--text-sm);
   font-weight: 600;
@@ -3729,4 +3742,53 @@ html[data-nav-open] {
   .cm-row.cm-rights {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* ——— Who you are: the role(s) in the top bar, the profile menu and the welcome banner ——————————————————— */
+.admin-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.admin-role-more {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+/* Only where there is room: the profile menu says it in full on a small screen. */
+.admin-topbar-tools > .admin-role {
+  display: none;
+  margin-inline-end: 0.5rem;
+}
+@media (min-width: 64rem) {
+  .admin-topbar-tools > .admin-role {
+    display: inline-flex;
+  }
+}
+.admin-menu-id {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+.admin-menu-id > :first-child {
+  margin-block-start: 0.125rem;
+  color: var(--ink-muted);
+}
+.admin-menu-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-block-start: 0.5rem;
+}
+.admin-menu-roles .admin-role {
+  font-size: 0.75rem;
+  white-space: normal;
 }

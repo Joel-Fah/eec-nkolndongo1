@@ -28,7 +28,7 @@ const ph = {
 const sections = [
   ['accueil', 'home', 'nav_home'],
   ['inscriptions', 'checklist', 'nav_regs'],
-  ['groupes', 'users', 'nav_groups'],
+  ['groupes', 'userMultiple', 'nav_groups'],
   ['notifications', 'bell', 'nav_notifs'],
   ['profil', 'account', 'nav_profile'],
 ] as const
@@ -170,7 +170,7 @@ const iconNames = [
   'home',
   'calendar',
   'checklist',
-  'users',
+  'userMultiple',
   'bell',
   'account',
   'sparkles',
@@ -227,7 +227,7 @@ const links = {
     <div class="me-cards" data-me-regs aria-busy="true"><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="groupes" hidden aria-labelledby="me-h-groupes">
-    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="users" size={20} /></span><div><h3 class="me-head-t" id="me-h-groupes">{m('nav_groups')}</h3><p class="me-head-p">{intros.groupes}</p></div></header>
+    <header class="me-head"><span class="me-head-ico" aria-hidden="true"><Icon name="userMultiple" size={20} /></span><div><h3 class="me-head-t" id="me-h-groupes">{m('nav_groups')}</h3><p class="me-head-p">{intros.groupes}</p></div></header>
     <div class="me-cards" data-me-groups aria-busy="true"><div class="me-skel"></div></div>
   </section>
   <section class="me-section" data-me-section="notifications" hidden aria-labelledby="me-h-notifications">
