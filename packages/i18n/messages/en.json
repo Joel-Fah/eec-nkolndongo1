@@ -1461,7 +1461,15 @@
       "err_last_super_admin": "Not possible: this is the last active super admin. Appoint another one first.",
       "err_self": "You can’t deactivate your own account.",
       "err_already": "This role is already granted.",
-      "err_email_taken": "An account already exists with this address."
+      "err_email_taken": "An account already exists with this address.",
+      "sign_in": "Sign-in",
+      "google_only": "This person signs in with Google only. After a role change they sign in again with Google: their team session lasts 12 h idle, 7 days at most.",
+      "google_both": "This person can sign in with Google or with their password.",
+      "google_none": "Password only. Only the person can link Google, from their own account.",
+      "google_remove": "Remove their Google account",
+      "google_remove_text": "Remove the Google account of {name}? Their devices will be signed out. They can link it again, or ask for a password reset link.",
+      "google_removed": "Google account removed.",
+      "roles_google_note": "This person signs in with Google only: the role applies at their next sign-in with Google."
     },
     "roles": {
       "title": "Roles",
@@ -1601,7 +1609,22 @@
       "err_current": "The current password isn’t right.",
       "sign_google": "Google",
       "sign_email": "Email and password",
-      "google_only": "You sign in with Google: there is no password to change here."
+      "google_only": "You sign in with Google: there is no password to change here.",
+      "google_title": "Sign in with Google",
+      "google_lead": "Link your Google account to sign in with it too. Your password keeps working.",
+      "google_confirm": "Your password, to confirm",
+      "google_link": "Link my Google account",
+      "google_other_email": "The Google address may differ from this account’s. Only the signed-in person can link Google: the secretariat cannot do it for them.",
+      "google_linked": "Google is linked to this account: you can sign in with it or with your password.",
+      "google_linked_only": "Google is your only way in: it cannot be removed until you have a password. Ask the secretariat for a reset link to choose one.",
+      "google_remove": "Remove Google",
+      "google_remove_text": "Google will no longer sign you in. You can link it again at any time.",
+      "google_removed": "Google was removed from your account.",
+      "google_ok": "Google is now linked to your account.",
+      "google_fail": "Google could not be linked. Try again in a moment.",
+      "google_taken": "This Google account is already linked to someone else.",
+      "google_rate": "Too many tries. Try again in fifteen minutes.",
+      "google_off": "Google sign-in is not turned on for this site yet."
     },
     "leaving": "See you soon! Closing the door gently…",
     "error": {
@@ -2217,7 +2240,12 @@
     "login": {
       "title": "Sign in",
       "lead": "Access the parish administration.",
-      "hint": "Forgot your password? Ask the secretariat for a reset link."
+      "hint": "Forgot your password? Ask the secretariat for a reset link.",
+      "google": "Continue with Google",
+      "google_staff": "For your security, a team account is not linked to Google by the e-mail address alone. Sign in with your password, then add Google from “My account”.",
+      "google_notstaff": "This Google account is not linked to any team account. Sign in with your password, then add Google from “My account”.",
+      "google_error": "Signing in with Google did not work. Try again or use your password.",
+      "google_off": "Google sign-in is not turned on for this site yet. Use your password."
     },
     "invite": {
       "title": "Welcome to the team",
@@ -2301,7 +2329,7 @@
     "google_err_consent": "No account with this Google address yet. Choose “Create an account”: we need your agreement before keeping your details.",
     "google_wait": "Opening Google…",
     "google_unavailable": "Google isn’t responding as expected right now. Sign in with your password or try again later.",
-    "google_err_staff": "Team accounts sign in with their email and password, not with Google.",
+    "google_err_staff": "This Google account is not linked to a team account yet. Sign in with your password, then add Google from “My account” in the admin.",
     "soon": "Soon",
     "leaving": "See you soon! Closing the door gently…",
     "panel_profile": "My details",

@@ -86,8 +86,8 @@ modules/events/                 workspace package @eec/module-events
 
 ## 5. Identity, roles and permissions
 
-- **Better Auth** (self-hosted, decision 0018) answers *who are you*: email + password now, Google for members
-  later; passwords hashed in Postgres (bcrypt) to stay within the Worker's CPU budget.
+- **Better Auth** (self-hosted, decision 0018) answers *who are you*: email + password, Google for members and, once linked by the person from Mon compte, for staff (0053);
+  passwords hashed in Postgres (bcrypt) to stay within the Worker's CPU budget.
 - **Our tables** answer *what can you do*:
   - `roles` (e.g. Super admin, Secrétariat, Éditeur, Responsable de département, Trésorier, Membre)
   - `permissions` (seeded from module manifests)

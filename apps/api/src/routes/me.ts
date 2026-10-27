@@ -3,7 +3,8 @@
  * from this), and Mon compte — profile, language and theme, password, sessions ("sign out everywhere").
  */
 import { type AppEnv, audit, fail, requireSelf } from '@eec/api-kit'
-import { checkPassword, isStaff } from '@eec/auth'
+import { allow, checkPassword, isStaff } from '@eec/auth'
+import { adminBase } from '@eec/core'
 import { schema } from '@eec/db'
 import { modules } from '@eec/modules'
 import { isModuleEnabled } from '@eec/modules-kit'
@@ -29,6 +30,7 @@ const patch = z.object({
   theme: z.enum(['system', 'light', 'dark']).optional(),
 })
 const password = z.object({ current: z.string().max(200), next: z.string().max(200) })
+const googleLink = z.object({ current: z.string().max(200).optional() })
 
 /** The current session row, from the session cookie (Better Auth). */
 async function currentSessionId(c: Context<AppEnv>) {
@@ -129,6 +131,73 @@ export const meRoutes = new Hono<AppEnv>()
       entityId: actor.userId,
       summaryFr: 'Mot de passe changé (autres sessions fermées)',
       summaryEn: 'Password changed (other sessions closed)',
+    })
+    return c.json({ ok: true })
+  })
+
+  // Add Google to my own account (decision 0053): from a signed-in session only, with the password asked again when
+  // there is one, so a stolen session cannot add someone else's Google. The Google address may differ from mine.
+  .post('/google', requireSelf(), zValidator('json', googleLink), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    if (!c.env.GOOGLE_CLIENT_ID || !c.env.GOOGLE_CLIENT_SECRET)
+      return fail(c, 404, 'not_configured')
+    const db = await c.var.deps.db()
+    if (!(await allow(db, `google-link:${actor.userId}`, 6, 900)))
+      return fail(c, 429, 'rate_limited')
+    const rows = await db
+      .select({ p: account.providerId, pw: account.password })
+      .from(account)
+      .where(eq(account.userId, actor.userId))
+    if (rows.some((r) => r.p === 'google')) return fail(c, 409, 'already_linked')
+    if (rows.some((r) => r.p === 'credential')) {
+      const { current } = c.req.valid('json')
+      const [ok] = await db
+        .select({ ok: sql<boolean>`eec_verify_password(${current ?? ''}, ${account.password})` })
+        .from(account)
+        .where(and(eq(account.userId, actor.userId), eq(account.providerId, 'credential')))
+      if (!ok?.ok) return fail(c, 400, 'invalid_credentials')
+    }
+    const admin = adminBase(c.env.ADMIN_PATH)
+    const auth = await c.var.deps.auth()
+    const res = await auth.api.linkSocialAccount({
+      body: {
+        provider: 'google',
+        callbackURL: `${admin}account?google=linked`,
+        errorCallbackURL: `${admin}account?google=error`,
+        disableRedirect: true,
+      },
+      headers: c.req.raw.headers,
+      asResponse: true,
+    })
+    if (!res.ok) return fail(c, 400, 'generic')
+    const { url } = (await res.clone().json()) as { url?: string }
+    if (!url) return fail(c, 400, 'generic')
+    const headers = new Headers({ 'content-type': 'application/json', 'cache-control': 'no-store' })
+    for (const cookie of res.headers.getSetCookie()) headers.append('set-cookie', cookie)
+    return new Response(JSON.stringify({ url }), { status: 200, headers })
+  })
+
+  // Take Google off my account. Refused when it is my only way in: nobody locks themselves out.
+  .delete('/google', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const db = await c.var.deps.db()
+    const rows = await db
+      .select({ p: account.providerId })
+      .from(account)
+      .where(eq(account.userId, actor.userId))
+    if (!rows.some((r) => r.p === 'google')) return fail(c, 404, 'not_found')
+    if (!rows.some((r) => r.p === 'credential')) return fail(c, 409, 'only_sign_in')
+    await db
+      .delete(account)
+      .where(and(eq(account.userId, actor.userId), eq(account.providerId, 'google')))
+    await audit(c, {
+      action: 'google.unlink',
+      entityType: 'account',
+      entityId: actor.userId,
+      summaryFr: 'Compte Google retiré par la personne elle-même',
+      summaryEn: 'Google account removed by its owner',
     })
     return c.json({ ok: true })
   })

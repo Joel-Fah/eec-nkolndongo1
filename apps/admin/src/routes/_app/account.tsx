@@ -1,11 +1,12 @@
 import { ApiError, api, useLocale, useMe } from '@eec/admin-kit'
 import type { Locale, MessageKey } from '@eec/i18n'
 import { avatarSvg } from '@eec/ui/avatar-art'
+import googleG from '@eec/ui/brand/google-g.svg?raw'
 import { Badge, Button, SelectField, TextField } from '@eec/ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { type FormEvent, useEffect, useState } from 'react'
-import { deviceName, fmt, notify, PageHeader } from '../../components/kit'
+import { Confirm, deviceName, fmt, notify, PageHeader } from '../../components/kit'
 import { PasswordField } from '../../components/PasswordField'
 import { ProfilePanel, useMyProfile } from '../../components/ProfilePanel'
 import { type ThemeChoice, useTheme } from '../../lib/theme'
@@ -78,6 +79,11 @@ function Account() {
 
           <ProfilePanel />
           <Password hasPassword={signIn.length === 0 || signIn.includes('email')} />
+          <GoogleLink
+            linked={signIn.includes('google')}
+            hasPassword={signIn.includes('email')}
+            enabled={mine?.googleEnabled ?? false}
+          />
         </div>
 
         <aside className="acct-col acct-aside" aria-label={t('admin.account.title')}>
@@ -213,6 +219,143 @@ function Password({ hasPassword }: { hasPassword: boolean }) {
         </Button>
       </div>
     </form>
+  )
+}
+
+/**
+ * « Connexion avec Google » (decision 0053): add Google to this account from here, signed in. The password is asked again
+ * (a stolen session cannot add someone else's Google), the Google address may differ from this account's, and Google can
+ * be removed again unless it is the only way in.
+ */
+function GoogleLink({
+  linked,
+  hasPassword,
+  enabled,
+}: {
+  linked: boolean
+  hasPassword: boolean
+  enabled: boolean
+}) {
+  const { t } = useLocale()
+  const qc = useQueryClient()
+  const [current, setCurrent] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [ask, setAsk] = useState(false)
+
+  // Coming back from Google: say how it went once, then clean the address.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const back = params.get('google')
+    if (!back) return
+    const why = params.get('error') ?? ''
+    notify(
+      back === 'linked'
+        ? t('admin.account.google_ok')
+        : t(
+            /different_user|already/.test(why)
+              ? 'admin.account.google_taken'
+              : 'admin.account.google_fail',
+          ),
+      { tone: back === 'linked' ? undefined : 'danger' },
+    )
+    qc.invalidateQueries({ queryKey: ['my-profile'] })
+    window.history.replaceState(null, '', window.location.pathname)
+  }, [qc, t])
+
+  const start = async () => {
+    setBusy(true)
+    try {
+      const r = await api<{ url: string }>('/me/google', { body: { current } })
+      window.location.assign(r.url)
+    } catch (e) {
+      setBusy(false)
+      const code = e instanceof ApiError ? e.code : ''
+      notify(
+        t(
+          code === 'invalid_credentials'
+            ? 'admin.account.err_current'
+            : code === 'rate_limited'
+              ? 'admin.account.google_rate'
+              : 'admin.account.google_fail',
+        ),
+        { tone: 'danger' },
+      )
+    }
+  }
+  const remove = useMutation({
+    mutationFn: () => api('/me/google', { method: 'DELETE' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['my-profile'] })
+      notify(t('admin.account.google_removed'))
+    },
+    onError: () => notify(t('admin.common.error'), { tone: 'danger' }),
+  })
+
+  return (
+    <section className="admin-panel">
+      <h2 className="text-xl">{t('admin.account.google_title')}</h2>
+      {linked ? (
+        <>
+          <p className="text-ink-muted">
+            {hasPassword ? t('admin.account.google_linked') : t('admin.account.google_linked_only')}
+          </p>
+          {hasPassword && (
+            <div>
+              <Button variant="secondary" onClick={() => setAsk(true)}>
+                {t('admin.account.google_remove')}
+              </Button>
+            </div>
+          )}
+          <Confirm
+            open={ask}
+            onOpenChange={setAsk}
+            title={t('admin.account.google_remove')}
+            text={t('admin.account.google_remove_text')}
+            confirmLabel={t('admin.account.google_remove')}
+            danger
+            busy={remove.isPending}
+            onConfirm={() => {
+              setAsk(false)
+              remove.mutate()
+            }}
+          />
+        </>
+      ) : !enabled ? (
+        <p className="text-ink-muted">{t('admin.account.google_off')}</p>
+      ) : (
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void start()
+          }}
+        >
+          <p className="text-ink-muted">{t('admin.account.google_lead')}</p>
+          {hasPassword && (
+            <PasswordField
+              label={t('admin.account.google_confirm')}
+              placeholder={t('admin.account.current_ph')}
+              autoComplete="current-password"
+              required
+              value={current}
+              onChange={(e: { target: { value: string } }) => setCurrent(e.target.value)}
+            />
+          )}
+          <div>
+            <Button type="submit" variant="secondary" loading={busy}>
+              <span
+                className="grid size-5 place-items-center"
+                aria-hidden="true"
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: our own brand drawing
+                dangerouslySetInnerHTML={{ __html: googleG }}
+              />
+              {t('admin.account.google_link')}
+            </Button>
+          </div>
+          <p className="text-sm text-ink-muted">{t('admin.account.google_other_email')}</p>
+        </form>
+      )}
+    </section>
   )
 }
 

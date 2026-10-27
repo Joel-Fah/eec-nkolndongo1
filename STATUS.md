@@ -6,6 +6,8 @@ _Last updated: 2026-10-27. History lives in the phase reports (`docs/phases/PHAS
 Branch `feat/phase-05a-member-home` (PR open, **not merged**). Report: `docs/phases/PHASE_05_REPORT.md`. Built: Mon espace as the member's home, groups with join requests, « Mon groupe », announcements, the carte de Sainte-Cène
 (cards, visas, contributions register, QR check, offline copy), the data-rights log. Push: « not now » (0051). Checkpoint L (legal footing) done as far as the sources allow: the official text could not be retrieved, so the notes mark every point « certain » or « à confirmer » (`docs/legal/member-data-legal-notes.md`, `questions-pour-un-juriste.md`, `register.md`). Migrations 0035–0040 are on the dev branch only.
 
+**Since the PR was opened (local commit, not pushed):** Google for staff (0053). A staff member adds Google from Mon compte (password asked again) and then signs in with it from the admin page; a link made by an e-mail match is refused; a member who signed up with Google and later got a role keeps the link they made. No migration, no new secret. Needs `GOOGLE_CLIENT_ID/SECRET` on the environment (same as members). To try on dev: sign in as a staff account, Mon compte → Connexion avec Google.
+
 ## Production
 - **Phase 04 is live** (PR #6 merged 2026-10-25; the deploy workflow applied the migrations; `db:seed` and `bible:seed` ran). `SITE_INDEXABLE` is **not** set (noindex).
 - **Not yet applied on production:** migrations **0036–0040** and the seed (they ship with the Phase 05 merge). Before that merge: a Neon backup branch `pre-phase-05` and a working backup.

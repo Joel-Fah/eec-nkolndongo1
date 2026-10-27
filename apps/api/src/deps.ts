@@ -1,6 +1,7 @@
 import type { AppEnv, Deps } from '@eec/api-kit'
 import { dbUrl } from '@eec/api-kit'
 import { createAuth, isStaff, loadPrincipal, slideSession } from '@eec/auth'
+import { adminBase } from '@eec/core'
 import { connect, type Db, schema } from '@eec/db'
 import type { MiddlewareHandler } from 'hono'
 import { policyVersion } from './policy.ts'
@@ -29,6 +30,7 @@ export const withDeps: MiddlewareHandler<AppEnv> = async (c, next) => {
           ? { clientId: c.env.GOOGLE_CLIENT_ID, clientSecret: c.env.GOOGLE_CLIENT_SECRET }
           : undefined,
       policyVersion: await policyVersion(d),
+      adminBase: adminBase(c.env.ADMIN_PATH),
       // No domain, no email (decision 0019): reset requests wait in the outbox for the secretariat.
       sendResetPassword: async ({ email, url }) => {
         await d

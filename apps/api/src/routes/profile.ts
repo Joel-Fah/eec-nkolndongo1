@@ -181,6 +181,8 @@ export const profileRoutes = new Hono<AppEnv>()
           ),
         ),
       ],
+      // Whether Google is set up at all (the link button is hidden otherwise).
+      googleEnabled: !!(c.env.GOOGLE_CLIENT_ID && c.env.GOOGLE_CLIENT_SECRET),
       consent,
       details,
       photo: {

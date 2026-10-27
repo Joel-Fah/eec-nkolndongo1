@@ -1461,7 +1461,15 @@
       "err_last_super_admin": "Impossible : c’est le dernier super administrateur actif. Nommez-en un autre d’abord.",
       "err_self": "Vous ne pouvez pas désactiver votre propre compte.",
       "err_already": "Ce rôle est déjà attribué.",
-      "err_email_taken": "Un compte existe déjà avec cette adresse."
+      "err_email_taken": "Un compte existe déjà avec cette adresse.",
+      "sign_in": "Connexion",
+      "google_only": "Cette personne se connecte avec Google uniquement. Après un changement de rôle, elle se reconnecte avec Google : sa session d’équipe dure 12 h d’inactivité, 7 jours au plus.",
+      "google_both": "Cette personne peut se connecter avec Google ou avec son mot de passe.",
+      "google_none": "Mot de passe uniquement. Seule la personne peut relier Google, depuis son compte.",
+      "google_remove": "Retirer son compte Google",
+      "google_remove_text": "Retirer le compte Google de {name} ? Ses appareils seront déconnectés. La personne pourra le relier de nouveau, ou demander un lien de réinitialisation du mot de passe.",
+      "google_removed": "Compte Google retiré.",
+      "roles_google_note": "Cette personne se connecte avec Google uniquement : le rôle s’applique à sa prochaine connexion avec Google."
     },
     "roles": {
       "title": "Rôles",
@@ -1601,7 +1609,22 @@
       "err_current": "Le mot de passe actuel n’est pas le bon.",
       "sign_google": "Google",
       "sign_email": "E-mail et mot de passe",
-      "google_only": "Vous vous connectez avec Google : il n’y a pas de mot de passe à changer ici."
+      "google_only": "Vous vous connectez avec Google : il n’y a pas de mot de passe à changer ici.",
+      "google_title": "Connexion avec Google",
+      "google_lead": "Reliez votre compte Google pour vous connecter aussi avec lui. Votre mot de passe continue de fonctionner.",
+      "google_confirm": "Votre mot de passe, pour confirmer",
+      "google_link": "Relier mon compte Google",
+      "google_other_email": "L’adresse Google peut être différente de celle de ce compte. Seule la personne connectée peut relier Google : le secrétariat ne peut pas le faire à sa place.",
+      "google_linked": "Google est relié à ce compte : vous pouvez vous connecter avec lui ou avec votre mot de passe.",
+      "google_linked_only": "Google est votre seul moyen de connexion : il ne peut pas être retiré tant que vous n’avez pas de mot de passe. Demandez un lien de réinitialisation au secrétariat pour en choisir un.",
+      "google_remove": "Retirer Google",
+      "google_remove_text": "Google ne pourra plus servir à vous connecter. Vous pourrez le relier de nouveau à tout moment.",
+      "google_removed": "Google a été retiré de votre compte.",
+      "google_ok": "Google est maintenant relié à votre compte.",
+      "google_fail": "Google n’a pas pu être relié. Réessayez dans un instant.",
+      "google_taken": "Ce compte Google est déjà relié à une autre personne.",
+      "google_rate": "Trop d’essais. Réessayez dans un quart d’heure.",
+      "google_off": "La connexion avec Google n’est pas encore activée sur ce site."
     },
     "leaving": "À bientôt ! On referme la porte doucement…",
     "error": {
@@ -2217,7 +2240,12 @@
     "login": {
       "title": "Connexion",
       "lead": "Accédez à l’administration de la paroisse.",
-      "hint": "Un mot de passe oublié ? Demandez un lien de réinitialisation au secrétariat."
+      "hint": "Un mot de passe oublié ? Demandez un lien de réinitialisation au secrétariat.",
+      "google": "Continuer avec Google",
+      "google_staff": "Pour votre sécurité, un compte de l’équipe n’est pas relié à Google par la seule adresse e-mail. Connectez-vous avec votre mot de passe, puis ajoutez Google depuis « Mon compte ».",
+      "google_notstaff": "Ce compte Google n’est lié à aucun compte de l’équipe. Connectez-vous avec votre mot de passe, puis ajoutez Google depuis « Mon compte ».",
+      "google_error": "La connexion avec Google n’a pas abouti. Réessayez ou utilisez votre mot de passe.",
+      "google_off": "La connexion avec Google n’est pas encore activée sur ce site. Utilisez votre mot de passe."
     },
     "invite": {
       "title": "Bienvenue dans l’équipe",
@@ -2301,7 +2329,7 @@
     "google_err_consent": "Pas encore de compte avec cette adresse Google. Choisissez « Créer un compte » : nous avons besoin de votre accord avant de garder vos informations.",
     "google_wait": "Ouverture de Google…",
     "google_unavailable": "Google ne répond pas comme prévu pour le moment. Connectez-vous avec votre mot de passe ou réessayez plus tard.",
-    "google_err_staff": "Les comptes de l’équipe se connectent avec leur e-mail et leur mot de passe, pas avec Google.",
+    "google_err_staff": "Ce compte Google n’est pas encore relié à un compte de l’équipe. Connectez-vous avec votre mot de passe, puis ajoutez Google depuis « Mon compte » dans l’administration.",
     "soon": "Bientôt",
     "leaving": "À bientôt ! On referme la porte doucement…",
     "panel_profile": "Mes informations",

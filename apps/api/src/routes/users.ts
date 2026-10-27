@@ -11,7 +11,8 @@ import { and, count, desc, eq, ilike, inArray, or, type SQL, sql } from 'drizzle
 import { Hono } from 'hono'
 import { z } from 'zod'
 
-const { user, profiles, userRoles, roles, groups, groupMembers, session, auditLog } = schema
+const { user, profiles, userRoles, roles, groups, groupMembers, session, auditLog, account } =
+  schema
 
 const listQuery = z.object({
   q: z.string().trim().max(100).optional(),
@@ -130,7 +131,7 @@ export const userRoutes = new Hono<AppEnv>()
       .innerJoin(profiles, eq(profiles.userId, user.id))
       .where(eq(user.id, id))
     if (!row) return fail(c, 404, 'not_found')
-    const [grants, memberships, sessions, activity] = await Promise.all([
+    const [grants, memberships, sessions, activity, methods] = await Promise.all([
       rolesOf(db, [id]),
       db
         .select({
@@ -164,8 +165,17 @@ export const userRoutes = new Hono<AppEnv>()
         .where(or(eq(auditLog.actorId, id), eq(auditLog.entityId, id)))
         .orderBy(desc(auditLog.createdAt))
         .limit(20),
+      db.select({ p: account.providerId }).from(account).where(eq(account.userId, id)),
     ])
-    return c.json({ user: row, roles: grants, groups: memberships, sessions, activity })
+    // How this person signs in (never the secrets): Google, e-mail and password, or both.
+    const signIn = [
+      ...new Set(
+        methods.flatMap((m) =>
+          m.p === 'google' ? ['google'] : m.p === 'credential' ? ['email'] : [],
+        ),
+      ),
+    ]
+    return c.json({ user: row, roles: grants, groups: memberships, sessions, activity, signIn })
   })
 
   .patch('/:id', requirePermission('core:users-update'), zValidator('json', patch), async (c) => {
@@ -347,6 +357,29 @@ export const userRoutes = new Hono<AppEnv>()
       entityId: groupId,
       summaryFr: `${target?.email ?? id} retiré d’un groupe`,
       summaryEn: `${target?.email ?? id} removed from a group`,
+    })
+    return c.json({ ok: true })
+  })
+
+  // Take Google off someone's account (a lost Gmail, a person who left) and close their sessions. They keep their password;
+  // with none, they ask for a reset link.
+  .delete('/:id/google', requirePermission('core:users-deactivate'), async (c) => {
+    const id = c.req.param('id')
+    const db = await c.var.deps.db()
+    const target = await nameOf(db, id)
+    if (!target) return fail(c, 404, 'not_found')
+    const removed = await db
+      .delete(account)
+      .where(and(eq(account.userId, id), eq(account.providerId, 'google')))
+      .returning({ id: account.id })
+    if (!removed.length) return fail(c, 404, 'not_found')
+    await db.delete(session).where(eq(session.userId, id))
+    await audit(c, {
+      action: 'google.unlink',
+      entityType: 'user',
+      entityId: id,
+      summaryFr: `Compte Google de ${target.email} retiré (sessions fermées)`,
+      summaryEn: `Google account of ${target.email} removed (sessions closed)`,
     })
     return c.json({ ok: true })
   })

@@ -57,3 +57,4 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0050 | La carte de Sainte-Cène | Accepted |
 | 0051 | Les notifications push : pas maintenant | Accepted |
 | 0052 | Le registre des demandes sur les données | Accepted |
+| 0053 | Google pour le personnel : relié depuis son compte, jamais par l'e-mail | Accepted |

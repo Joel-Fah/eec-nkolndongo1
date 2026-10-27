@@ -33,7 +33,7 @@ La paroisse EEC Nkolndongo 1 (Église Évangélique du Cameroun), à Yaoundé. C
 ## Ce que nous gardons
 **Si vous avez un compte**
 - Votre nom, votre adresse e-mail et, si vous le souhaitez, votre numéro de téléphone.
-- Si vous vous connectez avec Google : votre nom, votre adresse e-mail et la photo de votre compte Google.
+- Si vous vous connectez avec Google (membres, et aussi l’équipe qui relie Google à son compte depuis « Mon compte ») : votre nom, votre adresse e-mail et la photo de votre compte Google.
 - Les groupes de la paroisse auxquels vous dites participer (facultatif).
 - Vos accords (politique, nouvelles, profil complet), avec la date et la version du texte accepté.
 - Votre langue et votre thème, vos notifications dans le site, et la liste de vos connexions en cours (appareil et date) pour que vous puissiez les fermer.
@@ -113,7 +113,7 @@ The EEC Nkolndongo 1 parish (Evangelical Church of Cameroon), in Yaoundé. Conta
 ## What we keep
 **If you have an account**
 - Your name, your email address and, if you wish, your phone number.
-- If you sign in with Google: your name, your email address and the photo of your Google account.
+- If you sign in with Google (members, and also the team who link Google to their account from “My account”): your name, your email address and the photo of your Google account.
 - The parish groups you say you take part in (optional).
 - Your agreements (policy, news, full profile), with the date and the version of the text accepted.
 - Your language and theme, your in-site notifications, and the list of your current sign-ins (device and date) so you can close them.

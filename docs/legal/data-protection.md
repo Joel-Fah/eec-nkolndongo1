@@ -125,6 +125,7 @@
   beyond that list.** Behind a separate, unticked, withdrawable consent (`profile`) with the policy version; withdrawing erases the details.
   Staff see an **age band** (never the exact date), how the person signs in (Google or e-mail) and aggregates (groups under 5 people are not shown on their own). The CSV export of these
   columns is limited to the export permission and audited by row count.
+- **Google for staff (0053):** a staff account can add Google from « Mon compte » (password asked again). Stored: the Google account id and the tokens Better Auth keeps for the sign-in; scopes openid, e-mail, profile only. Every link and removal is in the activity log. Removing it, or deleting the account, erases it.
 - **Profile photo:** seen by the parish team who manage members (`members:read`), never public; the member decides whether it is also their avatar in the menu (otherwise a generated avatar). One 512 px WebP, metadata removed in the browser, served only by session-checked routes (`private, no-store`). A Google sign-in photo counts as the member's photo until they choose another. Deleted with the photo, the consent or the account.
 - **Member card:** removed for now; it comes back with the communion card in the next phase.
 - Retention: with the account, in « my data » and in the 30-day deletion.

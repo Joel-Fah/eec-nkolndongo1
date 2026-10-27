@@ -1191,5 +1191,40 @@ const stamp = Date.now().toString(36)
   ok('rights: the super admin can delete it', gone.status === 200)
 }
 
+// 15. Google for staff (decision 0053): only from a signed-in account; nothing here reaches Google, it checks the guards
+{
+  const me = await api('/me')
+  const profile = await api('/me/profile')
+  ok(
+    'google: the profile says how I sign in and whether Google is set up',
+    Array.isArray(profile.json.signIn) && typeof profile.json.googleEnabled === 'boolean',
+  )
+  const anon = await fetch(`${base}/api/me/google`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: base },
+    body: '{}',
+  })
+  ok('google: linking is refused without a session', anon.status === 401)
+  const wrong = await api('/me/google', {
+    method: 'POST',
+    body: JSON.stringify({ current: 'pas-le-bon-mot-de-passe' }),
+  })
+  // 404 when Google is not set up on this environment, 400 when it is (the password is asked again)
+  ok('google: linking asks for the password again', wrong.status === 400 || wrong.status === 404)
+  const none = await api('/me/google', { method: 'DELETE' })
+  ok('google: nothing to remove when none is linked', none.status === 404 || none.status === 409)
+  const person = await api(`/users/${me.json.user?.id}`)
+  ok('google: staff see how a person signs in', Array.isArray(person.json.signIn))
+  const start = await fetch(`${base}/api/members/google`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: base },
+    body: JSON.stringify({ locale: 'fr', target: 'admin' }),
+  })
+  ok(
+    'google: the admin page can start a sign-in (or says it is not set up)',
+    start.status === 200 || start.status === 404,
+  )
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll checks passed')
 process.exit(failures ? 1 : 0)
