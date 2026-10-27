@@ -4,7 +4,9 @@
  * and, at the photo's *staff* level, the picture (routes/members.ts). Audit lines never carry a value.
  */
 import { type AppEnv, audit, fail, requireSelf } from '@eec/api-kit'
+import { isStaff } from '@eec/auth'
 import {
+  adminBase,
   avatarSeed,
   type Completeness,
   emptyDetails,
@@ -172,7 +174,14 @@ export const profileRoutes = new Hono<AppEnv>()
       .from(account)
       .where(eq(account.userId, actor.userId))
     c.header('cache-control', 'private, no-store')
+    const principal = actor.principal
     return c.json({
+      // Mon espace points a team member to the admin, which they cannot be expected to guess (and tells one who still has to
+      // choose a password, whose rights wait, where to go). Everyone else gets nothing.
+      admin:
+        isStaff(principal) || principal.needsPassword
+          ? { url: adminBase(c.env.ADMIN_PATH), needsPassword: !!principal.needsPassword }
+          : null,
       // How this account signs in: Google, e-mail and password, or both.
       signIn: [
         ...new Set(

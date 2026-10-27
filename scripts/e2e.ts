@@ -1199,6 +1199,10 @@ const stamp = Date.now().toString(36)
     'google: the profile says how I sign in and whether Google is set up',
     Array.isArray(profile.json.signIn) && typeof profile.json.googleEnabled === 'boolean',
   )
+  ok(
+    'google: Mon espace points a team member to the admin',
+    typeof profile.json.admin?.url === 'string' && profile.json.admin.needsPassword === false,
+  )
   const anon = await fetch(`${base}/api/me/google`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', origin: base },

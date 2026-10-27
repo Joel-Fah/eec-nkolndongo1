@@ -2572,7 +2572,13 @@
       "card_state_suspended": "Suspended",
       "card_name": "Name",
       "card_code": "Code",
-      "member_here": "You are a member of this group"
+      "member_here": "You are a member of this group",
+      "staff_k": "Team",
+      "staff_t": "Your team space",
+      "staff_p": "You have a role in the parish team: the admin is where you carry it out.",
+      "staff_pw_t": "One last step before the admin",
+      "staff_pw_p": "You have a role in the team. To keep the account safe, first choose a password: the admin takes you there, and your rights come back right after.",
+      "staff_open": "Open the admin"
     },
     "verify": {
       "title": "Check a card",

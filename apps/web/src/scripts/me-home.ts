@@ -111,6 +111,20 @@ export async function initHome(ctx: Ctx, box: HTMLElement, go: (id: string) => v
     box.append(c)
   }
 
+  // A team member finds the admin here: nobody should have to guess its address. One who still has to choose a password
+  // (rights wait) sees it first.
+  const staff = profile.json.admin
+  if (staff) {
+    const c = card('green')
+    c.append(
+      head('shield', m.staff_k ?? '', staff.needsPassword ? m.staff_pw_t : m.staff_t),
+      el('p', 'me-p', staff.needsPassword ? m.staff_pw_p : m.staff_p),
+      link(m.staff_open ?? '', staff.url, 'btn btn-primary btn-sm'),
+    )
+    if (staff.needsPassword) box.prepend(c)
+    else box.append(c)
+  }
+
   const comp = profile.json.completeness
   if (comp) {
     if (comp.complete) {

@@ -89,6 +89,8 @@ export function ico(name: string, cls = 'me-ico') {
 }
 
 export type Profile = {
+  /** Only for a team member: where the admin is, and whether they must first choose a password (decision 0053). */
+  admin: { url: string; needsPassword: boolean } | null
   seed: number
   photo: { url: string | null }
   completeness: { filled: number; total: number; complete: boolean }

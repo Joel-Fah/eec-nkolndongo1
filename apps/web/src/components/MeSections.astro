@@ -53,6 +53,12 @@ const messages = Object.fromEntries(
     'groups_none_p',
     'profile_p',
     'profile_ok_t',
+    'staff_k',
+    'staff_t',
+    'staff_p',
+    'staff_pw_t',
+    'staff_pw_p',
+    'staff_open',
     'profile_ok_p',
     'card_k',
     'card_valid_until',
@@ -177,6 +183,7 @@ const iconNames = [
   'lock',
   'arrowRight',
   'megaphone',
+  'shield',
 ] as const
 const icons = Object.fromEntries(iconNames.map((n) => [n, iconSvg(n, { size: 20 })]))
 const intros: Record<string, string> = {

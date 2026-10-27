@@ -56,3 +56,6 @@ Une barre de sections collée en haut (défilable sur 360 px, icône + libellé,
 - **Notifications** : `group_announcement`, `group_decision` (réponse à ma demande), `communion_reminder` (semaine de préparation), chacun coupable.
 - **Profil** : « Baptême et confirmation » (facultatif, sous le profil complet).
 - **Administration** : « Mon groupe », « Annonces de groupe », « Cartes de Sainte-Cène » (cartes, nouvelle carte, cotisations attendues, vérifier une carte).
+
+## Team members
+A person with a role in the team sees one extra card on Accueil, « Votre espace d'équipe », with a button to the admin (the address comes from `/api/me/profile`, `admin`, never built into the page; members get `null`). A team member who still has to choose a password (decision 0053) sees it first, with the reason, and the admin then takes them to the password step.

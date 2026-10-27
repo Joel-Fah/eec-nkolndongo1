@@ -2572,7 +2572,13 @@
       "card_state_suspended": "Suspendue",
       "card_name": "Nom",
       "card_code": "Code",
-      "member_here": "Vous êtes membre de ce groupe"
+      "member_here": "Vous êtes membre de ce groupe",
+      "staff_k": "Équipe",
+      "staff_t": "Votre espace d’équipe",
+      "staff_p": "Vous avez un rôle dans l’équipe de la paroisse : l’administration est là où vous l’exercez.",
+      "staff_pw_t": "Une dernière étape avant l’administration",
+      "staff_pw_p": "Vous avez un rôle dans l’équipe. Pour la sécurité du compte, choisissez d’abord un mot de passe : l’administration vous y conduit, et vos droits reviennent aussitôt.",
+      "staff_open": "Ouvrir l’administration"
     },
     "verify": {
       "title": "Vérifier une carte",
