@@ -16,6 +16,10 @@ type Item = {
     reports?: number
     reviews?: number
     entries?: number
+    title?: string
+    by?: string
+    groupFr?: string | null
+    groupEn?: string | null
   }
   href: string
   weekOf: string
@@ -120,6 +124,8 @@ export function NotificationsBell() {
   const title = (n: Item) => {
     const date = day(n.params.date ?? n.weekOf)
     if (n.kind === 'sunday_review') return t(k(n.resolved ? 'review_done_t' : 'review_t'), { date })
+    if (n.kind === 'publish_request')
+      return t(k(n.resolved ? 'publish_done_t' : 'publish_t'), { by: n.params.by ?? '' })
     if (n.kind === 'rights_due')
       return t(k(n.resolved ? 'rights_done_t' : 'rights_t'), { n: String(n.params.count ?? 0) })
     if (n.kind === 'campaign_review')
@@ -135,6 +141,10 @@ export function NotificationsBell() {
   const detail = (n: Item) => {
     if (n.resolved) return t(k('done'))
     if (n.kind === 'sunday_review') return t(k(`review_${n.params.what ?? 'both'}`))
+    if (n.kind === 'publish_request') {
+      const group = (locale === 'en' ? n.params.groupEn : n.params.groupFr) ?? ''
+      return `« ${n.params.title || t(k('publish_untitled'))} »${group ? ` · ${group}` : ''}`
+    }
     if (n.kind === 'rights_due') return t(k('rights_p'))
     if (n.kind === 'campaign_review') return t(k('campaign_p'))
     if (n.kind === 'week_nudge')
@@ -145,18 +155,14 @@ export function NotificationsBell() {
       })
     return t(k(`what_${n.params.what ?? 'both'}`))
   }
-  const icon = (n: Item) =>
-    n.resolved
-      ? 'check'
-      : n.kind === 'week_nudge'
-        ? 'clock'
-        : n.kind === 'rights_due'
-          ? 'shield'
-          : n.kind === 'campaign_review'
-            ? 'gift'
-            : n.kind === 'sunday_review'
-              ? 'shield'
-              : 'notebook'
+  const icon = (n: Item) => {
+    if (n.resolved) return 'check'
+    if (n.kind === 'week_nudge') return 'clock'
+    if (n.kind === 'publish_request') return 'mailSend'
+    if (n.kind === 'rights_due' || n.kind === 'sunday_review') return 'shield'
+    if (n.kind === 'campaign_review') return 'gift'
+    return 'notebook'
+  }
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger

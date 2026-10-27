@@ -14,6 +14,17 @@ A **news item** is a text that appears on the site’s **News** page: an announc
 
 > Your work is saved automatically. Until you publish, nobody sees it.
 
+## If you cannot publish
+
+A group leader writes, the secretariat reviews and publishes.
+
+1. Write the news post (or the event): the title and the text are required.
+2. In the **Status** panel, click **Ask for publication**. The people who may publish are notified (the bell).
+3. The panel says « Publication requested on… ». You can keep editing: the secretariat sees the latest version.
+4. When it is published, the request closes by itself.
+
+The same goes for Calendar events.
+
 ## Good to know
 
 - **Preview**: a secret link, valid for 3 days, to show the draft to someone without an account.

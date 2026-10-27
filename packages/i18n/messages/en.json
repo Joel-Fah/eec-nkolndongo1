@@ -1778,7 +1778,10 @@
       "rights_done_t": "Data requests: all up to date",
       "rights_p": "A request is overdue or due within 5 days.",
       "kind_rights_due": "Data requests",
-      "kind_rights_due_p": "Access, correction or erasure requests close to their deadline."
+      "kind_rights_due_p": "Access, correction or erasure requests close to their deadline.",
+      "publish_t": "{by} asks for publication",
+      "publish_done_t": "A publication request is dealt with",
+      "publish_untitled": "Untitled"
     },
     "picker": {
       "open": "Choose",
@@ -2714,7 +2717,21 @@
     "visits_gap": "Only pages served on demand are counted: the home page and the fixed pages are not.",
     "qa_news": "Write a news post",
     "qa_sunday": "Sunday report",
-    "qa_event": "Create an event"
+    "qa_event": "Create an event",
+    "insight_req_news": "{n} news post(s) to review before publishing.",
+    "insight_req_events": "{n} event(s) to review before publishing.",
+    "insight_req_do": "Review and publish",
+    "insight_join": "{n} request(s) to join your group await an answer.",
+    "insight_join_do": "Answer",
+    "insight_cards": "{n} Communion card(s) await a second approval.",
+    "insight_cards_do": "Approve",
+    "insight_baptisms": "{n} declared baptism(s) or confirmation(s) to confirm.",
+    "insight_baptisms_do": "Confirm",
+    "insight_messages": "{n} contact message(s) not answered yet.",
+    "insight_messages_do": "Open the inbox",
+    "insight_drafts_news": "{n} news draft(s): ask for publication when ready.",
+    "insight_drafts_events": "{n} event draft(s): ask for publication when ready.",
+    "insight_drafts_do": "Open my drafts"
   },
   "content": {
     "status": {
@@ -2838,6 +2855,16 @@
       "to": "To",
       "remove": "Remove the passage",
       "order": "The last verse must come after the first."
+    },
+    "request": {
+      "button": "Ask for publication",
+      "help": "You write, the secretariat reviews and publishes. You can keep editing: they will see the latest version.",
+      "sent": "Request sent: {n} people notified.",
+      "waiting": "Publication requested on {date}. Waiting for the secretariat.",
+      "again": "Ask again",
+      "not_ready": "Complete the title and the text first.",
+      "nobody": "Nobody may publish this yet. Tell the secretariat.",
+      "error": "The request could not be sent. Try again."
     }
   },
   "search": {

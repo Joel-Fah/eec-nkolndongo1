@@ -1,4 +1,5 @@
 import { api, hasPermission, useMe } from '@eec/admin-kit'
+import type { IconName } from '@eec/ui/icons'
 import { useQuery } from '@tanstack/react-query'
 
 export type MemberStats = {
@@ -60,7 +61,25 @@ export function useDashboardData() {
     queryFn: () => api<{ latest: { status: 'ok' | 'warn' | 'fail' } | null }>('/system-health'),
     enabled: hasPermission(me, 'core:system-health'),
   })
-  return { me, members, media, audit, outbox, validation, health }
+  // What is waiting for this person (shared with « À faire »): requests from colleagues, join requests, cards, messages.
+  const todo = useQuery({
+    queryKey: ['todo'],
+    queryFn: () => api<TodoCounts>('/todo'),
+    enabled: !!me,
+    staleTime: 30_000,
+  })
+  return { me, members, media, audit, outbox, validation, health, todo }
+}
+
+/** The part of `/todo` the insight cards read. */
+export type TodoCounts = {
+  drafts?: { news: number | null; events: number | null; guides: number | null }
+  publishRequests?: { news: number; events: number }
+  joinRequests?: number
+  cardsToApprove?: number
+  baptismsToConfirm?: number
+  newMessages?: number
+  emptySundays?: string[]
 }
 
 /** Change between two periods: direction and a rounded percentage (null when there is nothing to compare to). */
@@ -73,12 +92,12 @@ export function change(current: number, previous: number) {
 
 export type Insight = {
   key: string
-  icon: 'mail' | 'photo' | 'shield' | 'users' | 'archive' | 'check'
+  icon: IconName
   /** i18n key for the sentence; `n` is filled in. */
   text: string
   n?: number
   action: string
-  to: '/outbox' | '/validate' | '/health' | '/m/$module' | '/groups' | '/'
+  to: '/outbox' | '/validate' | '/health' | '/m/$module' | '/groups' | '/my-group' | '/'
   params?: { module: string }
 }
 
@@ -87,8 +106,84 @@ export type Insight = {
  * act on appears; when nothing needs attention, one reassuring card says so.
  */
 export function useInsights(): Insight[] {
-  const { me, members, media, outbox, validation, health } = useDashboardData()
+  const { me, members, media, outbox, validation, health, todo } = useDashboardData()
   const out: Insight[] = []
+  const w = todo.data
+  const module = (m: string) => ({ to: '/m/$module' as const, params: { module: m } })
+  // What colleagues and the parish are waiting for this person to do comes first, whatever their role.
+  if (w?.publishRequests?.news)
+    out.push({
+      key: 'req-news',
+      icon: 'newspaper',
+      text: 'dash.insight_req_news',
+      n: w.publishRequests.news,
+      action: 'dash.insight_req_do',
+      ...module('news'),
+    })
+  if (w?.publishRequests?.events)
+    out.push({
+      key: 'req-events',
+      icon: 'calendar',
+      text: 'dash.insight_req_events',
+      n: w.publishRequests.events,
+      action: 'dash.insight_req_do',
+      ...module('events'),
+    })
+  if (w?.joinRequests)
+    out.push({
+      key: 'join',
+      icon: 'users',
+      text: 'dash.insight_join',
+      n: w.joinRequests,
+      action: 'dash.insight_join_do',
+      to: '/my-group',
+    })
+  if (w?.cardsToApprove)
+    out.push({
+      key: 'cards',
+      icon: 'church',
+      text: 'dash.insight_cards',
+      n: w.cardsToApprove,
+      action: 'dash.insight_cards_do',
+      ...module('communion'),
+    })
+  if (w?.baptismsToConfirm)
+    out.push({
+      key: 'baptisms',
+      icon: 'church',
+      text: 'dash.insight_baptisms',
+      n: w.baptismsToConfirm,
+      action: 'dash.insight_baptisms_do',
+      ...module('communion'),
+    })
+  if (w?.newMessages)
+    out.push({
+      key: 'messages',
+      icon: 'mail',
+      text: 'dash.insight_messages',
+      n: w.newMessages,
+      action: 'dash.insight_messages_do',
+      ...module('contact'),
+    })
+  // Someone who writes but may not publish: their drafts are theirs to send for review.
+  if (!hasPermission(me, 'news:publish') && w?.drafts?.news)
+    out.push({
+      key: 'drafts-news',
+      icon: 'newspaper',
+      text: 'dash.insight_drafts_news',
+      n: w.drafts.news,
+      action: 'dash.insight_drafts_do',
+      ...module('news'),
+    })
+  if (!hasPermission(me, 'events:publish') && w?.drafts?.events)
+    out.push({
+      key: 'drafts-events',
+      icon: 'calendar',
+      text: 'dash.insight_drafts_events',
+      n: w.drafts.events,
+      action: 'dash.insight_drafts_do',
+      ...module('events'),
+    })
   const pending = outbox.data?.messages.length ?? 0
   if (pending > 0)
     out.push({
@@ -146,7 +241,7 @@ export function useInsights(): Insight[] {
       action: 'dash.insight_groups_do',
       to: '/groups',
     })
-  const loaded = !!(outbox.data || validation.data || media.data || members.data)
+  const loaded = !!(outbox.data || validation.data || media.data || members.data || todo.data)
   if (loaded && out.length === 0)
     out.push({
       key: 'ok',

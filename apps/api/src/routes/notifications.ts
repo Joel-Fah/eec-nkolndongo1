@@ -23,6 +23,8 @@ export const KINDS = [
   'campaign_review',
   'rights_due',
 ] as const
+/** What the list shows: the kinds a person can silence, and requests from colleagues (« please publish this »), which are not silenced. */
+const LISTED = [...KINDS, 'publish_request']
 const todayLocal = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 
@@ -224,7 +226,7 @@ export const notificationRoutes = new Hono<AppEnv>()
       .where(
         and(
           eq(notifications.userId, me),
-          inArray(notifications.kind, [...KINDS]),
+          inArray(notifications.kind, LISTED),
           isNull(notifications.dismissedAt),
           muted.size ? notInArray(notifications.kind, [...muted]) : undefined,
         ),
@@ -238,7 +240,7 @@ export const notificationRoutes = new Hono<AppEnv>()
       .where(
         and(
           eq(notifications.userId, me),
-          inArray(notifications.kind, [...KINDS]),
+          inArray(notifications.kind, LISTED),
           isNull(notifications.readAt),
           isNull(notifications.resolvedAt),
           isNull(notifications.dismissedAt),

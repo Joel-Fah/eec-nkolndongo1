@@ -10,6 +10,8 @@ Branch `feat/phase-05a-member-home` (PR open, **not merged**). Report: `docs/pha
 
 **Group leaders (local commit, run `pnpm db:seed` on each environment to apply):** « Responsable de groupe » can now write events (`events:read`, `events:edit`, for their group) as well as news; « Secrétariat » gets `events:read/edit/publish` and publishes what leaders draft. A leader's new news/event is created for their group (no more 403). The admin shows the role in the top bar, the profile menu and the welcome banner (same banner height for every role); Mon espace's group tab uses the user-multiple icon; the profile menu has leading icons.
 
+**Publication requests + insight cards (local commit):** a leader (or anyone who writes but may not publish) can « Demander la publication » on a draft news/event: each person who may publish it gets a bell notification, the request closes when it is published (no migration: `notifications`, kind `publish_request`). The welcome banner's insight cards now exist for every role: requests to review, join requests, cards to approve, baptisms to confirm, contact messages, and a writer's own drafts (`/api/todo` gives the counts); a role with nothing waiting gets the « tout est à jour » card.
+
 ## Production
 - **Phase 04 is live** (PR #6 merged 2026-10-25; the deploy workflow applied the migrations; `db:seed` and `bible:seed` ran). `SITE_INDEXABLE` is **not** set (noindex).
 - **Not yet applied on production:** migrations **0036–0040** and the seed (they ship with the Phase 05 merge). Before that merge: a Neon backup branch `pre-phase-05` and a working backup.

@@ -788,6 +788,37 @@ const stamp = Date.now().toString(36)
       )
       if (made.json.id) await api(`/${kind}/${made.json.id}`, { method: 'DELETE' })
     }
+    // « Demander la publication »: the secretariat is told, then it closes when the item is published.
+    {
+      const doc = {
+        type: 'doc',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Texte de test.' }] }],
+      }
+      const post = (await lead('/news', { method: 'POST', body: '{}' })).json.id as string
+      const empty = await lead(`/news/${post}/request-publication`, { method: 'POST', body: '{}' })
+      ok('groups: asking for publication needs a title and a text first', empty.status === 400)
+      await lead(`/news/${post}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ titleFr: `E2E Demande ${stamp}`, bodyFr: doc }),
+      })
+      const asked = await lead(`/news/${post}/request-publication`, { method: 'POST', body: '{}' })
+      ok('groups: a leader can ask for publication', asked.status === 200 && asked.json.asked >= 1)
+      ok(
+        'groups: the request is shown as waiting',
+        (await lead(`/news/${post}/request-publication`)).json.requested === true,
+      )
+      const todo = await api('/todo')
+      ok(
+        'groups: the publisher sees the request in « À faire »',
+        todo.json.publishRequests?.news >= 1,
+      )
+      await api(`/news/${post}/publish`, { method: 'POST', body: '{}' })
+      ok(
+        'groups: publishing closes the request',
+        (await lead(`/news/${post}/request-publication`)).json.requested === false,
+      )
+      await api(`/news/${post}`, { method: 'DELETE' })
+    }
     ok(
       'groups: a plain member cannot open Mon groupe',
       (await joiner.as(`/group-space/mine`)).status === 403,

@@ -1778,7 +1778,10 @@
       "rights_done_t": "Demandes sur les données : tout est à jour",
       "rights_p": "Une demande est en retard ou arrive à échéance dans 5 jours.",
       "kind_rights_due": "Demandes sur les données",
-      "kind_rights_due_p": "Des demandes d’accès, de correction ou d’effacement proches de leur délai."
+      "kind_rights_due_p": "Des demandes d’accès, de correction ou d’effacement proches de leur délai.",
+      "publish_t": "{by} demande la publication",
+      "publish_done_t": "Une demande de publication est traitée",
+      "publish_untitled": "Sans titre"
     },
     "picker": {
       "open": "Choisir",
@@ -2714,7 +2717,21 @@
     "visits_gap": "Seules les pages servies à la demande sont comptées : la page d’accueil et les pages fixes ne le sont pas.",
     "qa_news": "Écrire une actualité",
     "qa_sunday": "Bilan du dimanche",
-    "qa_event": "Créer un événement"
+    "qa_event": "Créer un événement",
+    "insight_req_news": "{n} actualité(s) à relire avant publication.",
+    "insight_req_events": "{n} événement(s) à relire avant publication.",
+    "insight_req_do": "Relire et publier",
+    "insight_join": "{n} demande(s) pour rejoindre votre groupe attendent une réponse.",
+    "insight_join_do": "Répondre",
+    "insight_cards": "{n} carte(s) de Sainte-Cène attendent une seconde approbation.",
+    "insight_cards_do": "Approuver",
+    "insight_baptisms": "{n} baptême(s) ou confirmation(s) déclaré(s) à confirmer.",
+    "insight_baptisms_do": "Confirmer",
+    "insight_messages": "{n} message(s) du formulaire de contact sans réponse.",
+    "insight_messages_do": "Ouvrir la boîte",
+    "insight_drafts_news": "{n} brouillon(s) d’actualité : demandez la publication quand c’est prêt.",
+    "insight_drafts_events": "{n} brouillon(s) d’événement : demandez la publication quand c’est prêt.",
+    "insight_drafts_do": "Ouvrir mes brouillons"
   },
   "content": {
     "status": {
@@ -2838,6 +2855,16 @@
       "to": "À",
       "remove": "Retirer le passage",
       "order": "Le verset de fin doit venir après le verset de début."
+    },
+    "request": {
+      "button": "Demander la publication",
+      "help": "Vous écrivez, le secrétariat relit et publie. Vous pouvez continuer à modifier : il verra la dernière version.",
+      "sent": "Demande envoyée : {n} personne(s) prévenue(s).",
+      "waiting": "Publication demandée le {date}. En attente du secrétariat.",
+      "again": "Redemander",
+      "not_ready": "Complétez d’abord le titre et le texte.",
+      "nobody": "Personne n’a le droit de publier ceci pour le moment. Prévenez le secrétariat.",
+      "error": "La demande n’a pas pu partir. Réessayez."
     }
   },
   "search": {
