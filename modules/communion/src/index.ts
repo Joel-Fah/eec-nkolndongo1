@@ -78,7 +78,7 @@ export const communionModule = defineModule({
         group: 'members',
         label: { fr: 'Cartes de Sainte-Cène', en: 'Communion cards' },
         path: '/m/communion',
-        icon: 'church',
+        icon: 'studentCard',
         order: 20,
         permission: 'communion:read',
       },

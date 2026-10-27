@@ -196,7 +196,7 @@ export function useInsights(): Insight[] {
   if (w?.cardsToApprove)
     out.push({
       key: 'cards',
-      icon: 'church',
+      icon: 'studentCard',
       text: 'dash.insight_cards',
       n: w.cardsToApprove,
       action: 'dash.insight_cards_do',

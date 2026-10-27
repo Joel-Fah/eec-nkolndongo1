@@ -116,6 +116,7 @@ import {
   SparklesIcon,
   SquareLock02Icon,
   StatusIcon,
+  StudentCardIcon,
   Sun03Icon,
   TableIcon,
   TagsIcon,
@@ -158,6 +159,8 @@ export const icons = {
   home: Home03Icon,
   calendar: Calendar03Icon,
   church: ChurchIcon,
+  /** The Communion card: its admin screen, its guide and the card on Mon espace. */
+  studentCard: StudentCardIcon,
   bible: Book02Icon,
   book: BookOpen01Icon,
   music: MusicNote03Icon,

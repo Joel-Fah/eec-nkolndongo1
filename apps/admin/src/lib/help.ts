@@ -20,7 +20,7 @@ export type Guide = {
 export const GUIDES: Guide[] = [
   {
     slug: 'cartes-sainte-cene',
-    icon: 'church',
+    icon: 'studentCard',
     summary: {
       fr: 'Proposer, approuver, viser le mois, noter les cotisations, vérifier une carte.',
       en: 'Propose, approve, sign the month, note contributions, check a card.',

@@ -111,7 +111,7 @@ export function cardEl(
   top.append(el('span', 'me-k', m.card_k), pill)
   const face = el('div', 'me-comm-face')
   const head = el('div', 'me-comm-head')
-  head.append(ico('church', 'me-comm-ico'), el('span', 'me-comm-parish', m.card_parish))
+  head.append(ico('studentCard', 'me-comm-ico'), el('span', 'me-comm-parish', m.card_parish))
   const who = el('div', 'me-comm-who')
   who.append(el('span', 'me-comm-name', card.name), el('span', 'me-comm-code', card.code))
   face.append(head, who)
