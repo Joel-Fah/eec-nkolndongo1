@@ -1,4 +1,4 @@
-import { can, canAnywhere, type Principal } from '@eec/auth'
+import { can, canAnywhere, type Principal, scopeFor } from '@eec/auth'
 import type { Context, MiddlewareHandler } from 'hono'
 import type { AppEnv } from './context.ts'
 
@@ -45,6 +45,21 @@ export function requirePermissionAnywhere(permission: string): Guarded {
 export async function mayOn(c: Context<AppEnv>, permission: string, groupId: string | null) {
   const actor = await c.var.deps.actor()
   return !!actor && can(actor.principal as Principal, permission, { groupId })
+}
+
+/**
+ * The group a new item belongs to when the person did not say. Someone who may write for the whole parish gets none (the
+ * parish); a group leader, whose right is for their group only, gets that group (the first, if they lead several).
+ */
+export async function groupForNew(
+  c: Context<AppEnv>,
+  permission: string,
+  asked: string | null,
+): Promise<string | null> {
+  if (asked) return asked
+  const actor = await c.var.deps.actor()
+  const scope = scopeFor((actor?.principal ?? null) as Principal | null, permission)
+  return scope === 'all' ? null : (scope[0] ?? null)
 }
 
 /** Signed-in user acting on their own data (profile, password, sessions). */

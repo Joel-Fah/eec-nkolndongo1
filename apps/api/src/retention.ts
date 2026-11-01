@@ -10,6 +10,8 @@
  *     (at most 6 after receipt)
  *   - registrations (module `registrations`, decision 0035): 6 months after the event, at most 12 months after the form closed;
  *     the anonymous totals per form are written first and kept
+ *   - group requests (decision 0049): decided ones 12 months after the decision, waiting ones after 6 months; expired group
+ *     announcements 12 months after they expired; closed data-rights requests 24 months after closing
  *   - member accounts whose deletion was requested more than 30 days ago (team accounts are never purged here)
  */
 import { dbUrl, type Env } from '@eec/api-kit'
@@ -39,6 +41,7 @@ export type RetentionResult = {
   audit: number
   contact: number
   registrations: number
+  groups: number
   accountsPurged: number
   accountsSkipped: number
 }
@@ -91,6 +94,7 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
       ),
       contact: 0,
       registrations: 0,
+      groups: 0,
       accountsPurged: 0,
       accountsSkipped: 0,
     }
@@ -132,6 +136,25 @@ export async function runRetention(env: Env, now = new Date()): Promise<Retentio
         ),
       )
     ).rows.length
+
+    // Group requests and expired announcements (decision 0049): tables read by name. Only counts are recorded.
+    const gr = await db.execute(
+      sql.raw(
+        `delete from group_requests where (status <> 'pending' and decided_at < now() - interval '12 months') or (status = 'pending' and requested_at < now() - interval '6 months') returning id`,
+      ),
+    )
+    const an = await db.execute(
+      sql.raw(
+        `delete from announcements_items where state = 'expired' and updated_at < now() - interval '12 months' returning id`,
+      ),
+    )
+    // Closed data-rights requests: 24 months after they were closed (decision 0052; duration to confirm with the legal notes).
+    const dr = await db.execute(
+      sql.raw(
+        `delete from rights_requests where closed_on is not null and closed_on < current_date - interval '24 months' returning id`,
+      ),
+    )
+    result.groups = gr.rows.length + an.rows.length + dr.rows.length
 
     // Accounts past their grace period. Anyone holding a role other than « membre » is a team account: skipped.
     const dueAccounts = await db

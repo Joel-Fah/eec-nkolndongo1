@@ -36,7 +36,8 @@ export function securityHeaders({ https, noindex }: HeaderOptions): Record<strin
     'x-content-type-options': 'nosniff',
     'referrer-policy': 'strict-origin-when-cross-origin',
     'permissions-policy':
-      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+      // camera=(self): only the admin's card scanner (decision 0050) asks for it, and only after the person taps « Ouvrir la caméra ».
+      'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
     'cross-origin-opener-policy': 'same-origin',
     ...(https ? { 'strict-transport-security': 'max-age=31536000; includeSubDomains' } : {}),
     ...(noindex ? { 'x-robots-tag': 'noindex, nofollow' } : {}),

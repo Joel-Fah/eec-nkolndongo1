@@ -37,3 +37,10 @@ Run locally / manually (CI stays frugal — `docs/ops/ci-cd.md`).
 ## Wrap-up
 - [ ] DB migration applied to Neon main (backup branch created first)
 - [ ] `STATUS.md` updated, tag `vYYYY.MM.N`
+
+## Release and real devices (Phase 05)
+- [ ] Neon backup branch **and** a working backup (the `backup` workflow green) before merging to `main`
+- [ ] `pnpm db:seed` after the deploy (grants are offered by the seed, decision 0048); `docs/ops/release-phase-04.md` for what no role holds
+- [ ] Privacy policy published when the purposes changed (« changement de finalité »)
+- [ ] Post-release smoke test and the device pass (`docs/ops/device-pass.md`): LCP/CLS, preloader first vs repeat visit, Worker CPU, TalkBack, keyboard, tap-to-dial, `.ics`, PWA install/offline/update, Rich Results, Neon egress
+- [ ] The service worker's new stamp is live and no private page was cached

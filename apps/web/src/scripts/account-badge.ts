@@ -10,8 +10,11 @@ type Badge = {
   signedIn: boolean
   seed?: number
   incomplete?: boolean
-  photo?: boolean
-  photoV?: number
+  /** The address of the photo, only when its owner chose it as their avatar. */
+  photo?: string | null
+  unread?: number
+  /** The keys of the groups the member belongs to. */
+  groups?: string[]
 }
 const KEY = 'eec-badge'
 const TTL = 60_000
@@ -46,6 +49,12 @@ export async function initAccountBadge() {
   if (!links.length) return
   const b = await read()
   if (!b?.signedIn) return
+  // A group's public page tells a member (and only them) that they belong to it.
+  for (const e of document.querySelectorAll<HTMLElement>('[data-member-of]'))
+    e.hidden = !(b.groups ?? []).includes(e.dataset.memberOf ?? '')
+  // The invitation above the footer speaks to a member differently.
+  for (const e of document.querySelectorAll<HTMLElement>('[data-cta-guest]')) e.hidden = true
+  for (const e of document.querySelectorAll<HTMLElement>('[data-cta-member]')) e.hidden = false
   for (const link of links) {
     if (link.dataset.badged) continue
     link.dataset.badged = '1'
@@ -63,7 +72,19 @@ export async function initAccountBadge() {
       })
       icon.replaceWith(wrap)
     }
-    if (b.incomplete) {
+    // Unread notifications: a red count on the avatar (9+ above nine) and the link goes straight to them. Otherwise, an incomplete
+    // profile shows the warning mark. One badge at a time, so the avatar never gets crowded.
+    const n = b.unread ?? 0
+    if (n > 0) {
+      const dot = document.createElement('span')
+      dot.className = 'acct-badge acct-count'
+      dot.setAttribute('aria-hidden', 'true')
+      dot.textContent = n > 9 ? '9+' : String(n)
+      link.append(dot)
+      const label = link.dataset.unreadLabel
+      if (label) link.setAttribute('aria-label', label.replace('{n}', String(n)))
+      link.setAttribute('href', `${link.getAttribute('href')?.replace(/#.*$/, '')}#notifications`)
+    } else if (b.incomplete) {
       const dot = document.createElement('span')
       dot.className = 'acct-badge'
       dot.setAttribute('aria-hidden', 'true')
@@ -82,4 +103,5 @@ export const forgetBadge = () => {
   } catch {
     // ignore
   }
+  dispatchEvent(new Event('eec:profile-changed'))
 }

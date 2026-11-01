@@ -5,10 +5,20 @@
  * News and Events use it; the module keeps only what is specific (fields, public reads, its own PATCH).
  */
 /* biome-ignore-all lint/suspicious/noExplicitAny: the factory is generic over a module's Drizzle table */
+
+import { allow } from '@eec/auth'
 import { cleanDoc, publishProblems, statusOf } from '@eec/core'
 import type { Db } from '@eec/db'
-import { contentRedirects, contentRevisions, mediaFiles, mediaUsages } from '@eec/db/schema'
-import { and, desc, eq, inArray } from 'drizzle-orm'
+import {
+  contentRedirects,
+  contentRevisions,
+  groups,
+  mediaFiles,
+  mediaUsages,
+  notifications,
+  user,
+} from '@eec/db/schema'
+import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { audit } from './audit.ts'
@@ -52,6 +62,14 @@ const date = z
 const publishSchema = z
   .object({ publishAt: date.optional(), unpublishAt: date.optional() })
   .strict()
+
+/** The Monday of the week of today in Douala (the key notifications are grouped by). */
+const thisWeek = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
+  const d = new Date(`${today}T12:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7))
+  return d.toISOString().slice(0, 10)
+}
 
 const lifecycleOf = (r: Row) => ({
   state: r.state as 'draft' | 'published' | 'archived',
@@ -137,6 +155,87 @@ export function contentRoutes<R extends Row>(cfg: ContentConfig<R>) {
   }
 
   const router = new Hono<AppEnv>()
+    // Someone who writes but may not publish (a group leader) asks the people who may (the secretariat). The request is an
+    // in-app notification for each of them, closed when the item is published; asking again re-opens it.
+    .get('/:id/request-publication', requirePermissionAnywhere(perms.edit), async (c) => {
+      const r = await load(c, c.req.param('id'), perms.edit)
+      if (r.error) return r.error
+      const [asked] = await r.db
+        .select({
+          at: sql<string | null>`min(${notifications.createdAt})`,
+          n: sql<number>`count(*)::int`,
+        })
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.kind, 'publish_request'),
+            eq(notifications.ref, `${entity}:${r.row.id}`),
+            isNull(notifications.resolvedAt),
+          ),
+        )
+      return c.json({ requested: (asked?.n ?? 0) > 0, at: asked?.at ?? null })
+    })
+    .post('/:id/request-publication', requirePermissionAnywhere(perms.edit), async (c) => {
+      const r = await load(c, c.req.param('id'), perms.edit)
+      if (r.error) return r.error
+      const { db, row } = r
+      const actor = await c.var.deps.actor()
+      const me = actor?.userId as string
+      if (!(await allow(db, `pubreq:${me}`, 20, 3600))) return fail(c, 429, 'rate_limited')
+      if (row.state !== 'draft') return fail(c, 409, 'not_draft')
+      const problems = cfg.problems(row, { publishAt: null, unpublishAt: null })
+      if (problems.length) return c.json({ error: { code: 'not_ready', problems } }, 400)
+      // Everyone who may publish this one: the parish-wide holders, those for its group, the super admins.
+      const who = await db.execute<{ user_id: string }>(sql`
+        select distinct ur.user_id from user_roles ur
+          join roles ro on ro.id = ur.role_id
+          join profiles pr on pr.user_id = ur.user_id and pr.status = 'active'
+          left join role_permissions rp on rp.role_id = ur.role_id and rp.permission_key = ${perms.publish}
+        where (ur.expires_at is null or ur.expires_at > now())
+          and (rp.permission_key is not null or (ro.key = 'super-admin' and ur.group_id is null))
+          and (ur.group_id is null or ur.group_id = ${row.groupId}::uuid)
+          and ur.user_id <> ${me}::uuid`)
+      if (!who.rows.length) return fail(c, 409, 'nobody')
+      const [by] = await db.select({ name: user.name }).from(user).where(eq(user.id, me))
+      const [grp] = row.groupId
+        ? await db
+            .select({ fr: groups.nameFr, en: groups.nameEn })
+            .from(groups)
+            .where(eq(groups.id, row.groupId))
+        : []
+      const params = {
+        entity,
+        title: cfg.revisionLabel(cfg.snapshotOf(row)).title,
+        by: by?.name ?? '',
+        groupFr: grp?.fr ?? null,
+        groupEn: grp?.en ?? grp?.fr ?? null,
+      }
+      const week = thisWeek()
+      await db
+        .insert(notifications)
+        .values(
+          who.rows.map((w) => ({
+            userId: w.user_id,
+            kind: 'publish_request',
+            ref: `${entity}:${row.id}`,
+            params,
+            href: `/m/${area}#${row.id}`,
+            weekOf: week,
+          })),
+        )
+        .onConflictDoUpdate({
+          target: [notifications.userId, notifications.kind, notifications.ref],
+          set: { params, weekOf: week, readAt: null, resolvedAt: null, dismissedAt: null },
+        })
+      await audit(c, {
+        action: 'update',
+        entityType: entity,
+        entityId: row.id,
+        summaryFr: 'Publication demandée',
+        summaryEn: 'Publication requested',
+      })
+      return c.json({ ok: true, asked: who.rows.length })
+    })
     .post('/:id/publish', requirePermissionAnywhere(perms.publish), async (c) => {
       const r = await load(c, c.req.param('id'), perms.publish)
       if (r.error) return r.error
@@ -173,6 +272,17 @@ export function contentRoutes<R extends Row>(cfg: ContentConfig<R>) {
         summaryFr: l.fr,
         summaryEn: l.en,
       })
+      // Whoever asked for this to be published has their answer: the requests close for everyone who was asked.
+      await db
+        .update(notifications)
+        .set({ resolvedAt: new Date() })
+        .where(
+          and(
+            eq(notifications.kind, 'publish_request'),
+            eq(notifications.ref, `${entity}:${row.id}`),
+            isNull(notifications.resolvedAt),
+          ),
+        )
       return c.json({ status: statusOf(lifecycleOf(next as R)) })
     })
     .post('/:id/unpublish', requirePermissionAnywhere(perms.publish), async (c) => {
@@ -226,6 +336,11 @@ export function contentRoutes<R extends Row>(cfg: ContentConfig<R>) {
       await r.db
         .delete(contentRedirects)
         .where(and(eq(contentRedirects.entityType, entity), eq(contentRedirects.entityId, id)))
+      await r.db
+        .delete(notifications)
+        .where(
+          and(eq(notifications.kind, 'publish_request'), eq(notifications.ref, `${entity}:${id}`)),
+        )
       await r.db.delete(table).where(eq(table.id, id))
       await bumpContentVersion(r.db, area)
       const l = cfg.labels.deleted

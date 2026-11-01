@@ -8,6 +8,7 @@ import {
   ConfirmDialog,
   CoverField,
   PublishDialog,
+  RequestPublication,
   RevisionsDrawer,
   SaveIndicator,
   StatusBadge,
@@ -1149,6 +1150,9 @@ function Editor({ id, onBack }: { id: string; onBack: () => void; onOpen: (id: s
                 </Button>
               )}
             </div>
+            {!canPublish && canEdit && meta.status === 'draft' && (
+              <RequestPublication base="/events" id={id} flush={autosave.flush} onMessage={say} />
+            )}
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="secondary"

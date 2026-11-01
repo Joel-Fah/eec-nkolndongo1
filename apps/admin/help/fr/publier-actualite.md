@@ -14,6 +14,17 @@ Une **actualité** est un texte qui apparaît sur la page **Actualités** du sit
 
 > Votre travail est enregistré automatiquement. Tant que vous n'avez pas publié, personne ne le voit.
 
+## Si vous ne pouvez pas publier
+
+Un responsable de groupe écrit, le secrétariat relit et publie.
+
+1. Écrivez l’actualité (ou l’événement) : le titre et le texte sont nécessaires.
+2. Dans le panneau **Statut**, cliquez sur **Demander la publication**. Les personnes qui peuvent publier reçoivent une notification (la cloche).
+3. Le panneau dit « Publication demandée le… ». Vous pouvez continuer à modifier : le secrétariat voit la dernière version.
+4. Quand c’est publié, la demande se ferme d’elle-même.
+
+Même chose pour les événements de l’Agenda.
+
 ## Bon à savoir
 
 - **Aperçu** : un lien secret, valable 3 jours, pour montrer le brouillon à quelqu'un qui n'a pas de compte.

@@ -21,15 +21,18 @@ export const KINDS = [
   'sunday_report_due',
   'sunday_review',
   'campaign_review',
+  'rights_due',
 ] as const
+/** What the list shows: the kinds a person can silence, and requests from colleagues (« please publish this »), which are not silenced. */
+const LISTED = [...KINDS, 'publish_request']
 const todayLocal = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 
-type Want = { ref: string; params: Record<string, unknown>; href: string; weekOf: string }
-type Db = Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>
+export type Want = { ref: string; params: Record<string, unknown>; href: string; weekOf: string }
+export type Db = Awaited<ReturnType<AppEnv['Variables']['deps']['db']>>
 
 /** Brings one kind of notification in line with what is due now: creates the new, reopens the grown, closes the done. */
-async function sync(db: Db, me: string, kind: string, wants: Want[]) {
+export async function sync(db: Db, me: string, kind: string, wants: Want[]) {
   const mine = await db
     .select()
     .from(notifications)
@@ -180,6 +183,24 @@ export const notificationRoutes = new Hono<AppEnv>()
         : [],
     )
 
+    // 3b. Data requests overdue or due within five days (decision 0052): one line a week while there are any.
+    let rightsDue = 0
+    if (on('rights') && can(p, 'rights:read')) {
+      rightsDue = Number(
+        (
+          await db.execute<{ n: number }>(
+            sql`select count(*)::int as n from rights_requests where status in ('received','in_progress') and due_on <= (${today}::date + 5)`,
+          )
+        ).rows[0]?.n ?? 0,
+      )
+    }
+    await run(
+      'rights_due',
+      rightsDue > 0
+        ? [{ ref: week, params: { count: rightsDue }, href: '/m/rights', weekOf: week }]
+        : [],
+    )
+
     // 4. The Monday nudge: one summary a week of everything above, until it is all done.
     const nr = muted.has('sunday_report_due') ? 0 : reports.length
     const nv = muted.has('sunday_review') ? 0 : reviews.length
@@ -205,6 +226,7 @@ export const notificationRoutes = new Hono<AppEnv>()
       .where(
         and(
           eq(notifications.userId, me),
+          inArray(notifications.kind, LISTED),
           isNull(notifications.dismissedAt),
           muted.size ? notInArray(notifications.kind, [...muted]) : undefined,
         ),
@@ -218,6 +240,7 @@ export const notificationRoutes = new Hono<AppEnv>()
       .where(
         and(
           eq(notifications.userId, me),
+          inArray(notifications.kind, LISTED),
           isNull(notifications.readAt),
           isNull(notifications.resolvedAt),
           isNull(notifications.dismissedAt),

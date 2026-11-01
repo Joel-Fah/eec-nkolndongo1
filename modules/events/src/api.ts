@@ -13,6 +13,7 @@ import {
   cachedJson,
   contentRoutes,
   fail,
+  groupForNew,
   mayOn,
   requirePermissionAnywhere,
   verifyPreview,
@@ -633,7 +634,8 @@ export const eventsApi = new Hono<AppEnv>()
       })
       .safeParse(await c.req.json().catch(() => ({})))
     if (!body.success) return fail(c, 400, 'invalid')
-    if (!(await mayOn(c, 'events:edit', body.data.groupId))) return fail(c, 403, 'forbidden')
+    const groupId = await groupForNew(c, 'events:edit', body.data.groupId)
+    if (!(await mayOn(c, 'events:edit', groupId))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
     const actor = await c.var.deps.actor()
     // Default: next Sunday 09:00 local (UTC+1 for Douala).
@@ -653,7 +655,7 @@ export const eventsApi = new Hono<AppEnv>()
       .values({
         slug,
         titleFr: body.data.titleFr,
-        groupId: body.data.groupId,
+        groupId,
         startsAt: body.data.startsAt ?? next,
         createdBy: actor?.userId,
         updatedBy: actor?.userId,

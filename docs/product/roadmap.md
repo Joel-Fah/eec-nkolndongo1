@@ -34,11 +34,13 @@ Each item becomes a module (`modules/<id>`). Phases are indicative; order inside
 - In-app notifications ✅ (added): reminders, validators' queue, weekly summary, per-person mutes
 - PWA ✅: installable, offline reading of saved public pages
 - Member profile ✅ (added): optional details behind a consent, private photo, generated avatar, completion warnings
+- Phase 05 ✅ (dev, merge pending): Mon espace as the member's home (registrations, groups, notifications, profile), groups with join requests and leaders' space (« Mon groupe », announcements), the carte de Sainte-Cène (cards, Elders' visa, contributions register, QR check, offline copy), the data-rights log. Push: decided « not now » (0051).
 
 ## Phase 3 — Deepen
 - `payments`: pawaPay (MTN MoMo + Orange Money), receipts, treasurer reconciliation
-- Member services: **carte de Sainte-Cène** (the member card was removed from Mon espace for now, decision 0047: one card, planned properly here together with the rest of « Mon espace »), attendance, group memberships
-- Department spaces (leaders' tools)
+- ~~Member services: carte de Sainte-Cène, group memberships~~ (done in Phase 05); per-person attendance stays out of scope
+- Department tools beyond rosters and announcements
+- Push notifications (0051: not now; needs real devices and a measured CPU cost)
 - `requests`: sacrament requests (only after a data-protection decision record)
 - Privacy-friendly analytics dashboard
 - Phone/SMS or WhatsApp login (paid per message — evaluate)

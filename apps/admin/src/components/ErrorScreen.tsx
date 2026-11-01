@@ -1,6 +1,7 @@
 import { useLocale, useMe } from '@eec/admin-kit'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useRouter } from '@tanstack/react-router'
-import { type PointerEvent, useRef } from 'react'
+import { type PointerEvent, useRef, useState } from 'react'
 import { Brand } from './Brand'
 import { LocaleSwitch, ThemeButton } from './Controls'
 import { Icon } from './Icon'
@@ -22,6 +23,22 @@ export function ErrorScreen({
   const { t, locale } = useLocale()
   const me = useMe().data
   const router = useRouter()
+  const qc = useQueryClient()
+  const [retrying, setRetrying] = useState(false)
+  // Try again for real: forget the failed answers (a cached error would just throw again), run the page's loaders once more,
+  // then let the page draw itself. If it still fails, the screen comes back and the button is usable again.
+  const retry = async () => {
+    setRetrying(true)
+    try {
+      await qc.resetQueries({ predicate: (q) => q.state.status === 'error' })
+      await router.invalidate()
+    } catch {
+      // still failing: the boundary below shows the screen again
+    } finally {
+      setRetrying(false)
+      reset?.()
+    }
+  }
   const root = useRef<HTMLDivElement>(null)
   const staff = !!me && (me.isSuperAdmin || me.permissions.length > 0)
   const tx = useRef({ x: 0, y: 0, tx: 0, ty: 0, frame: 0 })
@@ -74,7 +91,9 @@ export function ErrorScreen({
             <button
               type="button"
               className="btn btn-primary btn-lg"
-              onClick={reset ?? (() => router.invalidate())}
+              disabled={retrying}
+              aria-busy={retrying}
+              onClick={() => void retry()}
             >
               <Icon name="refresh" />
               {t('admin.error.retry')}

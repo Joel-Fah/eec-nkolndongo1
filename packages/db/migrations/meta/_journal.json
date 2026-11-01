@@ -253,6 +253,41 @@
       "when": 1792947319147,
       "tag": "0035_eager_next_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1792987262954,
+      "tag": "0036_narrow_edwin_jarvis",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792990417981,
+      "tag": "0037_round_mathemanic",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1793004951833,
+      "tag": "0038_nappy_mulholland_black",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1793006973024,
+      "tag": "0039_classy_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1793040145777,
+      "tag": "0040_confused_valkyrie",
+      "breakpoints": true
     }
   ]
 }

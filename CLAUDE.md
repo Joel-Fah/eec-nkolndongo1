@@ -35,7 +35,7 @@ super admin and (for now) the only developer. Read this file, then `STATUS.md`, 
 
 Astro (public) · Vite + React + TanStack (admin) · Hono on Cloudflare Workers (API) · Neon Postgres +
 self-hosted Better Auth (0018) · Drizzle · S3-compatible bucket: Neon Object Storage now, R2 later (0020) · YouTube (video) ·
-Google Drive (archive only) · outbox now, Brevo later (0019) · hand-written PWA service worker (0037) · in-app notifications (0044) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + Erode (0023).
+Google Drive (archive only) · outbox now, Brevo later (0019) · hand-written PWA service worker (0037, amended by 0050) · in-app notifications (0044) · Tailwind v4 · GSAP · Hugeicons stroke-rounded · Switzer + Erode (0023).
 pnpm workspaces + Turborepo.
 
 ## How to work
@@ -71,5 +71,8 @@ pnpm --filter @eec/scripts og:generate | brand:icons | jsonld:check | social:kit
 - Anything private (Mon espace, photos, notifications, member-only pages) is `private, no-store`, `noindex`, and in the service worker's private list.
 - Figures that wait for validation (0045) count nowhere; a person cannot validate their own entry.
 - Modules never import each other: cross-module data is read by table name; `modules/scope.test.ts` and the route-table test must stay green.
-- System-role grants are only written when a role is created: after adding a permission, grant it in Rôles on each environment (tell Joël).
+- System-role grants are **offered once** by the seed (decision 0048): after adding a permission, run `pnpm db:seed` on each environment; a grant removed on purpose in Rôles never comes back. Tell Joël what a new role needs.
+- A person waiting (a join request, a card proposed) is **never** counted as a member or a holder: keep them in their own table or status.
+- Anything that reveals a belief (baptism, confirmation, the card) is sensitive: explicit acknowledgement, restricted access, erased with the account (0050).
+- Help for an admin screen lives in the top-bar help sheet (`apps/admin/help/<lang>/<slug>.md` + `GUIDES` in `apps/admin/src/lib/help.ts`), never inline on the page.
 - Production is Joël's: no deploy, migration, seed, secret, role grant or merge to `main` without his explicit OK. Never set `SITE_INDEXABLE=1`.

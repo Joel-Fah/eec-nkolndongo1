@@ -28,6 +28,7 @@ import { type ShapeId, shapes } from '../../lib/shapes'
 import ContentCard from '../content/ContentCard.astro'
 import LangFallbackNote from '../content/LangFallbackNote.astro'
 import UnavailableState from '../content/UnavailableState.astro'
+import MeSections from '../MeSections.astro'
 import SiteLockup from '../SiteLockup.astro'
 import ThemeToggle from '../ThemeToggle.astro'
 import DocBlock from './DocBlock.astro'
@@ -79,6 +80,10 @@ type Id =
   | 'pagination'
   | 'insetfields'
   | 'datepicker'
+  | 'mespace'
+  | 'communioncard'
+  | 'groupspace'
+  | 'headerbell'
   | 'identicon'
   | 'profilebadge'
   | 'timepicker'
@@ -471,6 +476,62 @@ const doc = (id: Id) => ({
       <div class="flex flex-wrap items-center gap-6">
         <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge">!</span></span>
         <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(7)} /></span>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('mespace')}>
+      <div class="grid max-w-[28rem] gap-3">
+        <MeSections />
+        <div class="me-card" data-tone="gold">
+          <span class="me-k">{t('member.me.next_reg_k')}</span>
+          <span class="me-t">Retraite des femmes</span>
+          <div class="me-row"><span class="me-m">samedi 7 novembre</span><span class="me-pill">{t('member.me.status_confirmed')}</span></div>
+        </div>
+        <div class="me-card">
+          <div class="me-row"><span class="me-t">Concert de Noël</span><span class="me-pill" data-tone="warn">{t('member.me.status_waitlist')}</span></div>
+          <span class="me-m">samedi 19 décembre · n° 1</span>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('communioncard')}>
+      <div class="grid max-w-[16rem] gap-3">
+        <MeSections />
+        <div class="me-card me-comm" data-state="valid">
+          <div class="me-row"><span class="me-k">{t('member.me.card_k')}</span><span class="me-pill">{t('member.me.card_state_valid')}</span></div>
+          <div class="me-comm-face">
+            <div class="me-comm-head"><span class="me-comm-parish">{t('member.me.card_parish')}</span></div>
+            <div class="me-comm-who"><span class="me-comm-name">Marie N.</span><span class="me-comm-code">EEC-7K2M-4Q9X</span></div>
+            <ol class="me-comm-grid" aria-hidden="true">
+              <li data-s="signed"><span class="me-comm-mo">Janv.</span><span class="me-comm-g">✓</span></li>
+              <li data-s="excused"><span class="me-comm-mo">Févr.</span><span class="me-comm-g">⏸</span></li>
+              <li data-s="missed"><span class="me-comm-mo">Mars</span><span class="me-comm-g">–</span></li>
+              <li data-s="open"><span class="me-comm-mo">Avr.</span><span class="me-comm-g">•</span></li>
+              <li data-s="future"><span class="me-comm-mo">Mai</span><span class="me-comm-g"></span></li>
+              <li data-s="before"><span class="me-comm-mo">Juin</span><span class="me-comm-g"></span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('groupspace')}>
+      <div class="grid max-w-[28rem] gap-3">
+        <div class="me-card">
+          <div class="me-top"><span class="me-ico" aria-hidden="true"><Icon name="userMultiple" /></span><div class="grid"><span class="me-t">Chorale</span></div><span class="me-pill">{t('member.me.member_badge')}</span></div>
+          <div class="me-ann"><span class="me-ico" aria-hidden="true"><Icon name="megaphone" /></span><span class="me-t">Répétition déplacée</span><span class="me-p">Samedi, même heure.</span></div>
+        </div>
+        <div class="me-card" data-tone="gold">
+          <div class="me-top"><span class="me-ico" aria-hidden="true"><Icon name="clock" /></span><div class="grid"><span class="me-k">{t('member.me.request_k')}</span><span class="me-t">Jeunesse</span></div></div>
+          <p class="me-p">{t('member.me.request_p')}</p>
+        </div>
+      </div>
+    </DocBlock>
+
+    <DocBlock {...doc('headerbell')}>
+      <div class="flex items-center gap-4">
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(2026)} /><span class="acct-badge acct-count">3</span></span>
+        <span class="nav-account btn btn-secondary btn-icon" aria-hidden="true"><span class="nav-avatar" set:html={avatarSvg(7)} /><span class="acct-badge acct-count">9+</span></span>
       </div>
     </DocBlock>
 

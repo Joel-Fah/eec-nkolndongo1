@@ -10,6 +10,11 @@ export type Principal = {
   status: 'active' | 'invited' | 'deactivated'
   isSuperAdmin: boolean
   grants: readonly Grant[]
+  /**
+   * A staff member with no password (a member who signed up with Google and was then given a role, decision 0053): every
+   * right is suspended until they set one. Set by the request layer, never stored.
+   */
+  needsPassword?: boolean
 }
 
 /** Load a user's effective rights once per request (callers memoise on the request context). */
@@ -68,7 +73,7 @@ export function can(
   permission: string,
   opts: { groupId?: string | null } = {},
 ): boolean {
-  if (p?.status !== 'active') return false
+  if (p?.status !== 'active' || p.needsPassword) return false
   if (p.isSuperAdmin) return true
   return p.grants.some(
     (g) => g.permissions.has(permission) && (g.groupId === null || g.groupId === opts.groupId),
@@ -77,13 +82,13 @@ export function can(
 
 /** Does the principal hold `permission` for at least one scope? (menu visibility, list screens) */
 export function canAnywhere(p: Principal | null, permission: string): boolean {
-  if (p?.status !== 'active') return false
+  if (p?.status !== 'active' || p.needsPassword) return false
   return p.isSuperAdmin || p.grants.some((g) => g.permissions.has(permission))
 }
 
 /** Group ids where the principal holds the permission via a scoped grant ('all' if global/super admin). */
 export function scopeFor(p: Principal | null, permission: string): 'all' | string[] {
-  if (p?.status !== 'active') return []
+  if (p?.status !== 'active' || p.needsPassword) return []
   if (p.isSuperAdmin || p.grants.some((g) => g.groupId === null && g.permissions.has(permission)))
     return 'all'
   return p.grants

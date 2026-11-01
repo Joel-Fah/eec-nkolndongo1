@@ -6,6 +6,7 @@ import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-route
 import { useEffect, useState } from 'react'
 import { guideForPath } from '../lib/help'
 import { labelOf, navFor } from '../lib/nav'
+import { roleLabels } from '../lib/roles'
 import { Brand } from './Brand'
 import { CommandPalette } from './CommandPalette'
 import { LocaleSwitch, ThemeButton } from './Controls'
@@ -51,6 +52,7 @@ export function AppShell() {
     .toUpperCase()
   const path = useRouterState({ select: (s) => s.location.pathname })
   const groups = navFor(me)
+  const roles = roleLabels(me, locale)
 
   return (
     <div className="admin-shell" data-mobile-open={mobileOpen ? '' : undefined}>
@@ -132,6 +134,16 @@ export function AppShell() {
             <kbd className="admin-kbd">⌘K</kbd>
           </button>
           <div className="admin-topbar-tools">
+            {roles.length > 0 && (
+              <span
+                className="admin-role"
+                data-tip={roles.map((r) => r.label).join(' · ')}
+                data-tip-end
+              >
+                {roles[0]?.label}
+                {roles.length > 1 && <span className="admin-role-more">+{roles.length - 1}</span>}
+              </span>
+            )}
             <NotificationsBell />
             {guideForPath(path) && (
               <button
@@ -177,11 +189,24 @@ export function AppShell() {
               <Menu.Portal>
                 <Menu.Positioner sideOffset={8} align="end" className="eec-positioner">
                   <Menu.Popup className="eec-popover eec-popup">
-                    <div className="grid px-3 py-2">
-                      <p className="text-sm font-medium">{me?.user.name}</p>
-                      <p className="text-xs text-ink-muted">{me?.user.email}</p>
+                    <div className="admin-menu-id">
+                      <Icon name="id" size={20} />
+                      <div className="grid">
+                        <p className="text-sm font-medium">{me?.user.name}</p>
+                        <p className="text-xs text-ink-muted">{me?.user.email}</p>
+                        {roles.length > 0 && (
+                          <ul className="admin-menu-roles" aria-label={t('admin.user.roles')}>
+                            {roles.map((r) => (
+                              <li key={r.key} className="admin-role">
+                                {r.label}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     </div>
                     <Menu.LinkItem className="menu-item" render={<Link to="/account" />}>
+                      <Icon name="account" size={20} />
                       {t('admin.items.account')}
                       {b?.incomplete && (
                         <span className="menu-flag">{t('admin.user.to_complete')}</span>
@@ -199,6 +224,7 @@ export function AppShell() {
                         navigate({ to: '/login' })
                       }}
                     >
+                      <Icon name="logout" size={20} />
                       {t('admin.user.signout')}
                     </Menu.Item>
                   </Menu.Popup>

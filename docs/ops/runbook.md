@@ -103,15 +103,25 @@ By hand: `pnpm --filter @eec/api retention`.
   the parish name or tagline changes; commit the result.
 - **Structured data check**: `node scripts/jsonld-check.ts <base url>`, then Google's Rich Results Test (see `launch.md`).
 
-## Phase 04 go-live checklist (Joël, in this order)
-1. Neon backup branch, then migrations **0024–0034** (all additive) on production, then `pnpm db:seed` and `pnpm bible:seed`.
-2. Role grants in Rôles (system roles only get grants when first created): treasurer = campaigns read + progress, sundays read + offerings;
-   secretariat = campaigns read + edit + validate, sundays read + attendance + close + export, registrations; **Editor = sundays read + propose** (0045).
-3. A new privacy-policy version and its notice (0033), because the purposes grew: profile details and photo (0047), Sunday figures stay aggregates.
-4. Private profile photos live in the media bucket under `private/avatar/…` (never a public media key). The second copy (`media:sync`) and the backups
-   must treat that prefix as **private data**: keep the destination private and encrypted like the database backups.
-5. `CF_ANALYTICS_TOKEN` if visit counts are wanted; never set `SITE_INDEXABLE=1` without reading `docs/ops/launch.md`.
-6. Real-phone passes: install and offline, LCP, TalkBack, keyboard, the pickers and the member card on a phone.
+## Release checklist (every phase; the first full one was Phase 04)
+1. **Before anything:** a Neon **backup branch** of production (`pre-phase-NN`) **and** a working encrypted backup (`pnpm backup` in the prod shell, or the `backup` workflow). The
+   weekly `backup` workflow must be green: it was failing with a 403 on upload until the GitHub environment secrets matched `.env.production.local`
+   (`gh secret set AWS_… --env production`, from the prod shell).
+2. Look at production's migration table (which migrations it already has) and check that every new one is additive. Merge to `main` (**merging deploys**): the `deploy` workflow migrates, builds, deploys.
+3. In the prod shell: `pnpm db:seed` (and `pnpm bible:seed` the first time). **Since decision 0048 the seed gives the system roles their grants by itself** (each grant offered once; nothing is removed or brought back).
+   What no system role holds is listed in `docs/ops/release-phase-04.md` (regenerate with `pnpm --filter @eec/modules grants:report`).
+4. **Privacy policy:** when the purposes changed, publish a new version in Légal with « changement de finalité » ticked (draft: `docs/legal/privacy-policy-draft-v2.md`).
+5. Private profile photos live in the media bucket under `private/avatar/…` (never a public media key): the second copy (`media:sync`) and the backups must keep that prefix **private and encrypted**.
+6. `CF_ANALYTICS_TOKEN` only if visit counts are wanted. **Never set `SITE_INDEXABLE=1`** before the launch decision (`docs/ops/launch.md`).
+7. Smoke test and device pass: `docs/ops/device-pass.md`.
+
+## Phase 05: groups, Communion cards, data requests
+- **After the deploy** (`pnpm db:seed` in the prod shell): the ledger offers the new grants once (Responsable de groupe: roster, members, announcements; Secrétariat: cards, register, data requests; Pasteur, Trésorier) and creates the **Ancien d'Église** role. Then grant **Ancien d'Église** to the Elders, and **Responsable de groupe** (with the group) to each leader.
+- **Start of a year (cards):** in *Cartes de Sainte-Cène*, filter « Expirée » and renew each card with a second person (the pasteur): the old QR code stops working. Cards are proposed by the secretariat after the baptism is confirmed from the register.
+- **At the door:** *Vérifier une carte* on a phone (camera) or scan the QR with any reader: the page says « valide jusqu'au … » or « non valide ». Offline, the member's own phone still shows their last card (« vérifiée le … »).
+- **Fees:** set once by the treasurer in *Cotisations attendues* (age bands and groups). Members only ever see « attendu ».
+- **Data requests:** log them in *Demandes sur les données*; the 30-day deadline is the cautious reading, to confirm with the legal notes.
+- **Push:** not built (decision 0051). No VAPID keys to manage.
 
 ## Monitoring and limits to watch (Free plans)
 Workers: 100 000 requests/day, 10 ms CPU per request. Neon: storage and the 5 GB/month egress shared with the media

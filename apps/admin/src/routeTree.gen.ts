@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAuditRouteImport } from './routes/_app/audit'
 import { Route as AppGroupsRouteImport } from './routes/_app/groups'
 import { Route as AppHealthRouteImport } from './routes/_app/health'
+import { Route as AppMyGroupRouteImport } from './routes/_app/my-group'
 import { Route as AppOutboxRouteImport } from './routes/_app/outbox'
 import { Route as AppRolesRouteImport } from './routes/_app/roles'
 import { Route as AppUiRouteImport } from './routes/_app/ui'
@@ -35,6 +37,11 @@ const AppRoute = AppRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetPasswordRoute = SetPasswordRouteImport.update({
+  id: '/set-password',
+  path: '/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -60,6 +67,11 @@ const AppGroupsRoute = AppGroupsRouteImport.update({
 const AppHealthRoute = AppHealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyGroupRoute = AppMyGroupRouteImport.update({
+  id: '/my-group',
+  path: '/my-group',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutboxRoute = AppOutboxRouteImport.update({
@@ -121,10 +133,12 @@ const AppUsersIdRoute = AppUsersIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
   '/health': typeof AppHealthRoute
+  '/my-group': typeof AppMyGroupRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
@@ -139,10 +153,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/account': typeof AppAccountRoute
   '/audit': typeof AppAuditRoute
   '/groups': typeof AppGroupsRoute
   '/health': typeof AppHealthRoute
+  '/my-group': typeof AppMyGroupRoute
   '/outbox': typeof AppOutboxRoute
   '/roles': typeof AppRolesRoute
   '/ui': typeof AppUiRoute
@@ -160,10 +176,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/_app/account': typeof AppAccountRoute
   '/_app/audit': typeof AppAuditRoute
   '/_app/groups': typeof AppGroupsRoute
   '/_app/health': typeof AppHealthRoute
+  '/_app/my-group': typeof AppMyGroupRoute
   '/_app/outbox': typeof AppOutboxRoute
   '/_app/roles': typeof AppRolesRoute
   '/_app/ui': typeof AppUiRoute
@@ -182,10 +200,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/set-password'
     | '/account'
     | '/audit'
     | '/groups'
     | '/health'
+    | '/my-group'
     | '/outbox'
     | '/roles'
     | '/ui'
@@ -200,10 +220,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/set-password'
     | '/account'
     | '/audit'
     | '/groups'
     | '/health'
+    | '/my-group'
     | '/outbox'
     | '/roles'
     | '/ui'
@@ -220,10 +242,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/login'
+    | '/set-password'
     | '/_app/account'
     | '/_app/audit'
     | '/_app/groups'
     | '/_app/health'
+    | '/_app/my-group'
     | '/_app/outbox'
     | '/_app/roles'
     | '/_app/ui'
@@ -241,6 +265,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SetPasswordRoute: typeof SetPasswordRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ResetTokenRoute: typeof ResetTokenRoute
 }
@@ -259,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-password': {
+      id: '/set-password'
+      path: '/set-password'
+      fullPath: '/set-password'
+      preLoaderRoute: typeof SetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -294,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof AppHealthRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-group': {
+      id: '/_app/my-group'
+      path: '/my-group'
+      fullPath: '/my-group'
+      preLoaderRoute: typeof AppMyGroupRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/outbox': {
@@ -381,6 +420,7 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppGroupsRoute: typeof AppGroupsRoute
   AppHealthRoute: typeof AppHealthRoute
+  AppMyGroupRoute: typeof AppMyGroupRoute
   AppOutboxRoute: typeof AppOutboxRoute
   AppRolesRoute: typeof AppRolesRoute
   AppUiRoute: typeof AppUiRoute
@@ -398,6 +438,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppGroupsRoute: AppGroupsRoute,
   AppHealthRoute: AppHealthRoute,
+  AppMyGroupRoute: AppMyGroupRoute,
   AppOutboxRoute: AppOutboxRoute,
   AppRolesRoute: AppRolesRoute,
   AppUiRoute: AppUiRoute,
@@ -415,6 +456,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  SetPasswordRoute: SetPasswordRoute,
   InviteTokenRoute: InviteTokenRoute,
   ResetTokenRoute: ResetTokenRoute,
 }

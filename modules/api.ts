@@ -1,7 +1,9 @@
 /** Server side of the registry: each module's API router, mounted at /api/<id> (apps/api). */
 import type { AppEnv } from '@eec/api-kit'
+import { announcementsApi } from '@eec/module-announcements/api'
 import { bulletinApi } from '@eec/module-bulletin/api'
 import { campaignsApi } from '@eec/module-campaigns/api'
+import { communionApi } from '@eec/module-communion/api'
 import { contactApi } from '@eec/module-contact/api'
 import { departmentsApi } from '@eec/module-departments/api'
 import { eventsApi } from '@eec/module-events/api'
@@ -13,6 +15,7 @@ import { meditationsApi } from '@eec/module-meditations/api'
 import { membersApi } from '@eec/module-members/api'
 import { newsApi } from '@eec/module-news/api'
 import { registrationsApi } from '@eec/module-registrations/api'
+import { rightsApi } from '@eec/module-rights/api'
 import { scheduleApi } from '@eec/module-schedule/api'
 import { sermonsApi } from '@eec/module-sermons/api'
 import { settingsApi } from '@eec/module-settings/api'
@@ -23,6 +26,9 @@ import type { Hono } from 'hono'
 // biome-ignore lint/suspicious/noExplicitAny: routers have their own schemas; the app only mounts them
 export const moduleApis: Record<string, Hono<AppEnv, any, any>> = {
   contact: contactApi,
+  announcements: announcementsApi,
+  communion: communionApi,
+  rights: rightsApi,
   departments: departmentsApi,
   guides: guidesApi,
   legal: legalApi,

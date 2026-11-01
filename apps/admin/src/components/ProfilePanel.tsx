@@ -23,6 +23,8 @@ export type MyProfile = {
   consent: boolean
   details: Details
   signIn: ('google' | 'email')[]
+  /** Whether Google is set up on this site at all. */
+  googleEnabled: boolean
   photo: {
     has: boolean
     source: 'upload' | 'google' | null

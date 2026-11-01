@@ -86,8 +86,8 @@ modules/events/                 workspace package @eec/module-events
 
 ## 5. Identity, roles and permissions
 
-- **Better Auth** (self-hosted, decision 0018) answers *who are you*: email + password now, Google for members
-  later; passwords hashed in Postgres (bcrypt) to stay within the Worker's CPU budget.
+- **Better Auth** (self-hosted, decision 0018) answers *who are you*: email + password, Google for members and, once linked by the person from Mon compte, for staff (0053);
+  passwords hashed in Postgres (bcrypt) to stay within the Worker's CPU budget.
 - **Our tables** answer *what can you do*:
   - `roles` (e.g. Super admin, Secrétariat, Éditeur, Responsable de département, Trésorier, Membre)
   - `permissions` (seeded from module manifests)
@@ -183,3 +183,14 @@ voice and tone, logo, colour, type, shape, motion, icons, illustration, every co
 - **Share cards, JSON-LD, sitemap:** `scripts/og-generate.ts`, `scripts/jsonld-check.ts`, on-demand `/sitemap.xml`; the launch kit is `docs/ops/launch.md`.
 - **Checks you can run:** `pnpm check` (lint, typecheck, tests incl. route-table, scope matrix, boundaries), `pnpm e2e` (local stack only).
 - Decisions 0034–0047 are listed in `docs/decisions/README.md`.
+
+## Phase 05 additions
+- **Mon espace** (`docs/product/mon-espace.md`): a static page, full width once signed in (welcome, side menu, bento home, five sections warmed after the first paint); everything is drawn from `/api/me/*`, `/api/communion/me`, never cached
+  (`private, no-store`). Scripts `apps/web/src/scripts/mon-espace.ts`, `me-*.ts`. The notification count lives on the avatar in the public header (`account-badge.ts`).
+- **Groups for members** (0049): `group_requests` (a person waiting is not a member), `group_members.share_phone`, `/api/group-space` (« Mon groupe »: roster, requests, removal, audited export; every route checks the right *for that group*),
+  `announcements` module (scoped by group, notifies the members).
+- **Communion cards** (0050, module `communion`): propose → a second person approves; the Elders sign the month and keep the contributions register; signed QR (`signPreview` over card id + version; renewing stops old codes) to `/verifier/?t=…`
+  (public, rate-limited, first name + initial only); the card is copied to IndexedDB for offline use; the service worker may keep the **empty shell** of Mon espace only (0037 amended). One dependency: `qrcode-generator` (API only).
+- **Data rights log** (0052, module `rights`): requests from people without an account, with the deadline; a staff notification when one is overdue.
+- **System-role grants are offered once** by the seed (0048, ledger `role_permission_offers`). **Push is not built** (0051).
+- Decisions 0048–0052 are in `docs/decisions/README.md`. Migrations 0035–0040.

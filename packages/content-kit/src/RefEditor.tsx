@@ -35,6 +35,7 @@ type Labels = {
   chapter: string
   from: string
   to: string
+  endChapter: string
   remove: string
   order: string
 }
@@ -133,12 +134,15 @@ export function RefEditor({
   onRemove,
   disabled,
   idPrefix,
+  allowSpan = false,
 }: {
   value: BibleRef
   onChange: (next: BibleRef) => void
   onRemove?: () => void
   disabled?: boolean
   idPrefix: string
+  /** Lets the passage run into a later chapter (« Jean 7 : 53 – 8 : 11 »), as the year plan does. */
+  allowSpan?: boolean
 }) {
   const { t, locale } = useLocale()
   const labels = {
@@ -146,14 +150,18 @@ export function RefEditor({
     chapter: t('content.passage.chapter'),
     from: t('content.passage.from'),
     to: t('content.passage.to'),
+    endChapter: t('content.passage.end_chapter'),
     remove: t('content.passage.remove'),
     order: t('content.passage.order'),
   }
+  const span = !!value.endChapter
   const bad =
+    !span &&
     value.from != null &&
     value.to != null &&
     value.to !== '' &&
     compareVerses(value.to, value.from) < 0
+  const chapters = chapterCount(value.book)
   return (
     <div className="reading-box" data-invalid={bad ? '' : undefined}>
       <div className="reading-row">
@@ -170,7 +178,9 @@ export function RefEditor({
                 book,
                 chapter,
                 from: value.from != null ? clampVerse(String(value.from), max) : null,
-                to: value.to != null ? clampVerse(String(value.to), max) : null,
+                to:
+                  value.to != null ? clampVerse(String(value.to), verseCount(book, chapter)) : null,
+                endChapter: null,
               })
             }}
             options={BOOKS.map((b) => ({ value: b.id, label: locale === 'en' ? b.en : b.fr }))}
@@ -184,8 +194,71 @@ export function RefEditor({
           disabled={disabled}
           labels={labels}
           idPrefix={idPrefix}
-          onChange={(patch) => onChange({ ...value, ...patch })}
+          onChange={(patch) =>
+            onChange({
+              ...value,
+              ...patch,
+              // Moving the first chapter past the second closes the span.
+              ...(patch.chapter && value.endChapter && patch.chapter >= value.endChapter
+                ? { endChapter: null }
+                : {}),
+            })
+          }
+          showTo={!allowSpan}
         />
+        {allowSpan && (
+          <>
+            <label className="reading-num" htmlFor={`${idPrefix}-e`}>
+              <span className="field-label">{labels.endChapter}</span>
+              <input
+                id={`${idPrefix}-e`}
+                className="input"
+                inputMode="numeric"
+                maxLength={3}
+                placeholder={`${Math.min(value.chapter + 1, chapters)}–${chapters}`}
+                disabled={disabled}
+                value={value.endChapter ?? ''}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, '')
+                  if (!raw) return onChange({ ...value, endChapter: null })
+                  const c = Math.min(Number(raw), chapters)
+                  onChange({
+                    ...value,
+                    endChapter: c > value.chapter ? c : null,
+                    to:
+                      value.to != null
+                        ? clampVerse(
+                            String(value.to),
+                            verseCount(value.book, c > value.chapter ? c : value.chapter),
+                          )
+                        : null,
+                  })
+                }}
+              />
+            </label>
+            <label className="reading-num" htmlFor={`${idPrefix}-t`}>
+              <span className="field-label">{labels.to}</span>
+              <input
+                id={`${idPrefix}-t`}
+                className="input"
+                maxLength={4}
+                placeholder={`1–${verseCount(value.book, value.endChapter ?? value.chapter)}`}
+                aria-invalid={bad}
+                disabled={disabled}
+                value={value.to ?? ''}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    to: clampVerse(
+                      e.target.value,
+                      verseCount(value.book, value.endChapter ?? value.chapter),
+                    ),
+                  })
+                }
+              />
+            </label>
+          </>
+        )}
         {onRemove && !disabled && (
           <Button
             variant="secondary"

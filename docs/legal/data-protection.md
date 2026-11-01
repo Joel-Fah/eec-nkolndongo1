@@ -21,9 +21,9 @@
 | Contact form messages | 12 months after closure |
 | Member account | While active; deleted 30 days after deletion request |
 | Event registrations | 6 months after the event |
-| Newsletter subscription | Until unsubscribe |
+| Newsletter subscription | **Not built** (no domain yet): nothing is kept |
 | Audit log | 24 months |
-| Server logs | 30 days |
+| Server logs | **Not kept by the site** (no application logs of visitors; Cloudflare's own logs are outside our control, to confirm) |
 
 ## Implemented in Phase 02 (2026-10)
 - Consents stored per person with the policy version, the optional one withdrawable (Mon espace); the privacy page
@@ -125,6 +125,7 @@
   beyond that list.** Behind a separate, unticked, withdrawable consent (`profile`) with the policy version; withdrawing erases the details.
   Staff see an **age band** (never the exact date), how the person signs in (Google or e-mail) and aggregates (groups under 5 people are not shown on their own). The CSV export of these
   columns is limited to the export permission and audited by row count.
+- **Google for staff (0053):** a staff account can add Google from « Mon compte » (password asked again). Stored: the Google account id and the tokens Better Auth keeps for the sign-in; scopes openid, e-mail, profile only. Every link and removal is in the activity log. Removing it, or deleting the account, erases it.
 - **Profile photo:** seen by the parish team who manage members (`members:read`), never public; the member decides whether it is also their avatar in the menu (otherwise a generated avatar). One 512 px WebP, metadata removed in the browser, served only by session-checked routes (`private, no-store`). A Google sign-in photo counts as the member's photo until they choose another. Deleted with the photo, the consent or the account.
 - **Member card:** removed for now; it comes back with the communion card in the next phase.
 - Retention: with the account, in « my data » and in the 30-day deletion.
@@ -137,3 +138,34 @@ what a parent provides for a specific activity.
 - Politique de confidentialité (draft in `docs/research/`, to rewrite)
 - Mentions légales
 - Cookie notice: none needed if we use no tracking cookies (only essential session cookies) — keep it that way.
+
+## Groupes, demandes et annonces (décision 0049, Phase 05)
+- **Ce qui est gardé** : l'appartenance à un groupe (`group_members`, avec la case « partager mon numéro avec les responsables » décochée par défaut), les demandes pour rejoindre (`group_requests` : qui, quel groupe, message du membre et de la décision, dates), les annonces d'un groupe (`announcements_items`).
+- **Pourquoi** : que chaque responsable connaisse son groupe sans passer par le secrétariat ; prévenir les membres.
+- **Qui voit quoi** : un responsable ne voit que son groupe (nom, avatar, arrivée, titre, numéro si partagé, tranche d'âge si ≥ 5 personnes) ; jamais l'e-mail ni la date de naissance. Le secrétariat voit tous les groupes. Rien n'est public.
+- **Export** de la liste d'un groupe : droit dangereux `core:group-export`, limité au groupe, journalisé.
+- **Conservation** : demande décidée effacée après 12 mois, demande en attente effacée après 6 mois, tout effacé avec le compte. Le motif d'un retrait reste dans le journal d'activité (24 mois), jamais montré au membre.
+
+## Carte de Sainte-Cène (décision 0050, Phase 05)
+- **Ce qui est gardé** : la carte (`communion_cards`), les visas mensuels, les excuses déclarées par le membre (sans motif), les cotisations reçues (registre), les montants attendus
+  (barèmes), et, sur le profil, la déclaration « baptisé / confirmé » du membre (avec le consentement `profile`) et la confirmation de la paroisse (qui, quand).
+- **Donnée sensible** : appartenance religieuse (baptême, confirmation, communiant). Accès : secrétariat et pasteur (émission, confirmation), Anciens (visa, registre), trésorier (barèmes, registre).
+  Jamais publique. Le contrôle par QR ne montre que « valide / non valide », un prénom et l'initiale du nom.
+- **Règles** : une carte est proposée par une personne et approuvée par une autre ; la suspension est du ressort du secrétariat, le retrait du pasteur (motif dans le journal seulement) ; le membre ne voit
+  jamais un motif ni une dette.
+- **Conservation** : tout est effacé avec le compte (cascade). La carte de papier reste la référence.
+- **Sur l'appareil** : la dernière carte est gardée dans le navigateur (IndexedDB) pour s'ouvrir sans réseau ; effacée à la déconnexion, au bout de 45 jours ou à l'expiration.
+
+## Registre des demandes sur les données (décision 0052, Phase 05)
+- **Ce qui est gardé** : type de demande, nom de la personne, moyen de lui répondre (facultatif), canal, dates, issue en quelques mots (jamais les données), qui a traité.
+- **Qui voit** : secrétariat (`rights:read` / `handle`) ; suppression : super administrateur. Le journal d'activité garde le type, jamais la personne.
+- **Délai** : 30 jours (lecture prudente, **à confirmer** avec la loi). **Conservation** : 24 mois après la clôture (à confirmer).
+- Le registre complet des traitements est dans `docs/legal/register.md` (Phase 05 : entrées ajoutées, le reste au Checkpoint L).
+
+## Ce que ce document ne disait pas encore (corrigé 2026-10-27)
+- **Notifications** dans le site (`notifications`, `notification_mutes`) : un type, un titre court, un lien ; gardées avec le compte.
+- **Boîte d'envoi** (`mail_outbox`) : messages à transmettre à la main, effacés après 90 jours.
+- **Sessions** : appareil et date de chaque connexion, visibles et fermables par la personne ; expirées effacées chaque jour.
+- **Sauvegardes** : une copie chiffrée hebdomadaire de la base ; **une personne supprimée peut rester dans les dernières sauvegardes (jusqu'à 12 sauvegardes hebdomadaires)** : à dire dans la politique de confidentialité.
+- **Groupes, demandes, annonces, carte de Sainte-Cène, demandes sur les données** : voir les sections ci-dessus.
+- **Cadre légal** : voir `member-data-legal-notes.md` (lecture de sources secondaires, points à confirmer) et `questions-pour-un-juriste.md`.

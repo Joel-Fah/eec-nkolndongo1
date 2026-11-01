@@ -5,8 +5,10 @@
  * Data only — no server or browser code here, so both the API and the admin can import it.
  */
 import { coreModule } from '@eec/auth/core-module'
+import { announcementsModule } from '@eec/module-announcements'
 import { bulletinModule } from '@eec/module-bulletin'
 import { campaignsModule } from '@eec/module-campaigns'
+import { communionModule } from '@eec/module-communion'
 import { contactModule } from '@eec/module-contact'
 import { departmentsModule } from '@eec/module-departments'
 import { eventsModule } from '@eec/module-events'
@@ -18,6 +20,7 @@ import { meditationsModule } from '@eec/module-meditations'
 import { membersModule } from '@eec/module-members'
 import { newsModule } from '@eec/module-news'
 import { registrationsModule } from '@eec/module-registrations'
+import { rightsModule } from '@eec/module-rights'
 import { scheduleModule } from '@eec/module-schedule'
 import { sermonsModule } from '@eec/module-sermons'
 import { settingsModule } from '@eec/module-settings'
@@ -45,6 +48,9 @@ export const modules: readonly DefinedModule[] = [
   storyModule,
   contactModule,
   legalModule,
+  announcementsModule,
+  communionModule,
+  rightsModule,
 ]
 
 export const moduleById = (id: string) => modules.find((m) => m.id === id)

@@ -12,6 +12,7 @@ import {
   cachedJson,
   contentRoutes,
   fail,
+  groupForNew,
   mayOn,
   requirePermissionAnywhere,
   verifyPreview,
@@ -397,7 +398,8 @@ export const newsApi = new Hono<AppEnv>()
       })
       .safeParse(await c.req.json().catch(() => ({})))
     if (!body.success) return fail(c, 400, 'invalid')
-    if (!(await mayOn(c, 'news:edit', body.data.groupId))) return fail(c, 403, 'forbidden')
+    const groupId = await groupForNew(c, 'news:edit', body.data.groupId)
+    if (!(await mayOn(c, 'news:edit', groupId))) return fail(c, 403, 'forbidden')
     const db = await c.var.deps.db()
     const actor = await c.var.deps.actor()
     const slug = await freeSlug(db, slugOf(body.data.titleFr) || 'sans-titre')
@@ -406,7 +408,7 @@ export const newsApi = new Hono<AppEnv>()
       .values({
         slug,
         titleFr: body.data.titleFr,
-        groupId: body.data.groupId,
+        groupId,
         createdBy: actor?.userId,
         updatedBy: actor?.userId,
       })

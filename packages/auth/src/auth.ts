@@ -10,7 +10,40 @@ export type GoogleConfig = { clientId: string; clientSecret: string }
 
 /** Cookie set by POST /api/members/google before the redirect: the consent the person gave, and their language. */
 export const GOOGLE_INTENT_COOKIE = 'eec_gc'
-export type GoogleIntent = { l: 'fr' | 'en'; privacy: boolean; news: boolean; v: string }
+export type GoogleIntent = {
+  l: 'fr' | 'en'
+  privacy: boolean
+  news: boolean
+  v: string
+  /** `admin` when the person started from the admin sign-in page: only existing staff may come out of it signed in. */
+  a?: 'admin'
+}
+
+/** A Google link younger than this was made by the sign-in itself (an e-mail match), not earlier by the person (decision 0053). */
+export const GOOGLE_FRESH_MS = 10_000
+
+export const googleLinkIsFresh = (createdAt: Date, now = Date.now()) =>
+  now - createdAt.getTime() < GOOGLE_FRESH_MS
+
+export type GoogleVerdict = 'ok' | 'staff' | 'notstaff' | 'consent'
+
+/**
+ * What to do with someone who has just come back from Google (decision 0053). Staff may sign in with a link they made
+ * themselves earlier (from their account, or as a member before being given a role): never with one the sign-in has just
+ * created by matching the e-mail. The admin page lets only staff through. A new member needs the consent ticked first.
+ */
+export function googleVerdict(x: {
+  staff: boolean
+  freshLink: boolean
+  knownMember: boolean
+  fromAdmin: boolean
+  consent: boolean
+}): GoogleVerdict {
+  if (x.staff) return x.freshLink ? 'staff' : 'ok'
+  if (x.fromAdmin) return 'notstaff'
+  if (x.knownMember) return 'ok'
+  return x.consent ? 'ok' : 'consent'
+}
 
 export function readIntent(cookieHeader: string | null | undefined): GoogleIntent | null {
   const raw = cookieHeader
@@ -21,7 +54,8 @@ export function readIntent(cookieHeader: string | null | undefined): GoogleInten
   if (!raw) return null
   try {
     const v = JSON.parse(decodeURIComponent(raw)) as GoogleIntent
-    return v && (v.l === 'fr' || v.l === 'en') ? v : null
+    if (!v || (v.l !== 'fr' && v.l !== 'en')) return null
+    return v.a === 'admin' ? v : { ...v, a: undefined }
   } catch {
     return null
   }
@@ -36,10 +70,12 @@ export type AuthDeps = {
   origin: string
   /** Send a password-reset link somewhere: the outbox until a domain exists (decision 0019). */
   sendResetPassword?: (data: { email: string; url: string; userId: string }) => Promise<void>
-  /** Members only (never staff). Absent = the Google button stays inactive. */
+  /** Absent = the Google buttons stay inactive. Members sign up and in with it; staff only with a link they added themselves (0053). */
   google?: GoogleConfig
   /** Policy version recorded with a Google sign-up's consent. */
   policyVersion?: string
+  /** Where the admin lives, e.g. `/admin/` (the sign-in page is `login` under it). */
+  adminBase?: string
 }
 
 const PASSWORD_PATHS = new Set([
@@ -57,8 +93,10 @@ export function createAuth({
   sendResetPassword,
   google,
   policyVersion = 'unversioned',
+  adminBase = '/admin/',
 }: AuthDeps) {
   const secure = origin.startsWith('https://')
+  const adminLoginPath = `${adminBase}login`
   return betterAuth({
     appName: 'EEC Nkolndongo 1',
     baseURL: origin,
@@ -82,9 +120,12 @@ export function createAuth({
         locale: { type: 'string', required: false, input: false },
       },
     },
-    // Google is for members. A member who first signed up with a password may add Google (Google verifies
-    // the address). Staff never sign in this way: the after-hook below undoes it and removes the link.
-    account: { accountLinking: { enabled: true, trustedProviders: ['google'] } },
+    // Anyone may link Google from their own signed-in account, even to another e-mail address (decision 0053).
+    // A member who signed up with a password is also linked when Google returns the same verified address. Staff
+    // are not: the after-hook below refuses a link that the sign-in itself has just made.
+    account: {
+      accountLinking: { enabled: true, trustedProviders: ['google'], allowDifferentEmails: true },
+    },
     socialProviders: google
       ? {
           google: {
@@ -152,41 +193,75 @@ export function createAuth({
         const created = ctx.context.newSession?.user
         if (!created) return
         const intent = readIntent(ctx.request?.headers.get('cookie'))
+        const fromAdmin = intent?.a === 'admin'
         const back = (code: string): never => {
-          throw ctx.redirect(`${origin}/${intent?.l ?? 'fr'}/mon-espace/?google=${code}`)
+          throw ctx.redirect(
+            fromAdmin
+              ? `${origin}${adminLoginPath}?google=${code}`
+              : `${origin}/${intent?.l ?? 'fr'}/mon-espace/?google=${code}`,
+          )
         }
-        const undo = async (deleteUser: boolean) => {
-          await db.delete(schema.session).where(eq(schema.session.userId, created.id))
-          if (deleteUser) await db.delete(schema.user).where(eq(schema.user.id, created.id))
-          else
-            await db
-              .delete(schema.account)
-              .where(
-                and(eq(schema.account.userId, created.id), eq(schema.account.providerId, 'google')),
-              )
+        /** Closes only the sign-in that has just happened; the account's other sessions are not touched. */
+        const dropSession = async () => {
+          const id = ctx.context.newSession?.session.id
+          if (id) await db.delete(schema.session).where(eq(schema.session.id, id))
         }
+        const dropLink = () =>
+          db
+            .delete(schema.account)
+            .where(
+              and(eq(schema.account.userId, created.id), eq(schema.account.providerId, 'google')),
+            )
         ctx.setCookie(GOOGLE_INTENT_COOKIE, '', { maxAge: 0, path: '/api/auth' })
 
-        // Staff never use Google: their sessions are short and tightly controlled.
         const grants = await db
           .select({ k: schema.roles.key })
           .from(schema.userRoles)
           .innerJoin(schema.roles, eq(schema.roles.id, schema.userRoles.roleId))
           .where(eq(schema.userRoles.userId, created.id))
-        if (grants.some((g) => g.k !== 'membre')) {
-          await undo(false)
-          return back('staff')
-        }
+        const [link] = await db
+          .select({ at: schema.account.createdAt })
+          .from(schema.account)
+          .where(
+            and(eq(schema.account.userId, created.id), eq(schema.account.providerId, 'google')),
+          )
         const [known] = await db
           .select({ id: schema.consents.id })
           .from(schema.consents)
           .where(and(eq(schema.consents.userId, created.id), eq(schema.consents.kind, 'privacy')))
-        if (known) return
-        // First time: only valid if the person ticked the privacy consent before leaving for Google.
-        if (!intent?.privacy) {
-          await undo(true)
+        const freshLink = !!link && googleLinkIsFresh(link.at)
+        /** An account only this visit created (never one that existed, even without a consent on record: an invited person, say). */
+        const undoVisit = async () => {
+          await dropSession()
+          if (googleLinkIsFresh(created.createdAt))
+            await db.delete(schema.user).where(eq(schema.user.id, created.id))
+          else if (freshLink) await dropLink()
+        }
+        const verdict = googleVerdict({
+          staff: grants.some((g) => g.k !== 'membre'),
+          freshLink,
+          knownMember: !!known,
+          fromAdmin,
+          consent: !!intent?.privacy,
+        })
+        if (verdict === 'ok' && known) return
+        if (verdict === 'staff') {
+          // Staff are not linked by an e-mail match: only the person, signed in, can add Google to their account.
+          await dropSession()
+          await dropLink()
+          return back('staff')
+        }
+        if (verdict === 'notstaff') {
+          // The admin page is for staff: anyone else is signed out again, and nothing this visit created is kept.
+          await undoVisit()
+          return back('notstaff')
+        }
+        if (verdict === 'consent') {
+          // First time: only valid if the person ticked the privacy consent before leaving for Google.
+          await undoVisit()
           return back('consent')
         }
+        if (!intent?.privacy || grants.some((g) => g.k !== 'membre')) return
         await db.insert(schema.consents).values([
           { userId: created.id, kind: 'privacy', policyVersion: intent.v || policyVersion },
           ...(intent.news
@@ -227,6 +302,22 @@ export function createAuth({
       }),
     },
     databaseHooks: {
+      account: {
+        create: {
+          // Every Google link is in the activity log (decision 0053); staff can see it on the person's page.
+          after: async (a) => {
+            if (a.providerId !== 'google') return
+            await db.insert(schema.auditLog).values({
+              actorId: a.userId,
+              action: 'google.link',
+              entityType: 'account',
+              entityId: a.userId,
+              summaryFr: 'Compte Google lié',
+              summaryEn: 'Google account linked',
+            })
+          },
+        },
+      },
       user: {
         create: {
           // Every account starts as a member with a profile; staff roles are granted separately.

@@ -18,6 +18,7 @@ import {
   publicRoute,
   requirePermission,
   requirePermissionAnywhere,
+  requireSelf,
   signPreview,
   verifyPreview,
   versionFor,
@@ -34,7 +35,7 @@ import {
   uniqueSlug,
 } from '@eec/core'
 import type { Db } from '@eec/db'
-import { mailOutbox } from '@eec/db/schema'
+import { mailOutbox, notifications } from '@eec/db/schema'
 import { and, asc, count, desc, eq, inArray, ne, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
@@ -161,6 +162,12 @@ async function takenOf(db: Db, formId: string): Promise<number> {
   return row?.n ?? 0
 }
 
+/** The Monday (YYYY-MM-DD) of the week a day falls in: how notifications are grouped. */
+const mondayOf = (d: Date) => {
+  const day = (d.getUTCDay() + 6) % 7
+  return new Date(d.getTime() - day * 86_400_000).toISOString().slice(0, 10)
+}
+
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name
 
 /** After a place opens: the next people on the waitlist who fit move up, in the order they came, and the secretariat is told. */
@@ -186,6 +193,19 @@ async function promoteWaitlist(db: Db, form: Form): Promise<number> {
       locale: 'fr',
       payload: { firstName: firstName(r.name), phone: r.phone, form: form.titleFr, code: r.code },
     })
+    // A member who registered signed in is told in Mon espace (the kind and the title only; the words are written on screen).
+    if (r.userId)
+      await db
+        .insert(notifications)
+        .values({
+          userId: r.userId,
+          kind: 'waitlist_promoted',
+          ref: r.id,
+          params: { title: form.titleFr, titleEn: form.titleEn },
+          href: 'account:inscriptions',
+          weekOf: mondayOf(new Date()),
+        })
+        .onConflictDoNothing()
     free -= r.partySize
     moved++
   }
@@ -550,6 +570,120 @@ export const registrationsApi = new Hono<AppEnv>()
       )
     },
   )
+  // ——— The signed-in member's own registrations (Mon espace, Phase 05) ———————————————————————
+  // Linked when the person registered signed in (`user_id`), or by opening the signed cancel link (see /mine/claim).
+  .get('/mine', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    c.header('cache-control', 'private, no-store')
+    const db = await c.var.deps.db()
+    const en = localeOf(c.req.query('locale')) === 'en'
+    const rows = await db
+      .select({ r: registrations, f: registrationForms })
+      .from(registrations)
+      .innerJoin(registrationForms, eq(registrationForms.id, registrations.formId))
+      .where(eq(registrations.userId, actor.userId))
+      .orderBy(desc(registrationForms.eventDate))
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
+    const items = []
+    for (const { r, f } of rows) {
+      let position: number | null = null
+      if (r.status === 'waitlist') {
+        const [ahead] = await db
+          .select({ n: count() })
+          .from(registrations)
+          .where(
+            and(
+              eq(registrations.formId, f.id),
+              eq(registrations.status, 'waitlist'),
+              sql`${registrations.createdAt} < ${r.createdAt}`,
+            ),
+          )
+        position = (ahead?.n ?? 0) + 1
+      }
+      items.push({
+        id: r.id,
+        code: r.code,
+        status: r.status,
+        partySize: r.partySize,
+        position,
+        title: (en && f.titleEn) || f.titleFr,
+        eventDate: f.eventDate,
+        eventSlug: f.eventSlug,
+        upcoming: f.eventDate >= today,
+        purgeOn: retentionOf(f).purgeOn,
+      })
+    }
+    return c.json({ items })
+  })
+  .post('/mine/:id/cancel', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const id = c.req.param('id')
+    if (!/^[0-9a-f-]{36}$/.test(id)) return fail(c, 400, 'invalid')
+    const db = await c.var.deps.db()
+    const [reg] = await db
+      .select()
+      .from(registrations)
+      .where(and(eq(registrations.id, id), eq(registrations.userId, actor.userId)))
+    if (!reg) return fail(c, 404, 'not_found')
+    if (reg.status !== 'cancelled') {
+      await db
+        .update(registrations)
+        .set({ status: 'cancelled', cancelledAt: new Date(), updatedAt: new Date() })
+        .where(eq(registrations.id, id))
+      const form = await loadForm(db, reg.formId)
+      if (form && reg.status === 'confirmed') await promoteWaitlist(db, form)
+      await bumpContentVersion(db, AREA)
+      await audit(c, {
+        action: 'update',
+        entityType: 'registration',
+        entityId: id,
+        summaryFr: 'Inscription annulée par la personne',
+        summaryEn: 'Registration cancelled by its owner',
+      })
+    }
+    return c.json({ ok: true })
+  })
+  // « Relier »: whoever holds the signed cancel link of a registration made without an account can attach it to their account.
+  // Holding the link proves it is theirs; nothing is ever matched on a phone number or an e-mail address.
+  .post('/mine/claim', requireSelf(), async (c) => {
+    const actor = await c.var.deps.actor()
+    if (!actor) return fail(c, 401, 'unauthenticated')
+    const body = z
+      .object({ token: z.string().min(10).max(600) })
+      .strict()
+      .safeParse(await c.req.json().catch(() => null))
+    if (!body.success) return fail(c, 400, 'invalid')
+    const db = await c.var.deps.db()
+    if (!(await allow(db, `claim:${actor.userId}`, 10, 3600))) return fail(c, 429, 'rate_limited')
+    // The member may paste the whole link: the token is its `t` parameter.
+    let raw = body.data.token.trim()
+    try {
+      raw = new URL(raw).searchParams.get('t') ?? raw
+    } catch {
+      // not a link: it is the token itself
+    }
+    const id = await verifyPreview(c.env.AUTH_SECRET, raw, CANCEL_ENTITY)
+    if (!id) return fail(c, 400, 'invalid_link')
+    const [reg] = await db.select().from(registrations).where(eq(registrations.id, id))
+    if (!reg) return fail(c, 404, 'not_found')
+    if (reg.userId && reg.userId !== actor.userId) return fail(c, 409, 'taken')
+    if (!reg.userId) {
+      await db
+        .update(registrations)
+        .set({ userId: actor.userId, updatedAt: new Date() })
+        .where(eq(registrations.id, id))
+      await audit(c, {
+        action: 'update',
+        entityType: 'registration',
+        entityId: id,
+        summaryFr: 'Inscription reliée à un compte par la personne',
+        summaryEn: 'Registration linked to an account by its owner',
+      })
+    }
+    return c.json({ ok: true })
+  })
   // What the cancel page shows before asking: the activity and the first name, nothing more.
   .get('/public/cancel', async (c) => {
     const id = await verifyPreview(c.env.AUTH_SECRET, c.req.query('t') ?? '', CANCEL_ENTITY)

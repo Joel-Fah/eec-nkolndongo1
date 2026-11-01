@@ -40,10 +40,11 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0033 | Legal documents are versioned; members told when the policy changes | Accepted |
 | 0034 | Sermon audio: no hosting and no processing on the site; links only | Accepted |
 | 0035 | Registrations: what is collected, from whom, for how long | Accepted |
+| 0036 | (not used: the audio encoding pipeline it was reserved for was dropped by 0034) | — |
+| 0037 | PWA: manifest and a small hand-written service worker, nothing private cached | Accepted |
 | 0038 | Visit counts without tracking (Analytics Engine), off until enabled | Accepted |
 | 0039 | Home texts and key figures are content slots | Accepted |
 | 0040 | A role and a screen for the content partner to validate and comment | Accepted |
-| 0037 | PWA: manifest and a small hand-written service worker, nothing private cached | Accepted |
 | 0041 | Campaigns (Moissons): validated totals only, entered and validated by two people | Accepted |
 | 0042 | The Moissons page: members only, in season, one immersive story | Accepted |
 | 0043 | Sunday reports: attendance and offerings as aggregates, two roles | Accepted |
@@ -51,3 +52,9 @@ Proposed · Accepted · Superseded by NNNN. Add a new record instead of rewritin
 | 0045 | Proposed Sunday figures: the editor proposes, the secretariat and the treasurer validate | Accepted |
 | 0046 | A person can silence a kind of notification | Accepted |
 | 0047 | Member profile details, a private photo, and the virtual member card | Accepted |
+| 0048 | System-role grants are offered once, by the seed (a ledger) | Accepted |
+| 0049 | Rejoindre un groupe, l'espace du responsable, les annonces | Accepted |
+| 0050 | La carte de Sainte-Cène | Accepted |
+| 0051 | Les notifications push : pas maintenant | Accepted |
+| 0052 | Le registre des demandes sur les données | Accepted |
+| 0053 | Google pour le personnel : relié depuis son compte, jamais par l'e-mail | Accepted |
