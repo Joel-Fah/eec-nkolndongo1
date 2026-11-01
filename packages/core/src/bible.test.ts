@@ -47,3 +47,19 @@ describe('bible references', () => {
     expect(cleanRef(null)).toBeNull()
   })
 })
+
+describe('a passage that runs into another chapter', () => {
+  it('is read, kept and written in full', () => {
+    const r = cleanRef({ book: 'jhn', chapter: 7, from: 53, to: 11, endChapter: 8 })
+    expect(r).toEqual({ book: 'jhn', chapter: 7, from: 53, to: 11, endChapter: 8 })
+    expect(formatRef(r as never, 'fr')).toBe('Jean 7 : 53–8 : 11')
+    expect(formatRef({ book: 'jhn', chapter: 7, endChapter: 8 }, 'en')).toBe('John 7–8')
+  })
+  it('refuses a second chapter that does not come after, or past the book', () => {
+    expect(cleanRef({ book: 'jhn', chapter: 7, endChapter: 7 })).toBeNull()
+    expect(cleanRef({ book: 'jhn', chapter: 7, endChapter: 99 })).toBeNull()
+  })
+  it('checks the last verse against the second chapter', () => {
+    expect(cleanRef({ book: 'jhn', chapter: 7, from: 53, to: 500, endChapter: 8 })).toBeNull()
+  })
+})

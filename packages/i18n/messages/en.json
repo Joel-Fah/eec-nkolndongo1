@@ -2866,7 +2866,8 @@
       "from": "From",
       "to": "To",
       "remove": "Remove the passage",
-      "order": "The last verse must come after the first."
+      "order": "The last verse must come after the first.",
+      "end_chapter": "To chapter"
     },
     "request": {
       "button": "Ask for publication",

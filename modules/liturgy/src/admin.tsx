@@ -463,6 +463,7 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
                 )}
                 {form.readings.map((r, i) => (
                   <RefEditor
+                    allowSpan
                     // biome-ignore lint/suspicious/noArrayIndexKey: edited in place
                     key={i}
                     idPrefix={`reading-${i}`}

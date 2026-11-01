@@ -78,7 +78,14 @@ export const BOOKS = [
 
 /** A verse number, with an optional part letter: 16, « 1b ». Up to three digits. */
 export type VerseNo = number | string
-export type BibleRef = { book: BookId; chapter: number; from?: VerseNo | null; to?: VerseNo | null }
+export type BibleRef = {
+  book: BookId
+  chapter: number
+  from?: VerseNo | null
+  to?: VerseNo | null
+  /** A passage that runs into another chapter (« Jean 7 : 53 – 8 : 11 »): `to` is then a verse of this chapter. */
+  endChapter?: number | null
+}
 
 const VERSE = /^(\d{1,3})([a-z])?$/i
 /** Digits and the letter of a verse number (« 1b » → [1, 'b']). */
@@ -125,6 +132,11 @@ export function formatRef(ref: BibleRef, locale: 'fr' | 'en'): string {
   if (!book) return ''
   const name = book[locale]
   const colon = locale === 'fr' ? ' : ' : ':'
+  if (ref.endChapter && ref.endChapter > ref.chapter) {
+    if (!ref.from) return `${name} ${ref.chapter}–${ref.endChapter}`
+    const end = ref.to ? `${ref.endChapter}${colon}${ref.to}` : `${ref.endChapter}`
+    return `${name} ${ref.chapter}${colon}${ref.from}–${end}`
+  }
   if (!ref.from) return `${name} ${ref.chapter}`
   const verses =
     ref.to && compareVerses(ref.to, ref.from) > 0 ? `${ref.from}–${ref.to}` : `${ref.from}`
@@ -144,15 +156,30 @@ export function cleanRef(raw: unknown): BibleRef | null {
       : null
   if (!chapter) return null
   const blank = (v: unknown) => v == null || v === ''
+  // A second chapter, after the first and inside the book (blank = the passage stays in one chapter).
+  let endChapter: number | null = null
+  if (!blank(r.endChapter)) {
+    if (
+      !Number.isInteger(r.endChapter) ||
+      (r.endChapter as number) <= chapter ||
+      (r.endChapter as number) > chapterCount(r.book)
+    )
+      return null
+    endChapter = r.endChapter as number
+  }
   const from = blank(r.from) ? null : cleanVerse(r.from)
   const to = blank(r.to) ? null : cleanVerse(r.to)
   if (!blank(r.from) && from === null) return null
-  if (!blank(r.to) && (to === null || from === null || compareVerses(to, from) < 0)) return null
+  if (!blank(r.to) && (to === null || from === null)) return null
+  // Across chapters the verses are not compared; inside one chapter « to » cannot come before « from ».
+  if (to != null && from != null && !endChapter && compareVerses(to, from) < 0) return null
   // A verse that the chapter does not have is refused (« Jean 140 : 173 » never gets in).
   if (
     (from != null && !inRange(r.book, chapter, from)) ||
-    (to != null && !inRange(r.book, chapter, to))
+    (to != null && !inRange(r.book, endChapter ?? chapter, to))
   )
     return null
-  return { book: r.book, chapter, from, to }
+  return endChapter
+    ? { book: r.book, chapter, from, to, endChapter }
+    : { book: r.book, chapter, from, to }
 }

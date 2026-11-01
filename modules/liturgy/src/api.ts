@@ -110,7 +110,7 @@ export async function planReadings(db: Db, dates: string[]): Promise<Map<string,
       for (const s of p.segments)
         refs.push(
           s.endChapter
-            ? { book: p.book, chapter: s.chapter, from: null, to: null }
+            ? { book: p.book, chapter: s.chapter, from: s.from, to: s.to, endChapter: s.endChapter }
             : { book: p.book, chapter: s.chapter, from: s.from, to: s.to },
         )
     }

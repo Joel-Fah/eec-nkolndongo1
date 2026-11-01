@@ -2866,7 +2866,8 @@
       "from": "De",
       "to": "À",
       "remove": "Retirer le passage",
-      "order": "Le verset de fin doit venir après le verset de début."
+      "order": "Le verset de fin doit venir après le verset de début.",
+      "end_chapter": "Jusqu’au chapitre"
     },
     "request": {
       "button": "Demander la publication",
