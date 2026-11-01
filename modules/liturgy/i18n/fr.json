@@ -114,5 +114,6 @@
   "to_short": "À",
   "from_after_to": "Le verset de fin doit venir après celui du début.",
   "holy_supper": "Sainte Cène",
-  "holy_supper_switch": "Dimanche de la Sainte Cène"
+  "holy_supper_switch": "Dimanche de la Sainte Cène",
+  "readings_from_plan": "Lectures reprises du plan de méditation de l’année. Modifiez-les librement : celles que vous enregistrez remplacent celles du plan."
 }

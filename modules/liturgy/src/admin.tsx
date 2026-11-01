@@ -61,6 +61,8 @@ type Entry = {
 type Row = {
   date: string
   suggested: { fr: string; en: string; season: string }
+  /** The year plan's readings (Méditations), offered when the Sunday has none of its own. */
+  suggestedReadings?: BibleRef[]
   entry: Entry | null
 }
 type Form = Omit<Entry, 'id' | 'state'> & { state: 'draft' | 'published' }
@@ -166,6 +168,7 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
   const [form, setForm] = useState<Form | null>(null)
   const [initial, setInitial] = useState('')
   const [suggested, setSuggested] = useState({ fr: '', en: '', season: 'ordinaire' })
+  const [fromPlan, setFromPlan] = useState(false)
   useEffect(() => {
     if (addSignal > 0) setAdding(true)
   }, [addSignal])
@@ -232,8 +235,12 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
   const openRow = (r: Row) => {
     const f = r.entry ? { ...r.entry } : blankForm(r.date)
     setSuggested(r.suggested)
+    // Readings come ready from the year plan when the Sunday has none; the form then counts as changed, so saving keeps them,
+    // and whatever is edited here is the Sunday's own from then on.
+    const prefilled = !f.readings.length && !!r.suggestedReadings?.length
     setInitial(JSON.stringify(f))
-    setForm(f)
+    setForm(prefilled ? { ...f, readings: r.suggestedReadings ?? [] } : f)
+    setFromPlan(prefilled)
   }
   const status = (r: Row) =>
     !r.entry ? (
@@ -451,6 +458,9 @@ function Sundays({ view, addSignal }: { view: 'grid' | 'list'; addSignal: number
                   <Icon name="bookText" size={20} />
                   {t(k('section_readings'))}
                 </h3>
+                {fromPlan && form.readings.length > 0 && (
+                  <p className="text-sm text-ink-muted">{t(k('readings_from_plan'))}</p>
+                )}
                 {form.readings.map((r, i) => (
                   <RefEditor
                     // biome-ignore lint/suspicious/noArrayIndexKey: edited in place

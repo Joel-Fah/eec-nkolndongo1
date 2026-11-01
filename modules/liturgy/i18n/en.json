@@ -114,5 +114,6 @@
   "to_short": "To",
   "from_after_to": "The ending verse must come after the starting one.",
   "holy_supper": "Holy Supper",
-  "holy_supper_switch": "Holy Supper Sunday"
+  "holy_supper_switch": "Holy Supper Sunday",
+  "readings_from_plan": "Readings taken from the year's meditation plan. Edit them freely: the ones you save replace the plan's."
 }

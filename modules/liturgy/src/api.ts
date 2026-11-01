@@ -20,13 +20,14 @@ import {
   comingSunday,
   formatRef,
   getSeason,
+  parseStructured,
   SEASONS,
   suggestSundayName,
   sundaysFrom,
 } from '@eec/core'
 import type { Db } from '@eec/db'
 import { roles, user, userRoles } from '@eec/db/schema'
-import { and, asc, desc, eq, gte, isNull, lte } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, isNull, lte, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { liturgySeasons, liturgySundays, liturgyVerses } from './schema.ts'
@@ -82,10 +83,50 @@ export const verseBody = z
   .strict()
 
 type SundayRow = typeof liturgySundays.$inferSelect
+
+/**
+ * The readings the parish's year plan (Méditations) gives for each of these days, as Bible references. Sundays take them as a
+ * starting point: a Sunday's own readings, once someone edits them, always win. The plan's tables are read by name (modules
+ * never import each other); only a published plan counts, and a reading that cannot be understood is left out.
+ */
+export async function planReadings(db: Db, dates: string[]): Promise<Map<string, BibleRef[]>> {
+  const out = new Map<string, BibleRef[]>()
+  if (!dates.length) return out
+  const rows = await db.execute<{ date: string; readings: { label: string; ref: string }[] }>(
+    sql`select d.date, d.readings from meditation_days d
+      join meditation_plans p on p.id = d.plan_id
+      where p.state = 'published' and d.date in (${sql.join(
+        dates.map((x) => sql`${x}`),
+        sql`, `,
+      )})
+      order by p.starts_on desc`,
+  )
+  for (const r of rows.rows) {
+    if (out.has(r.date)) continue
+    const refs: BibleRef[] = []
+    for (const reading of r.readings ?? []) {
+      const p = parseStructured(reading.ref)
+      if (!p) continue
+      for (const s of p.segments)
+        refs.push(
+          s.endChapter
+            ? { book: p.book, chapter: s.chapter, from: null, to: null }
+            : { book: p.book, chapter: s.chapter, from: s.from, to: s.to },
+        )
+    }
+    if (refs.length) out.set(r.date, refs.slice(0, 6))
+  }
+  return out
+}
 const today = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Douala' }).format(new Date())
 
-function publicSunday(row: SundayRow | undefined, d: string, locale: Locale) {
+function publicSunday(
+  row: SundayRow | undefined,
+  d: string,
+  locale: Locale,
+  plan: BibleRef[] = [],
+) {
   const s = suggestSundayName(d)
   const en = locale === 'en'
   return {
@@ -93,7 +134,11 @@ function publicSunday(row: SundayRow | undefined, d: string, locale: Locale) {
     season: s.season,
     name: (en ? row?.nameEn || row?.nameFr : row?.nameFr) || (en ? s.en : s.fr),
     theme: (en ? row?.themeEn || row?.themeFr : row?.themeFr) ?? '',
-    readings: (row?.readings ?? []).map((r) => ({ ...r, label: formatRef(r, locale) })),
+    // The Sunday's own readings, or the year plan's when none were entered.
+    readings: (row?.readings?.length ? row.readings : row ? plan : []).map((r) => ({
+      ...r,
+      label: formatRef(r, locale),
+    })),
     // People's names only with recorded consent.
     preacher: row?.namesConsent ? row.preacherName : '',
     liturgist: row?.namesConsent ? row.liturgistName : '',
@@ -182,7 +227,9 @@ export const liturgyApi = new Hono<AppEnv>()
           .from(liturgySundays)
           .where(and(eq(liturgySundays.date, d), eq(liturgySundays.state, 'published')))
           .limit(1)
-        return publicSunday(row, d, locale)
+        const plan =
+          row && !row.readings?.length ? ((await planReadings(db, [d])).get(d) ?? []) : []
+        return publicSunday(row, d, locale, plan)
       },
     })
   })
@@ -202,7 +249,14 @@ export const liturgyApi = new Hono<AppEnv>()
           .toISOString()
           .slice(0, 10)
         const rows = await publishedSundays(db, back, forward)
-        return { current: d, items: rows.map((r) => publicSunday(r, r.date, locale)) }
+        const plan = await planReadings(
+          db,
+          rows.filter((r) => !r.readings?.length).map((r) => r.date),
+        )
+        return {
+          current: d,
+          items: rows.map((r) => publicSunday(r, r.date, locale, plan.get(r.date))),
+        }
       },
     })
   })
@@ -261,11 +315,14 @@ export const liturgyApi = new Hono<AppEnv>()
           lte(liturgySundays.date, dates.at(-1) as string),
         ),
       )
+    const plan = await planReadings(db, dates)
     return c.json({
       current: first,
       items: dates.map((d) => ({
         date: d,
         suggested: suggestSundayName(d),
+        // From the year plan (Méditations): offered when the Sunday has none of its own.
+        suggestedReadings: plan.get(d) ?? [],
         entry: rows.find((r) => r.date === d) ?? null,
       })),
     })
